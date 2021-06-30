@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import {StyleTouchable} from 'components/base';
 import useRedux from 'hook/useRedux';
 import React from 'react';
@@ -25,7 +26,7 @@ const BtnPenEdit = (props: BtnPenEditProps) => {
                 style={[
                     {
                         fontSize: moderateScale(23),
-                        color: theme.backgroundButtonColor,
+                        color: 'black',
                     },
                     iconStyle,
                 ]}

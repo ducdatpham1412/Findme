@@ -97,6 +97,7 @@ const profile = {
     },
     edit: {
         headerTitle: 'Trang cá nhân',
+        confirmButton: 'Cập nhật',
     },
 };
 
@@ -178,6 +179,9 @@ const alert = {
     passNotMatch: 'Mật khẩu không trùng khớp',
     inValidEmail: 'Email không đúng định dạng',
     inValidPhone: 'Số điện thoại không đúng',
+
+    // PROFILE
+    successUpdatePro: 'Cập nhật trang cá nhân thành công !',
 };
 
 const vi = {

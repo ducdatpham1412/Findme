@@ -20,8 +20,8 @@ export const getProfile = {
     info: {
         name: 'Duc Hehe',
         description: 'I want to fly',
-        avatar: 'https://scontent.fhan3-1.fna.fbcdn.net/v/t1.6435-9/104774014_2789100984653499_4396713680184081828_n.jpg?_nc_cat=102&ccb=1-3&_nc_sid=09cbfe&_nc_ohc=vqWY-GhIOdMAX8PhMDh&_nc_oc=AQlbyTt3NHjQOA6_J9dV_lNVoFChkVGyyJE4RIQLcZAf0_gEdhti5siwj98iuAL3FEI&_nc_ht=scontent.fhan3-1.fna&oh=6a23abd05cf9fd1634bcfb7c452359f5&oe=60D26210',
-        cover: 'https://scontent.fhan3-1.fna.fbcdn.net/v/t31.18172-8/27500990_2092080781022193_3998095643133249671_o.jpg?_nc_cat=106&ccb=1-3&_nc_sid=e3f864&_nc_ohc=ZdWljRoinQQAX9An5vC&_nc_ht=scontent.fhan3-1.fna&oh=2a459eef4946d38a54c477dd6e5cfddc&oe=60D4A1C0',
+        avatar: 'https://i.pinimg.com/564x/cf/e6/6c/cfe66c20d118d57ff423014e06e224b1.jpg',
+        cover: 'https://i.pinimg.com/564x/f0/2b/7c/f02b7cfb45f282fd6b9c728beab45835.jpg',
         followers: 10,
         followings: 10,
         listPhotos: [

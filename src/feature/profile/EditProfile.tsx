@@ -1,5 +1,6 @@
 /*eslint-disable react-native/no-inline-styles */
-import {StyleContainer, StyleInput} from 'components/base';
+import UpdateProfile from 'api/actions/setting/UpdateProfile';
+import {StyleButton, StyleContainer, StyleInput} from 'components/base';
 import useRedux from 'hook/useRedux';
 import React, {useState} from 'react';
 import {Dimensions, View} from 'react-native';
@@ -29,7 +30,7 @@ const AvatarEdit = ({avatar, setAvatar}: any) => {
             <AvatarElement
                 avatar={avatar}
                 customStyle={styles.avatar}
-                imageStyle={{width: '100%', height: '100%'}}
+                imageStyle={styles.avatarImg}
             />
             <BtnPenEdit
                 btnStyle={styles.btnEditAvatar}
@@ -46,14 +47,40 @@ const NameEdit = ({name, setName}: any) => {
                 value={name}
                 i18Placeholder="login.detailInformation.nameHolder"
                 onChangeText={value => setName(value)}
-                containerStyle={styles.inputNameView}
+                inputStyle={styles.inputName}
             />
         </View>
     );
 };
 
 const DescriptionEdit = ({description, setDescription}: any) => {
-    return <View />;
+    const theme = useRedux().getTheme();
+
+    return (
+        <View style={[styles.descriptionBox, {borderColor: theme.borderColor}]}>
+            <StyleInput
+                value={description}
+                i18Placeholder="About me"
+                multiline
+                onChangeText={value => setDescription(value)}
+                containerStyle={{width: '100%'}}
+                inputStyle={styles.inputDescription}
+                hasUnderLine={false}
+                hasErrorBox={false}
+            />
+        </View>
+    );
+};
+
+const BtnSaveChange = ({onSaveChange}: any) => {
+    return (
+        <StyleButton
+            title="profile.edit.confirmButton"
+            titleStyle={styles.titleBtn}
+            containerStyle={styles.saveBtnView}
+            onPress={onSaveChange}
+        />
+    );
 };
 
 /**
@@ -67,8 +94,14 @@ const EditProfile = () => {
     const [name, setName] = useState(info?.name);
     const [description, setDescription] = useState(info?.description);
 
+    const onSaveChange = async () => {
+        await UpdateProfile.updateProfile({
+            info: {name, avatar, cover, description},
+        });
+    };
+
     return (
-        <StyleContainer scrollEnabled>
+        <StyleContainer scrollEnabled customStyle={{alignItems: 'center'}}>
             <CoverEdit cover={cover} setCover={setCover} />
 
             <AvatarEdit avatar={avatar} setAvatar={setAvatar} />
@@ -79,15 +112,13 @@ const EditProfile = () => {
                 description={description}
                 setDescription={setDescription}
             />
+
+            <BtnSaveChange onSaveChange={onSaveChange} />
         </StyleContainer>
     );
 };
 
 const styles = ScaledSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-    },
     // cover
     coverBox: {
         width: '100%',
@@ -109,18 +140,23 @@ const styles = ScaledSheet.create({
         marginTop: '-20@vs',
         overflow: 'hidden',
         borderRadius: width / 2,
-        alignSelf: 'center',
     },
     avatar: {
         width: '100%',
         height: '100%',
         backgroundColor: 'lightgreen',
-        borderRadius: width / 2,
+        borderRadius: '200@vs',
+        borderWidth: 4,
+    },
+    avatarImg: {
+        width: '100%',
+        height: '100%',
+        borderRadius: '200@vs',
     },
     btnEditAvatar: {
         position: 'absolute',
         width: width / 2.8,
-        height: '30@vs',
+        height: '23@vs',
         bottom: 0,
     },
 
@@ -131,11 +167,36 @@ const styles = ScaledSheet.create({
         marginTop: '40@vs',
         alignSelf: 'center',
     },
-    inputNameView: {},
+    inputName: {
+        fontSize: '20@ms',
+    },
     iconNameBox: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+
+    // description
+    descriptionBox: {
+        width: '80%',
+        paddingBottom: '10@vs',
+        paddingTop: '5@vs',
+        borderWidth: 0.5,
+        borderColor: 'white',
+        borderRadius: '10@s',
+        marginTop: '15@vs',
+    },
+    inputDescription: {
+        fontSize: '17@ms',
+    },
+
+    // btnSave
+    saveBtnView: {
+        paddingHorizontal: '60@s',
+        marginTop: '60@vs',
+    },
+    titleBtn: {
+        fontSize: '17@ms',
     },
 });
 

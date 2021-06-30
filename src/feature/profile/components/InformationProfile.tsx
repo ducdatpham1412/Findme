@@ -99,25 +99,24 @@ const Introduce = ({description}: any) => {
     const theme = useRedux().getTheme();
     const modeExp = useRedux().getModeExp();
 
-    if (modeExp) {
-        return (
-            <View style={styles.introduceBox}>
-                {/* INTRODUCE TEXT OF FIND ME */}
-                <StyleText
-                    i18Text={description}
-                    customStyle={[
-                        styles.introduceText,
-                        {color: theme.textColor},
-                    ]}
-                />
+    return (
+        <View style={styles.introduceBox}>
+            {/* INTRODUCE TEXT OF FIND ME */}
+            <StyleText
+                i18Text={description}
+                customStyle={[styles.introduceText, {color: theme.textColor}]}
+            />
 
-                {/* IMAGE CUTE */}
+            {/* IMAGE CUTE */}
+            {modeExp && (
                 <StyleImage
                     customStyle={styles.imageTellSignUp}
                     source={theme.icon.profile.signUpNow}
                 />
+            )}
 
-                {/* BUTTON TELL TO SIGN UP */}
+            {/* BUTTON TELL TO SIGN UP */}
+            {modeExp && (
                 <StyleTouchable
                     customStyle={[
                         styles.buttonTellSignUp,
@@ -132,11 +131,9 @@ const Introduce = ({description}: any) => {
                         ]}
                     />
                 </StyleTouchable>
-            </View>
-        );
-    }
-
-    return <View style={styles.introduceBox} />;
+            )}
+        </View>
+    );
 };
 
 const ButtonEditProfile = () => {
@@ -251,7 +248,7 @@ const styles = ScaledSheet.create({
     // INTRODUCE STYLE
     introduceBox: {
         width: '100%',
-        paddingHorizontal: '10@vs',
+        paddingHorizontal: '20@s',
     },
     introduceText: {
         fontSize: '20@ms',

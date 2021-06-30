@@ -1,7 +1,7 @@
 import useRedux from 'hook/useRedux';
 import React, {useRef, useState} from 'react';
 import {Animated, TextInput, TouchableOpacity} from 'react-native';
-import {ScaledSheet} from 'react-native-size-matters';
+import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 
 interface SearchButtonProps {
@@ -16,9 +16,15 @@ const SearchButton = (props: SearchButtonProps) => {
     const theme = useRedux().getTheme();
 
     const searchIcon = (
-        <Feather name="search" size={30} color={theme.textColor} />
+        <Feather
+            name="search"
+            size={moderateScale(30)}
+            color={theme.textColor}
+        />
     );
-    const deleteIcon = <Feather name="x" size={30} color={theme.textColor} />;
+    const deleteIcon = (
+        <Feather name="x" size={moderateScale(30)} color={theme.textColor} />
+    );
     /**
      * HANDLING EFFECT
      */
@@ -38,12 +44,12 @@ const SearchButton = (props: SearchButtonProps) => {
             opacitySearch.setValue(1);
         }
         if (type === 'blur') {
-            const x = setTimeout(() => {
+            setTimeout(() => {
                 Animated.timing(opacitySearch, {
                     toValue: theme.opacityValue,
                     duration: 300,
                     useNativeDriver: true,
-                }).start(() => clearTimeout(x));
+                }).start();
             }, 3000);
         }
     };

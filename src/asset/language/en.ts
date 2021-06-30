@@ -105,6 +105,7 @@ const profile = {
     },
     edit: {
         headerTitle: 'Edit own profile',
+        confirmButton: 'Update',
     },
 };
 
@@ -177,6 +178,9 @@ const alert = {
     passNotMatch: 'Password not match',
     inValidEmail: 'Invalid email',
     inValidPhone: 'Invalid phone number',
+
+    // PROFILE
+    successUpdatePro: 'Update profile successful !',
 };
 
 const en = {

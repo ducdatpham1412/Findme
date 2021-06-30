@@ -12,7 +12,7 @@ interface LoginType {
     token?: string;
     refreshToken?: string;
 }
-interface ProfileType {
+export interface ProfileType {
     info?: {
         name?: string;
         description?: string;

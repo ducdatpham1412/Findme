@@ -8,7 +8,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 interface ScrollContainerProps extends ScrollViewProps {
     children?: ReactNode;
     containerStyle?: StyleProp<ViewStyle>;
-    customStyle?: StyleProp<any>;
+    customStyle?: StyleProp<ViewStyle>;
     extraHeight?: number;
     isEffectTabBar?: boolean;
 }

@@ -14,6 +14,7 @@ import {openHeartBox, openMessRoute, openPlusBox} from 'utility/assistant';
 import HeartButton from './components/HeartButton';
 import MessButton from './components/MessButton';
 import PlusButton from './components/PlusButton';
+import {API_URL} from '@env';
 
 /**
  * MAIN_DISCOVERY WILL DO A MISSION THAT SEARCH
@@ -71,6 +72,7 @@ const DiscoveryScreen: React.FunctionComponent = () => {
                 <StyleScrollView>
                     <View style={styles.sky}>
                         <StyleText originValue="Starting point" />
+                        <StyleText originValue={API_URL} />
                         <View style={styles.bubble} />
                         <View style={styles.bubble} />
                         <View style={styles.bubble} />
