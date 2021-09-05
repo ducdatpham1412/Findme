@@ -1,0 +1,14 @@
+declare module 'react-native-vector-icons/Feather';
+declare module 'react-native-vector-icons/AntDesign';
+declare module 'react-native-vector-icons/Ionicons';
+declare module 'react-native-vector-icons/FontAwesome';
+declare module 'react-native-vector-icons/Zocial';
+declare module 'react-native-vector-icons/SimpleLineIcons';
+declare module 'react-native-vector-icons/Foundation';
+declare module 'react-native-vector-icons/Entypo';
+declare module 'react-native-vector-icons/MaterialIcons';
+declare module 'react-native-actionsheet';
+declare module 'react-native-keyboard-aware-view';
+declare module 'react-native-vector-icons/EvilIcons';
+declare module 'react-native-vector-icons/MaterialCommunityIcons';
+declare module 'react-native-vector-icons/Octicons';
