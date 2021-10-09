@@ -1,5 +1,5 @@
 import FindmeStore from 'app-redux/store';
-import SocketProvider from 'hook/SocketProvider';
+import {SocketProvider} from 'hook/useSocket';
 import RootScreen from 'navigation/screen/RootScreen';
 import React from 'react';
 import {I18nextProvider} from 'react-i18next';

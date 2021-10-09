@@ -1,5 +1,5 @@
 import APP_ROUTE from 'navigation/config/routes';
-import React, {RefObject} from 'react';
+import React, {ReactNode, RefObject} from 'react';
 
 export const navigationRef: RefObject<any> = React.createRef();
 
@@ -11,10 +11,19 @@ export const goBack = () => {
     navigationRef.current.goBack();
 };
 
-export const appAlert = (notice: any, actionClickOk?: Function) => {
+export const appAlert = (
+    notice: any,
+    more?: {
+        actionClickOk?: Function;
+        moreNotice?: string;
+        moreAction?(): void;
+    },
+) => {
     navigate(APP_ROUTE.alert, {
         notice: String(notice),
-        actionClickOk: actionClickOk,
+        actionClickOk: more?.actionClickOk,
+        moreNotice: more?.moreNotice,
+        moreAction: more?.moreAction,
     });
 };
 
@@ -23,6 +32,7 @@ export const appAlertYesNo = (params: {
     i18Params?: object;
     agreeChange(): any;
     refuseChange(): any;
+    headerNode?: ReactNode;
 }) => {
     navigate(APP_ROUTE.alertYesNo, params);
 };

@@ -118,7 +118,7 @@ export const Redux = {
         });
         Redux.updateListChatTag(temp);
     },
-    setChatTafFocusing: (value: string) => {
+    setChatTagFocusing: (value: string) => {
         FindmeStore.dispatch(logicSliceAction.setChatTagFocusing(value));
     },
 
@@ -198,7 +198,7 @@ export const Redux = {
 
     logOut: () => {
         Redux.setModeExp(true);
-        Redux.setToken('');
+        Redux.setToken('logout');
         Redux.updatePassport(initialAccountState.passport);
         Redux.updateResource(initialLogicState.resource);
     },

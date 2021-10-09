@@ -3,8 +3,9 @@ import {Metrics} from 'asset/metrics';
 import StyleText from 'components/base/StyleText';
 import Redux from 'hook/useRedux';
 import {goBack} from 'navigation/NavigationService';
-import React, {useEffect, useRef} from 'react';
-import {Animated, StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, {ReactNode, useEffect, useRef} from 'react';
+import {Animated, TouchableOpacity, View} from 'react-native';
+import {ScaledSheet} from 'react-native-size-matters';
 import {StyleIcon} from './base';
 
 interface AlertConfirmChangeProps {
@@ -14,6 +15,7 @@ interface AlertConfirmChangeProps {
             i18Params?: object;
             agreeChange(): void;
             refuseChange(): void;
+            headerNode?: ReactNode;
         };
     };
 }
@@ -23,7 +25,7 @@ const ButtonYesOrNo = (props: any) => {
     const theme = Redux.getTheme();
 
     return (
-        <View style={styles.button}>
+        <View style={styles.buttonView}>
             {/* BUTTON YES */}
             <TouchableOpacity
                 style={[
@@ -58,7 +60,8 @@ const ButtonYesOrNo = (props: any) => {
  */
 const AlertYesNo = ({route}: AlertConfirmChangeProps) => {
     const theme = Redux.getTheme();
-    const {i18Title, i18Params, agreeChange, refuseChange} = route.params;
+    const {i18Title, i18Params, agreeChange, refuseChange, headerNode} =
+        route.params;
     const scale = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
@@ -70,37 +73,47 @@ const AlertYesNo = ({route}: AlertConfirmChangeProps) => {
     }, []);
 
     return (
-        <View style={styles.container}>
+        <>
             <View
                 style={{position: 'absolute', width: '100%', height: '100%'}}
                 onTouchEnd={goBack}
             />
             <Animated.View
                 style={[
-                    styles.notificationBox,
+                    styles.body,
                     {
                         backgroundColor: theme.backgroundButtonColor,
                         transform: [{scaleY: scale}],
                     },
                 ]}>
-                {/* IMAGE OWL AND HEADER */}
-                <View style={styles.header}>
-                    <StyleIcon
-                        source={Images.icons.alert}
-                        size={30}
-                        customStyle={{tintColor: theme.borderColor}}
-                    />
-                    <StyleText
-                        originValue="Alert"
-                        customStyle={[
-                            styles.headerText,
-                            {color: theme.borderColor},
-                        ]}
-                    />
+                {/* Header */}
+                <View
+                    style={[
+                        styles.headerView,
+                        {borderBottomColor: theme.borderColor},
+                    ]}>
+                    {headerNode ? (
+                        headerNode
+                    ) : (
+                        <>
+                            <StyleIcon
+                                source={Images.icons.alert}
+                                size={30}
+                                customStyle={{tintColor: theme.borderColor}}
+                            />
+                            <StyleText
+                                originValue="Alert"
+                                customStyle={[
+                                    styles.headerText,
+                                    {color: theme.borderColor},
+                                ]}
+                            />
+                        </>
+                    )}
                 </View>
 
                 {/* CONTENT OF NOTICE */}
-                <View style={styles.notice}>
+                <View style={styles.noticeView}>
                     <StyleText
                         i18Text={i18Title}
                         i18Params={i18Params}
@@ -117,63 +130,59 @@ const AlertYesNo = ({route}: AlertConfirmChangeProps) => {
                     refuseChange={refuseChange}
                 />
             </Animated.View>
-        </View>
+        </>
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
+const styles = ScaledSheet.create({
+    body: {
+        width: '75%',
+        borderRadius: '30@s',
+        paddingHorizontal: '20@s',
+        marginTop: Metrics.width / 2,
         alignSelf: 'center',
     },
-    notificationBox: {
-        width: Metrics.width * 0.8,
-        borderRadius: 30,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        marginTop: Metrics.width / 2,
-    },
-    header: {
+    // header view
+    headerView: {
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        paddingBottom: 10,
+        borderBottomWidth: 0.25,
+        paddingVertical: '10@vs',
     },
     headerText: {
-        fontSize: 25,
+        fontSize: '20@ms',
         fontWeight: 'bold',
-        marginLeft: 10,
+        marginLeft: '10@s',
     },
-    contentText: {
-        fontSize: 20,
-        fontStyle: 'italic',
-    },
-    notice: {
+    // notification view
+    noticeView: {
         width: '100%',
-        paddingVertical: 10,
+        paddingBottom: '15@vs',
+        paddingTop: '7@vs',
         alignItems: 'center',
     },
-    button: {
+    contentText: {
+        fontSize: '17@ms',
+        fontStyle: 'italic',
+    },
+    // button view
+    buttonView: {
         width: '100%',
-        paddingTop: 20,
-        paddingBottom: 10,
+        paddingBottom: '20@vs',
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'space-around',
         alignItems: 'center',
     },
     buttonElement: {
-        paddingVertical: 5,
-        paddingHorizontal: 20,
-        borderRadius: 10,
-        minWidth: 100,
-        minHeight: 45,
+        paddingVertical: '5@vs',
+        paddingHorizontal: '20@s',
+        borderRadius: '15@s',
         alignItems: 'center',
         justifyContent: 'center',
-        marginHorizontal: '5%',
     },
     textButtonElement: {
-        fontSize: 20,
+        fontSize: '17@ms',
         color: 'white',
     },
 });

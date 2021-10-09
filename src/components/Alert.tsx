@@ -1,54 +1,25 @@
 import Images from 'asset/img/images';
+import {Metrics} from 'asset/metrics';
 import Redux from 'hook/useRedux';
-import {LOGIN_ROUTE} from 'navigation/config/routes';
-import {goBack, navigate} from 'navigation/NavigationService';
+import {goBack} from 'navigation/NavigationService';
 import React, {useEffect, useRef} from 'react';
-import {Animated, Dimensions, TouchableOpacity, View} from 'react-native';
+import {Animated, TouchableOpacity, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {StyleIcon, StyleText} from './base';
 
-/**
- * ALERT WILL SEND NOTICE TO USER
- * MOREOVER IT ALSO CONSIDER TO THE ELEMENT <MORE_BUTTON></MORE_BUTTON>
- */
-const screenWidth = Dimensions.get('screen').width;
-
-interface MoreButtonProps {
-    notice: string;
+interface Props {
+    route: {
+        params: {
+            notice: string;
+            actionClickOk?(): void;
+            moreNotice?: string;
+            moreAction?(): void;
+        };
+    };
 }
 
-const MoreButton = (props: MoreButtonProps) => {
-    const theme = Redux.getTheme();
-    const {notice} = props;
-
-    if (
-        notice === 'alert.clickHeartModeExp' ||
-        notice === 'alert.clickPlusModeExp'
-    ) {
-        return (
-            <TouchableOpacity
-                style={[
-                    styles.buttonElement,
-                    {backgroundColor: theme.borderColor},
-                ]}
-                onPress={() => navigate(LOGIN_ROUTE.signUpType)}>
-                <StyleText
-                    i18Text="alert.moreButtonContent"
-                    customStyle={styles.textButtonElement}
-                />
-            </TouchableOpacity>
-        );
-    } else {
-        return <View />;
-    }
-};
-
-/**
- * BOSS HERE
- */
-
-const Alert = ({route}: any) => {
-    const {notice, actionClickOk} = route.params;
+const Alert = ({route}: Props) => {
+    const {notice, actionClickOk, moreNotice, moreAction} = route.params;
     const theme = Redux.getTheme();
 
     const scale = useRef(new Animated.Value(0)).current;
@@ -62,7 +33,7 @@ const Alert = ({route}: any) => {
     }, []);
 
     return (
-        <View style={styles.container}>
+        <>
             <Animated.View
                 style={[
                     styles.notificationBox,
@@ -71,7 +42,7 @@ const Alert = ({route}: any) => {
                         transform: [{scaleY: scale}],
                     },
                 ]}>
-                {/* IMAGE OWL AND HEADER */}
+                {/* Header */}
                 <View style={styles.header}>
                     <StyleIcon
                         source={Images.icons.alert}
@@ -87,7 +58,7 @@ const Alert = ({route}: any) => {
                     />
                 </View>
 
-                {/* CONTENT OF NOTICE */}
+                {/* Notification */}
                 <View style={styles.notice}>
                     <StyleText
                         i18Text={notice}
@@ -98,7 +69,7 @@ const Alert = ({route}: any) => {
                     />
                 </View>
 
-                {/* BUTTON OK AND ONE_MORE IF POSSIBLE */}
+                {/* Button ok and more*/}
                 <View style={styles.buttonBox}>
                     {/* BUTTON OK */}
                     <TouchableOpacity
@@ -113,65 +84,72 @@ const Alert = ({route}: any) => {
                         />
                     </TouchableOpacity>
 
-                    {/* BUTTON ONE_MORE IF CAN */}
-                    <MoreButton notice={notice} />
+                    {/* Button more */}
+                    {!!moreNotice && (
+                        <TouchableOpacity
+                            style={[
+                                styles.buttonElement,
+                                {backgroundColor: theme.borderColor},
+                            ]}
+                            onPress={moreAction}>
+                            <StyleText
+                                i18Text={moreNotice}
+                                customStyle={styles.textButtonElement}
+                            />
+                        </TouchableOpacity>
+                    )}
                 </View>
             </Animated.View>
-        </View>
+        </>
     );
 };
 
 const styles = ScaledSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-    },
-
     notificationBox: {
-        width: screenWidth * 0.8,
-        borderRadius: '25@s',
-        paddingVertical: '10@vs',
-        paddingHorizontal: '17@s',
-        marginTop: screenWidth / 2,
+        width: Metrics.width * 0.8,
+        borderRadius: '30@s',
+        paddingHorizontal: '20@s',
+        marginTop: Metrics.width / 2,
+        alignSelf: 'center',
     },
 
+    // header view
     header: {
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        paddingBottom: '6@vs',
+        paddingVertical: '10@vs',
     },
     headerText: {
-        fontSize: '23@ms',
+        fontSize: '20@ms',
         fontWeight: 'bold',
         marginLeft: '8@s',
     },
-    contentText: {
-        fontSize: '20@ms',
-        fontStyle: 'italic',
-    },
+
+    // notification view
     notice: {
         width: '100%',
-        paddingVertical: '10@vs',
         alignItems: 'center',
     },
+    contentText: {
+        fontSize: '17@ms',
+        fontStyle: 'italic',
+    },
+
+    // button view
     buttonBox: {
         width: '100%',
-        paddingTop: '20@vs',
-        paddingBottom: '10@vs',
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'space-around',
         alignItems: 'center',
+        paddingVertical: '20@vs',
     },
     buttonElement: {
         paddingVertical: '5@vs',
         paddingHorizontal: '20@s',
-        borderRadius: '10@s',
-        minWidth: '90@s',
-        minHeight: '38@vs',
+        borderRadius: '15@s',
         alignItems: 'center',
         justifyContent: 'center',
-        marginHorizontal: '5%',
     },
     textButtonElement: {
         fontSize: '18@ms',

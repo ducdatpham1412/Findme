@@ -193,11 +193,14 @@ export interface TypeMemberInListChatTag {
 export interface TypeChatTagResponse {
     id: any;
     listUser: Array<TypeMemberInListChatTag>;
+    type: number;
     groupName: string;
     isPrivate: boolean;
+    isStop: boolean;
     updateTime: Date;
     // append in front-end
     hasNewMessage?: boolean;
+    isRequestingPublic?: boolean;
 }
 
 export interface TypeChatMessageSend {
@@ -221,6 +224,7 @@ export interface TypeChatMessageResponse {
     relationship: number;
 }
 
+// bubbles
 export interface TypeMyBubbles {
     idHobby: number;
     name: string;

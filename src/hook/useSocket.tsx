@@ -1,3 +1,4 @@
+import {API_SOCKET} from '@env';
 import {
     TypeBubblePalace,
     TypeChatMessageResponse,
@@ -10,13 +11,10 @@ import FindmeStore from 'app-redux/store';
 import {RELATIONSHIP, SOCKET_EVENT} from 'asset/enum';
 import {appAlert} from 'navigation/NavigationService';
 import React, {memo, useEffect, useMemo, useState} from 'react';
-import {logger} from 'utility/assistant';
 import Redux from './useRedux';
 
-let socket: WebSocket;
-// let socket = new WebSocket(`ws://${API_SOCKET}/ws/doffy-socket/${0}`);
-logger('init socket');
-
+let bubbleChatTagSocket: WebSocket;
+let chatSocket: WebSocket;
 interface TypeSocketOn {
     event: any;
     function(data: any): void;
@@ -25,40 +23,55 @@ interface TypeSocketOn {
 class SocketClass {
     static listEvent: Array<TypeSocketOn> = [];
 
+    static myEvent: any = {};
+    static chatEvent: any;
+
     static start = (id: number) => {
-        socket = new WebSocket(
-            `ws://${'127.0.0.1:8000'}/ws/doffy-socket/${id}`,
+        bubbleChatTagSocket = new WebSocket(
+            `ws://${API_SOCKET}/ws/doffy-socket/bubble-chattag/${id}`,
+        );
+        chatSocket = new WebSocket(
+            `ws://${API_SOCKET}/ws/doffy-socket/chat-detail/${id}`,
         );
     };
 
-    static on = (event: any, callBackFunction: any) => {
-        for (let i = 0; i < SocketClass.listEvent.length; i++) {
-            if (SocketClass.listEvent[i].event === event) {
-                SocketClass.listEvent[i] = {
-                    event,
-                    function: callBackFunction,
-                };
-                return;
-            }
+    static on = (event: string, callBackFunction: any) => {
+        if (event === SOCKET_EVENT.message) {
+            SocketClass.chatEvent = callBackFunction;
+            return;
         }
-
-        SocketClass.listEvent.push({
-            event,
-            function: callBackFunction,
-        });
+        // bubble and chat tag
+        SocketClass.myEvent[event] = callBackFunction;
     };
 
-    static emit = (inputEvent: any, data: any) => {
-        socket.send(
+    // bubble and chat tag have "event"
+    // to determine type because these use the same socket
+    static emitBubble = (data: any) => {
+        bubbleChatTagSocket.send(
             JSON.stringify({
-                event: inputEvent,
+                event: SOCKET_EVENT.bubble,
                 data,
             }),
         );
     };
 
+    static emitChatTag = (data: any) => {
+        bubbleChatTagSocket.send(
+            JSON.stringify({
+                event: SOCKET_EVENT.chatTag,
+                data,
+            }),
+        );
+    };
+
+    // chat not need event because it have its own socket
+    static emitChat = (data: any) => {
+        chatSocket.send(JSON.stringify(data));
+    };
+
     static close = () => {
-        socket.close();
+        bubbleChatTagSocket.close();
+        chatSocket.close();
     };
 }
 
@@ -68,25 +81,47 @@ class SocketClass {
 export const SocketProvider = memo(({children}: any) => {
     const token = Redux.getToken();
     const id = Redux.getPassport().profile?.id;
+    const chatTagFocusing = Redux.getChatTagFocusing();
+    const listChatTag = Redux.getListChatTag();
 
-    const hearing = () => {
-        socket.onmessage = e => {
-            const event = JSON.parse(e.data).event;
-            const data = JSON.parse(e.data).data;
+    const hearingBubbleChatTag = () => {
+        if (bubbleChatTagSocket) {
+            bubbleChatTagSocket.onmessage = e => {
+                const event = JSON.parse(e.data).event;
+                const data = JSON.parse(e.data).data;
 
-            SocketClass.listEvent.forEach(item => {
-                if (item.event === event) {
-                    console.log(item.event);
-                    item.function(data);
+                SocketClass.myEvent[event]?.(data);
+            };
+        }
+    };
+
+    const hearingChatDetail = () => {
+        if (chatSocket) {
+            chatSocket.onmessage = e => {
+                const data: TypeChatMessageResponse = JSON.parse(e.data);
+
+                SocketClass.chatEvent?.(data);
+
+                if (data.chatTag !== chatTagFocusing) {
+                    const temp = listChatTag.map(item => {
+                        if (item.id === data.chatTag) {
+                            return {
+                                ...item,
+                                hasNewMessage: true,
+                            };
+                        }
+                        return item;
+                    });
+                    Redux.updateListChatTag(temp);
                 }
-            });
-        };
+            };
+        }
     };
 
     useEffect(() => {
         if (token && token !== 'logout' && id) {
             SocketClass.start(id);
-            hearing();
+            hearingBubbleChatTag();
         }
 
         // this is for press log out
@@ -95,13 +130,17 @@ export const SocketProvider = memo(({children}: any) => {
         }
     }, [token]);
 
+    useEffect(() => {
+        hearingChatDetail();
+    }, [chatTagFocusing]);
+
     return <>{children}</>;
 });
 
 /**
  * BubblePalace and ChatTag
  */
-export const useSocketListChatTag = () => {
+export const useSocketChatTagBubble = () => {
     const listChatTags = Redux.getListChatTag();
     const myId = useMemo(() => {
         return FindmeStore.getState().accountSlice.passport.profile.id;
@@ -144,39 +183,43 @@ export const useSocketListChatTag = () => {
         }
     });
 
-    SocketClass.on(SOCKET_EVENT.message, (data: TypeChatMessageResponse) => {
-        const temp = listChatTags.map(item => {
-            if (item.id === data.chatTag) {
-                return {
-                    ...item,
-                    hasNewMessage: true,
-                };
-            } else {
-                return item;
-            }
-        });
-        Redux.updateListChatTag(temp);
+    SocketClass.on(SOCKET_EVENT.requestPublicChat, (chatTagId: string) => {
+        if (listChatTags.filter(item => item.id === chatTagId)) {
+            const temp = listChatTags.map(item => {
+                if (item.id !== chatTagId) {
+                    return item;
+                } else {
+                    return {
+                        ...item,
+                        isRequestingPublic: true,
+                        updateTime: new Date(),
+                    };
+                }
+            });
+            Redux.updateListChatTag(temp);
+        } else {
+            // api find chat tag
+            // set again
+        }
     });
-
-    const startNewChatTag = (params: TypeChatTagRequest) => {
-        SocketClass.emit(SOCKET_EVENT.chatTag, params);
-    };
 
     return {
         listChatTags,
-        startNewChatTag,
     };
 };
 
-export const socketSendMyBubble = (params: any) => {
-    SocketClass.emit(SOCKET_EVENT.bubble, params);
+export const sendBubblePalace = (params: any) => {
+    SocketClass.emitBubble(params);
+};
+
+export const startNewChatTag = (params: TypeChatTagRequest) => {
+    SocketClass.emitChatTag(params);
 };
 
 /**
  * Detail Chat
  */
 export const useSocketChatDetail = (chatTagId: string) => {
-    const listChatTags = Redux.getListChatTag();
     const myId = useMemo(() => {
         return FindmeStore.getState().accountSlice.passport.profile.id;
     }, []);
@@ -226,55 +269,13 @@ export const useSocketChatDetail = (chatTagId: string) => {
                 ].concat(messages),
             );
         }
-        // else update status of chat tag other
-        else {
-            const temp = listChatTags.map(item => {
-                if (item.id === data.chatTag) {
-                    return {
-                        ...item,
-                        hasNewMessage: true,
-                    };
-                } else {
-                    return item;
-                }
-            });
-            Redux.updateListChatTag(temp);
-        }
     });
-
-    SocketClass.on(SOCKET_EVENT.chatTag, (data: TypeChatTagResponse) => {
-        if (data.id !== chatTagId) {
-            const temp = listChatTags.map(item => {
-                if (item.id === data.id) {
-                    return {
-                        ...item,
-                        hasNewMessage: true,
-                    };
-                } else {
-                    return item;
-                }
-            });
-            Redux.updateListChatTag(temp);
-        }
-    });
-
-    SocketClass.on(SOCKET_EVENT.bubble, (data: TypeBubblePalace) => {
-        Redux.addBubblePalace({
-            ...data,
-            relationship:
-                data.creatorId == myId
-                    ? RELATIONSHIP.self
-                    : RELATIONSHIP.notKnow,
-        });
-    });
-
-    const sendMessage = (params_: TypeChatMessageSend) => {
-        // formData here
-        SocketClass.emit(SOCKET_EVENT.message, params_);
-    };
 
     return {
         messages,
-        sendMessage,
     };
+};
+
+export const sendMessage = (params: TypeChatMessageSend) => {
+    SocketClass.emitChat(params);
 };

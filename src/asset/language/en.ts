@@ -114,6 +114,7 @@ const mess = {
     component: {},
     messScreen: {
         headerTitle: 'Messages',
+        requestPublic: 'This friend\nwant to public chatting\nDo you agree?',
     },
     detailSetting: {
         profile: 'profile',

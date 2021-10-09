@@ -6,10 +6,11 @@ import {PRIVATE_AVATAR} from 'asset/standardValue';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {
     DISCOVERY_ROUTE,
+    LOGIN_ROUTE,
     PROFILE_ROUTE,
     SETTING_ROUTE,
 } from 'navigation/config/routes';
-import {appAlert, navigate} from 'navigation/NavigationService';
+import {appAlert, goBack, navigate} from 'navigation/NavigationService';
 import {Animated, Platform} from 'react-native';
 import {checkCamera, checkPhoto} from './permission/permission';
 import ImageUploader, {ImagePickerParamsType} from './upload/ImageUploader';
@@ -31,7 +32,10 @@ export const selectBgCardStyle = (opacity?: number) => {
 export const openHeartBox = (setShowTabBar: any) => {
     const modeExp = Redux.getModeExp();
     if (modeExp) {
-        appAlert('alert.clickHeartModeExp');
+        appAlert('alert.clickHeartModeExp', {
+            moreNotice: 'alert.moreButtonContent',
+            moreAction: () => navigate(LOGIN_ROUTE.signUpType),
+        });
     } else {
         navigate(DISCOVERY_ROUTE.heartScreen);
         setShowTabBar(false);
@@ -42,7 +46,10 @@ export const openPlusBox = (setShowTabBar: any) => {
     const modeExp = Redux.getModeExp();
 
     if (modeExp) {
-        appAlert('alert.clickPlusModeExp');
+        appAlert('alert.clickPlusModeExp', {
+            moreNotice: 'alert.moreButtonContent',
+            moreAction: () => navigate(LOGIN_ROUTE.signUpType),
+        });
     } else {
         navigate(DISCOVERY_ROUTE.plusScreen);
         setShowTabBar(false);

@@ -23,6 +23,8 @@ const ChatTag = (props: ChatTagProps) => {
     const theme = Redux.getTheme();
     const myId = Redux.getPassport().profile?.id;
 
+    const isRequest = item.isRequestingPublic;
+
     const goToChat = () => {
         cancelStatusNewMessage(item.id);
         navigate(MESS_ROUTE.chatDetail, {itemChatTag: item});
@@ -44,7 +46,9 @@ const ChatTag = (props: ChatTagProps) => {
         <StyleTouchable
             customStyle={[
                 styles.container,
-                {borderBottomColor: theme.borderColor},
+                {
+                    borderBottomColor: theme.borderColor,
+                },
             ]}
             onPress={goToChat}>
             {/* AVATAR */}
@@ -84,7 +88,11 @@ const ChatTag = (props: ChatTagProps) => {
                             size={30}
                             customStyle={[
                                 styles.iconShh,
-                                {tintColor: theme.borderColor},
+                                {
+                                    tintColor: isRequest
+                                        ? theme.highlightColor
+                                        : theme.borderColor,
+                                },
                             ]}
                         />
                     )}
@@ -99,7 +107,7 @@ const styles = ScaledSheet.create({
         width: '95%',
         marginVertical: '10@vs',
         flexDirection: 'row',
-        borderBottomWidth: 0.5,
+        borderBottomWidth: 0.25,
         paddingBottom: '7@vs',
         paddingHorizontal: '15@s',
         alignSelf: 'center',

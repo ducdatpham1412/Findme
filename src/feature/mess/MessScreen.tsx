@@ -1,8 +1,8 @@
 import {TypeChatTagResponse} from 'api/interface';
 import {apiGetListChatTags} from 'api/module';
 import StyleList from 'components/base/StyleList';
-import {useSocketChatTagBubble} from 'hook/SocketProvider';
 import Redux from 'hook/useRedux';
+import {useSocketChatTagBubble} from 'hook/useSocket';
 import Header from 'navigation/components/Header';
 import {appAlert} from 'navigation/NavigationService';
 import React, {memo, useEffect} from 'react';
@@ -21,7 +21,12 @@ const MessScreen: React.FunctionComponent = () => {
     const getData = async () => {
         try {
             const res = await apiGetListChatTags();
-            Redux.updateListChatTag(res.data);
+            const temp = res.data.map(item => ({
+                ...item,
+                updateTime: new Date(item.updateTime),
+            }));
+            console.log('tem:\n', temp);
+            Redux.updateListChatTag(temp);
         } catch (err) {
             appAlert(err);
         }

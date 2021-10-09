@@ -1,5 +1,5 @@
 import {StyleIcon, StyleTouchable} from 'components/base';
-import {sendBubblePalace} from 'hook/SocketProvider';
+import {sendBubblePalace} from 'hook/useSocket';
 import Redux from 'hook/useRedux';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
 import {useTabBar} from 'navigation/config/TabBarProvider';

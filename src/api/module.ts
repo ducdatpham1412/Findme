@@ -1,8 +1,8 @@
-import {listBubbles} from 'asset/staticData';
 import {
     TypeChangeInformationResponse,
     TypeChangePasswordRequest,
     TypeChatMessageResponse,
+    TypeChatTagResponse,
     TypeCheckOTPRequest,
     TypeCheckOTPResponse,
     TypeEditProfileRequest,
@@ -79,7 +79,10 @@ export const apiGetResource = (): Promise<TypeResourceResponse> => {
 /**
  *  DISCOVERY and CHAT
  */
-export const apiGetListChatTags = () => {
+export const apiGetListChatTags = (): Promise<{
+    success: boolean;
+    data: Array<TypeChatTagResponse>;
+}> => {
     return request.get('chat/get-list-chat-tag');
 };
 
@@ -90,6 +93,10 @@ export const apiGetListMessages = (
     data: Array<TypeChatMessageResponse>;
 }> => {
     return request.get(`chat/get-list-messages/${chatTagId}`);
+};
+
+export const apiRequestPublicChat = (chatTagId: number) => {
+    return request.put(`chat/request-public/${chatTagId}`);
 };
 
 /**

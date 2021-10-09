@@ -7,8 +7,8 @@ import {
     StyleText,
     StyleTouchable,
 } from 'components/base';
-import {useSocketChatTagBubble} from 'hook/SocketProvider';
 import Redux from 'hook/useRedux';
+import {startNewChatTag} from 'hook/useSocket';
 import {goBack} from 'navigation/NavigationService';
 import React, {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -35,8 +35,6 @@ const InteractBubble = ({route}: Props) => {
     const inputRef = useRef<any>();
     const [message, setMessage] = useState('');
 
-    const {sendChatTag} = useSocketChatTagBubble();
-
     useEffect(() => {
         inputRef.current.focus();
     }, []);
@@ -60,7 +58,7 @@ const InteractBubble = ({route}: Props) => {
             newChatTag.idBubble = item.id;
             newChatTag.nameBubble = item.name;
         }
-        sendChatTag(newChatTag);
+        startNewChatTag(newChatTag);
         goBack();
     };
 

@@ -145,6 +145,8 @@ const mess = {
     component: {},
     messScreen: {
         headerTitle: 'Tin nhắn',
+        requestPublic:
+            'Bạn bên kia muốn\n công khai cuộc trò chuyện\nBạn đồng ý chứ?',
     },
     detailSetting: {
         profile: 'profile',

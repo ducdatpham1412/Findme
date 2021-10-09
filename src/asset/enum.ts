@@ -83,7 +83,9 @@ export enum SOCKET_EVENT {
     authenticate = '0',
     is_authenticated = '1',
     un_authorized = '2',
-    chatTag = '2',
-    message = '3',
-    bubble = '4',
+    bubble = '3',
+    chatTag = '4',
+    message = '5',
+    seenMessage = '6',
+    requestPublicChat = '7',
 }

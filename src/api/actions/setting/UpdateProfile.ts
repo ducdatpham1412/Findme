@@ -30,9 +30,9 @@ export default class UpdateProfile {
                 await UpdateProfile.updateInSever(newProfile);
             }
             UpdateProfile.updateInApp(newProfile);
-            appAlert('alert.successUpdatePro', () =>
-                navigate(PROFILE_ROUTE.myProfile),
-            );
+            appAlert('alert.successUpdatePro', {
+                actionClickOk: () => navigate(PROFILE_ROUTE.myProfile),
+            });
         } catch (err) {
             appAlert(err);
         }
