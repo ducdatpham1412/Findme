@@ -1,0 +1,160 @@
+import Images from 'asset/img/images';
+import {Metrics} from 'asset/metrics';
+import Redux from 'hook/useRedux';
+import {goBack} from 'navigation/NavigationService';
+import React, {useEffect, useRef} from 'react';
+import {Animated, TouchableOpacity, View} from 'react-native';
+import {ScaledSheet} from 'react-native-size-matters';
+import {StyleIcon, StyleText} from './base';
+
+interface Props {
+    route: {
+        params: {
+            notice: string;
+            actionClickOk?(): void;
+            moreNotice?: string;
+            moreAction?(): void;
+        };
+    };
+}
+
+const Alert = ({route}: Props) => {
+    const {notice, actionClickOk, moreNotice, moreAction} = route.params;
+    const theme = Redux.getTheme();
+
+    const scale = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        Animated.timing(scale, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }, []);
+
+    return (
+        <>
+            <Animated.View
+                style={[
+                    styles.notificationBox,
+                    {
+                        backgroundColor: theme.backgroundButtonColor,
+                        transform: [{scaleY: scale}],
+                    },
+                ]}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <StyleIcon
+                        source={Images.icons.alert}
+                        size={30}
+                        customStyle={{tintColor: theme.borderColor}}
+                    />
+                    <StyleText
+                        originValue="Alert"
+                        customStyle={[
+                            styles.headerText,
+                            {color: theme.borderColor},
+                        ]}
+                    />
+                </View>
+
+                {/* Notification */}
+                <View style={styles.notice}>
+                    <StyleText
+                        i18Text={notice}
+                        customStyle={[
+                            styles.contentText,
+                            {color: theme.textColor},
+                        ]}
+                    />
+                </View>
+
+                {/* Button ok and more*/}
+                <View style={styles.buttonBox}>
+                    {/* BUTTON OK */}
+                    <TouchableOpacity
+                        style={[
+                            styles.buttonElement,
+                            {backgroundColor: theme.borderColor},
+                        ]}
+                        onPress={actionClickOk || goBack}>
+                        <StyleText
+                            originValue="Ok"
+                            customStyle={styles.textButtonElement}
+                        />
+                    </TouchableOpacity>
+
+                    {/* Button more */}
+                    {!!moreNotice && (
+                        <TouchableOpacity
+                            style={[
+                                styles.buttonElement,
+                                {backgroundColor: theme.borderColor},
+                            ]}
+                            onPress={moreAction}>
+                            <StyleText
+                                i18Text={moreNotice}
+                                customStyle={styles.textButtonElement}
+                            />
+                        </TouchableOpacity>
+                    )}
+                </View>
+            </Animated.View>
+        </>
+    );
+};
+
+const styles = ScaledSheet.create({
+    notificationBox: {
+        width: Metrics.width * 0.8,
+        borderRadius: '30@s',
+        paddingHorizontal: '20@s',
+        marginTop: Metrics.width / 2,
+        alignSelf: 'center',
+    },
+
+    // header view
+    header: {
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: '10@vs',
+    },
+    headerText: {
+        fontSize: '20@ms',
+        fontWeight: 'bold',
+        marginLeft: '8@s',
+    },
+
+    // notification view
+    notice: {
+        width: '100%',
+        alignItems: 'center',
+    },
+    contentText: {
+        fontSize: '17@ms',
+        fontStyle: 'italic',
+    },
+
+    // button view
+    buttonBox: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        paddingVertical: '20@vs',
+    },
+    buttonElement: {
+        paddingVertical: '5@vs',
+        paddingHorizontal: '20@s',
+        borderRadius: '15@s',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    textButtonElement: {
+        fontSize: '18@ms',
+        color: 'white',
+    },
+});
+
+export default Alert;

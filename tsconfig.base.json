@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./src",
+        "paths": {
+            "api"           : ["api"],
+            "app-redux"     : ["app-redux"],
+            "asset"         : ["asset"],
+            "backend"       : ["backend"],
+            "components"    : ["components"],
+            "feature"       : ["feature"],
+            "hook"          : ["hook"],
+            "navigation"    : ["navigation"],
+            "utility"       : ["utility"],
+        }
+    }
+}
