@@ -4,15 +4,15 @@ import {RELATIONSHIP} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
+import IconLiked from 'components/common/IconLiked';
+import IconNotLiked from 'components/common/IconNotLiked';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import Redux from 'hook/useRedux';
 import {appAlert, showSwipeImages} from 'navigation/NavigationService';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {Animated, Image, View} from 'react-native';
+import {Image, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import EvilIcons from 'react-native-vector-icons/EvilIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {modalizeOptionPost} from 'utility/assistant';
 
 interface PostStatusProps {
@@ -20,44 +20,6 @@ interface PostStatusProps {
     editAPostInList?(params: {id: string; newContent: string}): void;
     deleteAPostInList?(idPost: string): void;
 }
-
-const IconLiked = (props: {onPress(): void}) => {
-    const aim = useRef(new Animated.Value(5)).current;
-
-    useEffect(() => {
-        Animated.spring(aim, {
-            toValue: 1,
-            useNativeDriver: true,
-        }).start();
-    }, []);
-
-    return (
-        <Animated.View style={{transform: [{scale: aim}]}}>
-            <StyleTouchable onPress={props.onPress}>
-                <FontAwesome name="heart" style={styles.heartIcon} />
-            </StyleTouchable>
-        </Animated.View>
-    );
-};
-
-const IconNotLiked = (props: {onPress(): void}) => {
-    const aim = useRef(new Animated.Value(0)).current;
-
-    useEffect(() => {
-        Animated.spring(aim, {
-            toValue: 1,
-            useNativeDriver: true,
-        }).start();
-    }, []);
-
-    return (
-        <Animated.View style={{transform: [{scale: aim}]}}>
-            <StyleTouchable onPress={props.onPress}>
-                <EvilIcons name="heart" style={styles.heartNotLikeIcon} />
-            </StyleTouchable>
-        </Animated.View>
-    );
-};
 
 const PostStatus = (props: PostStatusProps) => {
     const {itemPost, editAPostInList, deleteAPostInList} = props;
@@ -71,7 +33,7 @@ const PostStatus = (props: PostStatusProps) => {
         height: 1,
     });
     const [isLiked, setIsLiked] = useState(itemPost.isLiked);
-    const [numberLikes, setNumberLikes] = useState(itemPost.peopleLike.length);
+    const [numberLikes, setNumberLikes] = useState(itemPost.totalLikes);
 
     const isMyPost = itemPost.relationship === RELATIONSHIP.self;
 
@@ -123,9 +85,19 @@ const PostStatus = (props: PostStatusProps) => {
     // render_view
     const RenderIconLike = useMemo(() => {
         if (isLiked) {
-            return <IconLiked onPress={onPressHeart} />;
+            return (
+                <IconLiked
+                    onPress={onPressHeart}
+                    customStyle={styles.heartIcon}
+                />
+            );
         }
-        return <IconNotLiked onPress={onPressHeart} />;
+        return (
+            <IconNotLiked
+                onPress={onPressHeart}
+                customStyle={styles.heartIcon}
+            />
+        );
     }, [isLiked]);
 
     return (
@@ -302,13 +274,6 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
     },
     heartIcon: {
-        fontSize: '40@ms',
-        color: Theme.common.pink,
-        marginRight: '20@s',
-    },
-    heartNotLikeIcon: {
-        fontSize: '50@ms',
-        color: Theme.common.white,
         marginRight: '20@s',
     },
     textNumberLike: {

@@ -14,6 +14,7 @@ const usePaging = (paramsPaging: {
     };
     onSuccess?: (data?: any, cbParams?: any) => void;
     onError?: (error?: Error, cbParams?: any) => void;
+    numberMaxForList?: number;
 }) => {
     const [refreshing, setRefreshing] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -37,7 +38,17 @@ const usePaging = (paramsPaging: {
         if (refreshing) {
             setList(newList);
         } else if (newList.length > 0) {
-            setList([...list, ...newList]);
+            if (!paramsPaging.numberMaxForList) {
+                setList(list.concat(newList));
+            } else {
+                const temp = list.concat(newList);
+                // if (temp.length > paramsPaging.numberMaxForList) {
+                //     setList(temp.splice(-paramsPaging.numberMaxForList));
+                // } else {
+                //     setList(temp);
+                // }
+                setList(temp);
+            }
         }
         setNoMore(pageIndex >= resData?.totalPages);
         setRefreshing(false);

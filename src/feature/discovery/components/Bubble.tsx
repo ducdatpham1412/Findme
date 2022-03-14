@@ -1,274 +1,291 @@
-// import {TypeBubblePalace} from 'api/interface';
-// import {RELATIONSHIP, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
-// import {Metrics} from 'asset/metrics';
-// import {TIMING_BUBBLE_FLY} from 'asset/standardValue';
-// import {StyleImage, StyleText, StyleTouchable} from 'components/base';
-// import Redux from 'hook/useRedux';
-// import {appAlert} from 'navigation/NavigationService';
-// import React, {memo, useEffect, useMemo, useRef, useState} from 'react';
-// import {useTranslation} from 'react-i18next';
-// import {Animated, View} from 'react-native';
-// import {scale, ScaledSheet} from 'react-native-size-matters';
-// import Svg, {Path} from 'react-native-svg';
-// import {interactBubble, onGoToSignUp} from 'utility/assistant';
+import {TypeBubblePalace} from 'api/interface';
+import {apiLikePost, apiUnLikePost} from 'api/module';
+import {Metrics} from 'asset/metrics';
+import Theme from 'asset/theme/Theme';
+import {StyleImage, StyleText, StyleTouchable} from 'components/base';
+import IconLiked from 'components/common/IconLiked';
+import IconNotLiked from 'components/common/IconNotLiked';
+import StyleMoreText from 'components/StyleMoreText';
+import Redux from 'hook/useRedux';
+import ROOT_SCREEN from 'navigation/config/routes';
+import {appAlert, navigate} from 'navigation/NavigationService';
+import React, {memo, useCallback, useMemo, useState} from 'react';
+import {View} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import {ScaledSheet, verticalScale} from 'react-native-size-matters';
+import Feather from 'react-native-vector-icons/Feather';
+import {chooseColorGradient, choosePrivateAvatar} from 'utility/assistant';
+import IconHobby from './IconHobby';
 
-// interface BubbleProps {
-//     item: TypeBubblePalace;
-// }
+interface Props {
+    item: TypeBubblePalace;
+    onInteractBubble(idBubble: TypeBubblePalace): void;
+}
 
-// const {width, height} = Metrics;
-// /**
-//  * Equation:
-//  * 1. x = a1 * y^2 + b1 * y
-//  * 2. x = a2 * y^2 + b2 * y
-//  * 3. x = 0
-//  */
-// const a1 = width / (3 * Math.pow(height, 2));
-// const b1 = (2 * width) / (3 * height);
-// const a2 = -width / (3 * Math.pow(height, 2));
-// const b2 = (-2 * width) / (3 * height);
+const bubbleWidth =
+    Metrics.width - Metrics.safeLeftPadding - Metrics.safeRightPadding;
+const bubbleHeight = Metrics.height - Metrics.safeBottomPadding;
 
-// const Bubble = (props: BubbleProps) => {
-//     const {item} = props;
-//     const {t} = useTranslation();
-//     const theme = Redux.getTheme();
+const Bubble = ({item, onInteractBubble}: Props) => {
+    const {gradient} = Redux.getResource();
 
-//     const [flagSize, setFlagSize] = useState({
-//         width: 0,
-//         height: 0,
-//     });
+    const [isLiked, setIsLiked] = useState(item.isLiked);
+    const [totalLikes, setTotalLikes] = useState(item.totalLikes);
 
-//     const {icon, description, name} = item;
-//     const isMyBubble = item.relationship === RELATIONSHIP.self;
+    const onLikeUnLike = useCallback(async () => {
+        const currentLike = isLiked;
+        const currentNumberLikes = totalLikes;
+        try {
+            setIsLiked(!currentLike);
+            setTotalLikes(currentNumberLikes + (currentLike ? -1 : 1));
+            currentLike
+                ? await apiUnLikePost(item.id)
+                : await apiLikePost(item.id);
+        } catch (err) {
+            setIsLiked(currentLike);
+            setTotalLikes(currentNumberLikes);
+            appAlert(err);
+        }
+    }, [isLiked, totalLikes]);
 
-//     const dPath = `M0 3 L${flagSize.width} 3 L${flagSize.width - 10} ${
-//         flagSize.height / 2
-//     } L${flagSize.width} ${flagSize.height - 3} L0 ${flagSize.height - 3} L10 ${
-//         flagSize.height / 2
-//     } L0 3`;
+    const onReportUser = useCallback(() => {
+        navigate(ROOT_SCREEN.reportUser, {
+            idUser: item.creatorId,
+        });
+    }, []);
 
-//     const opacity = item?.canNotInteract ? 0.6 : 1;
-//     const opacityBubble = useMemo(() => {
-//         if (item?.canNotInteract) {
-//             return 0.6;
-//         }
-//         if (isMyBubble) {
-//             return 1;
-//         }
-//         return 1;
-//     }, [item.canNotInteract, isMyBubble]);
+    /**
+     * Render view
+     */
+    const RenderImage = useMemo(() => {
+        return (
+            <StyleImage
+                source={{uri: item.images[0]}}
+                customStyle={styles.image}
+            />
+        );
+    }, []);
 
-//     /**
-//      * For moving bubble
-//      */
-//     const aim = useRef(new Animated.Value(0)).current;
-//     const translateX = useRef(new Animated.Value(0)).current;
-//     const translateY = aim.interpolate({
-//         inputRange: [0, 1],
-//         outputRange: [0, -2 * height],
-//     });
+    const RenderAvatarNameAndContent = useMemo(() => {
+        const avatar = choosePrivateAvatar(item.gender);
+        return (
+            <View style={styles.avatarNameContentView}>
+                <View style={styles.avatarNameBox}>
+                    <StyleImage
+                        source={{uri: avatar}}
+                        customStyle={styles.avatar}
+                    />
+                    <StyleText
+                        originValue={`@${item.name}`}
+                        customStyle={styles.textName}
+                    />
+                </View>
+                <View style={styles.contentBox}>
+                    <StyleMoreText
+                        value={item.content}
+                        textStyle={styles.textContent}
+                    />
+                </View>
+            </View>
+        );
+    }, [item.gender, item.name, item.content]);
 
-//     const choose = useMemo(() => Math.floor(Math.random() * 3), []);
-//     translateY.removeAllListeners();
-//     if (choose === 0) {
-//         translateY.addListener(({value}) => {
-//             translateX.setValue(a1 * Math.pow(value, 2) + b1 * value);
-//         });
-//     } else if (choose === 1) {
-//     } else if (choose === 2) {
-//         translateY.addListener(({value}) =>
-//             translateX.setValue(a2 * Math.pow(value, 2) + b2 * value),
-//         );
-//     }
+    const RenderIconHobby = useMemo(() => {
+        return <IconHobby color={item.color} />;
+    }, [item.color]);
 
-//     const moving = () => {
-//         Animated.timing(aim, {
-//             toValue: 1,
-//             duration: TIMING_BUBBLE_FLY,
-//             useNativeDriver: true,
-//         }).start(() => {
-//             Redux.setBubblePalaceAction({
-//                 action: TYPE_BUBBLE_PALACE_ACTION.removeOne,
-//                 payload: item.id,
-//             });
-//         });
-//     };
+    const RenderIconLikeUnLike = useMemo(() => {
+        const color = isLiked ? Theme.common.pink : Theme.common.white;
+        return (
+            <>
+                <View style={styles.likeBox}>
+                    {isLiked ? (
+                        <IconLiked
+                            onPress={onLikeUnLike}
+                            customStyle={styles.iconLike}
+                        />
+                    ) : (
+                        <IconNotLiked
+                            onPress={onLikeUnLike}
+                            customStyle={styles.iconUnLike}
+                        />
+                    )}
+                </View>
 
-//     useEffect(() => {
-//         moving();
-//     }, []);
+                <View style={styles.textLikeBox}>
+                    <StyleText
+                        originValue={totalLikes}
+                        customStyle={[styles.textLike, {color}]}
+                    />
+                </View>
+            </>
+        );
+    }, [isLiked, totalLikes]);
 
-//     const onInteractBubble = () => {
-//         if (item?.canNotInteract) {
-//             appAlert(t('discovery.interactBubble.thisIsUserHadAccount'), {
-//                 moreNotice: 'profile.component.infoProfile.tellSignUp',
-//                 moreAction: onGoToSignUp,
-//             });
-//         } else {
-//             interactBubble({
-//                 itemBubble: item,
-//                 isBubble: true,
-//                 havingOption: true,
-//             });
-//         }
-//     };
+    const RenderStartChat = useMemo(() => {
+        const color = chooseColorGradient({
+            listGradients: gradient,
+            colorChoose: item.color,
+        });
+        return (
+            <LinearGradient
+                style={styles.linearGradient}
+                colors={color}
+                start={{x: 0, y: 0}}
+                end={{x: 1, y: 1}}>
+                <StyleTouchable
+                    customStyle={styles.touchStartChat}
+                    onPress={() => onInteractBubble(item)}>
+                    <StyleText
+                        i18Text="discovery.bubble.startChat"
+                        customStyle={[
+                            styles.textStart,
+                            {color: Theme.common.white},
+                        ]}
+                    />
+                </StyleTouchable>
+            </LinearGradient>
+        );
+    }, [item]);
 
-//     return (
-//         <Animated.View
-//             style={[
-//                 styles.container,
-//                 {
-//                     transform: [{translateY}, {translateX}],
-//                     opacity,
-//                 },
-//             ]}>
-//             {/* Bubble */}
-//             <StyleTouchable
-//                 customStyle={[
-//                     styles.avatarBox,
-//                     {
-//                         borderColor: isMyBubble
-//                             ? theme.highlightColor
-//                             : theme.textColor,
-//                     },
-//                 ]}
-//                 onPress={onInteractBubble}
-//                 normalOpacity={opacityBubble}>
-//                 <StyleImage
-//                     source={{uri: item.creatorAvatar}}
-//                     customStyle={styles.avatarCreator}
-//                 />
-//             </StyleTouchable>
+    const RenderReport = useMemo(() => {
+        return (
+            <StyleTouchable
+                customStyle={styles.reportView}
+                onPress={onReportUser}>
+                <Feather
+                    name="flag"
+                    style={[styles.iconReport, {color: Theme.common.white}]}
+                />
+            </StyleTouchable>
+        );
+    }, []);
 
-//             {/* Cord */}
-//             <View
-//                 style={[
-//                     styles.chainLink,
-//                     {
-//                         borderColor: isMyBubble
-//                             ? theme.highlightColor
-//                             : theme.borderColor,
-//                     },
-//                 ]}
-//             />
+    return (
+        <View style={styles.itemBubbleView}>
+            {RenderImage}
+            {RenderAvatarNameAndContent}
+            {RenderReport}
+            <View style={styles.toolView}>
+                {RenderIconHobby}
+                {RenderIconLikeUnLike}
+            </View>
+            {RenderStartChat}
+        </View>
+    );
+};
 
-//             {/* Description */}
-//             <StyleTouchable
-//                 style={styles.descriptionBox}
-//                 onLayout={({nativeEvent}) =>
-//                     setFlagSize({
-//                         width: nativeEvent.layout.width,
-//                         height: nativeEvent.layout.height,
-//                     })
-//                 }
-//                 onPress={onInteractBubble}>
-//                 <Svg width={'100%'} height={'100%'} style={styles.svgView}>
-//                     <Path
-//                         d={dPath}
-//                         stroke={
-//                             isMyBubble
-//                                 ? theme.highlightColor
-//                                 : theme.borderColor
-//                         }
-//                         strokeWidth={scale(0.5)}
-//                         fill="none"
-//                     />
-//                 </Svg>
+const styles = ScaledSheet.create({
+    itemBubbleView: {
+        width: bubbleWidth,
+        height: bubbleHeight,
+    },
+    image: {
+        width: '100%',
+        height: '100%',
+    },
+    // tool
+    toolView: {
+        position: 'absolute',
+        width: '100@s',
+        paddingVertical: '10@vs',
+        bottom: Metrics.height / 3,
+        right: 0,
+        alignItems: 'center',
+    },
+    likeBox: {
+        width: '100%',
+        height: '70@vs',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    iconLike: {
+        fontSize: '60@ms',
+    },
+    iconUnLike: {
+        fontSize: '60@ms',
+    },
+    textLikeBox: {
+        height: '30@ms',
+    },
+    textLike: {
+        fontSize: '20@ms',
+    },
+    // gradient
+    linearGradient: {
+        height: '40@s',
+        position: 'absolute',
+        alignSelf: 'center',
+        bottom: '100@vs',
+        borderRadius: '50@s',
+    },
+    touchStartChat: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: '50@s',
+    },
+    textStart: {
+        fontSize: '15@ms',
+        fontWeight: 'bold',
+    },
+    // report
+    reportView: {
+        position: 'absolute',
+        width: '50@ms',
+        height: '50@ms',
+        top: Metrics.safeTopPadding + verticalScale(5),
+        right: '10@s',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: '30@ms',
+    },
+    iconReport: {
+        fontSize: '25@ms',
+    },
+    reportBox: {
+        position: 'absolute',
+        right: '60@ms',
+        top: '60@ms',
+    },
+    // avatar, name and content
+    avatarNameContentView: {
+        position: 'absolute',
+        top: Metrics.safeTopPadding + verticalScale(10),
+        left: '10@s',
+        width: '70%',
+    },
+    avatarNameBox: {
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    avatar: {
+        width: '35@ms',
+        height: '35@ms',
+        marginRight: '10@ms',
+    },
+    textName: {
+        fontSize: '20@ms',
+        fontWeight: 'bold',
+        color: Theme.common.white,
+    },
+    contentBox: {
+        width: '100%',
+        paddingLeft: '45@ms',
+        paddingTop: '7@vs',
+    },
+    textContent: {
+        fontSize: '17@ms',
+        color: Theme.common.white,
+    },
+});
 
-//                 <View style={styles.headerView}>
-//                     <StyleImage
-//                         source={{uri: icon}}
-//                         customStyle={styles.iconHobby}
-//                     />
-//                     <StyleText
-//                         originValue={name}
-//                         customStyle={[
-//                             styles.textName,
-//                             {color: theme.textColor},
-//                         ]}
-//                         numberOfLines={1}
-//                     />
-//                 </View>
-
-//                 <View style={styles.contentBox}>
-//                     <StyleText
-//                         originValue={description}
-//                         customStyle={[styles.text, {color: theme.textColor}]}
-//                     />
-//                 </View>
-//             </StyleTouchable>
-//         </Animated.View>
-//     );
-// };
-
-// const bubbleWidth = Metrics.width / 3.2;
-
-// const styles = ScaledSheet.create({
-//     container: {
-//         alignItems: 'center',
-//         position: 'absolute',
-//         bottom: 0,
-//         left: width / 2 - bubbleWidth / 2,
-//     },
-//     avatarBox: {
-//         width: '37@s',
-//         height: '37@s',
-//         borderRadius: '20@s',
-//         borderWidth: '1.5@ms',
-//     },
-//     chainLink: {
-//         borderWidth: '0.5@s',
-//         height: '20@vs',
-//     },
-//     avatarCreator: {
-//         width: '100%',
-//         height: '100%',
-//     },
-//     // path
-//     descriptionBox: {
-//         width: bubbleWidth,
-//     },
-//     svgView: {
-//         position: 'absolute',
-//     },
-//     // header
-//     headerView: {
-//         width: '100%',
-//         flexDirection: 'row',
-//         paddingLeft: '15@s',
-//         paddingRight: '30@s',
-//         paddingTop: '10@vs',
-//         alignItems: 'center',
-//         overflow: 'hidden',
-//     },
-//     iconHobby: {
-//         width: '17@s',
-//         height: '17@s',
-//         borderRadius: '10@s',
-//         marginRight: '7@s',
-//     },
-//     textName: {
-//         fontSize: '10@ms',
-//         fontWeight: 'bold',
-//     },
-//     // content
-//     contentBox: {
-//         width: '100%',
-//         paddingHorizontal: '15@s',
-//         paddingVertical: '10@vs',
-//     },
-//     text: {
-//         fontSize: '9@ms',
-//     },
-// });
-
-// export default memo(Bubble, (prevProps: BubbleProps, nextProps: any) => {
-//     Object.entries(prevProps.item).forEach(item => {
-//         const [key, value] = item;
-//         if (nextProps.item?.[key] !== value) {
-//             return false;
-//         }
-//     });
-
-//     return true;
-// });
+export default memo(Bubble, (preProps: Props, nextProps: any) => {
+    for (const [key, value] of Object.entries(preProps)) {
+        if (nextProps?.[key] !== value) {
+            return false;
+        }
+    }
+    return true;
+});

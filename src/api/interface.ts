@@ -175,9 +175,7 @@ export interface TypeCreatePostResponse {
     id: string;
     content: string;
     images: Array<string>;
-    peopleLike: Array<{
-        id: number;
-    }>;
+    totalLikes: number;
     creatorId: number;
     creatorName: string;
     creatorAvatar: string;
@@ -204,16 +202,19 @@ export interface TypeFollowResponse {
  */
 export interface TypeBubblePalace {
     id: string;
-    name: string;
-    icon: string;
-    color: number;
-    description: string;
+    content: string;
+    images: Array<string>;
+    totalLikes: number;
     creatorId: number;
-    creatorAvatar: string;
-    // set up in front-end
-    relationship?: number;
-    canNotInteract?: boolean;
-    readyToReplace?: boolean;
+    gender: number;
+    createdTime: string;
+    totalComments: number;
+    color: number;
+    name: string;
+    isLiked: boolean;
+    relationship: number;
+    // in front-end
+    canInteract?: boolean;
 }
 
 export interface TypeBubblePalaceAction {

@@ -78,8 +78,7 @@ export enum SOCKET_EVENT {
     appActive = '0.3',
     appBackground = '0.4',
     // bubble
-    createBubble = '1.0',
-    deleteBubble = '1.1',
+    disableBubble = '1.0',
     // chat tag
     createChatTag = '2.0',
     joinRoom = '2.1',
@@ -125,8 +124,5 @@ export enum TYPE_NOTIFICATION {
 }
 
 export enum TYPE_BUBBLE_PALACE_ACTION {
-    addNew = 0,
-    readyToReplace = 1,
-    removeOne = 2,
-    clearAll = 3,
+    disableBubble = 0,
 }

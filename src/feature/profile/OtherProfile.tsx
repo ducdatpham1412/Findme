@@ -98,7 +98,6 @@ const OtherProfile = ({route}: Props) => {
             interactBubble({
                 itemBubble,
                 isBubble: false,
-                havingOption: false,
             });
         }
     };

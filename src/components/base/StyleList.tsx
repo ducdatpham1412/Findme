@@ -78,6 +78,7 @@ const StyleList = (props: StyleListProps, ref: any) => {
             onEndReached={handleLoadMore}
             ListFooterComponent={renderFooterView}
             ListEmptyComponent={renderEmptyView}
+            nestedScrollEnabled
             {...props}
         />
     );

@@ -12,6 +12,7 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleProp} from 'react-native';
 import {moderateScale} from 'react-native-size-matters';
+import {cardStyleSafeTop} from '../RootScreen';
 
 const ProfileStack = createStackNavigator();
 
@@ -35,6 +36,10 @@ const ProfileRoute = () => {
         <ProfileStack.Navigator
             screenOptions={{
                 headerShown: false,
+                cardStyle: [
+                    {backgroundColor: theme.backgroundColor},
+                    cardStyleSafeTop,
+                ],
             }}>
             <ProfileStack.Screen
                 name={PROFILE_ROUTE.myProfile}

@@ -205,8 +205,8 @@ const TabNavigator = (props?: any) => {
                     name="user"
                     style={{
                         fontSize: moderateScale(20),
-                        color: theme.tabBarIconColor,
-                        opacity: isFocusingProfile ? 1 : 0.4,
+                        color: theme.textHightLight,
+                        opacity: isFocusingProfile ? 1 : 0.6,
                     }}
                 />
             </StyleTouchable>
@@ -305,7 +305,7 @@ const styles = ScaledSheet.create({
         position: 'absolute',
         width: '100%',
         height: '100%',
-        opacity: 0.8,
+        opacity: 0.45,
         borderTopWidth: Platform.select({
             ios: 0.5,
             android: 0.5,

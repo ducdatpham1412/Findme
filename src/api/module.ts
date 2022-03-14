@@ -1,4 +1,5 @@
 import {
+    TypeBubblePalace,
     TypeChangeInformationResponse,
     TypeChangePasswordRequest,
     TypeChatMessageResponse,
@@ -112,8 +113,20 @@ export const apiReportUser = (params: {
     return request.post(`/common/report-user/${params.userId}`, params.body);
 };
 
-export const apiGetListBubbleActive = () => {
-    return request.get('/common/get-list-bubble-active');
+export const apiGetListBubbleActive = ({
+    params,
+}: TypeParamsPaging): Promise<TypeBubblePalace> => {
+    return request.get('/common/get-list-bubble-profile', {
+        params,
+    });
+};
+
+export const apiGetListBubbleActiveOfUserEnjoy = ({
+    params,
+}: TypeParamsPaging): Promise<TypeBubblePalace> => {
+    return request.get('/common/get-list-bubble-profile-enjoy', {
+        params,
+    });
 };
 
 /**

@@ -12,6 +12,9 @@ const common = {
     done: 'Done',
     save: 'Save',
     success: 'Success',
+    seeMore: '...See more',
+    seeLess: '...See less',
+    letGo: "Let's go",
 };
 
 const login = {
@@ -105,21 +108,13 @@ const discovery = {
     heart: {
         headerTitle: 'Chat hobbies',
     },
-    plus: {
-        headerTitle: 'My bubbles',
-        holderDes: 'Adding description',
-        create: 'Create',
-        edit: 'Edit',
-        update: 'Update',
-    },
     discoveryScreen: {
         searchHobbies: 'Find hobbies',
         searchChat: 'Find chat',
     },
-    interactBubble: {
-        enterMessage: 'Message',
-        thisIsUserHadAccount: 'This is user\nwho already had account ^^',
-        report: 'Report this user',
+    bubble: {
+        startChat: 'Start chat now',
+        goToSignUp: 'Go to login so you can start chatting with everyone',
     },
     report: {
         title: 'Report',

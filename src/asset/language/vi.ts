@@ -12,6 +12,9 @@ const common = {
     done: 'Xong',
     save: 'Lưu',
     success: 'Thành công',
+    seeMore: '...Xem thêm',
+    seeLess: '...Ẩn bớt',
+    letGo: 'Đi thôi',
 };
 
 const login = {
@@ -107,21 +110,14 @@ const discovery = {
     heart: {
         headerTitle: 'Sở thích chat',
     },
-    plus: {
-        headerTitle: 'Bắt chuyện',
-        holderDes: 'Thêm mô tả',
-        create: 'Tạo',
-        edit: 'Sửa',
-        update: 'Cập nhật',
-    },
     discoveryScreen: {
         searchHobbies: 'Tìm sở thích',
         searchChat: 'Tìm cuộc trò chuyện',
     },
-    interactBubble: {
-        enterMessage: 'Lời nhắn',
-        thisIsUserHadAccount: 'Đây là người dùng\nđã có tài khoản ^^',
-        report: 'Tố cáo người dùng',
+    bubble: {
+        startChat: 'Bắt chuyện ngay',
+        goToSignUp:
+            'Đi tới đăng nhập để có thể bắt đầu trò chuyện với mọi người nhé',
     },
     report: {
         title: 'Tố cáo',

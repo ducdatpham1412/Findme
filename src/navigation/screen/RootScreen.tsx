@@ -2,7 +2,9 @@ import {NavigationContainer} from '@react-navigation/native';
 import {
     CardStyleInterpolators,
     createStackNavigator,
+    StackNavigationOptions,
 } from '@react-navigation/stack';
+import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
 import Alert from 'components/Alert';
 import AlertYesNo from 'components/AlerYesNo';
@@ -17,7 +19,7 @@ import ROOT_SCREEN from 'navigation/config/routes';
 import TabBarProvider from 'navigation/config/TabBarProvider';
 import {navigationRef} from 'navigation/NavigationService';
 import React, {useEffect} from 'react';
-import {StatusBar} from 'react-native';
+import {StatusBar, StyleProp, ViewStyle} from 'react-native';
 import CodePush from 'react-native-code-push';
 import Config from 'react-native-config';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -74,7 +76,7 @@ const RootScreen = () => {
                         overflow: 'visible',
                         backgroundColor: theme.backgroundColor,
                     }}
-                    edges={['top', 'bottom', 'left', 'right']}>
+                    edges={['bottom', 'left', 'right']}>
                     <RootStack.Navigator
                         screenOptions={{
                             gestureEnabled: false,
@@ -84,6 +86,9 @@ const RootScreen = () => {
                         <RootStack.Screen
                             name={ROOT_SCREEN.loginRoute}
                             component={LoginRoute}
+                            options={{
+                                cardStyle: cardStyleSafeTop,
+                            }}
                         />
 
                         {/* Main Tabs */}
@@ -123,9 +128,10 @@ const RootScreen = () => {
                         <RootStack.Screen
                             options={{
                                 ...alertOption,
-                                cardStyle: {
-                                    backgroundColor: selectBgCardStyle(0.6),
-                                },
+                                cardStyle: [
+                                    {backgroundColor: selectBgCardStyle(0.6)},
+                                    cardStyleSafeTop,
+                                ],
                             }}
                             name={ROOT_SCREEN.modalize}
                             component={Modalize}
@@ -134,9 +140,10 @@ const RootScreen = () => {
                         {/* Interact Bubble */}
                         <RootStack.Screen
                             options={{
-                                cardStyle: {
-                                    backgroundColor: selectBgCardStyle(0.6),
-                                },
+                                cardStyle: [
+                                    {backgroundColor: selectBgCardStyle(0.3)},
+                                    cardStyleSafeTop,
+                                ],
                                 cardStyleInterpolator:
                                     CardStyleInterpolators.forFadeFromBottomAndroid,
                             }}
@@ -144,11 +151,13 @@ const RootScreen = () => {
                             component={InteractBubble}
                         />
 
+                        {/* Swipe Image */}
                         <RootStack.Screen
                             options={{
-                                cardStyle: {
-                                    backgroundColor: selectBgCardStyle(0.6),
-                                },
+                                cardStyle: [
+                                    {backgroundColor: theme.backgroundColor},
+                                    cardStyleSafeTop,
+                                ],
                                 cardStyleInterpolator:
                                     CardStyleInterpolators.forFadeFromBottomAndroid,
                             }}
@@ -156,22 +165,39 @@ const RootScreen = () => {
                             component={SwipeImages}
                         />
 
+                        {/* Report user */}
                         <RootStack.Screen
                             name={ROOT_SCREEN.reportUser}
                             component={ReportUser}
+                            options={{
+                                cardStyle: [
+                                    {backgroundColor: theme.backgroundColor},
+                                    cardStyleSafeTop,
+                                ],
+                            }}
                         />
 
+                        {/* Web view */}
                         <RootStack.Screen
                             name={ROOT_SCREEN.webView}
                             component={WebViewScreen}
+                            options={{
+                                cardStyle: [
+                                    {backgroundColor: theme.backgroundColor},
+                                    cardStyleSafeTop,
+                                ],
+                            }}
                         />
+
+                        {/* Picker */}
                         <RootStack.Screen
                             name={ROOT_SCREEN.picker}
                             component={StylePicker}
                             options={{
-                                cardStyle: {
-                                    backgroundColor: selectBgCardStyle(0.6),
-                                },
+                                cardStyle: [
+                                    {backgroundColor: selectBgCardStyle(0.6)},
+                                    cardStyleSafeTop,
+                                ],
                                 cardStyleInterpolator:
                                     CardStyleInterpolators.forFadeFromBottomAndroid,
                             }}
@@ -186,10 +212,14 @@ const RootScreen = () => {
     );
 };
 
-const alertOption = {
+const alertOption: StackNavigationOptions = {
     animationEnabled: false,
     cardOverlayEnabled: true,
     headerShown: false,
+};
+
+export const cardStyleSafeTop: StyleProp<ViewStyle> = {
+    paddingTop: Metrics.safeTopPadding,
 };
 
 export default RootScreen;

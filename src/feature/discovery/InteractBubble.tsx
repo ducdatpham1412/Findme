@@ -1,59 +1,86 @@
 import {TypeBubblePalace, TypeChatTagRequest} from 'api/interface';
+import FindmeStore from 'app-redux/store';
 import {CHAT_TAG} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
+import Theme from 'asset/theme/Theme';
 import {
-    StyleIcon,
     StyleImage,
     StyleInput,
     StyleText,
     StyleTouchable,
 } from 'components/base';
 import Redux from 'hook/useRedux';
-import {startChatTag, startChatTagEnjoy} from 'hook/useSocketIO';
-import ROOT_SCREEN from 'navigation/config/routes';
-import {appAlert, goBack, navigate} from 'navigation/NavigationService';
+import {startChatTag} from 'hook/useSocketIO';
+import {goBack} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Platform, View} from 'react-native';
+import {Animated, Platform, Text, View} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import {ScaledSheet} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
+import {chooseColorGradient, choosePrivateAvatar} from 'utility/assistant';
 
 interface Props {
     route: {
         params: {
             item: TypeBubblePalace;
             isBubble: boolean;
-            havingOption?: boolean;
         };
     };
 }
 
 const InteractBubble = ({route}: Props) => {
-    const {item, isBubble, havingOption} = route.params;
+    const {item, isBubble} = route.params;
 
-    const isModeExp = Redux.getModeExp();
     const token = Redux.getToken();
     const theme = Redux.getTheme();
     const {id} = Redux.getPassport().profile;
 
+    const translateY = useRef(new Animated.Value(-300)).current;
+    const aim = useRef(new Animated.Value(0)).current;
+    const rotateY = aim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['80deg', '0deg'],
+    });
+
     const inputRef = useRef<any>();
-    const [displayOption, setDisplayOption] = useState(false);
     const [message, setMessage] = useState('');
 
-    const finalHavingOption = useMemo(() => {
-        return havingOption && !isModeExp && item.creatorId !== id;
+    const colorGradient = useMemo(() => {
+        return chooseColorGradient({
+            listGradients: FindmeStore.getState().logicSlice.resource.gradient,
+            colorChoose: item.color,
+        });
+    }, []);
+
+    const startMoving = useCallback(() => {
+        Animated.timing(translateY, {
+            toValue: 0,
+            useNativeDriver: true,
+            duration: 600,
+        }).start(() => {
+            Animated.spring(aim, {
+                toValue: 1,
+                useNativeDriver: true,
+                speed: 0.1,
+            }).start();
+        });
     }, []);
 
     useEffect(() => {
         inputRef.current.focus();
     }, []);
 
-    const onTouchBackground = () => {
+    useEffect(() => {
+        startMoving();
+    }, []);
+
+    const onTouchBackground = useCallback(() => {
         if (inputRef.current.isFocused()) {
             inputRef.current.blur();
         } else {
             goBack();
         }
-    };
+    }, []);
 
     const onSendInteract = () => {
         const newChatTag: TypeChatTagRequest = {
@@ -67,38 +94,25 @@ const InteractBubble = ({route}: Props) => {
         if (isBubble) {
             newChatTag.nameBubble = item.name;
         }
-        try {
-            if (!isModeExp) {
-                startChatTag({
-                    token,
-                    newChatTag,
-                });
-            } else {
-                startChatTagEnjoy({
-                    myId: id,
-                    newChatTag,
-                });
-            }
-        } catch (err) {
-            appAlert(err);
-        }
+        startChatTag({
+            token,
+            newChatTag,
+        });
         goBack();
     };
-
-    const onReportUser = useCallback(() => {
-        navigate(ROOT_SCREEN.reportUser, {
-            idUser: item.creatorId,
-        });
-    }, [item.creatorId]);
 
     /**
      * Render view
      */
     const RenderNameAndAvatar = useMemo(() => {
         return (
-            <>
+            <View
+                style={[
+                    styles.avatarAndNameBox,
+                    {borderBottomColor: colorGradient[2]},
+                ]}>
                 <StyleImage
-                    source={{uri: item.creatorAvatar}}
+                    source={{uri: choosePrivateAvatar(item.gender)}}
                     customStyle={[
                         styles.avatar,
                         {borderColor: theme.highlightColor},
@@ -106,135 +120,77 @@ const InteractBubble = ({route}: Props) => {
                 />
                 <StyleText
                     originValue={item.name}
-                    customStyle={[styles.nameText, {color: theme.textColor}]}
+                    customStyle={[
+                        styles.nameText,
+                        {color: Theme.common.textMe},
+                    ]}
                 />
-            </>
-        );
-    }, [item.creatorAvatar, item.name, theme]);
-
-    const RenderOptionBox = useMemo(() => {
-        if (finalHavingOption) {
-            return (
-                <>
-                    {displayOption && (
-                        <View
-                            style={[
-                                styles.optionBox,
-                                {
-                                    backgroundColor: theme.backgroundColor,
-                                },
-                            ]}>
-                            <StyleTouchable onPress={onReportUser}>
-                                <StyleText
-                                    i18Text="discovery.interactBubble.report"
-                                    customStyle={[
-                                        styles.textReport,
-                                        {color: theme.highlightColor},
-                                    ]}
-                                />
-                            </StyleTouchable>
-                        </View>
-                    )}
-
-                    <StyleTouchable
-                        customStyle={styles.touchIconMore}
-                        onPress={() => {
-                            setDisplayOption(!displayOption);
-                        }}>
-                        <Feather
-                            name="more-vertical"
-                            style={[
-                                styles.iconMore,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                    </StyleTouchable>
-                </>
-            );
-        }
-        return null;
-    }, [finalHavingOption, displayOption, item.creatorId]);
-
-    const RenderIconAndDescription = useMemo(() => {
-        return (
-            <View style={styles.iconAndDesView}>
-                <View style={styles.iconBox}>
-                    <StyleIcon source={{uri: item.icon}} size={20} />
-                </View>
-                <View style={styles.descriptionBox}>
-                    <StyleText
-                        originValue={item.description}
-                        customStyle={[
-                            styles.descriptionText,
-                            {color: theme.borderColor},
-                        ]}
-                    />
-                </View>
             </View>
         );
-    }, [item.icon, item.description]);
+    }, [item]);
 
     const RenderIconSend = useMemo(() => {
         return (
             <Feather
                 name="send"
-                style={[styles.iconSend, {color: theme.borderColor}]}
+                style={[styles.iconSend, {color: Theme.common.white}]}
             />
         );
     }, []);
 
     return (
         <View style={[styles.container]}>
-            <StyleTouchable
-                customStyle={styles.spaceView}
-                onPress={onTouchBackground}
-                activeOpacity={1}
-            />
+            <Text style={styles.spaceView} onPress={onTouchBackground} />
 
-            <View
+            <Animated.View
                 style={[
-                    styles.interactView,
-                    {
-                        backgroundColor: theme.backgroundButtonColor,
-                    },
+                    styles.animatedView,
+                    {transform: [{rotateY}, {translateY}]},
                 ]}>
-                {/* Avatar, Name and Report */}
+                <Text style={styles.spaceView} onPress={onTouchBackground} />
                 <View
                     style={[
-                        styles.avatarAndNameBox,
-                        {borderBottomColor: theme.borderColor},
-                    ]}>
+                        styles.cordBox,
+                        {backgroundColor: colorGradient[2]},
+                    ]}
+                />
+
+                <LinearGradient
+                    style={[
+                        styles.inputMessageBox,
+                        {
+                            backgroundColor: theme.backgroundButtonColor,
+                        },
+                    ]}
+                    colors={colorGradient}
+                    start={{x: 0, y: 0}}
+                    end={{x: 1, y: 1}}>
                     {RenderNameAndAvatar}
-                    {RenderOptionBox}
-                </View>
-
-                {/* Icon and Description */}
-                {RenderIconAndDescription}
-
-                {/* Input Message */}
-                <View style={styles.inputAndSendView}>
-                    <StyleInput
-                        ref={inputRef}
-                        value={message}
-                        onChangeText={text => setMessage(text)}
-                        containerStyle={[
-                            styles.inputContainer,
-                            {
-                                borderColor: theme.highlightColor,
-                            },
-                        ]}
-                        multiline
-                        i18Placeholder="discovery.interactBubble.enterMessage"
-                        placeholderTextColor={theme.holderColorLighter}
-                        keyboardAppearance={Redux.getThemeKeyboard()}
-                        hasErrorBox={false}
-                        hasUnderLine={false}
-                    />
-                    <StyleTouchable onPress={onSendInteract}>
-                        {RenderIconSend}
-                    </StyleTouchable>
-                </View>
-            </View>
+                    {/* Input Message */}
+                    <View style={styles.inputAndSendView}>
+                        <StyleInput
+                            ref={inputRef}
+                            value={message}
+                            onChangeText={text => setMessage(text)}
+                            containerStyle={styles.inputContainer}
+                            inputStyle={{color: Theme.common.textMe}}
+                            multiline
+                            i18Placeholder="Hello"
+                            placeholderTextColor={
+                                Theme.lightTheme.holderColorLighter
+                            }
+                            keyboardAppearance={Redux.getThemeKeyboard()}
+                            hasErrorBox={false}
+                            hasUnderLine={false}
+                        />
+                        <StyleTouchable
+                            onPress={onSendInteract}
+                            disable={!message}>
+                            {RenderIconSend}
+                        </StyleTouchable>
+                    </View>
+                </LinearGradient>
+            </Animated.View>
         </View>
     );
 };
@@ -243,46 +199,33 @@ const styles = ScaledSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'transparent',
-        alignItems: 'center',
     },
     spaceView: {
         position: 'absolute',
         width: '100%',
         height: Metrics.height,
     },
-    interactView: {
-        width: '80%',
-        borderRadius: '20@vs',
-        paddingHorizontal: '10@s',
-        paddingVertical: '20@vs',
-        marginTop: '100@vs',
+    animatedView: {
+        width: '100%',
+        alignItems: 'center',
     },
-    optionBox: {
-        position: 'absolute',
-        top: 0,
-        right: '30@s',
-        paddingHorizontal: '10@s',
-        paddingVertical: '7@s',
-        borderRadius: '4@s',
+    // cord
+    cordBox: {
+        width: '3@s',
+        height: '40%',
+        backgroundColor: 'red',
     },
-    touchIconMore: {
-        position: 'absolute',
-        right: 0,
-        top: 0,
-    },
-    textReport: {
-        fontSize: '15@ms',
-    },
-    iconMore: {
-        fontSize: '20@ms',
-    },
-    // Avatar and name
+    // avatar and name
     avatarAndNameBox: {
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        borderBottomWidth: 0.5,
-        paddingBottom: '10@s',
+        paddingHorizontal: '10@s',
+        paddingBottom: '10@vs',
+        borderBottomWidth: Platform.select({
+            ios: '0.25@ms',
+            android: '0.5@ms',
+        }),
     },
     avatar: {
         width: '35@s',
@@ -295,40 +238,24 @@ const styles = ScaledSheet.create({
         fontWeight: 'bold',
         marginLeft: '10@s',
     },
-    // Icon and description
-    iconAndDesView: {
-        width: '100%',
-        paddingVertical: '15@vs',
-        flexDirection: 'row',
+    // input
+    inputMessageBox: {
+        width: '80%',
+        borderRadius: '50@vs',
+        paddingHorizontal: '10@s',
+        paddingVertical: '20@vs',
     },
-    iconBox: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    descriptionBox: {
-        flex: 4,
-        justifyContent: 'center',
-    },
-    descriptionText: {
-        fontSize: '15@ms',
-    },
-    // Input message
     inputAndSendView: {
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
+        paddingTop: '10@vs',
     },
     inputContainer: {
         flex: 1,
         paddingHorizontal: '5@s',
         paddingTop: '5@vs',
         paddingBottom: '10@vs',
-        borderWidth: '0.25@ms',
-        borderRadius: Platform.select({
-            ios: '10@ms',
-            android: '3@ms',
-        }),
         fontSize: '14@ms',
     },
     iconSend: {

@@ -72,17 +72,17 @@ export const openPlusBox = (setShowTabBar: any) => {
 export const interactBubble = (params: {
     itemBubble: any;
     isBubble: boolean;
-    havingOption: boolean;
 }) => {
     navigate(ROOT_SCREEN.interactBubble, {
         item: params.itemBubble,
         isBubble: params.isBubble,
-        havingOption: params.havingOption,
     });
 };
 
-export const choosePrivateAvatar = () => {
-    const {gender} = FindmeStore.getState().accountSlice.passport.information;
+export const choosePrivateAvatar = (_gender?: number) => {
+    const gender =
+        _gender ||
+        FindmeStore.getState().accountSlice.passport.information.gender;
 
     switch (gender) {
         case GENDER_TYPE.man:
@@ -94,6 +94,13 @@ export const choosePrivateAvatar = () => {
         default:
             return '';
     }
+};
+
+export const chooseIconHobby = (idHobby: number) => {
+    const {listHobbies} = FindmeStore.getState().logicSlice.resource;
+    const temp =
+        listHobbies.find(item => item.id === idHobby) || listHobbies[0];
+    return temp.icon;
 };
 
 export const countDownToCancelRequestPublic = (params: {
@@ -272,10 +279,10 @@ export const renderIconGender = (_gender?: number) => {
 
 export const onGoToSignUp = () => {
     Redux.updateListChatTag([]);
-    Redux.setBubblePalaceAction({
-        action: TYPE_BUBBLE_PALACE_ACTION.clearAll,
-        payload: undefined,
-    });
+    // Redux.setBubblePalaceAction({
+    //     action: TYPE_BUBBLE_PALACE_ACTION.clearAll,
+    //     payload: undefined,
+    // });
     navigate(LOGIN_ROUTE.signUpForm, {
         typeSignUp: SIGN_UP_TYPE.email,
     });

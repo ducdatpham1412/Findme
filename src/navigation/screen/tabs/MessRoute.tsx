@@ -2,6 +2,7 @@ import {
     CardStyleInterpolators,
     createStackNavigator,
 } from '@react-navigation/stack';
+import {Metrics} from 'asset/metrics';
 import ChatDetail from 'feature/mess/ChatDetail';
 import ChatDetailSetting from 'feature/mess/ChatDetailSetting';
 import MessScreen from 'feature/mess/MessScreen';
@@ -29,6 +30,7 @@ const MessRoute = () => {
                 styles.container,
                 {
                     backgroundColor: theme.backgroundColor,
+                    paddingTop: Metrics.safeTopPadding,
                 },
             ]}>
             <MessStack.Navigator

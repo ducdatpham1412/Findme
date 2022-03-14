@@ -1,14 +1,11 @@
 import {
-    TypeBubblePalace,
     TypeChangeChatColor,
     TypeChangeGroupNameResponse,
     TypeChatMessageResponse,
     TypeChatMessageSend,
-    TypeChatTagEnjoyResponse,
     TypeChatTagRequest,
     TypeChatTagResponse,
     TypeDeleteMessageResponse,
-    TypeSeenMessageEnjoyResponse,
     TypeSeenMessageResponse,
     TypingResponse,
 } from 'api/interface';
@@ -18,15 +15,10 @@ import {
     apiGetListMessages,
 } from 'api/module';
 import FindmeStore from 'app-redux/store';
-import {
-    MESSAGE_TYPE,
-    RELATIONSHIP,
-    SOCKET_EVENT,
-    TYPE_BUBBLE_PALACE_ACTION,
-} from 'asset/enum';
+import {MESSAGE_TYPE, RELATIONSHIP, SOCKET_EVENT} from 'asset/enum';
 import {MESS_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {AppState, AppStateStatus} from 'react-native';
 import Config from 'react-native-config';
 import {io, Socket} from 'socket.io-client';
@@ -127,47 +119,15 @@ export const useSocketChatTagBubble = () => {
 
     let countdownRequestPublic: any;
 
-    const hearingSocketBubble = () => {
-        socket?.off(SOCKET_EVENT.createBubble);
-        socket.on(SOCKET_EVENT.createBubble, (data: TypeBubblePalace) => {
-            const relationship =
-                data.creatorId === myId
-                    ? RELATIONSHIP.self
-                    : RELATIONSHIP.notKnow;
-
-            if (relationship === RELATIONSHIP.notKnow) {
-                Redux.setBubblePalaceAction({
-                    action: TYPE_BUBBLE_PALACE_ACTION.addNew,
-                    payload: {
-                        ...data,
-                        relationship,
-                    },
-                });
-                return;
-            }
-
-            if (relationship === RELATIONSHIP.self) {
-                Redux.setBubblePalaceAction({
-                    action: TYPE_BUBBLE_PALACE_ACTION.addNew,
-                    payload: {
-                        ...data,
-                        relationship,
-                    },
-                });
-                return;
-            }
-        });
-
-        socket?.off(SOCKET_EVENT.deleteBubble);
-        socket.on(SOCKET_EVENT.deleteBubble, (bubbleId: string) => {
-            Redux.setBubblePalaceAction({
-                action: TYPE_BUBBLE_PALACE_ACTION.removeOne,
-                payload: bubbleId,
-            });
-        });
-    };
-
     const hearingOtherSocket = useCallback(() => {
+        // socket?.off(SOCKET_EVENT.disableBubble);
+        // socket.on(SOCKET_EVENT.disableBubble, (data: string) => {
+        //     Redux.setBubblePalaceAction({
+        //         action: TYPE_BUBBLE_PALACE_ACTION.disableBubble,
+        //         payload: data,
+        //     });
+        // });
+
         socket?.off(SOCKET_EVENT.createChatTag);
         socket?.on(SOCKET_EVENT.createChatTag, (data: TypeChatTagResponse) => {
             setList((previousChatTags: Array<TypeChatTagResponse>) => {
@@ -489,10 +449,6 @@ export const useSocketChatTagBubble = () => {
     };
 
     useEffect(() => {
-        hearingSocketBubble();
-    }, [myId]);
-
-    useEffect(() => {
         hearingOtherSocket();
     }, [myId]);
 
@@ -713,478 +669,21 @@ export const useSocketChatDetail = (params: {
  * ----------------------------------- /
  */
 export const useSocketChatTagBubbleEnjoy = () => {
-    const listChatTag = Redux.getListChatTag();
-    const chatTagFocusing = Redux.getChatTagFocusing();
-    const listMessageEnjoy = Redux.getListMessagesEnjoy();
-    const myId = Redux.getPassport().profile.id;
-
-    const hearingSocketBubble = () => {
-        socket?.off(SOCKET_EVENT.createBubble);
-        socket.on(SOCKET_EVENT.createBubble, (data: TypeBubblePalace) => {
-            const relationship =
-                data.creatorId === myId
-                    ? RELATIONSHIP.self
-                    : RELATIONSHIP.notKnow;
-            const canNotInteract = data.creatorId > 0;
-
-            if (relationship === RELATIONSHIP.notKnow) {
-                Redux.setBubblePalaceAction({
-                    action: TYPE_BUBBLE_PALACE_ACTION.addNew,
-                    payload: {
-                        ...data,
-                        relationship,
-                        canNotInteract,
-                    },
-                });
-                return;
-            }
-
-            if (relationship === RELATIONSHIP.self) {
-                Redux.setBubblePalaceAction({
-                    action: TYPE_BUBBLE_PALACE_ACTION.addNew,
-                    payload: {
-                        ...data,
-                        relationship,
-                    },
-                });
-                return;
-            }
-        });
-
-        socket?.off(SOCKET_EVENT.deleteBubble);
-        socket.on(SOCKET_EVENT.deleteBubble, (bubbleId: string) => {
-            Redux.setBubblePalaceAction({
-                action: TYPE_BUBBLE_PALACE_ACTION.removeOne,
-                payload: bubbleId,
-            });
-        });
-    };
-
-    const hearingOtherSocket = () => {
-        socket?.off(SOCKET_EVENT.createChatTag);
-        socket.on(
-            SOCKET_EVENT.createChatTag,
-            (data: TypeChatTagEnjoyResponse) => {
-                const temp = FindmeStore.getState().logicSlice.listChatTag;
-                Redux.updateListChatTag([data.newChatTag].concat(temp));
-                Redux.startNewMessageEnjoy({
-                    chatTagId: data.newChatTag.id,
-                    newMessage: {
-                        ...data.newMessage,
-                        relationship:
-                            data.newMessage.senderId === myId
-                                ? RELATIONSHIP.self
-                                : RELATIONSHIP.notKnow,
-                    },
-                });
-                socket.emit(SOCKET_EVENT.joinRoom, data.newChatTag.id);
-            },
-        );
-
-        socket?.off(SOCKET_EVENT.changeGroupName);
-        socket.on(
-            SOCKET_EVENT.changeGroupName,
-            (data: TypeChangeGroupNameResponse) => {
-                const currentListChatTag =
-                    FindmeStore.getState().logicSlice.listChatTag;
-                const temp = currentListChatTag.map(item => {
-                    if (item.id !== data.chatTagId) {
-                        return item;
-                    }
-                    return {
-                        ...item,
-                        groupName: data.newName,
-                    };
-                });
-                Redux.updateListChatTag(temp);
-            },
-        );
-    };
-
-    const hearingSocketTyping = () => {
-        socket?.off(SOCKET_EVENT.typing);
-        socket.on(SOCKET_EVENT.typing, (data: TypingResponse) => {
-            const temp = listChatTag.map(item => {
-                if (item.id !== data.chatTagId) {
-                    return item;
-                }
-                let userTyping: Array<number> = [];
-                // check user had is list or not
-                if (item.userTyping) {
-                    const index = item.userTyping.findIndex(
-                        userId => userId === data.userId,
-                    );
-                    if (index >= 0) {
-                        userTyping = item.userTyping;
-                    } else {
-                        userTyping = item.userTyping.concat(data.userId);
-                    }
-                } else {
-                    userTyping = [data.userId];
-                }
-                return {
-                    ...item,
-                    userTyping,
-                };
-            });
-            Redux.updateListChatTag(temp);
-        });
-
-        socket?.off(SOCKET_EVENT.unTyping);
-        socket.on(SOCKET_EVENT.unTyping, (data: TypingResponse) => {
-            const temp = listChatTag.map(item => {
-                if (item.id !== data.chatTagId || !item.userTyping) {
-                    return item;
-                }
-                const userTyping = item.userTyping.filter(
-                    userId => userId !== data.userId,
-                );
-                return {
-                    ...item,
-                    userTyping,
-                };
-            });
-            Redux.updateListChatTag(temp);
-        });
-    };
-
-    const hearingSocketMessage = () => {
-        socket?.off(SOCKET_EVENT.seenMessage);
-        socket.on(
-            SOCKET_EVENT.seenMessage,
-            (data: TypeSeenMessageEnjoyResponse) => {
-                let latestMessage = '';
-                // find latest message
-                const messageFind = listMessageEnjoy.find(
-                    item => item.chatTag === data.chatTagId,
-                );
-                latestMessage =
-                    messageFind?.messages.find(
-                        item => item.senderId !== data.userSeen,
-                    )?.id ||
-                    messageFind?.messages.find(
-                        item => item.senderId === data.userSeen,
-                    )?.id ||
-                    '';
-
-                const temp = listChatTag.map(item => {
-                    if (item.id !== data.chatTagId) {
-                        return item;
-                    }
-                    return {
-                        ...item,
-                        userSeenMessage: {
-                            ...item.userSeenMessage,
-                            [String(data.userSeen)]: {
-                                latestMessage,
-                                isLatest: true,
-                            },
-                        },
-                    };
-                });
-                Redux.updateListChatTag(temp);
-            },
-        );
-
-        socket?.off(SOCKET_EVENT.messageEnjoy);
-        socket.on(
-            SOCKET_EVENT.messageEnjoy,
-            (data: TypeChatMessageResponse) => {
-                const relationship =
-                    data.senderId === myId
-                        ? RELATIONSHIP.self
-                        : RELATIONSHIP.notKnow;
-                Redux.addNewMessageEnjoy({
-                    chatTag: data.chatTag,
-                    newMessage: {
-                        ...data,
-                        relationship,
-                    },
-                });
-
-                let indexNeedToReorder = 0;
-                const temp = listChatTag.map((item, index) => {
-                    if (item.id !== data.chatTag) {
-                        return item;
-                    }
-                    indexNeedToReorder = index;
-                    return {
-                        ...item,
-                        userSeenMessage: {
-                            ...item.userSeenMessage,
-                            [String(myId)]: {
-                                ...item.userSeenMessage[String(myId)],
-                                isLatest: false,
-                            },
-                        },
-                    };
-                });
-
-                if (indexNeedToReorder > 0) {
-                    const updateList = reorderListChatTag(
-                        temp,
-                        indexNeedToReorder,
-                    );
-                    Redux.updateListChatTag(updateList);
-                } else {
-                    Redux.updateListChatTag(temp);
-                }
-            },
-        );
-    };
-
-    const checkDisplayNotification = () => {
-        let newNumber = 0;
-        for (let i = 0; i < listChatTag.length; i++) {
-            if (
-                !listChatTag[i].userSeenMessage[String(myId)]?.isLatest &&
-                listChatTag[i].id !== chatTagFocusing
-            ) {
-                newNumber += 1;
-            }
-        }
-        Redux.setNumberNewMessage(newNumber);
-    };
-
-    useEffect(() => {
-        hearingSocketBubble();
-    }, []);
-
-    useEffect(() => {
-        hearingOtherSocket();
-    }, []);
-
-    useEffect(() => {
-        hearingSocketTyping();
-    }, [listChatTag]);
-
-    useEffect(() => {
-        if (!chatTagFocusing) {
-            hearingSocketMessage();
-        }
-    }, [chatTagFocusing, listChatTag, listMessageEnjoy]);
-
-    useEffect(() => {
-        checkDisplayNotification();
-    }, [chatTagFocusing, listChatTag]);
-
-    const seenMessage = (chatTagId: string) => {
-        socket.emit(SOCKET_EVENT.seenMessage, {myId, chatTagId, isEnjoy: true});
-    };
-
     return {
-        listChatTags: listChatTag,
+        listChatTags: [],
         refreshing: false,
         onRefresh: () => null,
         onLoadMore: () => null,
         setListChatTags: () => null,
-        seenMessage,
+        seenMessage: () => null,
     };
 };
 
 export const useSocketChatDetailEnjoy = (params: {isMyChatTag: boolean}) => {
-    const myId = Redux.getPassport().profile.id;
-    const chatTagFocusing = Redux.getChatTagFocusing();
-    const listChatTag = Redux.getListChatTag();
-    const listMessageEnjoy = Redux.getListMessagesEnjoy();
-
-    const messageObject = useMemo(() => {
-        return listMessageEnjoy.find(item => item.chatTag === chatTagFocusing);
-    }, [chatTagFocusing]);
-
-    const [messages, setMessages] = useState(messageObject?.messages || []);
-
-    const hearingSocket = () => {
-        socket?.off(SOCKET_EVENT.messageEnjoy);
-        socket.on(
-            SOCKET_EVENT.messageEnjoy,
-            (data: TypeChatMessageResponse) => {
-                if (data.chatTag === chatTagFocusing) {
-                    if (data.senderId === myId) {
-                        setMessages(
-                            (
-                                previousMessages: Array<TypeChatMessageResponse>,
-                            ) => {
-                                const temp = previousMessages.map(item => {
-                                    if (item?.tag !== data?.tag) {
-                                        return item;
-                                    }
-                                    return {
-                                        ...data,
-                                        relationship: RELATIONSHIP.self,
-                                    };
-                                });
-                                return temp;
-                            },
-                        );
-                        if (params.isMyChatTag) {
-                            socket.emit(SOCKET_EVENT.seenMessage, {
-                                myId,
-                                chatTagId: data.chatTag,
-                                isEnjoy: true,
-                            });
-                        }
-                    }
-
-                    // if senderId not me, set messages
-                    else if (data.senderId !== myId) {
-                        setMessages(
-                            (
-                                previousMessages: Array<TypeChatMessageResponse>,
-                            ) => {
-                                return [
-                                    {
-                                        ...data,
-                                        relationship: RELATIONSHIP.notKnow,
-                                    },
-                                ].concat(previousMessages);
-                            },
-                        );
-                        socket.emit(SOCKET_EVENT.seenMessage, {
-                            myId,
-                            chatTagId: data.chatTag,
-                            isEnjoy: true,
-                        });
-                    }
-                }
-                // message not in chatTagFocusing
-                else {
-                    const relationship =
-                        data.senderId === myId
-                            ? RELATIONSHIP.self
-                            : RELATIONSHIP.notKnow;
-                    Redux.addNewMessageEnjoy({
-                        chatTag: data.chatTag,
-                        newMessage: {
-                            ...data,
-                            relationship,
-                        },
-                    });
-                }
-
-                // reorder list chat tag, set it to first
-                let indexNeedToReorder = 0;
-                const temp = listChatTag.map((item, index) => {
-                    if (item.id !== data.chatTag) {
-                        return item;
-                    }
-                    let updateItem = item;
-                    // if message received, you're not in it's chat tag
-                    // set your status isLatest = false
-                    if (item.id !== chatTagFocusing) {
-                        updateItem = {
-                            ...item,
-                            userSeenMessage: {
-                                ...item.userSeenMessage,
-                                [String(myId)]: {
-                                    ...item.userSeenMessage[String(myId)],
-                                    isLatest: false,
-                                },
-                            },
-                        };
-                    }
-                    indexNeedToReorder = index;
-                    return {
-                        ...updateItem,
-                        updateTime: new Date(),
-                    };
-                });
-                if (indexNeedToReorder > 0) {
-                    const updateList = reorderListChatTag(
-                        temp,
-                        indexNeedToReorder,
-                    );
-                    Redux.updateListChatTag(updateList);
-                } else {
-                    Redux.updateListChatTag(temp);
-                }
-            },
-        );
-    };
-
-    const hearingSocketSeenMessage = () => {
-        socket?.off(SOCKET_EVENT.seenMessage);
-        socket.on(
-            SOCKET_EVENT.seenMessage,
-            (data: TypeSeenMessageEnjoyResponse) => {
-                let latestMessage = '';
-                // find latest message
-                if (data.chatTagId !== chatTagFocusing) {
-                    const messageFind = listMessageEnjoy.find(
-                        item => item.chatTag === data.chatTagId,
-                    );
-                    latestMessage =
-                        messageFind?.messages.find(
-                            item => item.senderId !== data.userSeen,
-                        )?.id ||
-                        messageFind?.messages.find(
-                            item => item.senderId === data.userSeen,
-                        )?.id ||
-                        '';
-                } else {
-                    latestMessage =
-                        messages?.find(item => item.senderId !== data.userSeen)
-                            ?.id ||
-                        messages?.find(item => item.senderId === data.userSeen)
-                            ?.id ||
-                        '';
-                }
-
-                const temp = listChatTag.map(item => {
-                    if (item.id !== data.chatTagId) {
-                        return item;
-                    }
-                    return {
-                        ...item,
-                        userSeenMessage: {
-                            ...item.userSeenMessage,
-                            [String(data.userSeen)]: {
-                                latestMessage,
-                                isLatest: true,
-                            },
-                        },
-                    };
-                });
-                Redux.updateListChatTag(temp);
-            },
-        );
-    };
-
-    useEffect(() => {
-        hearingSocket();
-    }, [listChatTag, chatTagFocusing]);
-
-    useEffect(() => {
-        hearingSocketSeenMessage();
-    }, [listMessageEnjoy, listChatTag, chatTagFocusing, messages]);
-
-    const sendMessage = (_params: TypeChatMessageSend) => {
-        const newMessage: any = {
-            id: _params.tag,
-            chatTag: _params.chatTag,
-            type: _params.type,
-            content: _params.content,
-            senderId: _params.senderId,
-            senderAvatar: _params.senderAvatar,
-            createdTime: _params.tag,
-            tag: _params.tag,
-            relationship: RELATIONSHIP.self,
-        };
-        setMessages([newMessage].concat(messages));
-
-        socket.emit(SOCKET_EVENT.messageEnjoy, _params);
-    };
-
-    const deleteMessage = async (idMessage: string) => {
-        setMessages((previousMessage: Array<TypeChatMessageResponse>) => {
-            return previousMessage.filter(item => item.id !== idMessage);
-        });
-    };
-
     return {
-        messages,
-        sendMessage,
-        deleteMessage,
+        messages: [],
+        sendMessage: () => null,
+        deleteMessage: async (idMessage: string) => {},
         refreshing: false,
         onRefresh: () => null,
         onLoadMore: () => null,
@@ -1200,12 +699,6 @@ export const useSocketChatDetailEnjoy = (params: {isMyChatTag: boolean}) => {
  */
 export const startChatTag = (params: {
     token: any;
-    newChatTag: TypeChatTagRequest;
-}) => {
-    socket.emit(SOCKET_EVENT.createChatTag, params);
-};
-export const startChatTagEnjoy = (params: {
-    myId: any;
     newChatTag: TypeChatTagRequest;
 }) => {
     socket.emit(SOCKET_EVENT.createChatTag, params);
@@ -1237,10 +730,6 @@ export const stopChatTag = (chatTagId: string) => {
 };
 export const openChatTag = (chatTagId: string) => {
     socket.emit(SOCKET_EVENT.openConversation, chatTagId);
-};
-
-export const pushBubble = (params: {myId: string; bubble: any}) => {
-    socket.emit(SOCKET_EVENT.createBubble, params);
 };
 
 export const changeGroupName = (params: {
