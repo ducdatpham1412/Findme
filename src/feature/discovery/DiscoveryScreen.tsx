@@ -19,6 +19,8 @@ import PlusButton from './components/PlusButton';
 const deleteHeight = moderateScale(70);
 const maxNumberBubble = 4;
 
+// This is bubble static
+
 const DiscoveryScreen: React.FunctionComponent = () => {
     useNotification();
 
