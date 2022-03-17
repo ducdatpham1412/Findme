@@ -1,9 +1,4 @@
-import {
-    TypeBubblePalaceAction,
-    TypeChatMessageResponse,
-    TypeChatTagResponse,
-    TypeMyBubbles,
-} from 'api/interface';
+import {TypeBubblePalaceAction, TypeChatTagResponse} from 'api/interface';
 import {
     accountSliceAction,
     initialAccountState,
@@ -13,7 +8,7 @@ import {
     logicSliceAction,
 } from 'app-redux/account/logicSlice';
 import FindmeStore, {RootState} from 'app-redux/store';
-import {THEME_TYPE, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
+import {THEME_TYPE} from 'asset/enum';
 import Theme from 'asset/theme/Theme';
 import {useSelector} from 'react-redux';
 
@@ -25,6 +20,7 @@ export interface PassportType {
     profile?: {
         id?: number | null | string; // if modeExp -> string '__1", else number
         name?: string;
+        anonymousName?: string;
         description?: string;
         avatar?: string;
         cover?: string;
@@ -45,7 +41,6 @@ export interface PassportType {
         language?: number;
         display_avatar?: boolean;
     };
-    listBubbles?: Array<TypeMyBubbles>;
 }
 
 export interface HobbyType {
@@ -71,17 +66,10 @@ export const Redux = {
     getResource: () =>
         useSelector((state: RootState) => state.logicSlice.resource),
 
-    getIndexBubble: () =>
-        useSelector((state: RootState) => state.logicSlice.indexBubble),
-    getDisplayBubbleFrame: () =>
-        useSelector((state: RootState) => state.logicSlice.displayBubbleFrame),
-
     getListChatTag: (): Array<TypeChatTagResponse> =>
         useSelector((state: RootState) => state.logicSlice.listChatTag),
     getChatTagFocusing: () =>
         useSelector((state: RootState) => state.logicSlice.chatTagFocusing),
-    getListMessagesEnjoy: () =>
-        useSelector((state: RootState) => state.logicSlice.listMessagesEnjoy),
 
     getToken: () => useSelector((state: RootState) => state.logicSlice.token),
 
@@ -102,6 +90,8 @@ export const Redux = {
         useSelector(
             (state: RootState) => state.logicSlice.chatTagFromNotification,
         ),
+    getBubbleFocusing: () =>
+        useSelector((state: RootState) => state.logicSlice.bubbleFocusing),
 
     // SET METHOD
     setIsLoading: (status: boolean) => {
@@ -114,13 +104,6 @@ export const Redux = {
             ...update,
         };
         FindmeStore.dispatch(logicSliceAction.setResource(newResource));
-    },
-
-    setIndexBubble: (index: number) => {
-        FindmeStore.dispatch(logicSliceAction.setIndexBubble(index));
-    },
-    setDisplayBubbleFrame: (value: boolean) => {
-        FindmeStore.dispatch(logicSliceAction.setDisplayBubbleFrame(value));
     },
 
     updateListChatTag: (newList: any) => {
@@ -136,45 +119,6 @@ export const Redux = {
 
     setBubblePalaceAction: (newBubble: TypeBubblePalaceAction) => {
         FindmeStore.dispatch(logicSliceAction.setBubblePalace(newBubble));
-    },
-
-    updateListMessageEnjoy: (
-        newList: Array<{
-            chatTag: string;
-            messages: Array<TypeChatMessageResponse>;
-        }>,
-    ) => {
-        FindmeStore.dispatch(logicSliceAction.setListMessagesEnjoy(newList));
-    },
-    addNewMessageEnjoy: (params: {
-        chatTag: string;
-        newMessage: TypeChatMessageResponse;
-    }) => {
-        const currentList = FindmeStore.getState().logicSlice.listMessagesEnjoy;
-        const temp = currentList.map(item => {
-            if (item.chatTag !== params.chatTag) {
-                return item;
-            }
-            const newMessages = [params.newMessage].concat(item.messages);
-            return {
-                chatTag: item.chatTag,
-                messages: newMessages,
-            };
-        });
-        FindmeStore.dispatch(logicSliceAction.setListMessagesEnjoy(temp));
-    },
-    startNewMessageEnjoy: (params: {
-        chatTagId: string;
-        newMessage: TypeChatMessageResponse;
-    }) => {
-        const currentList = FindmeStore.getState().logicSlice.listMessagesEnjoy;
-        const temp = [
-            {
-                chatTag: params.chatTagId,
-                messages: [params.newMessage],
-            },
-        ].concat(currentList);
-        FindmeStore.dispatch(logicSliceAction.setListMessagesEnjoy(temp));
     },
 
     setNumberNewMessage: (value: number) => {
@@ -195,6 +139,10 @@ export const Redux = {
         FindmeStore.dispatch(
             logicSliceAction.setChatTagFromNotification(value),
         );
+    },
+
+    setBubbleFocusing: (value: string) => {
+        FindmeStore.dispatch(logicSliceAction.setBubbleFocusing(value));
     },
 
     /**
@@ -253,7 +201,6 @@ export const Redux = {
                     : current.information.birthday,
             },
             setting: {...current.setting, ...newProfile.setting},
-            listBubbles: newProfile.listBubbles || current.listBubbles,
         };
 
         FindmeStore.dispatch(accountSliceAction.updatePassport(temp));
@@ -282,14 +229,9 @@ export const Redux = {
             setting: {
                 display_avatar: passport.setting.display_avatar,
             },
-            listBubbles: passport.listBubbles,
         });
         Redux.updateResource(initialLogicState.resource);
         Redux.updateListChatTag([]);
-        Redux.setBubblePalaceAction({
-            action: TYPE_BUBBLE_PALACE_ACTION.clearAll,
-            payload: undefined,
-        });
     },
 };
 

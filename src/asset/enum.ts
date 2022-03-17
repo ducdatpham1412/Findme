@@ -121,8 +121,10 @@ export enum TYPE_NOTIFICATION {
     newChatTag = 0,
     message = 1,
     follow = 2,
+    likePost = 3,
 }
 
 export enum TYPE_BUBBLE_PALACE_ACTION {
     disableBubble = 0,
+    createNewPostFromProfile = 1,
 }

@@ -1,36 +1,30 @@
-import {DELAY_LONG_PRESS} from 'asset/standardValue';
+import Images from 'asset/img/images';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
-import {pushBubble} from 'hook/useSocketIO';
-import {PROFILE_ROUTE} from 'navigation/config/routes';
+import {MAIN_SCREEN, PROFILE_ROUTE} from 'navigation/config/routes';
 import {useTabBar} from 'navigation/config/TabBarProvider';
-import {appAlert, navigate} from 'navigation/NavigationService';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {navigate} from 'navigation/NavigationService';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Animated, Platform, View} from 'react-native';
-import {moderateScale, scale, ScaledSheet} from 'react-native-size-matters';
+import {
+    moderateScale,
+    scale,
+    ScaledSheet,
+    verticalScale,
+} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {openPlusBox} from 'utility/assistant';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
-/**
- * Button circle in the middle
- * 1. Show iconPlus if not have any bubble
- * 2. Show indexBubble of listBubbles
- * 3. Disable when open BubblePushFrame
- */
-const ratio = scale(50) / scale(40);
+const ratio = scale(40) / scale(40);
+const opacityNotFocus = 0.6;
 
 const TabNavigator = (props?: any) => {
-    const isModeExp = Redux.getModeExp();
     const theme = Redux.getTheme();
-    const {listBubbles, profile} = Redux.getPassport();
-    const indexBubble = Redux.getIndexBubble();
-    const isDisplayBubbleFrame = Redux.getDisplayBubbleFrame();
 
     const numberNewMessages = Redux.getNumberNewMessages();
+    const {avatar} = Redux.getPassport().profile;
 
     const routeDiscovery = props.state.routes[0];
     const routeMessage = props.state.routes[1];
@@ -42,17 +36,15 @@ const TabNavigator = (props?: any) => {
     const isFocusingProfile = props.state.index === 2;
     const isFocusingNotification = props.state.index === 3;
 
-    const {showTabBar, setShowTabBar} = useTabBar();
+    const {showTabBar} = useTabBar();
 
     const aim = useRef(new Animated.Value(0)).current;
-    const [buttonPushHeight, setButtonPushHeight] = useState(scale(50));
+    const [buttonPushHeight, setButtonPushHeight] = useState(scale(40));
     const [height, setHeight] = useState(scale(40));
     aim.addListener(({value}) => {
         setHeight(value);
         setButtonPushHeight(ratio * value);
     });
-
-    const translateYButtonPush = useRef(new Animated.Value(0)).current;
 
     const controlTabBar = () => {
         if (!showTabBar) {
@@ -74,50 +66,11 @@ const TabNavigator = (props?: any) => {
         controlTabBar();
     }, [showTabBar]);
 
-    useEffect(() => {
-        if (isFocusingDiscovery) {
-            Animated.timing(translateYButtonPush, {
-                toValue: scale(-25),
-                duration: 400,
-                useNativeDriver: true,
-            }).start();
-        } else {
-            Animated.timing(translateYButtonPush, {
-                toValue: scale(-5),
-                duration: 400,
-                useNativeDriver: true,
-            }).start();
-        }
-    }, [isFocusingDiscovery]);
-
-    const onOpenBubblePushFrame = () => {
-        if (isFocusingDiscovery) {
-            Redux.setDisplayBubbleFrame(true);
-        }
-    };
-    const onPushBubblePalace = () => {
-        if (isFocusingDiscovery) {
-            if (listBubbles.length) {
-                try {
-                    if (!isModeExp) {
-                        pushBubble({
-                            myId: profile.id,
-                            bubble: listBubbles[indexBubble],
-                        });
-                    } else {
-                        pushBubble({
-                            myId: profile.id,
-                            bubble: listBubbles[indexBubble],
-                        });
-                    }
-                } catch (err) {
-                    appAlert(err);
-                }
-            } else {
-                openPlusBox(setShowTabBar);
-            }
-        }
-    };
+    const onGoToCreatePost = useCallback(() => {
+        navigate(MAIN_SCREEN.profileRoute, {
+            screen: PROFILE_ROUTE.createPost,
+        });
+    }, []);
 
     /**
      * Render view
@@ -146,9 +99,9 @@ const TabNavigator = (props?: any) => {
                 <Entypo
                     name="compass"
                     style={{
-                        opacity: isFocusingDiscovery ? 1 : 0.4,
+                        opacity: isFocusingDiscovery ? 1 : opacityNotFocus,
                         fontSize: moderateScale(20),
-                        color: theme.tabBarIconColor,
+                        color: theme.textHightLight,
                     }}
                 />
             </StyleTouchable>
@@ -157,9 +110,7 @@ const TabNavigator = (props?: any) => {
 
     const RenderMessageButton = useMemo(() => {
         const tintColor =
-            numberNewMessages > 0
-                ? theme.highlightColor
-                : theme.tabBarIconColor;
+            numberNewMessages > 0 ? theme.highlightColor : theme.textHightLight;
         return (
             <StyleTouchable
                 customStyle={styles.buttonView}
@@ -168,7 +119,7 @@ const TabNavigator = (props?: any) => {
                     <Ionicons
                         name="chatbubble-ellipses-outline"
                         style={{
-                            opacity: isFocusingMess ? 1 : 0.4,
+                            opacity: isFocusingMess ? 1 : opacityNotFocus,
                             color: tintColor,
                             fontSize: moderateScale(20),
                         }}
@@ -192,11 +143,9 @@ const TabNavigator = (props?: any) => {
                 customStyle={styles.buttonView}
                 onPress={() => {
                     if (isFocusingProfile) {
-                        // navigate(routeProfile.name, {
-                        //     screen: PROFILE_ROUTE.profileScreen,
-                        //     resetToMyProfile: 'reset',
-                        // });
-                        navigate(PROFILE_ROUTE.myProfile);
+                        navigate(MAIN_SCREEN.profileRoute, {
+                            screen: PROFILE_ROUTE.myProfile,
+                        });
                     } else {
                         navigate(routeProfile.name);
                     }
@@ -206,7 +155,7 @@ const TabNavigator = (props?: any) => {
                     style={{
                         fontSize: moderateScale(20),
                         color: theme.textHightLight,
-                        opacity: isFocusingProfile ? 1 : 0.6,
+                        opacity: isFocusingProfile ? 1 : opacityNotFocus,
                     }}
                 />
             </StyleTouchable>
@@ -222,8 +171,8 @@ const TabNavigator = (props?: any) => {
                     name="book-open"
                     style={{
                         fontSize: moderateScale(18),
-                        color: theme.tabBarIconColor,
-                        opacity: isFocusingNotification ? 1 : 0.4,
+                        color: theme.textHightLight,
+                        opacity: isFocusingNotification ? 1 : opacityNotFocus,
                     }}
                 />
             </StyleTouchable>
@@ -256,7 +205,7 @@ const TabNavigator = (props?: any) => {
             <Animated.View
                 style={[
                     styles.bubbleView,
-                    {transform: [{translateY: translateYButtonPush}]},
+                    {transform: [{translateY: -verticalScale(4)}]},
                 ]}>
                 <StyleTouchable
                     customStyle={[
@@ -266,26 +215,18 @@ const TabNavigator = (props?: any) => {
                             height: buttonPushHeight,
                         },
                     ]}
-                    onLongPress={onOpenBubblePushFrame}
-                    onDoublePress={onOpenBubblePushFrame}
-                    delayLongPress={DELAY_LONG_PRESS}
-                    onPress={onPushBubblePalace}
-                    disableOpacity={1}
-                    disable={isDisplayBubbleFrame || !isFocusingDiscovery}>
-                    {listBubbles.length ? (
-                        <StyleImage
-                            source={{
-                                uri: listBubbles[indexBubble].icon,
-                            }}
-                            customStyle={styles.indexBubbleNow}
-                        />
-                    ) : (
-                        <MaterialIcons
-                            name="bubble-chart"
-                            size={moderateScale(26)}
-                            color={theme.tabBarIconColor}
-                        />
-                    )}
+                    onPress={onGoToCreatePost}>
+                    <StyleImage
+                        source={{uri: avatar}}
+                        customStyle={styles.avatar}
+                    />
+                    <StyleImage
+                        source={Images.icons.zoomPhoto}
+                        customStyle={[
+                            styles.zoomPhoto,
+                            {tintColor: theme.borderColor},
+                        ]}
+                    />
                 </StyleTouchable>
             </Animated.View>
         </>
@@ -305,10 +246,10 @@ const styles = ScaledSheet.create({
         position: 'absolute',
         width: '100%',
         height: '100%',
-        opacity: 0.45,
+        opacity: 0.25,
         borderTopWidth: Platform.select({
-            ios: 0.5,
-            android: 0.5,
+            ios: '1.5@ms',
+            android: '1.5@ms',
         }),
     },
     buttonView: {
@@ -323,17 +264,6 @@ const styles = ScaledSheet.create({
         bottom: '-6@s',
         borderRadius: '3@s',
         opacity: 0.6,
-    },
-    buttonPush: {
-        width: '50@s',
-        borderRadius: '50@s',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    indexBubbleNow: {
-        borderRadius: '100@s',
-        width: '25@s',
-        height: '25@s',
     },
     newMessagesBox: {
         position: 'absolute',
@@ -354,6 +284,22 @@ const styles = ScaledSheet.create({
         alignSelf: 'center',
         zIndex: 2,
         bottom: 0,
+    },
+    buttonPush: {
+        width: '40@s',
+        borderRadius: '40@s',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    avatar: {
+        width: '45%',
+        height: '45%',
+        borderRadius: '30@s',
+    },
+    zoomPhoto: {
+        position: 'absolute',
+        width: '60%',
+        height: '60%',
     },
 });
 

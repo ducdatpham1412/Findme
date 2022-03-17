@@ -1,9 +1,8 @@
 import {createStackNavigator} from '@react-navigation/stack';
 import CreatePost from 'feature/profile/CreatePost';
+import CreatePostPreview from 'feature/profile/CreatePostPreview';
 import EditProfile from 'feature/profile/EditProfile';
-import ListFollows from 'feature/profile/ListFollows';
 import MyProfile from 'feature/profile/MyProfile';
-import OtherProfile from 'feature/profile/OtherProfile';
 import Redux from 'hook/useRedux';
 import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
@@ -22,7 +21,6 @@ const ProfileRoute = () => {
 
     const optionStyle: StyleProp<any> = {
         headerTintColor: theme.textColor,
-        // headerTintColor: 'white',
         headerTitleStyle: {
             fontSize: moderateScale(17),
             fontWeight: 'bold',
@@ -47,11 +45,6 @@ const ProfileRoute = () => {
             />
 
             <ProfileStack.Screen
-                name={PROFILE_ROUTE.otherProfile}
-                component={OtherProfile}
-            />
-
-            <ProfileStack.Screen
                 name={PROFILE_ROUTE.editProfile}
                 component={EditProfile}
                 options={{
@@ -73,8 +66,8 @@ const ProfileRoute = () => {
             />
 
             <ProfileStack.Screen
-                name={PROFILE_ROUTE.listFollows}
-                component={ListFollows}
+                name={PROFILE_ROUTE.createPostPreview}
+                component={CreatePostPreview}
             />
         </ProfileStack.Navigator>
     );

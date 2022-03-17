@@ -1,7 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {
     TypeBubblePalaceAction,
-    TypeChatMessageResponse,
     TypeChatTagResponse,
     TypeGradient,
 } from 'api/interface';
@@ -13,20 +12,12 @@ export const initialLogicState = {
 
     token: null, // is set from active user in async, to handle SocketProvider
 
-    displayBubbleFrame: false, // for display BubbleFrame in Discovery
-    indexBubble: 0, // index to push in tabBar
-
     listChatTag: <Array<TypeChatTagResponse>>[],
     chatTagFocusing: '', // this flag to check if socket do action update chat tag hasNewMessage
-    listMessagesEnjoy: <
-        Array<{
-            chatTag: string;
-            messages: Array<TypeChatMessageResponse>;
-        }>
-    >[],
 
     bubblePalaceAction: <TypeBubblePalaceAction>{},
     borderMessRoute: 'yellow',
+    bubbleFocusing: '',
 
     // notification
     numberNewMessages: 0,
@@ -55,12 +46,6 @@ const logicSlice = createSlice({
         setResource: (state, action) => {
             state.resource = action.payload;
         },
-        setDisplayBubbleFrame: (state, action) => {
-            state.displayBubbleFrame = action.payload;
-        },
-        setIndexBubble: (state, action) => {
-            state.indexBubble = action.payload;
-        },
         setListChatTag: (state, action) => {
             state.listChatTag = action.payload;
         },
@@ -69,9 +54,6 @@ const logicSlice = createSlice({
         },
         setBubblePalace: (state, action) => {
             state.bubblePalaceAction = action.payload;
-        },
-        setListMessagesEnjoy: (state, action) => {
-            state.listMessagesEnjoy = action.payload;
         },
         setNumberNewMessages: (state, action) => {
             state.numberNewMessages = action.payload;
@@ -84,6 +66,9 @@ const logicSlice = createSlice({
         },
         setShouldRenderOtherProfile: (state, action) => {
             state.shouldRenderOtherProfile = action.payload;
+        },
+        setBubbleFocusing: (state, action) => {
+            state.bubbleFocusing = action.payload;
         },
     },
 });

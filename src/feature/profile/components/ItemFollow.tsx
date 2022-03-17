@@ -3,11 +3,12 @@ import {apiFollowUser} from 'api/module';
 import {RELATIONSHIP} from 'asset/enum';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
-import {PROFILE_ROUTE} from 'navigation/config/routes';
+import ROOT_SCREEN from 'navigation/config/routes';
 import {appAlert, push} from 'navigation/NavigationService';
 import React, {useState} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface Props {
     item: TypeFollowResponse;
@@ -32,14 +33,17 @@ const ItemFollow = (props: Props) => {
     };
 
     const onGoToProfile = () => {
-        push(PROFILE_ROUTE.otherProfile, {
+        push(ROOT_SCREEN.otherProfile, {
             id: item.id,
             onGoBack: undefined,
         });
     };
 
     return (
-        <StyleTouchable style={styles.container} onPress={onGoToProfile}>
+        <StyleTouchable
+            style={styles.container}
+            onPress={onGoToProfile}
+            disable={!item.id}>
             <StyleImage
                 source={{uri: item.avatar}}
                 customStyle={styles.avatar}
@@ -64,7 +68,7 @@ const ItemFollow = (props: Props) => {
             </View>
 
             <View style={styles.buttonFollowView}>
-                {hadNotFollow && (
+                {hadNotFollow && !!item.id && (
                     <StyleTouchable
                         customStyle={[
                             styles.buttonFollow,
@@ -79,6 +83,15 @@ const ItemFollow = (props: Props) => {
                             ]}
                         />
                     </StyleTouchable>
+                )}
+                {!item.id && (
+                    <MaterialCommunityIcons
+                        name="incognito"
+                        style={[
+                            styles.iconIncognito,
+                            {color: theme.borderColor},
+                        ]}
+                    />
                 )}
             </View>
         </StyleTouchable>
@@ -118,6 +131,7 @@ const styles = ScaledSheet.create({
         width: '70@s',
         height: '100%',
         justifyContent: 'center',
+        alignItems: 'center',
     },
     buttonFollow: {
         width: '100%',
@@ -128,6 +142,9 @@ const styles = ScaledSheet.create({
     },
     textFollow: {
         fontSize: '11@ms',
+    },
+    iconIncognito: {
+        fontSize: '20@ms',
     },
 });
 

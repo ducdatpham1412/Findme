@@ -4,6 +4,7 @@ const Theme = {
         black: '#333333',
         pink: '#F067D6',
         textMe: '#e4f0f4',
+        orange: 'orange',
     },
     darkTheme: {
         backgroundColor: '#081019',
@@ -16,6 +17,7 @@ const Theme = {
         backgroundButtonColor: '#102a47',
         backgroundTextInput: '#202E44',
         tabBarIconColor: '#75adcb',
+        unLikeHeart: 'white',
     },
     lightTheme: {
         backgroundColor: 'white',
@@ -28,6 +30,7 @@ const Theme = {
         backgroundButtonColor: '#c5e3ff',
         backgroundTextInput: '#cbe1ef',
         tabBarIconColor: '#102a47',
+        unLikeHeart: '#acc2e2',
     },
 };
 

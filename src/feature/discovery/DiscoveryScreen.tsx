@@ -1,13 +1,17 @@
 import {TypeBubblePalace} from 'api/interface';
 import {
+    apiGetDetailBubble,
+    apiGetDetailBubbleEnjoy,
     apiGetListBubbleActive,
     apiGetListBubbleActiveOfUserEnjoy,
 } from 'api/module';
 import {Metrics} from 'asset/metrics';
 import StyleList from 'components/base/StyleList';
+import LoadingScreen from 'components/LoadingScreen';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
-import {appAlert} from 'navigation/NavigationService';
+import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
+import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {useCallback, useMemo} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
@@ -22,6 +26,7 @@ const DiscoveryScreen = () => {
 
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
+    const myId = Redux.getPassport().profile.id;
 
     const selectedApi = useMemo(() => {
         return isModeExp
@@ -44,7 +49,7 @@ const DiscoveryScreen = () => {
             if (!isModeExp) {
                 interactBubble({
                     itemBubble,
-                    isBubble: true,
+                    isBubble: !itemBubble.hadKnowEachOther,
                 });
             } else {
                 appAlert('discovery.bubble.goToSignUp', {
@@ -56,8 +61,58 @@ const DiscoveryScreen = () => {
         [isModeExp],
     );
 
+    const onReportUser = useCallback((idUser: number) => {
+        navigate(ROOT_SCREEN.reportUser, {
+            idUser,
+        });
+    }, []);
+
+    const onRefreshItem = useCallback(
+        async (idBubble: string) => {
+            try {
+                const res = isModeExp
+                    ? await apiGetDetailBubbleEnjoy(idBubble)
+                    : await apiGetDetailBubble(idBubble);
+                setList((preValue: Array<TypeBubblePalace>) => {
+                    return preValue.map(item => {
+                        if (item.id !== idBubble) {
+                            return item;
+                        }
+                        return res.data;
+                    });
+                });
+            } catch (err) {
+                appAlert(err);
+            }
+        },
+        [isModeExp],
+    );
+
+    const onGoToProfile = useCallback(
+        (item: TypeBubblePalace) => {
+            if (item.hadKnowEachOther) {
+                if (item.creatorId === myId) {
+                    navigate(PROFILE_ROUTE.myProfile);
+                } else {
+                    navigate(ROOT_SCREEN.otherProfile, {
+                        id: item.creatorId,
+                    });
+                }
+            }
+        },
+        [myId],
+    );
+
     const RenderItemBubble = useCallback((item: TypeBubblePalace) => {
-        return <Bubble item={item} onInteractBubble={onInteractBubble} />;
+        return (
+            <Bubble
+                item={item}
+                onInteractBubble={onInteractBubble}
+                onReportUser={onReportUser}
+                onRefreshItem={onRefreshItem}
+                onGoToProfile={onGoToProfile}
+            />
+        );
     }, []);
 
     const RenderBubblePlaceStatic = useMemo(() => {
@@ -72,6 +127,7 @@ const DiscoveryScreen = () => {
                 refreshing={refreshing}
                 onRefresh={onRefresh}
                 onLoadMore={onLoadMore}
+                ListEmptyComponent={LoadingScreen}
                 // onEndReached={undefined}
                 // onScroll={e => {
                 //     const indexToLast = Math.round(
@@ -79,9 +135,7 @@ const DiscoveryScreen = () => {
                 //             e.nativeEvent.contentOffset.y) /
                 //             bubbleHeight,
                 //     );
-                //     if (indexToLast === 2 && !loading) {
-                //         onLoadMore();
-                //     }
+                //     Redux.setBubbleFocusing(list[indexToLast].id);
                 // }}
             />
         );

@@ -15,6 +15,7 @@ const common = {
     seeMore: '...See more',
     seeLess: '...See less',
     letGo: "Let's go",
+    continue: 'Continue',
 };
 
 const login = {
@@ -173,6 +174,8 @@ const profile = {
     edit: {
         headerTitle: 'Edit own profile',
         confirmButton: 'Update',
+        name: 'Your name',
+        anonymousName: 'Anonymous name',
     },
     screen: {
         sendMessage: 'Send message',
@@ -193,6 +196,7 @@ const profile = {
         editPost: 'Edit post',
         delete: 'Delete',
         sureDeletePost: 'Are you sure delete this post?',
+        enterTopic: 'Enter topic yourself',
     },
     follow: {
         follower: 'Followers',

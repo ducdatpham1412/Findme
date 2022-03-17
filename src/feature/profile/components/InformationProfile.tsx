@@ -4,31 +4,30 @@ import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
-import {PROFILE_ROUTE} from 'navigation/config/routes';
+import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {navigate, push} from 'navigation/NavigationService';
 import React, {useMemo} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import {onGoToSignUp} from 'utility/assistant';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import {onGoToSignUp} from 'utility/assistant';
 
 interface Props {
     profile: TypeGetProfileResponse;
     routeName: string;
     havingEditProfile?: boolean;
+    anonymousName?: string;
 }
 
-const InformationProfile = ({
-    profile,
-    routeName,
-    havingEditProfile = false,
-}: Props) => {
+const InformationProfile = (props: Props) => {
+    const {profile, routeName, havingEditProfile, anonymousName} = props;
+
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
-    const {name, description, avatar, cover, followers, followings} = profile;
+    const {name, description, followers, followings} = profile;
 
     const onNavigateFollow = (type: number) => {
-        push(PROFILE_ROUTE.listFollows, {
+        push(ROOT_SCREEN.listFollows, {
             userId: profile.id,
             name: profile.name,
             type,
@@ -71,18 +70,27 @@ const InformationProfile = ({
                     ]}
                     originValue={name}
                 />
+                {!!anonymousName && (
+                    <StyleText
+                        customStyle={[
+                            styles.textNameAnonymous,
+                            {color: theme.textColor},
+                        ]}
+                        originValue={`@${anonymousName}`}
+                    />
+                )}
                 {!!description && (
                     <StyleText
                         i18Text={description}
                         customStyle={[
                             styles.textDescription,
-                            {color: theme.textColor},
+                            {color: theme.textHightLight},
                         ]}
                     />
                 )}
             </View>
         );
-    }, [name, description, theme]);
+    }, [name, anonymousName, description, theme]);
 
     const RenderFollow = useMemo(() => {
         return (
@@ -104,7 +112,7 @@ const InformationProfile = ({
                         originValue={String(followers)}
                         customStyle={[
                             styles.numberFollow,
-                            {color: theme.textColor},
+                            {color: theme.textHightLight},
                         ]}
                     />
                 </StyleTouchable>
@@ -125,7 +133,7 @@ const InformationProfile = ({
                         originValue={String(followings)}
                         customStyle={[
                             styles.numberFollow,
-                            {color: theme.textColor},
+                            {color: theme.textHightLight},
                         ]}
                     />
                 </StyleTouchable>
@@ -169,14 +177,14 @@ const InformationProfile = ({
                 <StyleTouchable
                     customStyle={[
                         styles.editProfileBox,
-                        {backgroundColor: theme.backgroundButtonColor},
+                        {backgroundColor: theme.tabBarIconColor},
                     ]}
                     onPress={() => navigate(PROFILE_ROUTE.editProfile)}>
                     <AntDesign
                         name="edit"
                         style={[
                             styles.editProfileIcon,
-                            {color: theme.borderColor},
+                            {color: theme.backgroundColor},
                         ]}
                     />
                 </StyleTouchable>
@@ -213,13 +221,13 @@ const styles = ScaledSheet.create({
     },
     editProfileBox: {
         position: 'absolute',
-        padding: '7@s',
+        padding: '10@s',
         borderRadius: '50@s',
         top: '17@s',
         right: '17@s',
     },
     editProfileIcon: {
-        fontSize: '13@ms',
+        fontSize: '18@ms',
     },
     // avatar - cover
     introduceView: {
@@ -245,10 +253,15 @@ const styles = ScaledSheet.create({
         fontSize: '30@ms',
         fontWeight: 'bold',
     },
+    textNameAnonymous: {
+        fontSize: '13@ms',
+        fontWeight: 'bold',
+        fontStyle: 'italic',
+        marginTop: '7@vs',
+    },
     textDescription: {
         fontSize: '15@ms',
-        fontStyle: 'italic',
-        marginTop: '22@vs',
+        marginTop: '25@vs',
     },
     // box follow
     followBox: {

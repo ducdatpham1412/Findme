@@ -1,6 +1,6 @@
-import {TypeCreatePostResponse} from 'api/interface';
-import {apiCreatePost, apiEditPost} from 'api/module';
-import {Metrics} from 'asset/metrics';
+import {TypeCreatePostRequest, TypeCreatePostResponse} from 'api/interface';
+import {apiEditPost} from 'api/module';
+import AutoHeightImage from 'components/AutoHeightImage';
 import {
     StyleButton,
     StyleContainer,
@@ -9,60 +9,74 @@ import {
     StyleText,
     StyleTouchable,
 } from 'components/base';
+import ButtonX from 'components/common/ButtonX';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
-import {appAlert, goBack} from 'navigation/NavigationService';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {PROFILE_ROUTE} from 'navigation/config/routes';
+import {
+    appAlert,
+    goBack,
+    navigate,
+    popUpPicker,
+} from 'navigation/NavigationService';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {TextInput, View} from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
-import {scale, ScaledSheet} from 'react-native-size-matters';
-import Feather from 'react-native-vector-icons/Feather';
+import {scale, ScaledSheet, verticalScale} from 'react-native-size-matters';
+import Entypo from 'react-native-vector-icons/Entypo';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
     chooseImageFromCamera,
     chooseImageFromLibrary,
     optionsImagePicker,
 } from 'utility/assistant';
-import ImageUploader from 'utility/ImageUploader';
 
 interface Props {
     route: {
         params: {
-            // for create post
-            addAPostToList?(newPost: any): void;
             // for edit post
             itemPostFromEdit?: TypeCreatePostResponse;
-            editAPostInList?(params: {id: string; newContent: string}): void;
+            editAPostInList?(params: {
+                id: string;
+                data: TypeCreatePostRequest;
+            }): void;
         };
     };
 }
 
 const CreatePost = ({route}: Props) => {
-    const addAPostToList = route.params?.addAPostToList;
-    const itemPostFromEdit = route.params.itemPostFromEdit;
+    const itemPostFromEdit = route.params?.itemPostFromEdit;
 
     const {t} = useTranslation();
     const theme = Redux.getTheme();
     const {profile} = Redux.getPassport();
+    const isModeExp = Redux.getModeExp();
+    const {listHobbies} = Redux.getResource();
 
     const actionSheetRef = useRef<any>(null);
     const inputRef = useRef<TextInput>(null);
 
     const [caption, setCaption] = useState(itemPostFromEdit?.content || '');
     const [image, setImage] = useState(itemPostFromEdit?.images[0] || '');
+    const [color, setColor] = useState<number | undefined>(
+        itemPostFromEdit?.color || undefined,
+    );
+    const [name, setName] = useState<string | undefined>(
+        itemPostFromEdit?.name || undefined,
+    );
 
     const optionsImgPicker = optionsImagePicker.map(item => t(item));
-    const titleButton = itemPostFromEdit
-        ? 'profile.post.edit'
-        : 'profile.post.post';
+    const titleButton = useMemo(
+        () => (itemPostFromEdit ? 'profile.post.edit' : 'common.continue'),
+        [],
+    );
 
     useEffect(() => {
-        if (itemPostFromEdit) {
-            inputRef.current?.focus();
-        }
+        inputRef.current?.focus();
     }, []);
 
-    const onChooseAction = async (index: number) => {
+    const onChooseAction = useCallback(async (index: number) => {
         if (index === 0) {
             await chooseImageFromCamera(setImage, {
                 freeStyleCrop: true,
@@ -72,35 +86,55 @@ const CreatePost = ({route}: Props) => {
                 freeStyleCrop: true,
             });
         }
-    };
+    }, []);
 
-    const onPostImage = async () => {
+    const onComeBackMyProfile = useCallback(() => {
+        navigate(PROFILE_ROUTE.myProfile);
+    }, []);
+
+    const onConfirm = async () => {
+        // Create post
+        if (!itemPostFromEdit) {
+            const createData: TypeCreatePostRequest = {
+                content: caption,
+                images: image ? [image] : [],
+                color,
+                name,
+            };
+            navigate(PROFILE_ROUTE.createPostPreview, {
+                createData,
+            });
+            return;
+        }
+
+        // Edit post
+        const updateData: TypeCreatePostRequest = {};
+        if (caption !== itemPostFromEdit.content) {
+            updateData.content = caption;
+        }
+        if (image !== itemPostFromEdit.images[0]) {
+            updateData.images = [image];
+        }
+        if (color !== itemPostFromEdit.color) {
+            updateData.color = color;
+        }
+        if (name !== itemPostFromEdit.name) {
+            updateData.name = name;
+        }
+
         try {
             Redux.setIsLoading(true);
-
-            // create post
-            if (!itemPostFromEdit) {
-                const tempImage = await ImageUploader.upLoad(image, 1080);
-                const res = await apiCreatePost({
-                    content: caption,
-                    images: [tempImage],
-                });
-                addAPostToList?.(res.data);
-                goBack();
-            }
-
-            // edit post
-            if (itemPostFromEdit?.id) {
+            if (!isModeExp) {
                 await apiEditPost({
                     idPost: itemPostFromEdit.id,
-                    newContent: caption,
+                    data: updateData,
                 });
-                route.params?.editAPostInList?.({
-                    id: itemPostFromEdit?.id,
-                    newContent: caption,
-                });
-                goBack();
             }
+            route.params?.editAPostInList?.({
+                id: itemPostFromEdit.id,
+                data: updateData,
+            });
+            onComeBackMyProfile();
         } catch (err) {
             appAlert(err);
         } finally {
@@ -115,7 +149,7 @@ const CreatePost = ({route}: Props) => {
         const title = itemPostFromEdit
             ? 'profile.post.editPost'
             : 'profile.post.title';
-        return <StyleHeader title={title} />;
+        return <StyleHeader title={title} onGoBack={onComeBackMyProfile} />;
     }, [!!itemPostFromEdit]);
 
     const RenderInformation = useMemo(() => {
@@ -133,25 +167,149 @@ const CreatePost = ({route}: Props) => {
         );
     }, [profile]);
 
+    const onNavigatePicker = useCallback(() => {
+        popUpPicker({
+            data: listHobbies,
+            renderItem: (item: any) => {
+                if (item.id === 8) {
+                    return (
+                        <View style={styles.elementPicker}>
+                            <StyleImage
+                                source={{uri: item.icon}}
+                                customStyle={styles.iconPicker}
+                            />
+                            <StyleInput
+                                defaultValue={name}
+                                onChangeText={text => setName(text)}
+                                containerStyle={styles.inputContainer}
+                                inputStyle={[
+                                    styles.inputOther,
+                                    {color: theme.textHightLight},
+                                ]}
+                                hasErrorBox={false}
+                                hasUnderLine={false}
+                                maxLength={50}
+                                i18Placeholder="profile.post.enterTopic"
+                                placeholderTextColor={theme.holderColorLighter}
+                            />
+                        </View>
+                    );
+                }
+                return (
+                    <View style={styles.elementPicker}>
+                        <StyleImage
+                            source={{uri: item.icon}}
+                            customStyle={styles.iconPicker}
+                        />
+                        <StyleText
+                            originValue={item.name}
+                            customStyle={[
+                                styles.textPicker,
+                                {color: theme.textHightLight},
+                            ]}
+                        />
+                    </View>
+                );
+            },
+            itemHeight: verticalScale(70),
+            onSetItemSelected: (hobby: any) => {
+                console.log('choosing: ', hobby);
+                if (hobby.id === 8) {
+                    // setName(nameIfChooseOther);
+                    setColor(hobby.id);
+                } else {
+                    setColor(hobby.id);
+                    setName(hobby.name);
+                }
+            },
+            initIndex: listHobbies.findIndex(item => item.id === color),
+            onCancel: () => {
+                setName(name);
+                goBack();
+            },
+        });
+    }, [color, name, theme]);
+
+    const RenderToolView = useMemo(() => {
+        return (
+            <View style={styles.toolView}>
+                {!(color && name) && (
+                    <StyleTouchable onPress={onNavigatePicker}>
+                        <Ionicons
+                            name="ios-color-palette-outline"
+                            style={[
+                                styles.iconTheme,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                    </StyleTouchable>
+                )}
+                <View style={{width: scale(30)}} />
+                {!image && (
+                    <StyleTouchable
+                        onPress={() => actionSheetRef.current.show()}>
+                        <Entypo
+                            name="images"
+                            style={[
+                                styles.iconImage,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                    </StyleTouchable>
+                )}
+            </View>
+        );
+    }, [color, name, image, theme]);
+
+    const RenderHobby = useMemo(() => {
+        const hobby = listHobbies.find(item => item.id === color);
+        if (!hobby) {
+            return null;
+        }
+
+        const onResetNameAndColor = () => {
+            setName('');
+            setColor(undefined);
+        };
+
+        return (
+            <View style={styles.hobbyView}>
+                <View
+                    style={[styles.hobbyBox, {borderColor: theme.borderColor}]}>
+                    <StyleImage
+                        source={{uri: hobby.icon}}
+                        customStyle={styles.iconHobby}
+                    />
+                    <StyleText
+                        originValue={name}
+                        customStyle={[
+                            styles.textHobby,
+                            {color: theme.textColor},
+                        ]}
+                    />
+                    <ButtonX
+                        onPress={onResetNameAndColor}
+                        containerStyle={styles.iconDelete}
+                    />
+                </View>
+            </View>
+        );
+    }, [name, color, theme]);
+
     const RenderImage = useMemo(() => {
         return image ? (
             <View style={[styles.imageBox, {shadowColor: theme.textColor}]}>
-                <StyleImage source={{uri: image}} customStyle={styles.image} />
+                <AutoHeightImage uri={image} customStyle={styles.image} />
+                {!itemPostFromEdit && (
+                    <ButtonX
+                        containerStyle={styles.iconDeleteImageTouch}
+                        iconStyle={styles.iconDeleteImage}
+                        onPress={() => setImage('')}
+                    />
+                )}
             </View>
-        ) : (
-            <StyleTouchable
-                customStyle={[
-                    styles.uploadTouch,
-                    {borderColor: theme.borderColor},
-                ]}
-                onPress={() => actionSheetRef.current.show()}>
-                <Feather
-                    name="upload"
-                    style={[styles.iconUpload, {color: theme.borderColor}]}
-                />
-            </StyleTouchable>
-        );
-    }, [image]);
+        ) : null;
+    }, [image, theme, itemPostFromEdit]);
 
     return (
         <>
@@ -173,18 +331,24 @@ const CreatePost = ({route}: Props) => {
                     multiline
                     i18Placeholder="profile.post.caption"
                     returnKeyType="default"
+                    hasErrorBox={false}
+                    hasUnderLine={false}
+                    isEffectTabBar={false}
                 />
 
-                {/* upload image */}
-                <View style={styles.uploadImageView}>{RenderImage}</View>
+                {RenderToolView}
 
-                {!!image && (
-                    <StyleButton
-                        title={titleButton}
-                        containerStyle={styles.buttonPostView}
-                        onPress={onPostImage}
-                    />
-                )}
+                {RenderHobby}
+
+                {/* upload image */}
+                {RenderImage}
+
+                <StyleButton
+                    title={titleButton}
+                    containerStyle={styles.buttonPostView}
+                    onPress={onConfirm}
+                    disable={!(name && color && image)}
+                />
             </StyleContainer>
 
             <ActionSheet
@@ -222,40 +386,100 @@ const styles = ScaledSheet.create({
     // caption view
     captionView: {
         width: '100%',
+        paddingTop: '10@vs',
+        paddingBottom: '15@vs',
     },
     inputCaption: {
         fontSize: '15@ms',
     },
-    // upload image view
-    uploadImageView: {
+    // tool view
+    toolView: {
         width: '100%',
-        minHeight: '200@vs',
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
         alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: '5@vs',
+        paddingVertical: '14@vs',
     },
-    uploadTouch: {
-        width: '50@s',
+    iconUploadTopic: {
+        width: '30@s',
         height: '50@s',
-        borderWidth: 0.7,
-        borderRadius: '10@s',
+        resizeMode: 'contain',
+    },
+    elementPicker: {
+        width: '70%',
+        height: '70@vs',
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
     },
-    iconUpload: {
-        fontSize: '20@ms',
+    iconPicker: {
+        width: '40@vs',
+        height: '40@vs',
+        marginRight: '20@s',
     },
+    textPicker: {
+        fontWeight: 'bold',
+    },
+    iconTheme: {
+        fontSize: '35@ms',
+    },
+    iconImage: {
+        fontSize: '30@ms',
+    },
+    inputContainer: {
+        flex: 1,
+    },
+    inputOther: {
+        width: '100%',
+        paddingHorizontal: 0,
+    },
+    // hobby view
+    hobbyView: {
+        width: '100%',
+        flexDirection: 'row',
+    },
+    hobbyBox: {
+        flexDirection: 'row',
+        borderWidth: '1@ms',
+        borderRadius: '50@ms',
+        paddingHorizontal: '15@s',
+        paddingVertical: '8@vs',
+        alignItems: 'center',
+    },
+    iconHobby: {
+        width: '30@s',
+        height: '30@s',
+        marginRight: '15@s',
+    },
+    textHobby: {
+        fontSize: '15@ms',
+        marginRight: '20@s',
+    },
+    iconDelete: {
+        position: 'relative',
+        borderRadius: '30@ms',
+        top: 0,
+    },
+    // image view
     imageBox: {
+        width: '100%',
         shadowOffset: {
             width: 2,
             height: 2,
         },
         shadowOpacity: 0.3,
+        marginTop: '30@vs',
     },
     image: {
-        width: Metrics.width - scale(100),
-        height: Metrics.width - scale(100),
+        width: '100%',
         borderRadius: '13@s',
+    },
+    iconDeleteImageTouch: {
+        right: '-12@ms',
+        top: '-12@ms',
+        borderRadius: '30@ms',
+    },
+    iconDeleteImage: {
+        fontSize: '20@ms',
     },
     // button post
     buttonPostView: {

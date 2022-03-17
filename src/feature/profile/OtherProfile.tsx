@@ -98,6 +98,7 @@ const OtherProfile = ({route}: Props) => {
             interactBubble({
                 itemBubble,
                 isBubble: false,
+                isEffectTabBar: false,
             });
         }
     };
@@ -249,6 +250,7 @@ const OtherProfile = ({route}: Props) => {
                     renderItem={RenderItem}
                     ListHeaderComponent={HeaderComponent}
                     style={styles.container}
+                    contentContainerStyle={styles.contentContainer}
                     refreshing={refreshing}
                     onRefresh={onRefreshPage}
                     onLoadMore={onLoadMore}
@@ -287,6 +289,9 @@ const styles = ScaledSheet.create({
     container: {
         flexGrow: 1,
         alignContent: 'center',
+    },
+    contentContainer: {
+        paddingBottom: '100@vs',
     },
     buttonActivityBox: {
         width: '100%',

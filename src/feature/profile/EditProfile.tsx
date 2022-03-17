@@ -1,7 +1,7 @@
 import {apiEditProfile} from 'api/module';
 import FindmeStore from 'app-redux/store';
 import {Metrics} from 'asset/metrics';
-import {AVATAR_SIZE, COVER_SIZE} from 'asset/standardValue';
+import {AVATAR_SIZE} from 'asset/standardValue';
 import {
     StyleButton,
     StyleContainer,
@@ -19,52 +19,51 @@ import {chooseImageFromCamera, chooseImageFromLibrary} from 'utility/assistant';
 import ImageUploader from 'utility/ImageUploader';
 import AvatarElement from './components/AvatarElement';
 import BtnPenEdit from './components/BtnPenEdit';
-import CoverElement from './components/CoverElement';
 
 // Cover
-const CoverEdit = memo(({cover, setCover}: any) => {
-    const actionRef = useRef<any>(null);
+// const CoverEdit = memo(({cover, setCover}: any) => {
+//     const actionRef = useRef<any>(null);
 
-    const listTextAndOption = useMemo(() => {
-        return [
-            {
-                text: 'common.chooseFromCamera',
-                action: async () =>
-                    await chooseImageFromCamera(setCover, {
-                        maxWidth: COVER_SIZE.width,
-                        maxHeight: COVER_SIZE.height,
-                    }),
-            },
-            {
-                text: 'common.chooseFromLibrary',
-                action: async () =>
-                    await chooseImageFromLibrary(setCover, {
-                        maxWidth: COVER_SIZE.width,
-                        maxHeight: COVER_SIZE.height,
-                    }),
-            },
-            {
-                text: 'common.cancel',
-                action: () => null,
-            },
-        ];
-    }, [cover]);
+//     const listTextAndOption = useMemo(() => {
+//         return [
+//             {
+//                 text: 'common.chooseFromCamera',
+//                 action: async () =>
+//                     await chooseImageFromCamera(setCover, {
+//                         maxWidth: COVER_SIZE.width,
+//                         maxHeight: COVER_SIZE.height,
+//                     }),
+//             },
+//             {
+//                 text: 'common.chooseFromLibrary',
+//                 action: async () =>
+//                     await chooseImageFromLibrary(setCover, {
+//                         maxWidth: COVER_SIZE.width,
+//                         maxHeight: COVER_SIZE.height,
+//                     }),
+//             },
+//             {
+//                 text: 'common.cancel',
+//                 action: () => null,
+//             },
+//         ];
+//     }, [cover]);
 
-    return (
-        <View style={styles.coverBox}>
-            <CoverElement cover={cover} customStyle={{flex: 1}} />
-            <BtnPenEdit
-                btnStyle={styles.buttonEditCover}
-                onPress={() => actionRef.current.show()}
-            />
+//     return (
+//         <View style={styles.coverBox}>
+//             <CoverElement cover={cover} customStyle={{flex: 1}} />
+//             <BtnPenEdit
+//                 btnStyle={styles.buttonEditCover}
+//                 onPress={() => actionRef.current.show()}
+//             />
 
-            <StyleActionSheet
-                ref={actionRef}
-                listTextAndAction={listTextAndOption}
-            />
-        </View>
-    );
-});
+//             <StyleActionSheet
+//                 ref={actionRef}
+//                 listTextAndAction={listTextAndOption}
+//             />
+//         </View>
+//     );
+// });
 
 // Avatar
 const AvatarEdit = memo(({avatar, setAvatar}: any) => {
@@ -126,13 +125,10 @@ const EditProfile = () => {
     const [avatar, setAvatar] = useState(profile?.avatar);
     const [cover, setCover] = useState(profile?.cover);
     const [name, setName] = useState(profile?.name);
+    const [anonymousName, setAnonymousName] = useState(profile?.anonymousName);
     const [description, setDescription] = useState(profile?.description);
 
-    const disableButton =
-        avatar === profile.avatar &&
-        cover === profile.cover &&
-        name === profile.name &&
-        description === profile.description;
+    const disableButton = !(avatar && name && anonymousName && description);
 
     const onSaveChange = async () => {
         try {
@@ -149,6 +145,10 @@ const EditProfile = () => {
                         ? undefined
                         : await ImageUploader.upLoad(cover, 600);
                 const newName = name === profile.name ? undefined : name;
+                const newAnonymousName =
+                    anonymousName === profile.anonymousName
+                        ? undefined
+                        : anonymousName;
                 const newDescription =
                     description === profile.description
                         ? undefined
@@ -158,12 +158,15 @@ const EditProfile = () => {
                     avatar: newAvatar,
                     cover: newCover,
                     name: newName,
+                    anonymous_name: newAnonymousName,
                     description: newDescription,
                 });
             }
 
             // update in local
-            Redux.updatePassport({profile: {avatar, cover, name, description}});
+            Redux.updatePassport({
+                profile: {avatar, cover, name, description, anonymousName},
+            });
 
             // alert success and comeback
             appAlert('alert.successUpdatePro', {
@@ -186,9 +189,21 @@ const EditProfile = () => {
             <View style={styles.nameBox}>
                 <StyleInput
                     value={name}
-                    i18Placeholder="login.detailInformation.nameHolder"
+                    i18Placeholder="profile.edit.name"
                     onChangeText={value => setName(value)}
                     inputStyle={styles.inputName}
+                    maxLength={100}
+                />
+            </View>
+
+            {/* Anonymous name */}
+            <View style={styles.nameAnonymousBox}>
+                <StyleInput
+                    value={anonymousName}
+                    i18Placeholder="profile.edit.anonymousName"
+                    onChangeText={value => setAnonymousName(value)}
+                    inputStyle={styles.inputAnonymous}
+                    maxLength={100}
                 />
             </View>
 
@@ -268,12 +283,21 @@ const styles = ScaledSheet.create({
     // name
     nameBox: {
         height: '50@vs',
-        width: '60%',
+        width: '80%',
         marginTop: '40@vs',
         alignSelf: 'center',
     },
     inputName: {
         fontSize: '20@ms',
+    },
+    nameAnonymousBox: {
+        height: '50@vs',
+        width: '60%',
+        alignSelf: 'center',
+    },
+    inputAnonymous: {
+        fontSize: '15@ms',
+        fontStyle: 'italic',
     },
     iconNameBox: {
         flex: 1,

@@ -24,10 +24,7 @@ import {
     unBlockAllChatTag,
 } from 'hook/useSocketIO';
 import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
-import ROOT_SCREEN, {
-    MAIN_SCREEN,
-    PROFILE_ROUTE,
-} from 'navigation/config/routes';
+import ROOT_SCREEN, {MAIN_SCREEN} from 'navigation/config/routes';
 import {
     appAlert,
     appAlertYesNo,
@@ -122,13 +119,10 @@ const ChatDetailSetting = ({route}: Props) => {
 
     // go to partner profile
     const onGoToProfile = useCallback(() => {
-        navigate(MAIN_SCREEN.profileRoute, {
-            screen: PROFILE_ROUTE.otherProfile,
-            params: {
-                id: listMembers[0].id,
-                onGoBack: () => {
-                    navigate(MAIN_SCREEN.messRoute);
-                },
+        navigate(ROOT_SCREEN.otherProfile, {
+            id: listMembers[0].id,
+            onGoBack: () => {
+                navigate(MAIN_SCREEN.messRoute);
             },
         });
     }, [listMembers[0].id]);

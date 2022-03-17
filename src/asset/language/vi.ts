@@ -15,6 +15,7 @@ const common = {
     seeMore: '...Xem thêm',
     seeLess: '...Ẩn bớt',
     letGo: 'Đi thôi',
+    continue: 'Tiếp tục',
 };
 
 const login = {
@@ -151,6 +152,8 @@ const profile = {
     edit: {
         headerTitle: 'Trang cá nhân',
         confirmButton: 'Cập nhật',
+        name: 'Tên hiển thị',
+        anonymousName: 'Tên ẩn danh',
     },
     screen: {
         sendMessage: 'Gửi tin nhắn',
@@ -164,13 +167,14 @@ const profile = {
         report: 'Tố cáo',
     },
     post: {
-        title: 'Album của tôi',
-        caption: 'Tiêu đề',
+        title: 'Đăng ảnh',
+        caption: 'Cảm nghĩ',
         post: 'Tải lên',
         edit: 'Sửa',
         editPost: 'Chỉnh sửa',
         delete: 'Xoá',
         sureDeletePost: 'Bạn chắc chắn muốn xoá\nbức ảnh này chứ?',
+        enterTopic: 'Tự nhập chủ đề',
     },
     follow: {
         follower: 'Người theo dõi',

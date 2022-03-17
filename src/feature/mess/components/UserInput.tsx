@@ -43,7 +43,7 @@ const UserInput = (props: UserInputProps, inputRef: any) => {
     const myId = Redux.getPassport().profile.id;
     const chatTagFocusing = Redux.getChatTagFocusing();
 
-    const aim = useRef(new Animated.Value(0.5)).current;
+    const aim = useRef(new Animated.Value(0.6)).current;
     const [inputWidth, setInputWidth] = useState(0.6 * Metrics.width);
     aim.addListener(({value}) => setInputWidth(value * Metrics.width));
     const [showImgTool, setShowImgTool] = useState(true);
@@ -65,43 +65,43 @@ const UserInput = (props: UserInputProps, inputRef: any) => {
         [],
     );
 
-    const attachKeyboardListener = useCallback(() => {
-        Keyboard.addListener('keyboardWillShow', () => stretchInput(true));
-        Keyboard.addListener('keyboardWillHide', () => stretchInput(false));
+    // const attachKeyboardListener = useCallback(() => {
+    //     Keyboard.addListener('keyboardWillShow', () => stretchInput(true));
+    //     Keyboard.addListener('keyboardWillHide', () => stretchInput(false));
 
-        // Keyboard.addListener('keyboardDidShow', () => {
-        //     if (!isIOS) {
-        //         stretchInput(true);
-        //     }
-        // });
-        // Keyboard.addListener('keyboardDidHide', () => {
-        //     if (!isIOS) {
-        //         stretchInput(false);
-        //     }
-        // });
-    }, []);
+    //     // Keyboard.addListener('keyboardDidShow', () => {
+    //     //     if (!isIOS) {
+    //     //         stretchInput(true);
+    //     //     }
+    //     // });
+    //     // Keyboard.addListener('keyboardDidHide', () => {
+    //     //     if (!isIOS) {
+    //     //         stretchInput(false);
+    //     //     }
+    //     // });
+    // }, []);
 
-    const detachKeyboardListener = useCallback(() => {
-        Keyboard.removeListener('keyboardWillShow', () => stretchInput(true));
-        Keyboard.removeListener('keyboardWillHide', () => stretchInput(false));
+    // const detachKeyboardListener = useCallback(() => {
+    //     Keyboard.removeListener('keyboardWillShow', () => stretchInput(true));
+    //     Keyboard.removeListener('keyboardWillHide', () => stretchInput(false));
 
-        // Keyboard.removeListener('keyboardDidShow', () => {
-        //     if (!isIOS) {
-        //         stretchInput(true);
-        //     }
-        // });
-        // Keyboard.removeListener('keyboardDidHide', () => {
-        //     if (!isIOS) {
-        //         stretchInput(false);
-        //     }
-        // });
-    }, []);
+    //     // Keyboard.removeListener('keyboardDidShow', () => {
+    //     //     if (!isIOS) {
+    //     //         stretchInput(true);
+    //     //     }
+    //     // });
+    //     // Keyboard.removeListener('keyboardDidHide', () => {
+    //     //     if (!isIOS) {
+    //     //         stretchInput(false);
+    //     //     }
+    //     // });
+    // }, []);
 
     useEffect(() => {
-        if (isIOS) {
-            attachKeyboardListener();
-            return detachKeyboardListener;
-        }
+        // if (isIOS) {
+        //     attachKeyboardListener();
+        //     return detachKeyboardListener;
+        // }
     }, []);
 
     const onChangeText = (_text: string) => {

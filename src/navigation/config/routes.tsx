@@ -10,6 +10,8 @@ const ROOT_SCREEN = {
     reportUser: '@ROOT_SCREEN/reportUser',
     webView: '@ROOT_SCREEN/webview',
     picker: '@ROOT_SCREEN/picker',
+    otherProfile: '@ROOT_SCREEN/otherProfile',
+    listFollows: '@ROOT_SCREEN/listFollows',
 };
 /**
  * ||
@@ -62,11 +64,10 @@ const MESS_ROUTE = {
 
 const PROFILE_ROUTE = {
     myProfile: '@PROFILE_ROUTE/myProfile',
-    otherProfile: '@PROFILE_ROUTE/otherProfile',
     editProfile: '@PROFILE_ROUTE/editProfile',
     settingRoute: '@PROFILE_ROUTE/settingRoute',
     createPost: '@PROFILE_ROUTE/createPost',
-    listFollows: '@PROFILE_ROUTE/listFollows',
+    createPostPreview: '@PROFILE_ROUTE/createPostPreview',
 };
 /**
  * ||

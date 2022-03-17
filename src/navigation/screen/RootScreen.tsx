@@ -14,6 +14,8 @@ import LoadingScreen from 'components/LoadingScreen';
 import SwipeImages from 'components/SwipeImages';
 import InteractBubble from 'feature/discovery/InteractBubble';
 import ReportUser from 'feature/discovery/ReportUser';
+import ListFollows from 'feature/profile/ListFollows';
+import OtherProfile from 'feature/profile/OtherProfile';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
 import TabBarProvider from 'navigation/config/TabBarProvider';
@@ -87,7 +89,10 @@ const RootScreen = () => {
                             name={ROOT_SCREEN.loginRoute}
                             component={LoginRoute}
                             options={{
-                                cardStyle: cardStyleSafeTop,
+                                cardStyle: [
+                                    cardStyleSafeTop,
+                                    {backgroundColor: theme.backgroundColor},
+                                ],
                             }}
                         />
 
@@ -98,6 +103,26 @@ const RootScreen = () => {
                             options={{
                                 cardStyleInterpolator:
                                     CardStyleInterpolators.forHorizontalIOS,
+                            }}
+                        />
+                        <RootStack.Screen
+                            name={ROOT_SCREEN.otherProfile}
+                            component={OtherProfile}
+                            options={{
+                                cardStyle: [
+                                    cardStyleSafeTop,
+                                    {backgroundColor: theme.backgroundColor},
+                                ],
+                            }}
+                        />
+                        <RootStack.Screen
+                            name={ROOT_SCREEN.listFollows}
+                            component={ListFollows}
+                            options={{
+                                cardStyle: [
+                                    cardStyleSafeTop,
+                                    {backgroundColor: theme.backgroundColor},
+                                ],
                             }}
                         />
 

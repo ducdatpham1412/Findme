@@ -38,6 +38,9 @@ const MainTabs: React.FunctionComponent = () => {
             <BottomTab.Screen
                 name={MAIN_SCREEN.profileRoute}
                 component={ProfileRoute}
+                options={{
+                    lazy: false,
+                }}
             />
 
             <BottomTab.Screen

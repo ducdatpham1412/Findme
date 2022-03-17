@@ -120,14 +120,6 @@ export const useSocketChatTagBubble = () => {
     let countdownRequestPublic: any;
 
     const hearingOtherSocket = useCallback(() => {
-        // socket?.off(SOCKET_EVENT.disableBubble);
-        // socket.on(SOCKET_EVENT.disableBubble, (data: string) => {
-        //     Redux.setBubblePalaceAction({
-        //         action: TYPE_BUBBLE_PALACE_ACTION.disableBubble,
-        //         payload: data,
-        //     });
-        // });
-
         socket?.off(SOCKET_EVENT.createChatTag);
         socket?.on(SOCKET_EVENT.createChatTag, (data: TypeChatTagResponse) => {
             setList((previousChatTags: Array<TypeChatTagResponse>) => {
@@ -577,7 +569,6 @@ export const useSocketChatDetail = (params: {
         socket.on(
             SOCKET_EVENT.deleteMessage,
             (data: TypeDeleteMessageResponse) => {
-                console.log('delete: ', data);
                 if (data.chatTagId === chatTagFocusing) {
                     setList(
                         (previousMessages: Array<TypeChatMessageResponse>) => {

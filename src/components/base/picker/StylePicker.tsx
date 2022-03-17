@@ -5,6 +5,7 @@ import {Animated, ScrollView, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import StyleTouchable from '../StyleTouchable';
 import StyleText from '../StyleText';
+import StyleContainer from '../StyleContainer';
 // import {StyleText} from 'components/base';
 
 export interface StylePickerProps {
@@ -14,6 +15,7 @@ export interface StylePickerProps {
     itemHeight: number;
     onSetItemSelected: Function;
     initIndex?: number;
+    onCancel?(): void;
 }
 
 interface Props {
@@ -23,13 +25,22 @@ interface Props {
 }
 
 const StylePicker = ({route}: Props) => {
-    const {data, itemHeight, onSetItemSelected, initIndex = 0} = route.params;
+    const {
+        data,
+        itemHeight,
+        onSetItemSelected,
+        initIndex = 0,
+        onCancel,
+    } = route.params;
     const theme = Redux.getTheme();
     const scrollRef = useRef<ScrollView>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
 
     return (
-        <View style={styles.container}>
+        <StyleContainer
+            containerStyle={{backgroundColor: 'transparent'}}
+            customStyle={styles.container}
+            extraHeight={10}>
             <View
                 style={[
                     styles.body,
@@ -44,7 +55,7 @@ const StylePicker = ({route}: Props) => {
                         styles.headerView,
                         {borderBottomColor: theme.borderColor},
                     ]}>
-                    <StyleTouchable onPress={goBack}>
+                    <StyleTouchable onPress={onCancel || goBack}>
                         <StyleText
                             i18Text="common.cancel"
                             customStyle={[
@@ -122,6 +133,8 @@ const StylePicker = ({route}: Props) => {
                                                 rotateX,
                                             },
                                         ],
+                                        width: '100%',
+                                        alignItems: 'center',
                                     }}>
                                     {route.params.renderItem(item)}
                                 </Animated.View>
@@ -130,7 +143,7 @@ const StylePicker = ({route}: Props) => {
                     </ScrollView>
                 </View>
             </View>
-        </View>
+        </StyleContainer>
     );
 };
 

@@ -17,6 +17,7 @@ I18Next.use(initReactI18next).init({
     interpolation: {
         escapeValue: false,
     },
+    nsSeparator: false,
 });
 
 export default I18Next;

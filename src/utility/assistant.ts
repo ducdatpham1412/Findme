@@ -9,7 +9,6 @@ import {
     LANGUAGE_TYPE,
     SIGN_UP_TYPE,
     THEME_TYPE,
-    TYPE_BUBBLE_PALACE_ACTION,
     TYPE_COLOR,
 } from 'asset/enum';
 import Images from 'asset/img/images';
@@ -22,6 +21,7 @@ import ROOT_SCREEN, {
     SETTING_ROUTE,
 } from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
+import {useState} from 'react';
 import {Platform} from 'react-native';
 import ImageUploader, {ImagePickerParamsType} from './ImageUploader';
 import {checkCamera, checkPhoto} from './permission/permission';
@@ -53,29 +53,15 @@ export const openHeartBox = (setShowTabBar: any) => {
     }
 };
 
-export const openPlusBox = (setShowTabBar: any) => {
-    const modeExp = FindmeStore.getState().accountSlice.modeExp;
-
-    if (modeExp) {
-        // appAlert('alert.clickPlusModeExp', {
-        //     moreNotice: 'alert.moreButtonContent',
-        //     moreAction: () => navigate(LOGIN_ROUTE.signUpType),
-        // });
-        navigate(DISCOVERY_ROUTE.plusScreen);
-        setShowTabBar(false);
-    } else {
-        navigate(DISCOVERY_ROUTE.plusScreen);
-        setShowTabBar(false);
-    }
-};
-
 export const interactBubble = (params: {
     itemBubble: any;
     isBubble: boolean;
+    isEffectTabBar?: boolean;
 }) => {
     navigate(ROOT_SCREEN.interactBubble, {
         item: params.itemBubble,
         isBubble: params.isBubble,
+        isEffectTabBar: params.isEffectTabBar,
     });
 };
 
@@ -279,10 +265,6 @@ export const renderIconGender = (_gender?: number) => {
 
 export const onGoToSignUp = () => {
     Redux.updateListChatTag([]);
-    // Redux.setBubblePalaceAction({
-    //     action: TYPE_BUBBLE_PALACE_ACTION.clearAll,
-    //     payload: undefined,
-    // });
     navigate(LOGIN_ROUTE.signUpForm, {
         typeSignUp: SIGN_UP_TYPE.email,
     });
@@ -321,16 +303,20 @@ export const reorderListChatTag = (listChatTag: Array<any>, index: number) => {
     return temp.concat(listChatTag);
 };
 
-export const modeExpUsePaging = {
-    list: [],
-    noMore: true,
-    refreshing: false,
-    loadingMore: false,
-    error: '',
-    onRefresh: () => null,
-    onLoadMore: () => null,
-    setParams: () => null,
-    setList: () => null,
+export const modeExpUsePaging = () => {
+    const [list, setList] = useState<any>([]);
+
+    return {
+        list,
+        noMore: true,
+        refreshing: false,
+        loadingMore: false,
+        error: '',
+        onRefresh: () => null,
+        onLoadMore: () => null,
+        setParams: () => null,
+        setList,
+    };
 };
 
 export const modalizeYourProfile = (params: {

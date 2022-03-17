@@ -245,6 +245,7 @@ const styles = ScaledSheet.create({
         width: '100%',
         height: '50@vs',
         justifyContent: 'center',
+        alignItems: 'center',
     },
     textReport: {
         fontSize: '14@ms',

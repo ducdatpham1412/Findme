@@ -35,7 +35,7 @@ const FollowerScreen = ({route}: any) => {
     const isModeExp = Redux.getModeExp();
 
     const {list, refreshing, onRefresh, onLoadMore, setParams} = isModeExp
-        ? modeExpUsePaging
+        ? modeExpUsePaging()
         : usePaging({
               request: apiGetListFollow,
               params: {
@@ -71,7 +71,7 @@ const FollowingScreen = ({route}: any) => {
     const isModeExp = Redux.getModeExp();
 
     const {list, refreshing, onRefresh, onLoadMore, setParams} = isModeExp
-        ? modeExpUsePaging
+        ? modeExpUsePaging()
         : usePaging({
               request: apiGetListFollow,
               params: {

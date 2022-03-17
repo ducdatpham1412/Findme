@@ -1,23 +1,24 @@
-import {TypeCreatePostResponse} from 'api/interface';
+import {TypeCreatePostRequest, TypeCreatePostResponse} from 'api/interface';
 import {apiLikePost, apiUnLikePost} from 'api/module';
 import {RELATIONSHIP} from 'asset/enum';
-import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
+import AutoHeightImage from 'components/AutoHeightImage';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
+import StyleTouchHaveDouble from 'components/base/StyleTouchHaveDouble';
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import Redux from 'hook/useRedux';
 import {appAlert, showSwipeImages} from 'navigation/NavigationService';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {Image, View} from 'react-native';
+import React, {useMemo, useRef, useState} from 'react';
+import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {modalizeOptionPost} from 'utility/assistant';
+import {chooseIconHobby, modalizeOptionPost} from 'utility/assistant';
 
 interface PostStatusProps {
     itemPost: TypeCreatePostResponse;
-    editAPostInList?(params: {id: string; newContent: string}): void;
+    editAPostInList?(params: {id: string; data: TypeCreatePostRequest}): void;
     deleteAPostInList?(idPost: string): void;
 }
 
@@ -25,30 +26,14 @@ const PostStatus = (props: PostStatusProps) => {
     const {itemPost, editAPostInList, deleteAPostInList} = props;
 
     const theme = Redux.getTheme();
+    const isModeExp = Redux.getModeExp();
 
     const optionsRef = useRef<any>(null);
 
-    const [imageSize, setImageSize] = useState({
-        width: 1,
-        height: 1,
-    });
     const [isLiked, setIsLiked] = useState(itemPost.isLiked);
     const [numberLikes, setNumberLikes] = useState(itemPost.totalLikes);
 
     const isMyPost = itemPost.relationship === RELATIONSHIP.self;
-
-    const getSizeImage = () => {
-        Image.getSize(itemPost.images[0], (width, height) => {
-            setImageSize({
-                width,
-                height,
-            });
-        });
-    };
-
-    useEffect(() => {
-        getSizeImage();
-    }, []);
 
     const onPressHeart = async () => {
         const currentLike = isLiked;
@@ -57,10 +42,12 @@ const PostStatus = (props: PostStatusProps) => {
             setIsLiked(!currentLike);
             const newNumber = currentLike ? numberLikes - 1 : numberLikes + 1;
             setNumberLikes(newNumber);
-            if (currentLike) {
-                await apiUnLikePost(itemPost.id);
-            } else {
-                await apiLikePost(itemPost.id);
+            if (!isModeExp) {
+                if (currentLike) {
+                    await apiUnLikePost(itemPost.id);
+                } else {
+                    await apiLikePost(itemPost.id);
+                }
             }
         } catch (err) {
             setIsLiked(currentLike);
@@ -82,34 +69,22 @@ const PostStatus = (props: PostStatusProps) => {
         });
     };
 
-    // render_view
-    const RenderIconLike = useMemo(() => {
-        if (isLiked) {
-            return (
-                <IconLiked
-                    onPress={onPressHeart}
-                    customStyle={styles.heartIcon}
-                />
-            );
-        }
+    /**
+     * Render view
+     */
+    const RenderBackground = useMemo(() => {
         return (
-            <IconNotLiked
-                onPress={onPressHeart}
-                customStyle={styles.heartIcon}
-            />
-        );
-    }, [isLiked]);
-
-    return (
-        <View style={styles.container}>
             <View
                 style={[
                     styles.spaceContainer,
                     {backgroundColor: theme.backgroundColor},
                 ]}
             />
+        );
+    }, [theme]);
 
-            {/* avatar, name and option post */}
+    const RenderAvatarNameOption = useMemo(() => {
+        return (
             <View style={styles.creatorView}>
                 <View style={styles.avatarNameBox}>
                     <StyleImage
@@ -120,7 +95,7 @@ const PostStatus = (props: PostStatusProps) => {
                         originValue={itemPost.creatorName}
                         customStyle={[
                             styles.textName,
-                            {color: theme.borderColor},
+                            {color: theme.textColor},
                         ]}
                     />
                 </View>
@@ -139,49 +114,98 @@ const PostStatus = (props: PostStatusProps) => {
                     </StyleTouchable>
                 )}
             </View>
+        );
+    }, [itemPost.creatorAvatar, itemPost.creatorName, theme]);
 
-            {/* caption */}
+    const RenderCaption = useMemo(() => {
+        if (!itemPost.content) {
+            return null;
+        }
+        return (
             <View style={styles.captionView}>
                 <StyleText
                     originValue={itemPost.content}
                     customStyle={[styles.textContent, {color: theme.textColor}]}
                 />
             </View>
+        );
+    }, [itemPost.content, theme]);
 
-            {/* image */}
-            <StyleTouchable
+    const RenderImage = useMemo(() => {
+        return (
+            <StyleTouchHaveDouble
                 customStyle={styles.imageView}
-                activeOpacity={0.95}
-                onPress={onSeeDetailImage}
-                onDoublePress={() => {
+                onDoubleClick={() => {
                     if (!isLiked) {
                         onPressHeart();
+                    } else {
+                        onSeeDetailImage();
                     }
                 }}>
-                <StyleImage
-                    source={{uri: itemPost.images[0]}}
-                    customStyle={[
-                        styles.image,
-                        {
-                            height:
-                                Metrics.width *
-                                (imageSize.height / imageSize.width),
-                        },
-                    ]}
+                <AutoHeightImage
+                    uri={itemPost.images[0]}
+                    customStyle={styles.image}
                 />
-            </StyleTouchable>
+            </StyleTouchHaveDouble>
+        );
+    }, [itemPost.images, isLiked]);
 
-            <View style={styles.heartNumberLikeBox}>
-                {RenderIconLike}
+    const RenderLikeBox = useMemo(() => {
+        return (
+            <>
+                {isLiked ? (
+                    <IconLiked
+                        onPress={onPressHeart}
+                        customStyle={styles.heartIcon}
+                    />
+                ) : (
+                    <IconNotLiked
+                        onPress={onPressHeart}
+                        customStyle={[
+                            styles.heartIcon,
+                            {
+                                color: theme.unLikeHeart,
+                            },
+                        ]}
+                    />
+                )}
+
                 {!!numberLikes && (
                     <StyleText
                         originValue={numberLikes}
                         customStyle={[
                             styles.textNumberLike,
-                            {color: Theme.common.pink},
+                            {
+                                color: isLiked
+                                    ? Theme.common.pink
+                                    : theme.unLikeHeart,
+                            },
                         ]}
                     />
                 )}
+            </>
+        );
+    }, [isLiked, numberLikes, theme]);
+
+    const RenderIconHobby = useMemo(() => {
+        return (
+            <StyleImage
+                source={{uri: chooseIconHobby(itemPost.color)}}
+                customStyle={styles.iconHobby}
+            />
+        );
+    }, [itemPost.color]);
+
+    return (
+        <View style={styles.container}>
+            {RenderBackground}
+            {RenderAvatarNameOption}
+            {RenderCaption}
+            {RenderImage}
+
+            <View style={styles.interactView}>
+                {RenderLikeBox}
+                {RenderIconHobby}
             </View>
 
             <StyleActionSheet
@@ -198,8 +222,7 @@ const PostStatus = (props: PostStatusProps) => {
 
 const styles = ScaledSheet.create({
     container: {
-        width: '90%',
-        marginBottom: '20@vs',
+        width: '99%',
         marginTop: '20@vs',
         alignSelf: 'center',
     },
@@ -208,7 +231,7 @@ const styles = ScaledSheet.create({
         width: '100%',
         height: '100%',
         borderRadius: '20@s',
-        opacity: 0.6,
+        opacity: 0.8,
     },
     // avatar and name
     creatorView: {
@@ -230,43 +253,38 @@ const styles = ScaledSheet.create({
         marginRight: '10@s',
     },
     textName: {
-        fontSize: '14@ms',
+        fontSize: '17@ms',
         fontWeight: 'bold',
-        fontStyle: 'italic',
     },
     buttonIconMore: {
         alignSelf: 'flex-end',
-        marginTop: '0@vs',
     },
     iconMore: {
-        fontSize: '17@ms',
+        fontSize: '20@ms',
     },
     // caption
     captionView: {
         width: '100%',
-        paddingTop: '7@vs',
-        paddingBottom: '10@vs',
         paddingHorizontal: '15@s',
+        marginTop: '15@vs',
     },
     textContent: {
-        fontSize: '13@ms',
-        fontStyle: 'italic',
+        fontSize: '15@ms',
     },
     // image
     imageView: {
         width: '100%',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: '15@s',
+        paddingHorizontal: '10@s',
+        marginTop: '15@vs',
     },
     image: {
         width: '100%',
-        maxHeight: '500@vs',
         borderRadius: '10@s',
-        backgroundColor: 'transparent',
     },
     // heart icon
-    heartNumberLikeBox: {
+    interactView: {
         width: '100%',
         paddingVertical: '10@vs',
         flexDirection: 'row',
@@ -279,7 +297,13 @@ const styles = ScaledSheet.create({
     textNumberLike: {
         fontSize: '20@ms',
         fontWeight: 'bold',
-        marginTop: '5@vs',
+    },
+    // icon hobby
+    iconHobby: {
+        position: 'absolute',
+        left: '20@s',
+        width: '40@ms',
+        height: '40@ms',
     },
 });
 

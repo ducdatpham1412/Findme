@@ -101,7 +101,6 @@ export interface TypeGetPassportResponse {
             theme: number;
             language: number;
         };
-        listBubbles: Array<TypeMyBubbles>;
     };
 }
 
@@ -141,6 +140,7 @@ export interface TypeChangeInformationResponse {
 export interface TypeGetProfileResponse {
     id: number;
     name: string;
+    anonymousName: string;
     description: string;
     avatar: string;
     cover: string;
@@ -151,6 +151,7 @@ export interface TypeGetProfileResponse {
 
 export interface TypeEditProfileRequest {
     name?: string;
+    anonymous_name?: string;
     description?: string;
     avatar?: string;
     cover?: string;
@@ -167,8 +168,10 @@ export interface TypeSendMessageFromProfile {
 }
 
 export interface TypeCreatePostRequest {
-    content: string;
-    images: Array<string>;
+    content?: string;
+    images?: Array<string>;
+    color?: number;
+    name?: string;
 }
 
 export interface TypeCreatePostResponse {
@@ -176,10 +179,13 @@ export interface TypeCreatePostResponse {
     content: string;
     images: Array<string>;
     totalLikes: number;
+    totalComments: number;
     creatorId: number;
     creatorName: string;
     creatorAvatar: string;
     createdTime: string;
+    color: number;
+    name: string;
     isLiked: boolean;
     relationship: number;
 }
@@ -205,7 +211,10 @@ export interface TypeBubblePalace {
     content: string;
     images: Array<string>;
     totalLikes: number;
+    hadKnowEachOther: boolean;
     creatorId: number;
+    creatorName: string;
+    creatorAvatar: string | null;
     gender: number;
     createdTime: string;
     totalComments: number;
@@ -213,13 +222,11 @@ export interface TypeBubblePalace {
     name: string;
     isLiked: boolean;
     relationship: number;
-    // in front-end
-    canInteract?: boolean;
 }
 
 export interface TypeBubblePalaceAction {
     action: number;
-    payload: TypeBubblePalace | string | undefined;
+    payload: any;
 }
 
 export interface TypeUpdateMyBubblesRequest {
@@ -336,13 +343,6 @@ export interface TypeSeenMessageEnjoyResponse {
 }
 
 // bubbles
-export interface TypeMyBubbles {
-    idHobby: number;
-    name: string;
-    icon: string;
-    description: string;
-    privateAvatar: string;
-}
 
 export interface TypeResourceResponse {
     success: boolean;

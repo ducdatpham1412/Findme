@@ -1,7 +1,6 @@
 import OptionsButton from 'components/common/OptionsButton';
 import SearchButton from 'components/common/SearchButton';
 import SettingButton from 'components/common/SettingButton';
-import Redux from 'hook/useRedux';
 import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
 import {goBack, navigate} from 'navigation/NavigationService';

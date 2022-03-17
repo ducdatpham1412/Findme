@@ -23,6 +23,7 @@ const Images = {
         alert: require('./ic_alert.png'),
         // tabBar
         push: require('./ic_push.png'),
+        zoomPhoto: require('./ic_zoom_photo.png'),
         // profile
         follower: require('./ic_follower.png'),
         following: require('./ic_following.png'),

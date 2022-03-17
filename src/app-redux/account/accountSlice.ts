@@ -1,5 +1,4 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {TypeMyBubbles} from 'api/interface';
 import {LANGUAGE_TYPE, THEME_TYPE} from 'asset/enum';
 
 /**
@@ -18,6 +17,7 @@ export const initialAccountState = {
         profile: {
             id: <any>null,
             name: 'Name',
+            anonymousName: 'Báoẩndanh',
             description: '',
             avatar: 'https://doffy-production.s3.ap-southeast-1.amazonaws.com/image/__admin_logo.png',
             cover: 'https://doffy-production.s3.ap-southeast-1.amazonaws.com/image/__admin_logo.png',
@@ -37,7 +37,6 @@ export const initialAccountState = {
             language: LANGUAGE_TYPE.vi,
             display_avatar: false,
         },
-        listBubbles: <Array<TypeMyBubbles>>[],
     },
     // modeExp
     modeExp: true,

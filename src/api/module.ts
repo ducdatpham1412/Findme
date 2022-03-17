@@ -129,6 +129,24 @@ export const apiGetListBubbleActiveOfUserEnjoy = ({
     });
 };
 
+export const apiGetDetailBubble = (
+    idBubble: string,
+): Promise<{
+    success: true;
+    data: TypeBubblePalace;
+}> => {
+    return request.get(`/common/detail-bubble-profile/${idBubble}`);
+};
+
+export const apiGetDetailBubbleEnjoy = (
+    idBubble: string,
+): Promise<{
+    success: true;
+    data: TypeBubblePalace;
+}> => {
+    return request.get(`/common/detail-bubble-profile-enjoy/${idBubble}`);
+};
+
 /**
  *  DISCOVERY and CHAT
  */
@@ -244,10 +262,11 @@ export const apiCreatePost = (
     return request.post('/profile/create-post', params);
 };
 
-export const apiEditPost = (params: {idPost: string; newContent: string}) => {
-    return request.put(`/profile/edit-post/${params.idPost}`, {
-        content: params.newContent,
-    });
+export const apiEditPost = (params: {
+    idPost: string;
+    data: TypeCreatePostRequest;
+}) => {
+    return request.put(`/profile/edit-post/${params.idPost}`, params.data);
 };
 
 export const apiDeletePost = (idPost: string) => {
@@ -281,37 +300,3 @@ export const apiGetListFollow = ({params}: TypeParamsPaging) => {
         },
     });
 };
-
-// export const apiRequestPublicChat = (chatTagId: string) => {
-//     return request.put(`/chat/request-public/${chatTagId}`);
-// };
-
-// export const apiAgreePublicChat = (chatTagId: string) => {
-//     return request.put(`/chat/agree-request-public/${chatTagId}`);
-// };
-
-// export const apiHandleChatTag = (params: TypeChatTagRequest) => {
-//     return request.post('/chat/handle-chat-tag', params);
-// };
-
-// export const apiHandleChatTagEnjoy = (params: TypeChatTagEnjoyRequest) => {
-//     return request.post('/chat/handle-chat-tag-enjoy', params);
-// };
-// export const apiHandleBubble = (params: TypeMyBubbles) => {
-//     return request.post('/chat/handle-bubble-palace', params);
-// };
-// export const apiHandleBubbleEnjoy = (params: {
-//     myId: string;
-//     bubble: TypeMyBubbles;
-// }) => {
-//     return request.post('/chat/handle-bubble-palace-enjoy', params);
-// };
-
-// export const apiChangeGroupName = (params: {
-//     newName: string;
-//     chatTag: string;
-// }) => {
-//     return request.put(`/chat/change-group-name/${params.chatTag}`, {
-//         name: params.newName,
-//     });
-// };

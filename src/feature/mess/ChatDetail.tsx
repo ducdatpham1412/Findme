@@ -280,24 +280,10 @@ const ChatDetail = ({route}: ChatDetailProps) => {
         [images],
     );
 
-    const listMessageEnjoy = Redux.getListMessagesEnjoy();
     const onGoBack = useCallback(() => {
-        if (isModeExp) {
-            const temp = listMessageEnjoy.map(item => {
-                if (item.chatTag !== itemChatTag.id) {
-                    return item;
-                }
-                return {
-                    chatTag: item.chatTag,
-                    messages,
-                };
-            });
-            Redux.updateListMessageEnjoy(temp);
-        }
-
         Redux.setChatTagFocusing('');
         goBack();
-    }, [listMessageEnjoy, messages]);
+    }, [messages]);
 
     const onSeeDetailImage = useCallback(
         (listImages: Array<any>, index: number) => {

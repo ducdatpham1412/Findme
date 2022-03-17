@@ -5,7 +5,7 @@ import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import useCountdown from 'hook/useCountdown';
 import Redux from 'hook/useRedux';
 import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
-import {MAIN_SCREEN, PROFILE_ROUTE} from 'navigation/config/routes';
+import ROOT_SCREEN from 'navigation/config/routes';
 import {goBack, navigate} from 'navigation/NavigationService';
 import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
@@ -48,14 +48,8 @@ const PublicChatting = ({route}: Props) => {
     }, []);
 
     const onGoToProfile = (userId: number) => {
-        navigate(MAIN_SCREEN.profileRoute, {
-            screen: PROFILE_ROUTE.otherProfile,
-            params: {
-                id: userId,
-                onGoBack: () => {
-                    navigate(MAIN_SCREEN.messRoute);
-                },
-            },
+        navigate(ROOT_SCREEN.otherProfile, {
+            id: userId,
         });
     };
 

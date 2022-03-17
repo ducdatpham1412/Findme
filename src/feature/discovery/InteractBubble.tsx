@@ -24,12 +24,13 @@ interface Props {
         params: {
             item: TypeBubblePalace;
             isBubble: boolean;
+            isEffectTabBar?: boolean;
         };
     };
 }
 
 const InteractBubble = ({route}: Props) => {
-    const {item, isBubble} = route.params;
+    const {item, isBubble, isEffectTabBar = true} = route.params;
 
     const token = Redux.getToken();
     const theme = Redux.getTheme();
@@ -86,7 +87,7 @@ const InteractBubble = ({route}: Props) => {
         const newChatTag: TypeChatTagRequest = {
             type: isBubble ? CHAT_TAG.newFromBubble : CHAT_TAG.newFromProfile,
             content: message,
-            listUser: [id, item.creatorId],
+            listUser: [id, item.creatorId].sort(),
             color: item.color,
             senderId: id,
             idBubble: item.id,
@@ -182,6 +183,7 @@ const InteractBubble = ({route}: Props) => {
                             keyboardAppearance={Redux.getThemeKeyboard()}
                             hasErrorBox={false}
                             hasUnderLine={false}
+                            isEffectTabBar={isEffectTabBar}
                         />
                         <StyleTouchable
                             onPress={onSendInteract}
@@ -257,6 +259,7 @@ const styles = ScaledSheet.create({
         paddingTop: '5@vs',
         paddingBottom: '10@vs',
         fontSize: '14@ms',
+        maxHeight: '70@vs',
     },
     iconSend: {
         fontSize: '20@ms',
