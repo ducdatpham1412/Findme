@@ -127,4 +127,5 @@ export enum TYPE_NOTIFICATION {
 export enum TYPE_BUBBLE_PALACE_ACTION {
     disableBubble = 0,
     createNewPostFromProfile = 1,
+    editPostFromProfile = 2,
 }

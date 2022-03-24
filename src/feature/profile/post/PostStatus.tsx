@@ -1,4 +1,4 @@
-import {TypeCreatePostRequest, TypeCreatePostResponse} from 'api/interface';
+import {TypeCreatePostResponse} from 'api/interface';
 import {apiLikePost, apiUnLikePost} from 'api/module';
 import {RELATIONSHIP} from 'asset/enum';
 import Theme from 'asset/theme/Theme';
@@ -12,18 +12,17 @@ import Redux from 'hook/useRedux';
 import {appAlert, showSwipeImages} from 'navigation/NavigationService';
 import React, {useMemo, useRef, useState} from 'react';
 import {View} from 'react-native';
-import {ScaledSheet} from 'react-native-size-matters';
+import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {chooseIconHobby, modalizeOptionPost} from 'utility/assistant';
 
 interface PostStatusProps {
     itemPost: TypeCreatePostResponse;
-    editAPostInList?(params: {id: string; data: TypeCreatePostRequest}): void;
     deleteAPostInList?(idPost: string): void;
 }
 
 const PostStatus = (props: PostStatusProps) => {
-    const {itemPost, editAPostInList, deleteAPostInList} = props;
+    const {itemPost, deleteAPostInList} = props;
 
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
@@ -121,17 +120,28 @@ const PostStatus = (props: PostStatusProps) => {
         if (!itemPost.content) {
             return null;
         }
+
+        const fontSize = itemPost.images[0]
+            ? moderateScale(15)
+            : moderateScale(20);
+
         return (
             <View style={styles.captionView}>
                 <StyleText
                     originValue={itemPost.content}
-                    customStyle={[styles.textContent, {color: theme.textColor}]}
+                    customStyle={[
+                        styles.textContent,
+                        {color: theme.textColor, fontSize},
+                    ]}
                 />
             </View>
         );
-    }, [itemPost.content, theme]);
+    }, [itemPost.content, theme, itemPost.images]);
 
     const RenderImage = useMemo(() => {
+        if (!itemPost.images[0]) {
+            return null;
+        }
         return (
             <StyleTouchHaveDouble
                 customStyle={styles.imageView}
@@ -212,7 +222,6 @@ const PostStatus = (props: PostStatusProps) => {
                 ref={optionsRef}
                 listTextAndAction={modalizeOptionPost({
                     itemPostFromEdit: itemPost,
-                    editAPostInList: editAPostInList,
                     deleteAPostInList: deleteAPostInList,
                 })}
             />

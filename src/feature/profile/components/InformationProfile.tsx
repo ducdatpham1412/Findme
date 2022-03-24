@@ -11,6 +11,7 @@ import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {onGoToSignUp} from 'utility/assistant';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface Props {
     profile: TypeGetProfileResponse;
@@ -71,13 +72,22 @@ const InformationProfile = (props: Props) => {
                     originValue={name}
                 />
                 {!!anonymousName && (
-                    <StyleText
-                        customStyle={[
-                            styles.textNameAnonymous,
-                            {color: theme.textColor},
-                        ]}
-                        originValue={`@${anonymousName}`}
-                    />
+                    <View style={styles.nameAnonymousBox}>
+                        <MaterialCommunityIcons
+                            name="incognito"
+                            style={[
+                                styles.iconAnonymous,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                        <StyleText
+                            customStyle={[
+                                styles.textNameAnonymous,
+                                {color: theme.textColor},
+                            ]}
+                            originValue={`@${anonymousName}`}
+                        />
+                    </View>
                 )}
                 {!!description && (
                     <StyleText
@@ -253,11 +263,19 @@ const styles = ScaledSheet.create({
         fontSize: '30@ms',
         fontWeight: 'bold',
     },
+    nameAnonymousBox: {
+        marginTop: '7@vs',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     textNameAnonymous: {
         fontSize: '13@ms',
         fontWeight: 'bold',
         fontStyle: 'italic',
-        marginTop: '7@vs',
+    },
+    iconAnonymous: {
+        fontSize: '15@ms',
+        marginRight: '7@s',
     },
     textDescription: {
         fontSize: '15@ms',

@@ -68,7 +68,7 @@ const TabNavigator = (props?: any) => {
 
     const onGoToCreatePost = useCallback(() => {
         navigate(MAIN_SCREEN.profileRoute, {
-            screen: PROFILE_ROUTE.createPost,
+            screen: PROFILE_ROUTE.createPostPreview,
         });
     }, []);
 

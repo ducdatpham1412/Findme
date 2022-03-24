@@ -19,7 +19,7 @@ const ToolProfile = () => {
                 ]}
             />
             <StyleTouchable
-                onPress={() => navigate(PROFILE_ROUTE.createPost)}
+                onPress={() => navigate(PROFILE_ROUTE.createPostPreview)}
                 customStyle={styles.touchIconCamera}>
                 <FontAwesome5
                     name="camera-retro"

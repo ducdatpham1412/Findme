@@ -14,27 +14,33 @@ import {StyleText, StyleTouchable} from './base';
 interface Props {
     value: any;
     maxHeight?: number | string;
+    maxRows?: number;
     textStyle?: StyleProp<TextStyle>;
+    onPress?(): void;
 }
 
-const MAX_ROWS = 3;
-
 const StyleMoreText = (props: Props) => {
-    const {value, maxHeight = verticalScale(400), textStyle} = props;
+    const {
+        value,
+        maxHeight = verticalScale(400),
+        maxRows = 8,
+        textStyle,
+        onPress,
+    } = props;
 
     const [saveNumber, setSaveNumber] = useState(0);
     const [numberOfLines, setNumberOfLines] = useState<number | undefined>(
         undefined,
     );
-    const displayButton = !!saveNumber && saveNumber > MAX_ROWS;
-    const isShowMore = displayButton && numberOfLines === MAX_ROWS;
+    const displayButton = !!saveNumber && saveNumber > maxRows;
+    const isShowMore = displayButton && numberOfLines === maxRows;
 
     const onTextLayOut = useCallback(
         (e: NativeSyntheticEvent<TextLayoutEventData>) => {
             if (numberOfLines === undefined) {
                 setSaveNumber(e.nativeEvent.lines.length);
-                if (e.nativeEvent.lines.length > MAX_ROWS) {
-                    setNumberOfLines(MAX_ROWS);
+                if (e.nativeEvent.lines.length > maxRows) {
+                    setNumberOfLines(maxRows);
                 }
             }
         },
@@ -48,16 +54,16 @@ const StyleMoreText = (props: Props) => {
     const RenderButtonShowMoreOrLess = useMemo(() => {
         const text = isShowMore ? 'common.seeMore' : 'common.seeLess';
 
-        const onPress = () => {
+        const onPressText = () => {
             if (isShowMore) {
                 setNumberOfLines(saveNumber);
             } else {
-                setNumberOfLines(MAX_ROWS);
+                setNumberOfLines(maxRows);
             }
         };
 
         return (
-            <StyleTouchable onPress={onPress}>
+            <StyleTouchable onPress={onPressText}>
                 <StyleText
                     i18Text={text}
                     customStyle={styles.textSeeMoreOrLess}
@@ -77,7 +83,8 @@ const StyleMoreText = (props: Props) => {
                     originValue={value}
                     customStyle={textStyle}
                     onTextLayout={onTextLayOut}
-                    numberOfLines={isShowMore ? MAX_ROWS : numberOfLines}
+                    numberOfLines={isShowMore ? maxRows : numberOfLines}
+                    onPress={onPress}
                 />
             </ScrollView>
 

@@ -10,12 +10,16 @@ import {
 interface Props extends ViewProps {
     delay?: number;
     radius?: number;
-    onDoubleClick(): any;
+    onDoubleClick?(): any;
+    onLongPress?(): void;
+    delayLongPress?: number;
+    onPressOut?(): void;
     customStyle?: StyleProp<ViewStyle>;
 }
 
 class StyleTouchHaveDouble extends Component<Props> {
     myPanResponder: any = {};
+    timeOut: any;
 
     prevTouchInfo = {
         prevTouchTimeStamp: 0,
@@ -33,12 +37,22 @@ class StyleTouchHaveDouble extends Component<Props> {
         const currentTouchTimeStamp = Date.now();
 
         if (this.isDoubleTap(currentTouchTimeStamp)) {
-            this.props.onDoubleClick();
+            this.props.onDoubleClick?.();
         }
 
         this.prevTouchInfo = {
             prevTouchTimeStamp: currentTouchTimeStamp,
         };
+
+        const {onLongPress, delayLongPress = 300} = this.props;
+        this.timeOut = setTimeout(() => {
+            onLongPress?.();
+        }, delayLongPress);
+    };
+
+    handlePanResponseRelease = () => {
+        clearTimeout(this.timeOut);
+        this.props.onPressOut?.();
     };
 
     componentWillMount() {
@@ -54,7 +68,8 @@ class StyleTouchHaveDouble extends Component<Props> {
                 style={this.props.customStyle}
                 {...this.props}
                 // {...this.myPanResponder.panHandlers}
-                onTouchStart={this.handlePanResponderGrant}>
+                onTouchStart={this.handlePanResponderGrant}
+                onTouchEnd={this.handlePanResponseRelease}>
                 {this.props.children}
             </View>
         );
