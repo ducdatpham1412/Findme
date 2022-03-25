@@ -5,6 +5,7 @@ const Theme = {
         pink: '#F067D6',
         textMe: '#e4f0f4',
         orange: 'orange',
+        comment: '#c5e3ff',
     },
     darkTheme: {
         backgroundColor: '#081019',

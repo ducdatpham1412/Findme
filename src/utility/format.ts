@@ -21,8 +21,26 @@ export const formatUTCDate = (date: string | Date) => {
     return dayjs(date, 'YYYY-MM-DD HH:mm:ss').utc();
 };
 
-export const formatSecondToNow = (date: Date) => {
-    return dayjs(date).fromNow();
+export const formatFromNow = (date: Date | string) => {
+    const now = dayjs();
+    let diff = now.diff(date, 'second');
+    if (diff < 60) {
+        return `${diff}s`;
+    }
+    diff = now.diff(date, 'minute');
+    if (diff < 60) {
+        return `${diff}m`;
+    }
+    diff = now.diff(date, 'hour');
+    if (diff < 24) {
+        return `${diff}h`;
+    }
+    diff = now.diff(date, 'day');
+    if (diff < 30) {
+        return `${diff}d`;
+    }
+    diff = now.diff(date, 'month');
+    return `${diff}month`;
 };
 
 export const checkIsToday = (date: string | Date) => {

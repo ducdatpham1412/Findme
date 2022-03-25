@@ -16,6 +16,7 @@ const common = {
     seeLess: '...See less',
     letGo: "Let's go",
     continue: 'Continue',
+    reply: 'Reply',
 };
 
 const login = {
@@ -131,6 +132,7 @@ const discovery = {
         reportHadSent:
             'Your report has been sent\nWe will review this report and the denounced user for timely handling measures\n\nThank you for joining hands for a better Doffy community\n\nBest regards!\nDoffy Co.',
     },
+    numberComments: '{{numberComments}} comments',
 };
 
 // MESS ROUTE

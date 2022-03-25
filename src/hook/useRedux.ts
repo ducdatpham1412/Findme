@@ -3,10 +3,7 @@ import {
     accountSliceAction,
     initialAccountState,
 } from 'app-redux/account/accountSlice';
-import {
-    initialLogicState,
-    logicSliceAction,
-} from 'app-redux/account/logicSlice';
+import {logicSliceAction} from 'app-redux/account/logicSlice';
 import FindmeStore, {RootState} from 'app-redux/store';
 import {THEME_TYPE} from 'asset/enum';
 import Theme from 'asset/theme/Theme';
@@ -230,7 +227,6 @@ export const Redux = {
                 display_avatar: passport.setting.display_avatar,
             },
         });
-        Redux.updateResource(initialLogicState.resource);
         Redux.updateListChatTag([]);
     },
 };

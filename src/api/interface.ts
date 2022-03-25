@@ -115,6 +115,26 @@ export interface TypeGradient {
     other: Array<string>;
 }
 
+export interface TypeCommentResponse {
+    id: string;
+    content: string;
+    numberLikes: number;
+    isLiked: boolean;
+    creatorId: number;
+    creatorName: string;
+    creatorAvatar: string;
+    createdTime: string;
+    listCommentsReply?: Array<TypeCommentResponse>;
+    replyOf?: string; // this is for socket
+}
+
+export interface TypeAddCommentRequest {
+    token: string;
+    bubbleId: string;
+    content: string;
+    commentReplied: string;
+}
+
 /**
  * SETTING
  */

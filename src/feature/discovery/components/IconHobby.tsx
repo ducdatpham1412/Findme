@@ -51,11 +51,11 @@ const IconHobby = ({color, onTouchStart, onTouchEnd}: Props) => {
 
 const styles = ScaledSheet.create({
     container: {
-        marginTop: '60@vs',
+        marginTop: '38@vs',
     },
     iconHobby: {
-        width: '50@s',
-        height: '50@s',
+        width: '40@s',
+        height: '40@s',
     },
 });
 

@@ -12,14 +12,20 @@ import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {interactBubble, onGoToSignUp} from 'utility/assistant';
 import {useNotification} from 'utility/notification';
 import Bubble from './components/Bubble';
+import ModalComment from './components/ModalComment';
 
 const bubbleHeight = Metrics.height - Metrics.safeBottomPadding;
+
+interface TypeCommentResponse {
+    totalComments: number;
+    listComments: Array<any>;
+}
 
 const DiscoveryScreen = () => {
     useNotification();
@@ -33,6 +39,7 @@ const DiscoveryScreen = () => {
             ? apiGetListBubbleActiveOfUserEnjoy
             : apiGetListBubbleActive;
     }, [isModeExp]);
+
     const {list, setList, onLoadMore, refreshing, onRefresh} = usePaging({
         request: selectedApi,
         params: {
@@ -41,9 +48,47 @@ const DiscoveryScreen = () => {
         numberMaxForList: 30,
     });
 
-    /**
-     * Render view
-     */
+    const [displayComment, setDisplayComment] = useState(false);
+    const [preNumberComment, setPreNumberComment] = useState(0);
+    const [bubbleFocusing, setBubbleFocusing] = useState<TypeBubblePalace>();
+
+    useEffect(() => {
+        if (
+            bubbleFocusing &&
+            bubbleFocusing.totalComments !== preNumberComment &&
+            !displayComment
+        ) {
+            setList((preValue: Array<TypeBubblePalace>) => {
+                return preValue.map(item => {
+                    if (item.id !== bubbleFocusing.id) {
+                        return item;
+                    }
+                    return {
+                        ...item,
+                        totalComments: bubbleFocusing?.totalComments,
+                    };
+                });
+            });
+            setPreNumberComment(bubbleFocusing?.totalComments);
+        }
+    }, [bubbleFocusing, preNumberComment, displayComment]);
+
+    const onShowModalComment = useCallback(
+        (post: TypeBubblePalace) => {
+            if (isModeExp) {
+                appAlert('discovery.bubble.goToSignUp', {
+                    moreNotice: 'common.letGo',
+                    moreAction: onGoToSignUp,
+                });
+            } else {
+                setBubbleFocusing(post);
+                setDisplayComment(true);
+                setPreNumberComment(post.totalComments);
+            }
+        },
+        [isModeExp],
+    );
+
     const onInteractBubble = useCallback(
         (itemBubble: TypeBubblePalace) => {
             if (!isModeExp) {
@@ -103,6 +148,9 @@ const DiscoveryScreen = () => {
         [myId],
     );
 
+    /**
+     * Render view
+     */
     const RenderItemBubble = useCallback((item: TypeBubblePalace) => {
         return (
             <Bubble
@@ -111,11 +159,12 @@ const DiscoveryScreen = () => {
                 onReportUser={onReportUser}
                 onRefreshItem={onRefreshItem}
                 onGoToProfile={onGoToProfile}
+                onShowModalComment={() => onShowModalComment(item)}
             />
         );
     }, []);
 
-    const RenderBubblePlaceStatic = useMemo(() => {
+    const RenderBubblePlaceStatic = () => {
         return (
             <StyleList
                 data={list}
@@ -139,7 +188,7 @@ const DiscoveryScreen = () => {
                 // }}
             />
         );
-    }, [list, refreshing]);
+    };
 
     return (
         <View
@@ -147,7 +196,15 @@ const DiscoveryScreen = () => {
                 styles.container,
                 {backgroundColor: theme.backgroundColor},
             ]}>
-            {RenderBubblePlaceStatic}
+            {RenderBubblePlaceStatic()}
+            {bubbleFocusing && (
+                <ModalComment
+                    bubbleFocusing={bubbleFocusing}
+                    setBubbleFocusing={setBubbleFocusing}
+                    displayComment={displayComment}
+                    setDisplayComment={setDisplayComment}
+                />
+            )}
         </View>
     );
 };
