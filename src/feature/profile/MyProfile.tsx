@@ -5,13 +5,7 @@ import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
-import {PROFILE_ROUTE} from 'navigation/config/routes';
-import {
-    appAlert,
-    appAlertYesNo,
-    goBack,
-    navigate,
-} from 'navigation/NavigationService';
+import {appAlert, appAlertYesNo, goBack} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {ScaledSheet} from 'react-native-size-matters';
 import {modalizeMyProfile, modeExpUsePaging} from 'utility/assistant';
@@ -49,6 +43,21 @@ const MyProfile = ({route}: any) => {
             setList((preValue: Array<TypeCreatePostResponse>) =>
                 [bubblePalaceAction.payload].concat(preValue),
             );
+        } else if (
+            bubblePalaceAction.action ===
+            TYPE_BUBBLE_PALACE_ACTION.editPostFromProfile
+        ) {
+            setList((preValue: Array<TypeCreatePostResponse>) => {
+                return preValue.map(item => {
+                    if (item.id !== bubblePalaceAction.payload.id) {
+                        return item;
+                    }
+                    return {
+                        ...item,
+                        ...bubblePalaceAction.payload,
+                    };
+                });
+            });
         }
     }, [bubblePalaceAction]);
 
@@ -56,29 +65,8 @@ const MyProfile = ({route}: any) => {
         optionRef.current.show();
     };
 
-    const onSubmitSearch = () => {
-        navigate(PROFILE_ROUTE.otherProfile, {
-            id: parseInt(search),
-            onGoBack: goBack,
-        });
-    };
+    const onSubmitSearch = () => {};
 
-    const onEditAPostInList = (params: {
-        id: string;
-        data: TypeCreatePostRequest;
-    }) => {
-        setList((preValue: Array<TypeCreatePostResponse>) => {
-            return preValue.map(item => {
-                if (item.id !== params.id) {
-                    return item;
-                }
-                return {
-                    ...item,
-                    ...params.data,
-                };
-            });
-        });
-    };
     const onDeleteAPostInList = async (idPost: string) => {
         const agreeDelete = async () => {
             try {
@@ -135,7 +123,6 @@ const MyProfile = ({route}: any) => {
             return (
                 <PostStatus
                     itemPost={item}
-                    editAPostInList={onEditAPostInList}
                     deleteAPostInList={() => {
                         onDeleteAPostInList(item.id);
                     }}

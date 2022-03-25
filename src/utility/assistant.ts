@@ -1,5 +1,6 @@
 import {
     TypeChatTagResponse,
+    TypeCreatePostResponse,
     TypeGradient,
     TypeMemberInListChatTag,
 } from 'api/interface';
@@ -226,14 +227,13 @@ export const chooseLanguageFromId = (id: number) => {
 };
 
 export const modalizeOptionPost = (params: {
-    itemPostFromEdit: any;
-    editAPostInList: any;
+    itemPostFromEdit: TypeCreatePostResponse;
     deleteAPostInList: any;
 }) => {
     return [
         {
             text: 'profile.post.editPost',
-            action: () => navigate(PROFILE_ROUTE.createPost, params),
+            action: () => navigate(PROFILE_ROUTE.createPostPreview, params),
         },
         {
             text: 'profile.post.delete',

@@ -40,6 +40,7 @@ const Bubble = (props: Props) => {
 
     const isModeExp = Redux.getModeExp();
     const {gradient} = Redux.getResource();
+    const theme = Redux.getTheme();
 
     const [isLiked, setIsLiked] = useState(item.isLiked);
     const [totalLikes, setTotalLikes] = useState(item.totalLikes);
@@ -85,7 +86,9 @@ const Bubble = (props: Props) => {
                     if (!isLiked) {
                         onLikeUnLike();
                     }
-                }}>
+                }}
+                onLongPress={() => setDisplayLayer(true)}
+                onPressOut={() => setDisplayLayer(false)}>
                 <StyleImage
                     source={{uri: item.images[0]}}
                     customStyle={styles.image}
@@ -97,8 +100,8 @@ const Bubble = (props: Props) => {
     const RenderNameAndContent = useMemo(() => {
         const color =
             item.relationship === RELATIONSHIP.self
-                ? Theme.common.orange
-                : Theme.common.white;
+                ? theme.highlightColor
+                : theme.textHightLight;
         return (
             <View style={styles.avatarNameContentView}>
                 <View style={styles.avatarNameBox}>
@@ -111,16 +114,22 @@ const Bubble = (props: Props) => {
                 <View style={styles.contentBox}>
                     <StyleText
                         originValue={`🌙  ${item.name}`}
-                        customStyle={styles.textNameBubble}
+                        customStyle={[
+                            styles.textNameBubble,
+                            {color: theme.textHightLight},
+                        ]}
                     />
                     <StyleMoreText
                         value={item.content}
-                        textStyle={styles.textContent}
+                        textStyle={[
+                            styles.textContent,
+                            {color: theme.textHightLight},
+                        ]}
                     />
                 </View>
             </View>
         );
-    }, [item.name, item.content, item.creatorName]);
+    }, [item.name, item.content, item.creatorName, theme]);
 
     const RenderAvatar = useMemo(() => {
         const avatar = item.creatorAvatar || choosePrivateAvatar(item.gender);
@@ -208,7 +217,7 @@ const Bubble = (props: Props) => {
                     onPress={() => onReportUser(item.creatorId)}>
                     <Feather
                         name="flag"
-                        style={[styles.iconReport, {color: Theme.common.white}]}
+                        style={[styles.iconReport, {color: theme.textColor}]}
                     />
                 </StyleTouchable>
                 <StyleTouchable
@@ -216,19 +225,26 @@ const Bubble = (props: Props) => {
                     onPress={() => onRefreshItem(item.id)}>
                     <Feather
                         name="refresh-ccw"
-                        style={[styles.iconReport, {color: Theme.common.white}]}
+                        style={[styles.iconReport, {color: theme.textColor}]}
                     />
                 </StyleTouchable>
             </View>
         );
-    }, []);
+    }, [theme]);
 
     const RenderLayer = useMemo(() => {
         if (!displayLayer) {
             return null;
         }
-        return <View style={styles.layerView} />;
-    }, [displayLayer]);
+        return (
+            <View
+                style={[
+                    styles.layerView,
+                    {backgroundColor: theme.backgroundColor},
+                ]}
+            />
+        );
+    }, [displayLayer, theme]);
 
     return (
         <View style={styles.itemBubbleView}>
@@ -260,13 +276,13 @@ const styles = ScaledSheet.create({
     image: {
         width: '100%',
         height: '100%',
+        resizeMode: 'contain',
     },
     // layer
     layerView: {
         position: 'absolute',
         width: '100%',
         height: '100%',
-        backgroundColor: Theme.darkTheme.backgroundColor,
         opacity: 0.6,
     },
     // tool
@@ -363,7 +379,6 @@ const styles = ScaledSheet.create({
     },
     textNameBubble: {
         fontSize: '18.5@ms',
-        color: Theme.common.white,
         marginBottom: '10@vs',
     },
     textContent: {
