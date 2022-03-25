@@ -78,7 +78,7 @@ const login = {
     },
     loginScreen: {
         slogan: 'Chat and find interesting friends',
-        username: 'Username',
+        username: 'Email',
         password: 'Password',
         keepSignIn: 'Keep sign in',
         forgotPass: 'Forgot password ?',

@@ -79,7 +79,7 @@ const login = {
     },
     loginScreen: {
         slogan: 'Trò chuyện và tìm những người bạn thú vị',
-        username: 'Tên đăng nhập',
+        username: 'Email',
         password: 'Mật khẩu',
         keepSignIn: 'Duy trì đăng nhập',
         forgotPass: 'Quên mật khẩu ?',
