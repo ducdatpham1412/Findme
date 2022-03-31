@@ -1,10 +1,13 @@
 import {
+    TypeAddCommentRequest,
+    TypeBubblePalace,
     TypeChangeChatColor,
     TypeChangeGroupNameResponse,
     TypeChatMessageResponse,
     TypeChatMessageSend,
     TypeChatTagRequest,
     TypeChatTagResponse,
+    TypeCommentResponse,
     TypeDeleteMessageResponse,
     TypeSeenMessageResponse,
     TypingResponse,
@@ -12,13 +15,14 @@ import {
 import {
     apiDeleteMessage,
     apiGetListChatTags,
+    apiGetListComments,
     apiGetListMessages,
 } from 'api/module';
 import FindmeStore from 'app-redux/store';
 import {MESSAGE_TYPE, RELATIONSHIP, SOCKET_EVENT} from 'asset/enum';
 import {MESS_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {AppState, AppStateStatus} from 'react-native';
 import Config from 'react-native-config';
 import {io, Socket} from 'socket.io-client';
@@ -652,6 +656,88 @@ export const useSocketChatDetail = (params: {
     };
 };
 
+export const useSocketComment = (params: {
+    bubbleId: string;
+    setBubbleFocusing: Function;
+}) => {
+    const {bubbleId, setBubbleFocusing} = params;
+
+    const [oldBubbleId, setOldBubbleId] = useState('');
+
+    const [isLoading, setIsLoading] = useState(false);
+
+    const [dataComment, setDataComment] = useState<Array<TypeCommentResponse>>(
+        [],
+    );
+
+    const getData = async () => {
+        try {
+            setIsLoading(true);
+            const res = await apiGetListComments(bubbleId);
+            setDataComment(res.data);
+
+            let totalComments = res.data.length;
+            res.data.forEach(item => {
+                if (item.listCommentsReply) {
+                    totalComments += item.listCommentsReply?.length;
+                }
+            });
+            setBubbleFocusing((preValue: TypeBubblePalace) => ({
+                ...preValue,
+                totalComments,
+            }));
+        } catch (err) {
+            appAlert(err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const hearingSocket = () => {
+        socket?.off(SOCKET_EVENT.addComment);
+        socket.on(SOCKET_EVENT.addComment, (data: TypeCommentResponse) => {
+            if (data?.replyOf) {
+                setDataComment(preValue =>
+                    preValue.map(item => {
+                        if (item.id !== data?.replyOf) {
+                            return item;
+                        }
+                        return {
+                            ...item,
+                            listCommentsReply:
+                                item.listCommentsReply?.concat(data),
+                        };
+                    }),
+                );
+            } else {
+                setDataComment(preValue => preValue.concat(data));
+            }
+            setBubbleFocusing((preValue: TypeBubblePalace) => ({
+                ...preValue,
+                totalComments: preValue.totalComments + 1,
+            }));
+        });
+    };
+
+    useEffect(() => {
+        if (bubbleId) {
+            getData();
+            socket.emit(SOCKET_EVENT.joinRoom, bubbleId);
+            hearingSocket();
+        }
+        if (oldBubbleId) {
+            socket.emit(SOCKET_EVENT.leaveRoom, oldBubbleId);
+        }
+        setOldBubbleId(bubbleId);
+    }, [bubbleId]);
+
+    return {
+        list: dataComment,
+        onRefresh: getData,
+        loading: isLoading,
+    };
+};
+
 /**
  *
  */
@@ -748,6 +834,10 @@ export const socketTyping = (params: TypingResponse) => {
 };
 export const socketUnTyping = (params: TypingResponse) => {
     socket.emit(SOCKET_EVENT.unTyping, params);
+};
+
+export const socketAddComment = (params: TypeAddCommentRequest) => {
+    socket.emit(SOCKET_EVENT.addComment, params);
 };
 
 export const closeSocket = () => {

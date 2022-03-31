@@ -13,7 +13,7 @@ import {ScaledSheet} from 'react-native-size-matters';
 import {isIOS} from 'utility/assistant';
 
 interface Props {
-    containerStyle: StyleProp<ViewStyle>;
+    containerStyle?: StyleProp<ViewStyle>;
     innerStyle?: StyleProp<ViewStyle>;
     extraHeight?: number;
     children: ReactNode;

@@ -10,11 +10,12 @@ import IconNotLiked from 'components/common/IconNotLiked';
 import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
 import {appAlert} from 'navigation/NavigationService';
-import React, {memo, useCallback, useEffect, useMemo, useState} from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import {View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {
     chooseColorGradient,
     choosePrivateAvatar,
@@ -28,6 +29,7 @@ interface Props {
     onReportUser(idUser: number): void;
     onRefreshItem(idBubble: string): Promise<void>;
     onGoToProfile(item: TypeBubblePalace): void;
+    onShowModalComment(): void;
 }
 
 const bubbleWidth =
@@ -35,8 +37,14 @@ const bubbleWidth =
 const bubbleHeight = Metrics.height - Metrics.safeBottomPadding;
 
 const Bubble = (props: Props) => {
-    const {item, onInteractBubble, onReportUser, onRefreshItem, onGoToProfile} =
-        props;
+    const {
+        item,
+        onInteractBubble,
+        onReportUser,
+        onRefreshItem,
+        onGoToProfile,
+        onShowModalComment,
+    } = props;
 
     const isModeExp = Redux.getModeExp();
     const {gradient} = Redux.getResource();
@@ -47,7 +55,9 @@ const Bubble = (props: Props) => {
 
     const [displayLayer, setDisplayLayer] = useState(false);
 
-    const onLikeUnLike = useCallback(async () => {
+    const avatar = item.creatorAvatar || choosePrivateAvatar(item.gender);
+
+    const onLikeUnLike = async () => {
         if (!isModeExp) {
             const currentLike = isLiked;
             const currentNumberLikes = totalLikes;
@@ -68,7 +78,7 @@ const Bubble = (props: Props) => {
                 moreAction: onGoToSignUp,
             });
         }
-    }, [isLiked, totalLikes, isModeExp]);
+    };
 
     useEffect(() => {
         setIsLiked(item.isLiked);
@@ -78,7 +88,9 @@ const Bubble = (props: Props) => {
     /**
      * Render view
      */
-    const RenderImage = useMemo(() => {
+    const RenderImage = () => {
+        const imageChoose = item.images[0] ? item.images[0] : avatar;
+        const opacity = item.images[0] ? 1 : 0.3;
         return (
             <StyleTouchHaveDouble
                 customStyle={styles.imageView}
@@ -86,18 +98,30 @@ const Bubble = (props: Props) => {
                     if (!isLiked) {
                         onLikeUnLike();
                     }
-                }}
-                onLongPress={() => setDisplayLayer(true)}
-                onPressOut={() => setDisplayLayer(false)}>
+                }}>
                 <StyleImage
-                    source={{uri: item.images[0]}}
-                    customStyle={styles.image}
+                    source={{uri: imageChoose}}
+                    customStyle={[styles.image, {opacity}]}
                 />
             </StyleTouchHaveDouble>
         );
-    }, [isLiked, totalLikes]);
+    };
 
-    const RenderNameAndContent = useMemo(() => {
+    const RenderLayer = () => {
+        if (!displayLayer) {
+            return null;
+        }
+        return (
+            <View
+                style={[
+                    styles.layerView,
+                    {backgroundColor: theme.backgroundColor},
+                ]}
+            />
+        );
+    };
+
+    const RenderNameAndContent = () => {
         const color =
             item.relationship === RELATIONSHIP.self
                 ? theme.highlightColor
@@ -129,10 +153,32 @@ const Bubble = (props: Props) => {
                 </View>
             </View>
         );
-    }, [item.name, item.content, item.creatorName, theme]);
+    };
 
-    const RenderAvatar = useMemo(() => {
-        const avatar = item.creatorAvatar || choosePrivateAvatar(item.gender);
+    const RenderExtensionTool = () => {
+        return (
+            <View style={styles.reportView}>
+                <StyleTouchable
+                    customStyle={styles.iconReportTouch}
+                    onPress={() => onReportUser(item.creatorId)}>
+                    <Feather
+                        name="flag"
+                        style={[styles.iconReport, {color: theme.textColor}]}
+                    />
+                </StyleTouchable>
+                <StyleTouchable
+                    customStyle={styles.iconReportTouch}
+                    onPress={() => onRefreshItem(item.id)}>
+                    <Feather
+                        name="refresh-ccw"
+                        style={[styles.iconReport, {color: theme.textColor}]}
+                    />
+                </StyleTouchable>
+            </View>
+        );
+    };
+
+    const RenderAvatar = () => {
         return (
             <StyleTouchable onPress={() => onGoToProfile(item)}>
                 <StyleImage
@@ -141,21 +187,10 @@ const Bubble = (props: Props) => {
                 />
             </StyleTouchable>
         );
-    }, [item.creatorAvatar]);
+    };
 
-    const RenderIconHobby = useMemo(() => {
-        return (
-            <IconHobby
-                bubbleId={item.id}
-                color={item.color}
-                onTouchStart={() => setDisplayLayer(true)}
-                onTouchEnd={() => setDisplayLayer(false)}
-            />
-        );
-    }, [item.color, item.id]);
-
-    const RenderIconLikeUnLike = useMemo(() => {
-        const color = isLiked ? Theme.common.pink : Theme.common.white;
+    const RenderIconLikeUnLike = () => {
+        const color = isLiked ? Theme.common.pink : theme.unLikeHeart;
         return (
             <View style={styles.likeBox}>
                 {isLiked ? (
@@ -166,21 +201,58 @@ const Bubble = (props: Props) => {
                 ) : (
                     <IconNotLiked
                         onPress={onLikeUnLike}
-                        customStyle={styles.iconUnLike}
+                        customStyle={[styles.iconUnLike, {color}]}
                     />
                 )}
 
-                <View style={styles.textLikeBox}>
-                    <StyleText
-                        originValue={totalLikes}
-                        customStyle={[styles.textLike, {color}]}
-                    />
+                <View style={styles.textLikeCommentBox}>
+                    {!!totalLikes && (
+                        <StyleText
+                            originValue={totalLikes}
+                            customStyle={[styles.textLikeComment, {color}]}
+                        />
+                    )}
                 </View>
             </View>
         );
-    }, [isLiked, totalLikes]);
+    };
 
-    const RenderStartChat = useMemo(() => {
+    const RenderComment = () => {
+        return (
+            <StyleTouchable
+                customStyle={styles.commentBox}
+                onPress={onShowModalComment}>
+                <FontAwesome
+                    name="comments-o"
+                    style={[styles.iconComment, {color: theme.unLikeHeart}]}
+                />
+                <View style={styles.textLikeCommentBox}>
+                    {!!item.totalComments && (
+                        <StyleText
+                            originValue={item.totalComments}
+                            customStyle={[
+                                styles.textLikeComment,
+                                {color: theme.unLikeHeart},
+                            ]}
+                        />
+                    )}
+                </View>
+            </StyleTouchable>
+        );
+    };
+
+    const RenderIconHobby = () => {
+        return (
+            <IconHobby
+                bubbleId={item.id}
+                color={item.color}
+                onTouchStart={() => setDisplayLayer(true)}
+                onTouchEnd={() => setDisplayLayer(false)}
+            />
+        );
+    };
+
+    const RenderStartChat = () => {
         if (item.hadKnowEachOther) {
             return null;
         }
@@ -207,57 +279,21 @@ const Bubble = (props: Props) => {
                 </StyleTouchable>
             </LinearGradient>
         );
-    }, [item]);
-
-    const RenderExtensionTool = useMemo(() => {
-        return (
-            <View style={styles.reportView}>
-                <StyleTouchable
-                    customStyle={styles.iconReportTouch}
-                    onPress={() => onReportUser(item.creatorId)}>
-                    <Feather
-                        name="flag"
-                        style={[styles.iconReport, {color: theme.textColor}]}
-                    />
-                </StyleTouchable>
-                <StyleTouchable
-                    customStyle={styles.iconReportTouch}
-                    onPress={() => onRefreshItem(item.id)}>
-                    <Feather
-                        name="refresh-ccw"
-                        style={[styles.iconReport, {color: theme.textColor}]}
-                    />
-                </StyleTouchable>
-            </View>
-        );
-    }, [theme]);
-
-    const RenderLayer = useMemo(() => {
-        if (!displayLayer) {
-            return null;
-        }
-        return (
-            <View
-                style={[
-                    styles.layerView,
-                    {backgroundColor: theme.backgroundColor},
-                ]}
-            />
-        );
-    }, [displayLayer, theme]);
+    };
 
     return (
         <View style={styles.itemBubbleView}>
-            {RenderImage}
-            {RenderLayer}
-            {RenderNameAndContent}
-            {RenderExtensionTool}
+            {RenderImage()}
+            {RenderLayer()}
+            {RenderNameAndContent()}
+            {RenderExtensionTool()}
             <View style={styles.toolView}>
-                {RenderAvatar}
-                {RenderIconLikeUnLike}
-                {RenderIconHobby}
+                {RenderAvatar()}
+                {RenderIconLikeUnLike()}
+                {RenderComment()}
+                {RenderIconHobby()}
             </View>
-            {RenderStartChat}
+            {RenderStartChat()}
         </View>
     );
 };
@@ -288,15 +324,15 @@ const styles = ScaledSheet.create({
     // tool
     toolView: {
         position: 'absolute',
-        width: '100@s',
+        width: '66@s',
         paddingVertical: '10@vs',
-        bottom: '200@s',
+        bottom: '150@s',
         right: 0,
         alignItems: 'center',
     },
     avatar: {
-        width: '50@ms',
-        height: '50@ms',
+        width: '45@ms',
+        height: '45@ms',
         borderRadius: '30@ms',
     },
     likeBox: {
@@ -307,17 +343,24 @@ const styles = ScaledSheet.create({
         marginTop: '40@vs',
     },
     iconLike: {
-        fontSize: '60@ms',
+        fontSize: '40@ms',
     },
     iconUnLike: {
-        fontSize: '60@ms',
+        fontSize: '40@ms',
     },
-    textLikeBox: {
+    textLikeCommentBox: {
         height: '30@ms',
         marginTop: '7@vs',
+        alignSelf: 'center',
     },
-    textLike: {
+    textLikeComment: {
         fontSize: '20@ms',
+    },
+    commentBox: {
+        marginTop: '20@vs',
+    },
+    iconComment: {
+        fontSize: '40@ms',
     },
     // gradient
     linearGradient: {
@@ -370,7 +413,7 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
     },
     textName: {
-        fontSize: '20@ms',
+        fontSize: '16@ms',
         fontWeight: 'bold',
     },
     contentBox: {
@@ -378,11 +421,11 @@ const styles = ScaledSheet.create({
         paddingTop: '7@vs',
     },
     textNameBubble: {
-        fontSize: '18.5@ms',
+        fontSize: '15@ms',
         marginBottom: '10@vs',
     },
     textContent: {
-        fontSize: '17@ms',
+        fontSize: '14@ms',
         color: Theme.common.white,
     },
 });

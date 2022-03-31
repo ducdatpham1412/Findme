@@ -6,6 +6,7 @@ import {
     TypeChatTagResponse,
     TypeCheckOTPRequest,
     TypeCheckOTPResponse,
+    TypeCommentResponse,
     TypeCreatePostRequest,
     TypeCreatePostResponse,
     TypeDeleteMessageRequest,
@@ -145,6 +146,15 @@ export const apiGetDetailBubbleEnjoy = (
     data: TypeBubblePalace;
 }> => {
     return request.get(`/common/detail-bubble-profile-enjoy/${idBubble}`);
+};
+
+export const apiGetListComments = (
+    idBubble: string,
+): Promise<{
+    success: boolean;
+    data: Array<TypeCommentResponse>;
+}> => {
+    return request.get(`/common/list-comments/${idBubble}`);
 };
 
 /**

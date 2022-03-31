@@ -18,7 +18,7 @@ const StyleText = (props: StyleTextProps) => {
     let valueText;
     if (i18Text) {
         valueText = t(i18Text, i18Params);
-    } else if (originValue) {
+    } else if (originValue !== undefined) {
         valueText = originValue;
     } else {
         valueText = '';

@@ -154,7 +154,7 @@ const CreatePostPreview = ({route}: Props) => {
                     : '';
                 const res = await apiCreatePost({
                     content,
-                    images: [uploadImage],
+                    images: image ? [uploadImage] : [],
                     color,
                     name,
                 });
@@ -387,6 +387,7 @@ const CreatePostPreview = ({route}: Props) => {
                                 maxLength={50}
                                 i18Placeholder="profile.post.enterTopic"
                                 placeholderTextColor={theme.holderColorLighter}
+                                isEffectTabBar={false}
                             />
                         </View>
                     );

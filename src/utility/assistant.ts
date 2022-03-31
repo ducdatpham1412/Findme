@@ -87,7 +87,7 @@ export const chooseIconHobby = (idHobby: number) => {
     const {listHobbies} = FindmeStore.getState().logicSlice.resource;
     const temp =
         listHobbies.find(item => item.id === idHobby) || listHobbies[0];
-    return temp.icon;
+    return temp?.icon || '';
 };
 
 export const countDownToCancelRequestPublic = (params: {
