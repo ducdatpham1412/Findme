@@ -12,6 +12,7 @@ const ROOT_SCREEN = {
     picker: '@ROOT_SCREEN/picker',
     otherProfile: '@ROOT_SCREEN/otherProfile',
     listFollows: '@ROOT_SCREEN/listFollows',
+    detailBubble: '@ROOT_SCREEN/detailBubble',
 };
 /**
  * ||

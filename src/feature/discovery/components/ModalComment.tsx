@@ -1,11 +1,16 @@
-import {TypeCommentResponse} from 'api/interface';
+import {useIsFocused} from '@react-navigation/native';
+import {TypeBubblePalace, TypeCommentResponse} from 'api/interface';
 import {Metrics} from 'asset/metrics';
 import {StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import InputComment from 'components/common/InputComment';
 import StyleKeyboardAwareView from 'components/StyleKeyboardAwareView';
 import Redux from 'hook/useRedux';
-import {socketAddComment, useSocketComment} from 'hook/useSocketIO';
+import {
+    socketAddComment,
+    socketLeaveRoom,
+    useSocketComment,
+} from 'hook/useSocketIO';
 import ROOT_SCREEN from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
@@ -14,9 +19,22 @@ import {ScaledSheet} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 import ItemComment from './ItemComment';
 
-const ModalComment = () => {
-    const bubbleFocusing = Redux.getBubbleFocusing();
-    const displayComment = Redux.getDisplayComment();
+interface Props {
+    bubbleFocusing: TypeBubblePalace;
+    displayComment: boolean;
+    setDisplayComment?: Function;
+    isNotModalOfMainTab?: boolean;
+}
+
+const ModalComment = (props: Props) => {
+    const {
+        bubbleFocusing,
+        displayComment,
+        setDisplayComment,
+        isNotModalOfMainTab = false,
+    } = props;
+
+    const isFocused = useIsFocused();
 
     const theme = Redux.getTheme();
     const token = Redux.getToken();
@@ -28,7 +46,7 @@ const ModalComment = () => {
     const [personReplied, setPersonReplied] = useState('');
     const [commentReplied, setCommentReplied] = useState(''); // if "", it not reply any comment
 
-    const {list, loading, onRefresh} = useSocketComment();
+    const {list, loading, onRefresh} = useSocketComment(bubbleFocusing);
 
     useEffect(() => {
         Animated.timing(translateY, {
@@ -37,6 +55,12 @@ const ModalComment = () => {
             useNativeDriver: true,
         }).start();
     }, [displayComment]);
+
+    useEffect(() => {
+        if (isNotModalOfMainTab && !isFocused) {
+            socketLeaveRoom(bubbleFocusing.id);
+        }
+    }, [isFocused, isNotModalOfMainTab]);
 
     const onSendComment = async () => {
         socketAddComment({
@@ -90,7 +114,11 @@ const ModalComment = () => {
                     customStyle={styles.iconTurnOffTouch}
                     onPress={() => {
                         onDeleteReply();
-                        Redux.setDisplayComment(false);
+                        if (!setDisplayComment) {
+                            Redux.setDisplayComment(false);
+                        } else {
+                            setDisplayComment?.(false);
+                        }
                     }}>
                     <Feather
                         name="x"

@@ -264,6 +264,11 @@ const setting = {
     },
 };
 
+// NOTIFICATION
+const notification = {
+    title: 'Notifications',
+};
+
 // ALERT
 const alert = {
     // FOR LOGIN
@@ -310,6 +315,7 @@ const en = {
     mess,
     profile,
     setting,
+    notification,
 };
 
 export default en;

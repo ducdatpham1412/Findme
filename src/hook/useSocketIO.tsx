@@ -1,3 +1,4 @@
+import {useIsFocused} from '@react-navigation/native';
 import {
     TypeAddCommentRequest,
     TypeBubblePalace,
@@ -18,7 +19,6 @@ import {
     apiGetListComments,
     apiGetListMessages,
 } from 'api/module';
-import {logicSliceAction} from 'app-redux/account/logicSlice';
 import FindmeStore from 'app-redux/store';
 import {MESSAGE_TYPE, RELATIONSHIP, SOCKET_EVENT} from 'asset/enum';
 import {MESS_ROUTE} from 'navigation/config/routes';
@@ -657,9 +657,8 @@ export const useSocketChatDetail = (params: {
     };
 };
 
-export const useSocketComment = () => {
-    const bubbleFocusing = Redux.getBubbleFocusing();
-
+export const useSocketComment = (bubbleFocusing: TypeBubblePalace) => {
+    const isFocused = useIsFocused();
     const [oldBubbleId, setOldBubbleId] = useState('');
 
     const [isLoading, setIsLoading] = useState(false);
@@ -832,6 +831,10 @@ export const socketUnTyping = (params: TypingResponse) => {
 
 export const socketAddComment = (params: TypeAddCommentRequest) => {
     socket.emit(SOCKET_EVENT.addComment, params);
+};
+
+export const socketLeaveRoom = (roomId: string) => {
+    socket.emit(SOCKET_EVENT.leaveRoom, roomId);
 };
 
 export const closeSocket = () => {

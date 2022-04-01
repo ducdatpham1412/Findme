@@ -268,6 +268,11 @@ const setting = {
     },
 };
 
+// NOTIFICATION
+const notification = {
+    title: 'Thông báo',
+};
+
 // ALERT
 const alert = {
     // FOR LOGIN
@@ -316,5 +321,6 @@ const vi = {
     mess,
     profile,
     setting,
+    notification,
 };
 export default vi;

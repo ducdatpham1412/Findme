@@ -167,6 +167,13 @@ const OtherProfile = ({route}: Props) => {
         }
     };
 
+    const onGoToDetailPost = (postId: string) => {
+        navigate(ROOT_SCREEN.detailBubble, {
+            bubbleId: postId,
+            displayComment: true,
+        });
+    };
+
     /**
      * Render_view
      */
@@ -231,7 +238,12 @@ const OtherProfile = ({route}: Props) => {
 
     const RenderItem = useCallback(
         ({item}: any) => {
-            return <PostStatus itemPost={item} />;
+            return (
+                <PostStatus
+                    itemPost={item}
+                    onGoToDetailPost={onGoToDetailPost}
+                />
+            );
         },
         [list],
     );

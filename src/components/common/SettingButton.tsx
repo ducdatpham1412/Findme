@@ -1,6 +1,6 @@
+import {StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import React from 'react';
-import {Animated, TouchableOpacity} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
@@ -13,33 +13,19 @@ const SettingButton = (props: SettingButtonProps) => {
     const theme = Redux.getTheme();
     const {customStyle, onPress} = props;
 
-    // const opacityMess = useRef(new Animated.Value(theme.opacityValue)).current
-
-    // const changeOpacityWhenClick = () => {
-    //     opacityMess.setValue(1)
-    //     setTimeout(() => {
-    //         Animated.timing(opacityMess, {
-    //             toValue: theme.opacityValue,
-    //             duration: 100,
-    //             useNativeDriver: true
-    //         }).start()
-    //     }, 3000);
-    // }
-
     return (
-        <Animated.View
-            style={[
+        <StyleTouchable
+            customStyle={[
                 styles.buttonBox,
                 customStyle,
                 {backgroundColor: theme.backgroundButtonColor},
-            ]}>
-            <TouchableOpacity style={styles.button} onPress={onPress}>
-                <AntDesign
-                    name="setting"
-                    style={[styles.icon, {color: theme.textColor}]}
-                />
-            </TouchableOpacity>
-        </Animated.View>
+            ]}
+            onPress={onPress}>
+            <AntDesign
+                name="setting"
+                style={[styles.icon, {color: theme.textColor}]}
+            />
+        </StyleTouchable>
     );
 };
 
@@ -49,9 +35,6 @@ const styles = ScaledSheet.create({
         height: '33@vs',
         borderRadius: '20@s',
         opacity: 0.8,
-    },
-    button: {
-        flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
     },

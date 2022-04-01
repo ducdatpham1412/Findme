@@ -12,6 +12,7 @@ import StylePicker from 'components/base/picker/StylePicker';
 import Modalize from 'components/common/useModalize';
 import LoadingScreen from 'components/LoadingScreen';
 import SwipeImages from 'components/SwipeImages';
+import DetailBubble from 'feature/discovery/DetailBubble';
 import InteractBubble from 'feature/discovery/InteractBubble';
 import ReportUser from 'feature/discovery/ReportUser';
 import ListFollows from 'feature/profile/ListFollows';
@@ -123,6 +124,18 @@ const RootScreen = () => {
                                     cardStyleSafeTop,
                                     {backgroundColor: theme.backgroundColor},
                                 ],
+                            }}
+                        />
+
+                        <RootStack.Screen
+                            name={ROOT_SCREEN.detailBubble}
+                            component={DetailBubble}
+                            options={{
+                                cardStyle: [
+                                    cardStyleSafeTop,
+                                    {backgroundColor: theme.backgroundColor},
+                                ],
+                                gestureEnabled: true,
                             }}
                         />
 

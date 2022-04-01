@@ -397,3 +397,17 @@ export interface TypingResponse {
     chatTagId: string;
     userId: number;
 }
+
+/**
+ * NOTIFICATION
+ */
+export interface TypeNotificationResponse {
+    id: string;
+    type: number;
+    content: string;
+    image: string;
+    creatorId: number;
+    hadRead: boolean;
+    chatTagId?: string;
+    bubbleId?: string;
+}

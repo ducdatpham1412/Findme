@@ -15,7 +15,7 @@ import {
 import Entypo from 'react-native-vector-icons/Entypo';
 import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const ratio = scale(40) / scale(40);
 const opacityNotFocus = 0.6;
@@ -167,10 +167,10 @@ const TabNavigator = (props?: any) => {
             <StyleTouchable
                 customStyle={styles.buttonView}
                 onPress={() => navigate(routeNotification.name)}>
-                <SimpleLineIcons
-                    name="book-open"
+                <MaterialIcons
+                    name="notifications-none"
                     style={{
-                        fontSize: moderateScale(18),
+                        fontSize: moderateScale(24),
                         color: theme.textHightLight,
                         opacity: isFocusingNotification ? 1 : opacityNotFocus,
                     }}
@@ -197,9 +197,9 @@ const TabNavigator = (props?: any) => {
                 {/* Push button */}
                 <View style={styles.buttonView} />
 
-                {RenderProfileButton}
-
                 {RenderNotificationButton}
+
+                {RenderProfileButton}
             </Animated.View>
 
             <Animated.View

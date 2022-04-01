@@ -1,18 +1,23 @@
+import {GUIDELINE_URL} from 'asset/standardValue';
+import {StyleTouchable} from 'components/base';
 import OptionsButton from 'components/common/OptionsButton';
 import SearchButton from 'components/common/SearchButton';
 import SettingButton from 'components/common/SettingButton';
+import Redux from 'hook/useRedux';
 import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
-import {PROFILE_ROUTE} from 'navigation/config/routes';
+import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {goBack, navigate} from 'navigation/NavigationService';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
-import {scale, ScaledSheet} from 'react-native-size-matters';
+import {moderateScale, scale, ScaledSheet} from 'react-native-size-matters';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 interface Props {
     search: string;
     onSearch: any;
     onShowOptions(): void;
+    hasGuideButton?: boolean;
     hasBackBtn?: boolean;
     hasSettingBtn?: boolean;
     onSubmitSearch?(): void;
@@ -26,6 +31,7 @@ const SearchAndSetting = (props: Props) => {
         search,
         onSearch,
         onShowOptions,
+        hasGuideButton = false,
         hasBackBtn = true,
         hasSettingBtn = true,
         onSubmitSearch,
@@ -34,6 +40,14 @@ const SearchAndSetting = (props: Props) => {
         onGoBack,
     } = props;
     const {t} = useTranslation();
+    const theme = Redux.getTheme();
+
+    const onGoToUserGuide = () => {
+        navigate(ROOT_SCREEN.webView, {
+            title: 'setting.userGuide.title',
+            linkWeb: GUIDELINE_URL,
+        });
+    };
 
     return (
         <View style={styles.container}>
@@ -52,6 +66,25 @@ const SearchAndSetting = (props: Props) => {
                     onBlur={onBlur}
                 />
             )}
+
+            <View style={styles.leftBtnView}>
+                {hasGuideButton && (
+                    <StyleTouchable
+                        customStyle={[
+                            styles.buttonBox,
+                            {backgroundColor: theme.backgroundButtonColor},
+                        ]}
+                        onPress={onGoToUserGuide}>
+                        <SimpleLineIcons
+                            name="book-open"
+                            style={{
+                                fontSize: moderateScale(16),
+                                color: theme.textHightLight,
+                            }}
+                        />
+                    </StyleTouchable>
+                )}
+            </View>
 
             <View style={styles.rightBtnView}>
                 <OptionsButton onPress={onShowOptions} />
@@ -75,6 +108,11 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
     },
+    leftBtnView: {
+        flexDirection: 'row',
+        position: 'absolute',
+        left: '20@s',
+    },
     rightBtnView: {
         flexDirection: 'row',
         position: 'absolute',
@@ -82,6 +120,14 @@ const styles = ScaledSheet.create({
     },
     settingBtn: {
         marginLeft: '7@s',
+    },
+    buttonBox: {
+        width: '33@vs',
+        height: '33@vs',
+        borderRadius: '20@s',
+        opacity: 0.8,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 });
 

@@ -10,19 +10,21 @@ import IconNotLiked from 'components/common/IconNotLiked';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import Redux from 'hook/useRedux';
 import {appAlert, showSwipeImages} from 'navigation/NavigationService';
-import React, {useMemo, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {chooseIconHobby, modalizeOptionPost} from 'utility/assistant';
 
 interface PostStatusProps {
     itemPost: TypeCreatePostResponse;
     deleteAPostInList?(idPost: string): void;
+    onGoToDetailPost(idPost: string): void;
 }
 
 const PostStatus = (props: PostStatusProps) => {
-    const {itemPost, deleteAPostInList} = props;
+    const {itemPost, deleteAPostInList, onGoToDetailPost} = props;
 
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
@@ -68,10 +70,15 @@ const PostStatus = (props: PostStatusProps) => {
         });
     };
 
+    useEffect(() => {
+        setIsLiked(itemPost.isLiked);
+        setNumberLikes(itemPost.totalLikes);
+    }, [itemPost.isLiked, itemPost.totalLikes]);
+
     /**
      * Render view
      */
-    const RenderBackground = useMemo(() => {
+    const RenderBackground = () => {
         return (
             <View
                 style={[
@@ -80,18 +87,18 @@ const PostStatus = (props: PostStatusProps) => {
                 ]}
             />
         );
-    }, [theme]);
+    };
 
-    const RenderAvatarNameOption = useMemo(() => {
+    const RenderAvatarNameOption = () => {
         return (
             <View style={styles.creatorView}>
                 <View style={styles.avatarNameBox}>
                     <StyleImage
-                        source={{uri: itemPost.creatorAvatar}}
+                        source={{uri: chooseIconHobby(itemPost.color)}}
                         customStyle={styles.avatar}
                     />
                     <StyleText
-                        originValue={itemPost.creatorName}
+                        originValue={itemPost.name}
                         customStyle={[
                             styles.textName,
                             {color: theme.textColor},
@@ -114,9 +121,9 @@ const PostStatus = (props: PostStatusProps) => {
                 )}
             </View>
         );
-    }, [itemPost.creatorAvatar, itemPost.creatorName, theme]);
+    };
 
-    const RenderCaption = useMemo(() => {
+    const RenderCaption = () => {
         if (!itemPost.content) {
             return null;
         }
@@ -136,9 +143,9 @@ const PostStatus = (props: PostStatusProps) => {
                 />
             </View>
         );
-    }, [itemPost.content, theme, itemPost.images]);
+    };
 
-    const RenderImage = useMemo(() => {
+    const RenderImage = () => {
         if (!itemPost.images[0]) {
             return null;
         }
@@ -158,11 +165,11 @@ const PostStatus = (props: PostStatusProps) => {
                 />
             </StyleTouchHaveDouble>
         );
-    }, [itemPost.images, isLiked]);
+    };
 
-    const RenderLikeBox = useMemo(() => {
+    const RenderLikeBox = () => {
         return (
-            <>
+            <View style={styles.likeBox}>
                 {isLiked ? (
                     <IconLiked
                         onPress={onPressHeart}
@@ -193,29 +200,44 @@ const PostStatus = (props: PostStatusProps) => {
                         ]}
                     />
                 )}
-            </>
+            </View>
         );
-    }, [isLiked, numberLikes, theme]);
+    };
 
-    const RenderIconHobby = useMemo(() => {
+    const RenderCommentBox = () => {
         return (
-            <StyleImage
-                source={{uri: chooseIconHobby(itemPost.color)}}
-                customStyle={styles.iconHobby}
-            />
+            <View style={styles.commentBox}>
+                <StyleTouchable
+                    customStyle={styles.commentBox}
+                    onPress={() => onGoToDetailPost(itemPost.id)}>
+                    <FontAwesome
+                        name="comments-o"
+                        style={[styles.iconComment, {color: theme.unLikeHeart}]}
+                    />
+                    {!!itemPost.totalComments && (
+                        <StyleText
+                            originValue={itemPost.totalComments}
+                            customStyle={[
+                                styles.textLikeComment,
+                                {color: theme.unLikeHeart},
+                            ]}
+                        />
+                    )}
+                </StyleTouchable>
+            </View>
         );
-    }, [itemPost.color]);
+    };
 
     return (
         <View style={styles.container}>
-            {RenderBackground}
-            {RenderAvatarNameOption}
-            {RenderCaption}
-            {RenderImage}
+            {RenderBackground()}
+            {RenderAvatarNameOption()}
+            {RenderCaption()}
+            {RenderImage()}
 
             <View style={styles.interactView}>
-                {RenderLikeBox}
-                {RenderIconHobby}
+                {RenderLikeBox()}
+                {RenderCommentBox()}
             </View>
 
             <StyleActionSheet
@@ -294,23 +316,41 @@ const styles = ScaledSheet.create({
     },
     // heart icon
     interactView: {
-        width: '100%',
-        paddingVertical: '10@vs',
+        width: '80%',
+        paddingTop: '20@vs',
+        paddingBottom: '10@vs',
+        paddingHorizontal: '10@s',
         flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
+        alignSelf: 'center',
     },
     heartIcon: {
         marginRight: '20@s',
+    },
+    likeBox: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
     },
     textNumberLike: {
         fontSize: '20@ms',
         fontWeight: 'bold',
     },
+    commentBox: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+    },
+    iconComment: {
+        fontSize: '40@ms',
+        marginRight: '15@s',
+    },
+    textLikeComment: {
+        fontSize: '20@ms',
+    },
     // icon hobby
     iconHobby: {
-        position: 'absolute',
-        left: '20@s',
         width: '40@ms',
         height: '40@ms',
     },
