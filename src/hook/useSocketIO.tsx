@@ -18,6 +18,7 @@ import {
     apiGetListComments,
     apiGetListMessages,
 } from 'api/module';
+import {logicSliceAction} from 'app-redux/account/logicSlice';
 import FindmeStore from 'app-redux/store';
 import {MESSAGE_TYPE, RELATIONSHIP, SOCKET_EVENT} from 'asset/enum';
 import {MESS_ROUTE} from 'navigation/config/routes';
@@ -656,11 +657,8 @@ export const useSocketChatDetail = (params: {
     };
 };
 
-export const useSocketComment = (params: {
-    bubbleId: string;
-    setBubbleFocusing: Function;
-}) => {
-    const {bubbleId, setBubbleFocusing} = params;
+export const useSocketComment = () => {
+    const bubbleFocusing = Redux.getBubbleFocusing();
 
     const [oldBubbleId, setOldBubbleId] = useState('');
 
@@ -673,7 +671,7 @@ export const useSocketComment = (params: {
     const getData = async () => {
         try {
             setIsLoading(true);
-            const res = await apiGetListComments(bubbleId);
+            const res = await apiGetListComments(bubbleFocusing.id);
             setDataComment(res.data);
 
             let totalComments = res.data.length;
@@ -682,10 +680,9 @@ export const useSocketComment = (params: {
                     totalComments += item.listCommentsReply?.length;
                 }
             });
-            setBubbleFocusing((preValue: TypeBubblePalace) => ({
-                ...preValue,
+            Redux.updateBubbleFocusing({
                 totalComments,
-            }));
+            });
         } catch (err) {
             appAlert(err);
         } finally {
@@ -712,24 +709,21 @@ export const useSocketComment = (params: {
             } else {
                 setDataComment(preValue => preValue.concat(data));
             }
-            setBubbleFocusing((preValue: TypeBubblePalace) => ({
-                ...preValue,
-                totalComments: preValue.totalComments + 1,
-            }));
+            Redux.increaseTotalCommentsOfBubbleFocusing(1);
         });
     };
 
     useEffect(() => {
-        if (bubbleId) {
+        if (bubbleFocusing.id && bubbleFocusing.id !== oldBubbleId) {
             getData();
-            socket.emit(SOCKET_EVENT.joinRoom, bubbleId);
+            socket.emit(SOCKET_EVENT.joinRoom, bubbleFocusing.id);
             hearingSocket();
+            if (oldBubbleId) {
+                socket.emit(SOCKET_EVENT.leaveRoom, oldBubbleId);
+            }
+            setOldBubbleId(bubbleFocusing.id);
         }
-        if (oldBubbleId) {
-            socket.emit(SOCKET_EVENT.leaveRoom, oldBubbleId);
-        }
-        setOldBubbleId(bubbleId);
-    }, [bubbleId]);
+    }, [bubbleFocusing.id, oldBubbleId]);
 
     return {
         list: dataComment,

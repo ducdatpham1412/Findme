@@ -1,7 +1,8 @@
 import {
-    createBottomTabNavigator,
     BottomTabBarProps,
+    createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs';
+import ModalComment from 'feature/discovery/components/ModalComment';
 import NotificationScreen from 'feature/notification/NotificationScreen';
 import TabNavigator from 'navigation/components/TabNavigator';
 import {MAIN_SCREEN} from 'navigation/config/routes';
@@ -14,40 +15,46 @@ const BottomTab = createBottomTabNavigator();
 
 const MainTabs: React.FunctionComponent = () => {
     return (
-        <BottomTab.Navigator
-            tabBar={(props: BottomTabBarProps) => <TabNavigator {...props} />}
-            screenOptions={{
-                headerShown: false,
-            }}>
-            <BottomTab.Screen
-                name={MAIN_SCREEN.discoveryRoute}
-                component={DiscoveryRoute}
-                options={{
-                    lazy: false,
-                }}
-            />
+        <>
+            <BottomTab.Navigator
+                tabBar={(props: BottomTabBarProps) => (
+                    <TabNavigator {...props} />
+                )}
+                screenOptions={{
+                    headerShown: false,
+                }}>
+                <BottomTab.Screen
+                    name={MAIN_SCREEN.discoveryRoute}
+                    component={DiscoveryRoute}
+                    options={{
+                        lazy: false,
+                    }}
+                />
 
-            <BottomTab.Screen
-                name={MAIN_SCREEN.messRoute}
-                component={MessRoute}
-                options={{
-                    lazy: false,
-                }}
-            />
+                <BottomTab.Screen
+                    name={MAIN_SCREEN.messRoute}
+                    component={MessRoute}
+                    options={{
+                        lazy: false,
+                    }}
+                />
 
-            <BottomTab.Screen
-                name={MAIN_SCREEN.profileRoute}
-                component={ProfileRoute}
-                options={{
-                    lazy: false,
-                }}
-            />
+                <BottomTab.Screen
+                    name={MAIN_SCREEN.profileRoute}
+                    component={ProfileRoute}
+                    options={{
+                        lazy: false,
+                    }}
+                />
 
-            <BottomTab.Screen
-                name={MAIN_SCREEN.notificationRoute}
-                component={NotificationScreen}
-            />
-        </BottomTab.Navigator>
+                <BottomTab.Screen
+                    name={MAIN_SCREEN.notificationRoute}
+                    component={NotificationScreen}
+                />
+            </BottomTab.Navigator>
+
+            <ModalComment />
+        </>
     );
 };
 

@@ -43,6 +43,7 @@
         "axios": "^0.21.1",
         "dayjs": "^1.10.7",
         "i18next": "^20.1.0",
+        "lodash": "^4.17.21",
         "react": "17.0.1",
         "react-hook-form": "^7.6.0",
         "react-i18next": "^11.8.12",

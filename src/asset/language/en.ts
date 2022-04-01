@@ -72,8 +72,8 @@ const login = {
     detailInformation: {
         header: 'OK !',
         noti: 'My information',
-        man: 'Man',
-        woman: 'Woman',
+        man: 'Male',
+        woman: 'Female',
         notToSay: 'Prefer not to say',
         done: "Let's go",
     },
@@ -281,8 +281,8 @@ const alert = {
 
     // FOR SETTING
     nowPassError: 'Current password not true !',
-    successChangePass: 'Changing password successful !',
-    successChange: 'Changing successfully !',
+    successChangePass: 'Changed password successful !',
+    successChange: 'Changed successfully !',
 
     // STYLE INPUT FORM
     notWrapProvider: 'You must wrap provider in this form',

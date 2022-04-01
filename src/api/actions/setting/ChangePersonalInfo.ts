@@ -2,7 +2,6 @@ import {apiChangeInformation} from 'api/module';
 import FindmeStore from 'app-redux/store';
 import {INFO_TYPE} from 'asset/enum';
 import Redux from 'hook/useRedux';
-import {choosePrivateAvatar} from 'utility/assistant';
 
 interface newInfoType {
     facebook?: any;
@@ -17,20 +16,6 @@ export default class ChangePersonalInfo {
         Redux.updatePassport({
             information: newInfo,
         });
-
-        if (newInfo?.gender) {
-            const {listBubbles} = FindmeStore.getState().accountSlice.passport;
-            const {display_avatar} =
-                FindmeStore.getState().accountSlice.passport.setting;
-
-            if (!display_avatar) {
-                const temp = listBubbles.map(item => ({
-                    ...item,
-                    privateAvatar: choosePrivateAvatar(),
-                }));
-                Redux.updatePassport({listBubbles: temp});
-            }
-        }
     };
 
     private static changeInfoInServer = async (newInfo: any) => {
