@@ -1,4 +1,4 @@
-import {TypeBubblePalace, TypeCommentResponse} from 'api/interface';
+import {TypeCommentResponse} from 'api/interface';
 import {Metrics} from 'asset/metrics';
 import {StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
@@ -6,43 +6,37 @@ import InputComment from 'components/common/InputComment';
 import StyleKeyboardAwareView from 'components/StyleKeyboardAwareView';
 import Redux from 'hook/useRedux';
 import {socketAddComment, useSocketComment} from 'hook/useSocketIO';
-import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
+import ROOT_SCREEN from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
-import React, {useCallback, useMemo, useRef, useState} from 'react';
-import {Modal, TextInput, View} from 'react-native';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {Animated, TextInput, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 import ItemComment from './ItemComment';
 
-interface Props {
-    bubbleFocusing: TypeBubblePalace;
-    setBubbleFocusing: Function;
-    displayComment: boolean;
-    setDisplayComment: Function;
-}
-
-const ModalComment = (props: Props) => {
-    const {
-        bubbleFocusing,
-        setBubbleFocusing,
-        displayComment,
-        setDisplayComment,
-    } = props;
+const ModalComment = () => {
+    const bubbleFocusing = Redux.getBubbleFocusing();
+    const displayComment = Redux.getDisplayComment();
 
     const theme = Redux.getTheme();
     const token = Redux.getToken();
-    const myId = Redux.getPassport().profile.id;
 
     const inputRef = useRef<TextInput>(null);
+    const translateY = useRef(new Animated.Value(Metrics.height)).current;
 
     const [textComment, setTextComment] = useState('');
     const [personReplied, setPersonReplied] = useState('');
     const [commentReplied, setCommentReplied] = useState(''); // if "", it not reply any comment
 
-    const {list, loading, onRefresh} = useSocketComment({
-        bubbleId: bubbleFocusing.id,
-        setBubbleFocusing,
-    });
+    const {list, loading, onRefresh} = useSocketComment();
+
+    useEffect(() => {
+        Animated.timing(translateY, {
+            toValue: displayComment ? 0 : Metrics.height,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }, [displayComment]);
 
     const onSendComment = async () => {
         socketAddComment({
@@ -71,13 +65,9 @@ const ModalComment = (props: Props) => {
     };
 
     const onGoToProfile = (userId: number) => {
-        if (userId === myId) {
-            navigate(PROFILE_ROUTE.myProfile);
-        } else {
-            navigate(ROOT_SCREEN.otherProfile, {
-                id: userId,
-            });
-        }
+        navigate(ROOT_SCREEN.otherProfile, {
+            id: userId,
+        });
     };
 
     /**
@@ -100,7 +90,7 @@ const ModalComment = (props: Props) => {
                     customStyle={styles.iconTurnOffTouch}
                     onPress={() => {
                         onDeleteReply();
-                        setDisplayComment(false);
+                        Redux.setDisplayComment(false);
                     }}>
                     <Feather
                         name="x"
@@ -136,25 +126,10 @@ const ModalComment = (props: Props) => {
         );
     }, [list, loading]);
 
-    const RenderSafeHeightBottom = () => {
-        return (
-            <View
-                style={{
-                    height: Metrics.safeBottomPadding,
-                    backgroundColor: theme.backgroundButtonColor,
-                }}
-            />
-        );
-    };
-
     return (
-        <Modal
-            animationType="slide"
-            visible={displayComment}
-            transparent
-            onRequestClose={() => null}>
+        <Animated.View style={[styles.container, {transform: [{translateY}]}]}>
             <StyleKeyboardAwareView
-                containerStyle={styles.container}
+                containerStyle={styles.body}
                 innerStyle={{justifyContent: 'flex-end'}}>
                 <View
                     style={[
@@ -177,15 +152,19 @@ const ModalComment = (props: Props) => {
                         personNameReplied={personReplied}
                         onDeleteReply={onDeleteReply}
                     />
-                    {RenderSafeHeightBottom()}
                 </View>
             </StyleKeyboardAwareView>
-        </Modal>
+        </Animated.View>
     );
 };
 
 const styles = ScaledSheet.create({
     container: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+    },
+    body: {
         flex: 1,
     },
     commentBox: {

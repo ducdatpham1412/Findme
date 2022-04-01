@@ -1,4 +1,4 @@
-import {TypeCreatePostRequest, TypeCreatePostResponse} from 'api/interface';
+import {TypeCreatePostResponse} from 'api/interface';
 import {apiDeletePost, apiGetListPost, apiGetProfile} from 'api/module';
 import {TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import StyleList from 'components/base/StyleList';

@@ -1,4 +1,8 @@
-import {TypeBubblePalaceAction, TypeChatTagResponse} from 'api/interface';
+import {
+    TypeBubblePalace,
+    TypeBubblePalaceAction,
+    TypeChatTagResponse,
+} from 'api/interface';
 import {
     accountSliceAction,
     initialAccountState,
@@ -52,6 +56,24 @@ interface ResourceType {
     imageBackground?: string;
 }
 
+interface TypeBubblePalaceUpdate {
+    id?: string;
+    content?: string;
+    images?: Array<string>;
+    totalLikes?: number;
+    hadKnowEachOther?: boolean;
+    creatorId?: number;
+    creatorName?: string;
+    creatorAvatar?: string | null;
+    gender?: number;
+    createdTime?: string;
+    totalComments?: number;
+    color?: number;
+    name?: string;
+    isLiked?: boolean;
+    relationship?: number;
+}
+
 export const Redux = {
     /** ----------------------------
      * IN LOGIC SLICE
@@ -89,6 +111,8 @@ export const Redux = {
         ),
     getBubbleFocusing: () =>
         useSelector((state: RootState) => state.logicSlice.bubbleFocusing),
+    getDisplayComment: () =>
+        useSelector((state: RootState) => state.logicSlice.displayComment),
 
     // SET METHOD
     setIsLoading: (status: boolean) => {
@@ -138,8 +162,22 @@ export const Redux = {
         );
     },
 
-    setBubbleFocusing: (value: string) => {
-        FindmeStore.dispatch(logicSliceAction.setBubbleFocusing(value));
+    updateBubbleFocusing: (value: TypeBubblePalaceUpdate) => {
+        FindmeStore.dispatch(
+            logicSliceAction.setBubbleFocusing({
+                ...FindmeStore.getState().logicSlice.bubbleFocusing,
+                ...value,
+            }),
+        );
+    },
+    increaseTotalCommentsOfBubbleFocusing: (value: number) => {
+        const temp = FindmeStore.getState().logicSlice.bubbleFocusing;
+        Redux.updateBubbleFocusing({
+            totalComments: temp.totalComments + value,
+        });
+    },
+    setDisplayComment: (value: boolean) => {
+        FindmeStore.dispatch(logicSliceAction.setDisplayComment(value));
     },
 
     /**

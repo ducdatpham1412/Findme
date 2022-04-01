@@ -18,14 +18,8 @@ import {ScaledSheet} from 'react-native-size-matters';
 import {interactBubble, onGoToSignUp} from 'utility/assistant';
 import {useNotification} from 'utility/notification';
 import Bubble from './components/Bubble';
-import ModalComment from './components/ModalComment';
 
 const bubbleHeight = Metrics.height - Metrics.safeBottomPadding;
-
-interface TypeCommentResponse {
-    totalComments: number;
-    listComments: Array<any>;
-}
 
 const DiscoveryScreen = () => {
     useNotification();
@@ -48,9 +42,9 @@ const DiscoveryScreen = () => {
         numberMaxForList: 30,
     });
 
-    const [displayComment, setDisplayComment] = useState(false);
+    const displayComment = Redux.getDisplayComment();
+    const bubbleFocusing = Redux.getBubbleFocusing();
     const [preNumberComment, setPreNumberComment] = useState(0);
-    const [bubbleFocusing, setBubbleFocusing] = useState<TypeBubblePalace>();
 
     useEffect(() => {
         if (
@@ -81,8 +75,8 @@ const DiscoveryScreen = () => {
                     moreAction: onGoToSignUp,
                 });
             } else {
-                setBubbleFocusing(post);
-                setDisplayComment(true);
+                Redux.updateBubbleFocusing(post);
+                Redux.setDisplayComment(true);
                 setPreNumberComment(post.totalComments);
             }
         },
@@ -197,14 +191,6 @@ const DiscoveryScreen = () => {
                 {backgroundColor: theme.backgroundColor},
             ]}>
             {RenderBubblePlaceStatic()}
-            {bubbleFocusing && (
-                <ModalComment
-                    bubbleFocusing={bubbleFocusing}
-                    setBubbleFocusing={setBubbleFocusing}
-                    displayComment={displayComment}
-                    setDisplayComment={setDisplayComment}
-                />
-            )}
         </View>
     );
 };

@@ -1,5 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {
+    TypeBubblePalace,
     TypeBubblePalaceAction,
     TypeChatTagResponse,
     TypeGradient,
@@ -17,7 +18,9 @@ export const initialLogicState = {
 
     bubblePalaceAction: <TypeBubblePalaceAction>{},
     borderMessRoute: 'yellow',
-    bubbleFocusing: '',
+
+    bubbleFocusing: <TypeBubblePalace>{},
+    displayComment: false,
 
     // notification
     numberNewMessages: 0,
@@ -69,6 +72,9 @@ const logicSlice = createSlice({
         },
         setBubbleFocusing: (state, action) => {
             state.bubbleFocusing = action.payload;
+        },
+        setDisplayComment: (state, action) => {
+            state.displayComment = action.payload;
         },
     },
 });
