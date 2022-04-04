@@ -9,6 +9,7 @@ import {
     TypeChatTagResponse,
     TypeCommentResponse,
     TypeDeleteMessageResponse,
+    TypeNotificationResponse,
     TypeSeenMessageResponse,
     TypingResponse,
 } from 'api/interface';
@@ -17,8 +18,8 @@ import {
     apiGetListChatTags,
     apiGetListComments,
     apiGetListMessages,
+    apiGetListNotifications,
 } from 'api/module';
-import {logicSliceAction} from 'app-redux/account/logicSlice';
 import FindmeStore from 'app-redux/store';
 import {MESSAGE_TYPE, RELATIONSHIP, SOCKET_EVENT} from 'asset/enum';
 import {MESS_ROUTE} from 'navigation/config/routes';
@@ -657,9 +658,7 @@ export const useSocketChatDetail = (params: {
     };
 };
 
-export const useSocketComment = () => {
-    const bubbleFocusing = Redux.getBubbleFocusing();
-
+export const useSocketComment = (bubbleFocusing: TypeBubblePalace) => {
     const [oldBubbleId, setOldBubbleId] = useState('');
 
     const [isLoading, setIsLoading] = useState(false);
@@ -732,6 +731,39 @@ export const useSocketComment = () => {
     };
 };
 
+export const useSocketNotification = () => {
+    const {list, setList, onRefresh, onLoadMore, refreshing} = usePaging({
+        request: apiGetListNotifications,
+        params: {
+            take: 30,
+        },
+    });
+
+    const hearingSocket = () => {
+        socket?.off(SOCKET_EVENT.notification);
+        socket.on(
+            SOCKET_EVENT.notification,
+            (data: TypeNotificationResponse) => {
+                setList((preValue: Array<TypeNotificationResponse>) => {
+                    return [data].concat(preValue);
+                });
+            },
+        );
+    };
+
+    useEffect(() => {
+        hearingSocket();
+    }, []);
+
+    return {
+        list,
+        setList,
+        onRefresh,
+        refreshing,
+        onLoadMore,
+    };
+};
+
 /**
  *
  */
@@ -757,6 +789,16 @@ export const useSocketChatDetailEnjoy = (params: {isMyChatTag: boolean}) => {
         deleteMessage: async (idMessage: string) => {},
         refreshing: false,
         onRefresh: () => null,
+        onLoadMore: () => null,
+    };
+};
+
+export const useSocketNotificationEnjoy = () => {
+    return {
+        list: [],
+        setList: (newList: any) => null,
+        onRefresh: () => null,
+        refreshing: false,
         onLoadMore: () => null,
     };
 };
@@ -832,6 +874,10 @@ export const socketUnTyping = (params: TypingResponse) => {
 
 export const socketAddComment = (params: TypeAddCommentRequest) => {
     socket.emit(SOCKET_EVENT.addComment, params);
+};
+
+export const socketLeaveRoom = (roomId: string) => {
+    socket.emit(SOCKET_EVENT.leaveRoom, roomId);
 };
 
 export const closeSocket = () => {

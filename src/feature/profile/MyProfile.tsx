@@ -5,7 +5,13 @@ import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
-import {appAlert, appAlertYesNo, goBack} from 'navigation/NavigationService';
+import ROOT_SCREEN from 'navigation/config/routes';
+import {
+    appAlert,
+    appAlertYesNo,
+    goBack,
+    navigate,
+} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {ScaledSheet} from 'react-native-size-matters';
 import {modalizeMyProfile, modeExpUsePaging} from 'utility/assistant';
@@ -100,6 +106,13 @@ const MyProfile = ({route}: any) => {
         }
     };
 
+    const onGoToDetailPost = (postId: string, displayComment: boolean) => {
+        navigate(ROOT_SCREEN.detailBubble, {
+            bubbleId: postId,
+            displayComment,
+        });
+    };
+
     // render_view
     const HeaderComponent = useMemo(() => {
         return (
@@ -126,6 +139,7 @@ const MyProfile = ({route}: any) => {
                     deleteAPostInList={() => {
                         onDeleteAPostInList(item.id);
                     }}
+                    onGoToDetailPost={onGoToDetailPost}
                 />
             );
         },
@@ -156,6 +170,7 @@ const MyProfile = ({route}: any) => {
                 onShowOptions={onShowOption}
                 onSubmitSearch={onSubmitSearch}
                 hasBackBtn={false}
+                hasGuideButton
                 onFocus={() => setDisplaySearchView(true)}
                 onBlur={() => setDisplaySearchView(false)}
             />

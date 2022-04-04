@@ -113,6 +113,10 @@ export const Redux = {
         useSelector((state: RootState) => state.logicSlice.bubbleFocusing),
     getDisplayComment: () =>
         useSelector((state: RootState) => state.logicSlice.displayComment),
+    getNumberNewNotifications: () =>
+        useSelector(
+            (state: RootState) => state.logicSlice.numberNewNotifications,
+        ),
 
     // SET METHOD
     setIsLoading: (status: boolean) => {
@@ -178,6 +182,9 @@ export const Redux = {
     },
     setDisplayComment: (value: boolean) => {
         FindmeStore.dispatch(logicSliceAction.setDisplayComment(value));
+    },
+    setNumberNewNotifications: (value: number) => {
+        FindmeStore.dispatch(logicSliceAction.setNumberNewNotification(value));
     },
 
     /**

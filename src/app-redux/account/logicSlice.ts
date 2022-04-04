@@ -25,6 +25,7 @@ export const initialLogicState = {
     // notification
     numberNewMessages: 0,
     chatTagFromNotification: undefined,
+    numberNewNotifications: 0,
 
     // is use when user block other and OtherProfile should re-render
     shouldRenderOtherProfile: true,
@@ -75,6 +76,9 @@ const logicSlice = createSlice({
         },
         setDisplayComment: (state, action) => {
             state.displayComment = action.payload;
+        },
+        setNumberNewNotification: (state, action) => {
+            state.numberNewNotifications = action.payload;
         },
     },
 });

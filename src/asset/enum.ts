@@ -101,10 +101,7 @@ export enum SOCKET_EVENT {
     stopConversation = '4.3',
     openConversation = '4.4',
     // notification
-    notificationStartChatTag = '5.0',
-    notificationFollow = '5.1',
-    notificationLikePost = '5.2',
-    notificationFriendPostNew = '5.3',
+    notification = '5.0',
 }
 
 export enum TYPE_FOLLOW {
@@ -125,9 +122,11 @@ export enum TYPE_COLOR {
 
 export enum TYPE_NOTIFICATION {
     newChatTag = 0,
-    message = 1,
-    follow = 2,
-    likePost = 3,
+    follow = 1,
+    likePost = 2,
+    friendPostNew = 3,
+    comment = 4,
+    message = 5,
 }
 
 export enum TYPE_BUBBLE_PALACE_ACTION {

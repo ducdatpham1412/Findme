@@ -15,7 +15,7 @@ import {
 import Entypo from 'react-native-vector-icons/Entypo';
 import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const ratio = scale(40) / scale(40);
 const opacityNotFocus = 0.6;
@@ -24,6 +24,7 @@ const TabNavigator = (props?: any) => {
     const theme = Redux.getTheme();
 
     const numberNewMessages = Redux.getNumberNewMessages();
+    const numberNewNotifications = Redux.getNumberNewNotifications();
     const {avatar} = Redux.getPassport().profile;
 
     const routeDiscovery = props.state.routes[0];
@@ -167,17 +168,29 @@ const TabNavigator = (props?: any) => {
             <StyleTouchable
                 customStyle={styles.buttonView}
                 onPress={() => navigate(routeNotification.name)}>
-                <SimpleLineIcons
-                    name="book-open"
-                    style={{
-                        fontSize: moderateScale(18),
-                        color: theme.textHightLight,
-                        opacity: isFocusingNotification ? 1 : opacityNotFocus,
-                    }}
-                />
+                <View>
+                    <MaterialIcons
+                        name="notifications-none"
+                        style={{
+                            fontSize: moderateScale(24),
+                            color: theme.textHightLight,
+                            opacity: isFocusingNotification
+                                ? 1
+                                : opacityNotFocus,
+                        }}
+                    />
+                    {numberNewNotifications > 0 && (
+                        <View style={styles.newMessagesBox}>
+                            <StyleText
+                                originValue={numberNewNotifications}
+                                customStyle={styles.textNewMessages}
+                            />
+                        </View>
+                    )}
+                </View>
             </StyleTouchable>
         );
-    }, [isFocusingNotification, theme]);
+    }, [isFocusingNotification, theme, numberNewNotifications]);
 
     return (
         <>
@@ -197,9 +210,9 @@ const TabNavigator = (props?: any) => {
                 {/* Push button */}
                 <View style={styles.buttonView} />
 
-                {RenderProfileButton}
-
                 {RenderNotificationButton}
+
+                {RenderProfileButton}
             </Animated.View>
 
             <Animated.View

@@ -146,7 +146,6 @@ const ButtonChangeTheme = (props: Props) => {
                     numColumns={2}
                     keyExtractor={item => String(item.id)}
                     contentContainerStyle={{alignItems: 'center'}}
-                    nestedScrollEnabled
                 />
             );
         }

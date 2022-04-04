@@ -30,6 +30,7 @@ export const selectIsHaveActiveUser = async () => {
 
         Redux.updatePassport(passport.data);
         // passport must be above token to set in SocketProvider
+        Redux.setNumberNewNotifications(passport.data.numberNewNotifications);
         Redux.setToken(activeUser.token);
         Redux.setModeExp(false);
         Redux.updateResource(resource.data);

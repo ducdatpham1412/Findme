@@ -1,6 +1,6 @@
 import {TYPE_NOTIFICATION} from 'asset/enum';
 import Redux from 'hook/useRedux';
-import {MAIN_SCREEN} from 'navigation/config/routes';
+import ROOT_SCREEN, {MAIN_SCREEN} from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
 import {useEffect} from 'react';
 import Config from 'react-native-config';
@@ -24,8 +24,19 @@ const onMoveNavigation = (data: any) => {
             // navigate(MESS_ROUTE.messScreen);
             Redux.setChatTagFromNotification(data.chatTagId);
             break;
+        case TYPE_NOTIFICATION.likePost:
+            navigate(ROOT_SCREEN.detailBubble, {
+                bubbleId: data.bubbleId,
+            });
+            break;
         case TYPE_NOTIFICATION.follow:
             navigate(MAIN_SCREEN.profileRoute);
+            break;
+        case TYPE_NOTIFICATION.comment:
+            navigate(ROOT_SCREEN.detailBubble, {
+                bubbleId: data.bubbleId,
+                displayComment: true,
+            });
             break;
         default:
             break;

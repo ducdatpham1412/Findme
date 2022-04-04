@@ -221,7 +221,7 @@ const InformationProfile = (props: Props) => {
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
-        paddingTop: Metrics.height / 2,
+        marginTop: Metrics.height / 2,
     },
     indicatorBox: {
         width: '50%',
