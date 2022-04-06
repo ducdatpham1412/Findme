@@ -1,4 +1,5 @@
 import {
+    TypeCreatePostResponse,
     TypeGetProfileResponse,
     TypeSendMessageFromProfile,
 } from 'api/interface';
@@ -59,7 +60,7 @@ const OtherProfile = ({route}: Props) => {
     const isMyProfile = id === myId;
     const isBlock = profile?.relationship === RELATIONSHIP.block;
 
-    const {list, refreshing, onRefresh, onLoadMore} = usePaging({
+    const {list, setList, refreshing, onRefresh, onLoadMore} = usePaging({
         request: apiGetListPost,
         params: {
             userId: id,
@@ -82,6 +83,23 @@ const OtherProfile = ({route}: Props) => {
             Redux.setIsLoading(false);
         }
     };
+
+    const [left, setLeft] = useState<Array<TypeCreatePostResponse>>([]);
+    const [right, setRight] = useState<Array<TypeCreatePostResponse>>([]);
+
+    useEffect(() => {
+        const tempLeft: Array<TypeCreatePostResponse> = [];
+        const tempRight: Array<TypeCreatePostResponse> = [];
+        list.forEach((item: TypeCreatePostResponse, index: number) => {
+            if (index % 2 === 0) {
+                tempLeft.push(item);
+            } else {
+                tempRight.push(item);
+            }
+        });
+        setLeft(tempLeft);
+        setRight(tempRight);
+    }, [list]);
 
     useEffect(() => {
         getData();
@@ -167,10 +185,13 @@ const OtherProfile = ({route}: Props) => {
         }
     };
 
-    const onGoToDetailPost = (postId: string) => {
-        navigate(ROOT_SCREEN.detailBubble, {
-            bubbleId: postId,
-            displayComment: true,
+    const onGoToDetailPost = (bubbleId: string) => {
+        const temp = list.findIndex(item => item.id === bubbleId);
+        const initIndex = temp < 0 ? 0 : temp;
+        navigate(ROOT_SCREEN.listDetailPost, {
+            listInProfile: list,
+            initIndex,
+            setListInProfile: setList,
         });
     };
 
@@ -236,10 +257,11 @@ const OtherProfile = ({route}: Props) => {
         );
     }, [profile, isFollowing, isMyProfile, list]);
 
-    const RenderItem = useCallback(
-        ({item}: any) => {
+    const RenderItemPost = useCallback(
+        (item: TypeCreatePostResponse) => {
             return (
                 <PostStatus
+                    key={item.id}
                     itemPost={item}
                     onGoToDetailPost={onGoToDetailPost}
                 />
@@ -247,6 +269,19 @@ const OtherProfile = ({route}: Props) => {
         },
         [list],
     );
+
+    const RenderPostStatus = () => {
+        return (
+            <View
+                style={{
+                    width: '100%',
+                    flexDirection: 'row',
+                }}>
+                <View style={{flex: 1}}>{left.map(RenderItemPost)}</View>
+                <View style={{flex: 1}}>{right.map(RenderItemPost)}</View>
+            </View>
+        );
+    };
 
     return (
         <>
@@ -257,10 +292,11 @@ const OtherProfile = ({route}: Props) => {
             {/* Information profile, List photos */}
             {!isBlock && (
                 <StyleList
-                    data={list}
-                    keyExtractor={item => item.id}
-                    renderItem={RenderItem}
+                    data={[]}
+                    renderItem={() => null}
                     ListHeaderComponent={HeaderComponent}
+                    ListFooterComponent={RenderPostStatus()}
+                    ListEmptyComponent={() => null}
                     style={styles.container}
                     contentContainerStyle={styles.contentContainer}
                     refreshing={refreshing}

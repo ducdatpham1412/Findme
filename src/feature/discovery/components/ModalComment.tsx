@@ -1,5 +1,9 @@
 import {useIsFocused} from '@react-navigation/native';
-import {TypeBubblePalace, TypeCommentResponse} from 'api/interface';
+import {
+    TypeBubblePalace,
+    TypeCommentResponse,
+    TypeCreatePostResponse,
+} from 'api/interface';
 import {Metrics} from 'asset/metrics';
 import {StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
@@ -20,7 +24,8 @@ import Feather from 'react-native-vector-icons/Feather';
 import ItemComment from './ItemComment';
 
 interface Props {
-    bubbleFocusing: TypeBubblePalace;
+    bubbleFocusing: TypeBubblePalace | TypeCreatePostResponse;
+    setBubbleFocusing?: Function;
     displayComment: boolean;
     setDisplayComment?: Function;
     isNotModalOfMainTab?: boolean;
@@ -29,6 +34,7 @@ interface Props {
 const ModalComment = (props: Props) => {
     const {
         bubbleFocusing,
+        setBubbleFocusing,
         displayComment,
         setDisplayComment,
         isNotModalOfMainTab = false,
@@ -52,7 +58,7 @@ const ModalComment = (props: Props) => {
         Animated.timing(translateY, {
             toValue: displayComment ? 0 : Metrics.height,
             useNativeDriver: true,
-            duration: 100,
+            duration: 250,
         }).start();
     }, [displayComment]);
 
@@ -69,6 +75,12 @@ const ModalComment = (props: Props) => {
             content: textComment.trimEnd(),
             commentReplied,
         });
+        setBubbleFocusing?.(
+            (preValue: TypeBubblePalace | TypeCreatePostResponse) => ({
+                ...preValue,
+                totalComments: preValue.totalComments + 1,
+            }),
+        );
         setCommentReplied('');
         setTextComment('');
     };
@@ -120,7 +132,8 @@ const ModalComment = (props: Props) => {
                             setDisplayComment?.(false);
                         }
                         Keyboard.dismiss();
-                    }}>
+                    }}
+                    hitSlop={15}>
                     <Feather
                         name="x"
                         style={[styles.iconTurnOff, {color: theme.textColor}]}

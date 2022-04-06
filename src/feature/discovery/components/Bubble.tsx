@@ -221,7 +221,8 @@ const Bubble = (props: Props) => {
         return (
             <StyleTouchable
                 customStyle={styles.commentBox}
-                onPress={onShowModalComment}>
+                onPress={onShowModalComment}
+                hitSlop={15}>
                 <FontAwesome
                     name="comments-o"
                     style={[styles.iconComment, {color: theme.unLikeHeart}]}
@@ -431,8 +432,8 @@ const styles = ScaledSheet.create({
 });
 
 export default memo(Bubble, (preProps: Props, nextProps: any) => {
-    for (const [key, value] of Object.entries(preProps)) {
-        if (nextProps?.[key] !== value) {
+    for (const [key, value] of Object.entries(preProps.item)) {
+        if (nextProps.item?.[key] !== value) {
             return false;
         }
     }

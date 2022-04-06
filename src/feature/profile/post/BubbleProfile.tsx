@@ -1,5 +1,4 @@
-import {TypeBubblePalace} from 'api/interface';
-import {apiGetDetailBubble, apiLikePost, apiUnLikePost} from 'api/module';
+import {TypeCreatePostResponse} from 'api/interface';
 import {RELATIONSHIP} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
@@ -8,129 +7,66 @@ import StyleTouchHaveDouble from 'components/base/StyleTouchHaveDouble';
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import StyleMoreText from 'components/StyleMoreText';
+import IconHobby from 'feature/discovery/components/IconHobby';
 import Redux from 'hook/useRedux';
-import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
-import ROOT_SCREEN from 'navigation/config/routes';
-import {appAlert, goBack, navigate} from 'navigation/NavigationService';
-import React, {useEffect, useState} from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import {View} from 'react-native';
-import {ScaledSheet} from 'react-native-size-matters';
+import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {choosePrivateAvatar} from 'utility/assistant';
-import IconHobby from './components/IconHobby';
-import ModalComment from './components/ModalComment';
+import {TypeLikeUnlikeParams} from './ListDetailPost';
 
 interface Props {
-    route: {
-        params: {
-            bubbleId?: string;
-            itemBubble?: TypeBubblePalace;
-            displayComment?: boolean;
-        };
-    };
+    item: TypeCreatePostResponse;
+    onReportUser(idUser: number): void;
+    onRefreshItem(idBubble: string): Promise<void>;
+    onShowModalComment(bubble: TypeCreatePostResponse): void;
+    onLikeOrUnLike(params: TypeLikeUnlikeParams): Promise<void>;
 }
 
 const bubbleWidth =
     Metrics.width - Metrics.safeLeftPadding - Metrics.safeRightPadding;
 const bubbleHeight = Metrics.height - Metrics.safeBottomPadding;
 
-const DetailBubble = ({route}: Props) => {
-    const bubbleId = route.params?.bubbleId;
-    const itemBubble = route.params?.itemBubble;
-    const routeDisplayComment = !!route.params?.displayComment;
+const BubbleProfile = (props: Props) => {
+    const {
+        item,
+        onReportUser,
+        onRefreshItem,
+        onShowModalComment,
+        onLikeOrUnLike,
+    } = props;
 
     const theme = Redux.getTheme();
 
-    const [bubble, setBubble] = useState<TypeBubblePalace>();
+    const [isLiked, setIsLiked] = useState(item.isLiked);
+    const [totalLikes, setTotalLikes] = useState(item.totalLikes);
+
     const [displayLayer, setDisplayLayer] = useState(false);
-    const [displayComment, setDisplayComment] = useState(routeDisplayComment);
 
-    const isLiked = bubble?.isLiked;
-    const totalLikes = bubble?.totalLikes;
-    const avatar =
-        bubble?.creatorAvatar ||
-        (bubble?.gender ? choosePrivateAvatar(bubble.gender) : '');
+    const avatar = item.creatorAvatar;
 
-    const getData = async () => {
-        try {
-            if (bubbleId) {
-                const res = await apiGetDetailBubble(bubbleId);
-                setBubble(res.data);
-            } else if (itemBubble) {
-                setBubble(itemBubble);
-            }
-        } catch (err) {
-            appAlert(err);
-        }
+    const onLikeUnLike = () => {
+        onLikeOrUnLike({
+            isLiked,
+            setIsLiked,
+            totalLikes,
+            setTotalLikes,
+            bubbleId: item.id,
+        });
     };
 
     useEffect(() => {
-        getData();
-    }, []);
-
-    const onGoToProfile = () => {
-        if (bubble?.hadKnowEachOther) {
-            navigate(ROOT_SCREEN.otherProfile, {
-                id: bubble.creatorId,
-            });
-        }
-    };
-
-    const onReportUser = () => {
-        if (bubble?.creatorId) {
-            navigate(ROOT_SCREEN.reportUser, {
-                idUser: bubble.creatorId,
-            });
-        }
-    };
-
-    const onRefreshItem = async () => {
-        try {
-            if (bubble?.id) {
-                const res = await apiGetDetailBubble(bubble.id);
-                setBubble(res.data);
-            }
-        } catch (err) {
-            appAlert(err);
-        }
-    };
-
-    const onLikeUnLike = async () => {
-        if (bubble && totalLikes !== undefined && isLiked !== undefined) {
-            const currentLike = isLiked;
-            const currentTotalLikes = totalLikes;
-
-            try {
-                setBubble({
-                    ...bubble,
-                    isLiked: !currentLike,
-                    totalLikes: currentTotalLikes + (isLiked ? -1 : 1),
-                });
-                await (currentLike
-                    ? apiUnLikePost(bubble.id)
-                    : apiLikePost(bubble.id));
-            } catch (err) {
-                setBubble({
-                    ...bubble,
-                    isLiked: currentLike,
-                    totalLikes: currentTotalLikes,
-                });
-                appAlert(err);
-            }
-        }
-    };
-
-    const onShowModalComment = () => {
-        setDisplayComment(true);
-    };
+        setIsLiked(item.isLiked);
+        setTotalLikes(item.totalLikes);
+    }, [item.isLiked, item.totalLikes]);
 
     /**
      * Render view
      */
     const RenderImage = () => {
-        const imageChoose = bubble?.images[0] ? bubble.images[0] : avatar;
-        const opacity = bubble?.images[0] ? 1 : 0.3;
+        const imageChoose = item.images[0] ? item.images[0] : avatar;
+        const opacity = item.images[0] ? 1 : 0.3;
         return (
             <StyleTouchHaveDouble
                 customStyle={styles.imageView}
@@ -163,29 +99,27 @@ const DetailBubble = ({route}: Props) => {
 
     const RenderNameAndContent = () => {
         const color =
-            bubble?.relationship === RELATIONSHIP.self
+            item.relationship === RELATIONSHIP.self
                 ? theme.highlightColor
                 : theme.textHightLight;
         return (
             <View style={styles.avatarNameContentView}>
-                <HeaderLeftIcon onPress={goBack} />
                 <View style={styles.avatarNameBox}>
                     <StyleText
-                        originValue={`@${bubble?.creatorName || ''}`}
+                        originValue={`@${item.creatorName}`}
                         customStyle={[styles.textName, {color}]}
-                        onPress={onGoToProfile}
                     />
                 </View>
                 <View style={styles.contentBox}>
                     <StyleText
-                        originValue={`🌙  ${bubble?.name || ''}`}
+                        originValue={`🌙  ${item.name}`}
                         customStyle={[
                             styles.textNameBubble,
                             {color: theme.textHightLight},
                         ]}
                     />
                     <StyleMoreText
-                        value={bubble?.content}
+                        value={item.content}
                         textStyle={[
                             styles.textContent,
                             {color: theme.textHightLight},
@@ -201,7 +135,7 @@ const DetailBubble = ({route}: Props) => {
             <View style={styles.reportView}>
                 <StyleTouchable
                     customStyle={styles.iconReportTouch}
-                    onPress={onReportUser}>
+                    onPress={() => onReportUser(item.creatorId)}>
                     <Feather
                         name="flag"
                         style={[styles.iconReport, {color: theme.textColor}]}
@@ -209,7 +143,7 @@ const DetailBubble = ({route}: Props) => {
                 </StyleTouchable>
                 <StyleTouchable
                     customStyle={styles.iconReportTouch}
-                    onPress={onRefreshItem}>
+                    onPress={() => onRefreshItem(item.id)}>
                     <Feather
                         name="refresh-ccw"
                         style={[styles.iconReport, {color: theme.textColor}]}
@@ -221,12 +155,7 @@ const DetailBubble = ({route}: Props) => {
 
     const RenderAvatar = () => {
         return (
-            <StyleTouchable onPress={onGoToProfile}>
-                <StyleImage
-                    source={{uri: avatar}}
-                    customStyle={styles.avatar}
-                />
-            </StyleTouchable>
+            <StyleImage source={{uri: avatar}} customStyle={styles.avatar} />
         );
     };
 
@@ -262,15 +191,16 @@ const DetailBubble = ({route}: Props) => {
         return (
             <StyleTouchable
                 customStyle={styles.commentBox}
-                onPress={onShowModalComment}>
+                onPress={() => onShowModalComment(item)}
+                hitSlop={15}>
                 <FontAwesome
                     name="comments-o"
                     style={[styles.iconComment, {color: theme.unLikeHeart}]}
                 />
                 <View style={styles.textLikeCommentBox}>
-                    {!!bubble?.totalComments && (
+                    {!!item.totalComments && (
                         <StyleText
-                            originValue={bubble.totalComments}
+                            originValue={item.totalComments}
                             customStyle={[
                                 styles.textLikeComment,
                                 {color: theme.unLikeHeart},
@@ -283,13 +213,10 @@ const DetailBubble = ({route}: Props) => {
     };
 
     const RenderIconHobby = () => {
-        if (bubble?.id === undefined || bubble?.color === undefined) {
-            return null;
-        }
         return (
             <IconHobby
-                bubbleId={bubble?.id}
-                color={bubble?.color}
+                bubbleId={item.id}
+                color={item.color}
                 onTouchStart={() => setDisplayLayer(true)}
                 onTouchEnd={() => setDisplayLayer(false)}
             />
@@ -297,30 +224,18 @@ const DetailBubble = ({route}: Props) => {
     };
 
     return (
-        <>
-            <View style={styles.itemBubbleView}>
-                {RenderImage()}
-                {RenderLayer()}
-                {RenderNameAndContent()}
-                {RenderExtensionTool()}
-                <View style={styles.toolView}>
-                    {RenderAvatar()}
-                    {RenderIconLikeUnLike()}
-                    {RenderComment()}
-                    {RenderIconHobby()}
-                </View>
+        <View style={styles.itemBubbleView}>
+            {RenderImage()}
+            {RenderLayer()}
+            {RenderNameAndContent()}
+            {RenderExtensionTool()}
+            <View style={styles.toolView}>
+                {RenderAvatar()}
+                {RenderIconLikeUnLike()}
+                {RenderComment()}
+                {RenderIconHobby()}
             </View>
-
-            {!!bubble && displayComment && (
-                <ModalComment
-                    bubbleFocusing={bubble}
-                    setBubbleFocusing={setBubble}
-                    displayComment={displayComment}
-                    setDisplayComment={setDisplayComment}
-                    isNotModalOfMainTab
-                />
-            )}
-        </>
+        </View>
     );
 };
 
@@ -352,7 +267,7 @@ const styles = ScaledSheet.create({
         position: 'absolute',
         width: '66@s',
         paddingVertical: '10@vs',
-        bottom: '200@s',
+        bottom: '150@s',
         right: 0,
         alignItems: 'center',
     },
@@ -410,7 +325,7 @@ const styles = ScaledSheet.create({
     reportView: {
         position: 'absolute',
         width: '50@ms',
-        top: '10@vs',
+        top: Metrics.safeTopPadding + verticalScale(10),
         right: '10@s',
         alignItems: 'center',
         borderRadius: '30@ms',
@@ -429,7 +344,7 @@ const styles = ScaledSheet.create({
     // avatar, name and content
     avatarNameContentView: {
         position: 'absolute',
-        top: '5@vs',
+        top: Metrics.safeTopPadding + verticalScale(30),
         left: '10@s',
         width: '70%',
     },
@@ -437,7 +352,6 @@ const styles = ScaledSheet.create({
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: '10@vs',
     },
     textName: {
         fontSize: '16@ms',
@@ -457,4 +371,11 @@ const styles = ScaledSheet.create({
     },
 });
 
-export default DetailBubble;
+export default memo(BubbleProfile, (preProps: Props, nextProps: any) => {
+    for (const [key, value] of Object.entries(preProps.item)) {
+        if (nextProps.item?.[key] !== value) {
+            return false;
+        }
+    }
+    return true;
+});

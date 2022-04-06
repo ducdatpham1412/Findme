@@ -304,7 +304,7 @@ export const reorderListChatTag = (listChatTag: Array<any>, index: number) => {
 };
 
 export const modeExpUsePaging = () => {
-    const [list, setList] = useState<any>([]);
+    const [list, setList] = useState<Array<any>>([]);
 
     return {
         list,

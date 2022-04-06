@@ -8,6 +8,7 @@ import {
     TypeChatTagRequest,
     TypeChatTagResponse,
     TypeCommentResponse,
+    TypeCreatePostResponse,
     TypeDeleteMessageResponse,
     TypeNotificationResponse,
     TypeSeenMessageResponse,
@@ -658,7 +659,9 @@ export const useSocketChatDetail = (params: {
     };
 };
 
-export const useSocketComment = (bubbleFocusing: TypeBubblePalace) => {
+export const useSocketComment = (
+    bubbleFocusing: TypeBubblePalace | TypeCreatePostResponse,
+) => {
     const [oldBubbleId, setOldBubbleId] = useState('');
 
     const [isLoading, setIsLoading] = useState(false);

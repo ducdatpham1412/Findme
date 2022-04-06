@@ -17,6 +17,7 @@ import InteractBubble from 'feature/discovery/InteractBubble';
 import ReportUser from 'feature/discovery/ReportUser';
 import ListFollows from 'feature/profile/ListFollows';
 import OtherProfile from 'feature/profile/OtherProfile';
+import ListDetailPost from 'feature/profile/post/ListDetailPost';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
 import TabBarProvider from 'navigation/config/TabBarProvider';
@@ -136,6 +137,17 @@ const RootScreen = () => {
                                     {backgroundColor: theme.backgroundColor},
                                 ],
                                 gestureEnabled: true,
+                            }}
+                        />
+                        <RootStack.Screen
+                            name={ROOT_SCREEN.listDetailPost}
+                            component={ListDetailPost}
+                            options={{
+                                // cardStyleInterpolator:
+                                //     CardStyleInterpolators.forScaleFromCenterAndroid,
+                                cardStyle: {
+                                    backgroundColor: theme.backgroundColor,
+                                },
                             }}
                         />
 

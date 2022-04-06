@@ -13,6 +13,7 @@ import {
     navigate,
 } from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {modalizeMyProfile, modeExpUsePaging} from 'utility/assistant';
 import AvatarBackground from './components/AvatarBackground';
@@ -40,6 +41,23 @@ const MyProfile = ({route}: any) => {
                   userId: profile.id,
               },
           });
+
+    const [left, setLeft] = useState<Array<TypeCreatePostResponse>>([]);
+    const [right, setRight] = useState<Array<TypeCreatePostResponse>>([]);
+
+    useEffect(() => {
+        const tempLeft: Array<TypeCreatePostResponse> = [];
+        const tempRight: Array<TypeCreatePostResponse> = [];
+        list.forEach((item: TypeCreatePostResponse, index: number) => {
+            if (index % 2 === 0) {
+                tempLeft.push(item);
+            } else {
+                tempRight.push(item);
+            }
+        });
+        setLeft(tempLeft);
+        setRight(tempRight);
+    }, [list]);
 
     useEffect(() => {
         if (
@@ -106,10 +124,13 @@ const MyProfile = ({route}: any) => {
         }
     };
 
-    const onGoToDetailPost = (postId: string, displayComment: boolean) => {
-        navigate(ROOT_SCREEN.detailBubble, {
-            bubbleId: postId,
-            displayComment,
+    const onGoToDetailPost = (bubbleId: string) => {
+        const temp = list.findIndex(item => item.id === bubbleId);
+        const initIndex = temp < 0 ? 0 : temp;
+        navigate(ROOT_SCREEN.listDetailPost, {
+            listInProfile: list,
+            initIndex,
+            setListInProfile: setList,
         });
     };
 
@@ -132,9 +153,10 @@ const MyProfile = ({route}: any) => {
     }, [profile, list, theme]);
 
     const RenderItemPost = useCallback(
-        ({item}: any) => {
+        (item: TypeCreatePostResponse) => {
             return (
                 <PostStatus
+                    key={item.id}
                     itemPost={item}
                     deleteAPostInList={() => {
                         onDeleteAPostInList(item.id);
@@ -146,15 +168,29 @@ const MyProfile = ({route}: any) => {
         [list],
     );
 
+    const ListPostStatus = () => {
+        return (
+            <View
+                style={{
+                    width: '100%',
+                    flexDirection: 'row',
+                }}>
+                <View style={{flex: 1}}>{left.map(RenderItemPost)}</View>
+                <View style={{flex: 1}}>{right.map(RenderItemPost)}</View>
+            </View>
+        );
+    };
+
     return (
         <>
             <AvatarBackground avatar={profile.avatar} />
 
             <StyleList
-                data={list}
-                keyExtractor={item => item.id}
-                renderItem={RenderItemPost}
+                data={[]}
+                renderItem={() => null}
                 ListHeaderComponent={HeaderComponent}
+                ListFooterComponent={ListPostStatus()}
+                ListEmptyComponent={() => null}
                 style={styles.container}
                 contentContainerStyle={styles.contentContainer}
                 refreshing={refreshing}

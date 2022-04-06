@@ -52,6 +52,10 @@ const ChoosingLoginOrEnjoy = () => {
         });
     };
 
+    /**
+     * Render view
+     */
+
     return (
         <View
             style={[

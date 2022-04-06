@@ -1,79 +1,31 @@
 import {TypeCreatePostResponse} from 'api/interface';
-import {apiLikePost, apiUnLikePost} from 'api/module';
 import {RELATIONSHIP} from 'asset/enum';
-import Theme from 'asset/theme/Theme';
 import AutoHeightImage from 'components/AutoHeightImage';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
-import StyleTouchHaveDouble from 'components/base/StyleTouchHaveDouble';
-import IconLiked from 'components/common/IconLiked';
-import IconNotLiked from 'components/common/IconNotLiked';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import Redux from 'hook/useRedux';
-import {appAlert, showSwipeImages} from 'navigation/NavigationService';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {memo, useRef} from 'react';
 import {View} from 'react-native';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {chooseIconHobby, modalizeOptionPost} from 'utility/assistant';
 
-interface PostStatusProps {
+interface Props {
     itemPost: TypeCreatePostResponse;
     deleteAPostInList?(idPost: string): void;
-    onGoToDetailPost(idPost: string, displayComment: boolean): void;
+    onGoToDetailPost(bubble: string): void;
 }
 
-const PostStatus = (props: PostStatusProps) => {
+const PostStatus = (props: Props) => {
     const {itemPost, deleteAPostInList, onGoToDetailPost} = props;
 
     const theme = Redux.getTheme();
-    const isModeExp = Redux.getModeExp();
-
     const optionsRef = useRef<any>(null);
-
-    const [isLiked, setIsLiked] = useState(itemPost.isLiked);
-    const [numberLikes, setNumberLikes] = useState(itemPost.totalLikes);
-
     const isMyPost = itemPost.relationship === RELATIONSHIP.self;
-
-    const onPressHeart = async () => {
-        const currentLike = isLiked;
-        const currentNumber = numberLikes;
-        try {
-            setIsLiked(!currentLike);
-            const newNumber = currentLike ? numberLikes - 1 : numberLikes + 1;
-            setNumberLikes(newNumber);
-            if (!isModeExp) {
-                if (currentLike) {
-                    await apiUnLikePost(itemPost.id);
-                } else {
-                    await apiLikePost(itemPost.id);
-                }
-            }
-        } catch (err) {
-            setIsLiked(currentLike);
-            setNumberLikes(currentNumber);
-            appAlert(err);
-        }
-    };
 
     const onShowOptionPost = () => {
         optionsRef.current.show();
     };
-
-    const onSeeDetailImage = () => {
-        const listImages = itemPost.images.map(item => ({
-            url: item,
-        }));
-        showSwipeImages({
-            listImages,
-        });
-    };
-
-    useEffect(() => {
-        setIsLiked(itemPost.isLiked);
-        setNumberLikes(itemPost.totalLikes);
-    }, [itemPost.isLiked, itemPost.totalLikes]);
 
     /**
      * Render view
@@ -92,9 +44,7 @@ const PostStatus = (props: PostStatusProps) => {
     const RenderAvatarNameOption = () => {
         return (
             <View style={styles.creatorView}>
-                <StyleTouchable
-                    customStyle={styles.avatarNameBox}
-                    onPress={() => onGoToDetailPost(itemPost.id, false)}>
+                <View style={styles.avatarNameBox}>
                     <StyleImage
                         source={{uri: chooseIconHobby(itemPost.color)}}
                         customStyle={styles.avatar}
@@ -106,12 +56,10 @@ const PostStatus = (props: PostStatusProps) => {
                             {color: theme.textColor},
                         ]}
                     />
-                </StyleTouchable>
+                </View>
 
                 {isMyPost && (
-                    <StyleTouchable
-                        style={styles.buttonIconMore}
-                        onPress={onShowOptionPost}>
+                    <StyleTouchable onPress={onShowOptionPost} hitSlop={10}>
                         <AntDesign
                             name="infocirlceo"
                             style={[
@@ -126,23 +74,22 @@ const PostStatus = (props: PostStatusProps) => {
     };
 
     const RenderCaption = () => {
-        if (!itemPost.content) {
-            return null;
-        }
-
         const fontSize = itemPost.images[0]
-            ? moderateScale(15)
-            : moderateScale(20);
+            ? moderateScale(10)
+            : moderateScale(15);
 
         return (
             <View style={styles.captionView}>
-                <StyleText
-                    originValue={itemPost.content}
-                    customStyle={[
-                        styles.textContent,
-                        {color: theme.textColor, fontSize},
-                    ]}
-                />
+                {!!itemPost.content && (
+                    <StyleText
+                        originValue={itemPost.content}
+                        customStyle={[
+                            styles.textContent,
+                            {color: theme.textColor, fontSize},
+                        ]}
+                        numberOfLines={1}
+                    />
+                )}
             </View>
         );
     };
@@ -152,95 +99,27 @@ const PostStatus = (props: PostStatusProps) => {
             return null;
         }
         return (
-            <StyleTouchHaveDouble
-                customStyle={styles.imageView}
-                onDoubleClick={() => {
-                    if (!isLiked) {
-                        onPressHeart();
-                    } else {
-                        onSeeDetailImage();
-                    }
-                }}>
+            <View
+                style={styles.imageView}
+                // onDoubleClick={onSeeDetailImage}
+            >
                 <AutoHeightImage
                     uri={itemPost.images[0]}
                     customStyle={styles.image}
                 />
-            </StyleTouchHaveDouble>
-        );
-    };
-
-    const RenderLikeBox = () => {
-        return (
-            <View style={styles.likeBox}>
-                {isLiked ? (
-                    <IconLiked
-                        onPress={onPressHeart}
-                        customStyle={styles.heartIcon}
-                    />
-                ) : (
-                    <IconNotLiked
-                        onPress={onPressHeart}
-                        customStyle={[
-                            styles.heartIcon,
-                            {
-                                color: theme.unLikeHeart,
-                            },
-                        ]}
-                    />
-                )}
-
-                {!!numberLikes && (
-                    <StyleText
-                        originValue={numberLikes}
-                        customStyle={[
-                            styles.textNumberLike,
-                            {
-                                color: isLiked
-                                    ? Theme.common.pink
-                                    : theme.unLikeHeart,
-                            },
-                        ]}
-                    />
-                )}
-            </View>
-        );
-    };
-
-    const RenderCommentBox = () => {
-        return (
-            <View style={styles.commentBox}>
-                <StyleTouchable
-                    customStyle={styles.commentBox}
-                    onPress={() => onGoToDetailPost(itemPost.id, true)}>
-                    <FontAwesome
-                        name="comments-o"
-                        style={[styles.iconComment, {color: theme.unLikeHeart}]}
-                    />
-                    {!!itemPost.totalComments && (
-                        <StyleText
-                            originValue={itemPost.totalComments}
-                            customStyle={[
-                                styles.textLikeComment,
-                                {color: theme.unLikeHeart},
-                            ]}
-                        />
-                    )}
-                </StyleTouchable>
             </View>
         );
     };
 
     return (
-        <View style={styles.container}>
+        <StyleTouchable
+            customStyle={styles.container}
+            onPress={() => onGoToDetailPost(itemPost.id)}>
             {RenderBackground()}
             {RenderAvatarNameOption()}
-            {RenderCaption()}
-            {RenderImage()}
 
-            <View style={styles.interactView}>
-                {RenderLikeBox()}
-                {RenderCommentBox()}
-            </View>
+            {RenderImage()}
+            {RenderCaption()}
 
             <StyleActionSheet
                 ref={optionsRef}
@@ -249,21 +128,21 @@ const PostStatus = (props: PostStatusProps) => {
                     deleteAPostInList: deleteAPostInList,
                 })}
             />
-        </View>
+        </StyleTouchable>
     );
 };
 
 const styles = ScaledSheet.create({
     container: {
         width: '99%',
-        marginTop: '20@vs',
+        marginTop: '10@vs',
         alignSelf: 'center',
     },
     spaceContainer: {
         position: 'absolute',
         width: '100%',
         height: '100%',
-        borderRadius: '20@s',
+        borderRadius: '10@s',
         opacity: 0.8,
     },
     // avatar and name
@@ -271,7 +150,8 @@ const styles = ScaledSheet.create({
         width: '100%',
         paddingHorizontal: '15@s',
         flexDirection: 'row',
-        marginTop: '15@vs',
+        marginVertical: '5@vs',
+        alignItems: 'center',
     },
     avatarNameBox: {
         flex: 1,
@@ -280,37 +160,34 @@ const styles = ScaledSheet.create({
         paddingRight: '15@s',
     },
     avatar: {
-        width: '30@s',
-        height: '30@s',
+        width: '15@s',
+        height: '15@s',
         borderRadius: '20@s',
         marginRight: '10@s',
     },
     textName: {
-        fontSize: '17@ms',
+        fontSize: '12@ms',
         fontWeight: 'bold',
     },
-    buttonIconMore: {
-        alignSelf: 'flex-end',
-    },
     iconMore: {
-        fontSize: '20@ms',
+        fontSize: '14@ms',
     },
     // caption
     captionView: {
         width: '100%',
-        paddingHorizontal: '15@s',
-        marginTop: '15@vs',
+        paddingHorizontal: '8@s',
+        paddingVertical: '5@vs',
+        overflow: 'hidden',
     },
     textContent: {
-        fontSize: '15@ms',
+        fontSize: '10@ms',
     },
     // image
     imageView: {
         width: '100%',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: '10@s',
-        marginTop: '15@vs',
+        paddingHorizontal: '5@s',
     },
     image: {
         width: '100%',
@@ -318,10 +195,9 @@ const styles = ScaledSheet.create({
     },
     // heart icon
     interactView: {
-        width: '80%',
-        paddingTop: '20@vs',
+        width: '100%',
         paddingBottom: '10@vs',
-        paddingHorizontal: '10@s',
+        paddingHorizontal: '5@s',
         flexDirection: 'row',
         alignSelf: 'center',
     },
@@ -358,4 +234,11 @@ const styles = ScaledSheet.create({
     },
 });
 
-export default PostStatus;
+export default memo(PostStatus, (preProps: Props, nextProps: any) => {
+    for (const [key, value] of Object.entries(preProps.itemPost)) {
+        if (nextProps.itemPost?.[key] !== value) {
+            return false;
+        }
+    }
+    return true;
+});

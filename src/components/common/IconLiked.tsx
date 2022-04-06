@@ -22,7 +22,7 @@ const IconLiked = ({onPress, customStyle}: Props) => {
 
     return (
         <Animated.View style={{transform: [{scale: aim}]}}>
-            <StyleTouchable onPress={onPress}>
+            <StyleTouchable onPress={onPress} hitSlop={14}>
                 <FontAwesome
                     name="heart"
                     style={[styles.heartIcon, customStyle]}

@@ -165,7 +165,7 @@ const DiscoveryScreen = () => {
                 renderItem={({item}) => RenderItemBubble(item)}
                 keyExtractor={(_, index) => String(index)}
                 snapToInterval={bubbleHeight}
-                scrollEventThrottle={16}
+                // scrollEventThrottle={16}
                 decelerationRate="fast"
                 refreshing={refreshing}
                 onRefresh={onRefresh}
