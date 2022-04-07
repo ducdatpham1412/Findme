@@ -12,7 +12,7 @@ import {
     goBack,
     navigate,
 } from 'navigation/NavigationService';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {modalizeMyProfile, modeExpUsePaging} from 'utility/assistant';
@@ -23,24 +23,180 @@ import SearchView from './components/SearchView';
 import ToolProfile from './components/ToolProfile';
 import PostStatus from './post/PostStatus';
 
-const MyProfile = ({route}: any) => {
+interface ChildrenProps {
+    routeName: string;
+}
+
+/** ------------------------
+ * Profile Enjoy
+ * -------------------------
+ */
+const ProfileEnjoy = ({routeName}: ChildrenProps) => {
     const {profile} = Redux.getPassport();
-    const theme = Redux.getTheme();
-    const isModeExp = Redux.getModeExp();
-    const bubblePalaceAction = Redux.getBubblePalaceAction();
 
     const optionRef = useRef<any>(null);
+
     const [search, setSearch] = useState('');
     const [displaySearchView, setDisplaySearchView] = useState(false);
 
-    const {list, setList, refreshing, onRefresh, onLoadMore} = isModeExp
-        ? modeExpUsePaging()
-        : usePaging({
-              request: apiGetListPost,
-              params: {
-                  userId: profile.id,
-              },
-          });
+    const {list, setList, onLoadMore} = modeExpUsePaging();
+
+    const [left, setLeft] = useState<Array<TypeCreatePostResponse>>([]);
+    const [right, setRight] = useState<Array<TypeCreatePostResponse>>([]);
+
+    useEffect(() => {
+        const tempLeft: Array<TypeCreatePostResponse> = [];
+        const tempRight: Array<TypeCreatePostResponse> = [];
+        list.forEach((item: TypeCreatePostResponse, index: number) => {
+            if (index % 2 === 0) {
+                tempLeft.push(item);
+            } else {
+                tempRight.push(item);
+            }
+        });
+        setLeft(tempLeft);
+        setRight(tempRight);
+    }, [list]);
+
+    /**
+     * Function
+     */
+    const onShowOption = () => {
+        optionRef.current.show();
+    };
+
+    const onSubmitSearch = () => {};
+
+    const onGoToDetailPost = (bubbleId: string) => {
+        const temp = list.findIndex(item => item.id === bubbleId);
+        const initIndex = temp < 0 ? 0 : temp;
+        navigate(ROOT_SCREEN.listDetailPost, {
+            listInProfile: list,
+            initIndex,
+            setListInProfile: setList,
+        });
+    };
+
+    const onDeleteAPostInList = async (idPost: string) => {
+        const agreeDelete = async () => {
+            try {
+                await apiDeletePost(idPost);
+                setList((preValue: Array<TypeCreatePostResponse>) => {
+                    return preValue.filter(item => item.id !== idPost);
+                });
+                goBack();
+            } catch (err) {
+                appAlert(err);
+            }
+        };
+        appAlertYesNo({
+            i18Title: 'profile.post.sureDeletePost',
+            agreeChange: agreeDelete,
+            refuseChange: goBack,
+        });
+    };
+
+    /**
+     * Render view
+     */
+    const HeaderComponent = () => {
+        return (
+            <>
+                <InformationProfile
+                    profile={profile}
+                    routeName={routeName}
+                    havingEditProfile
+                    anonymousName={profile.anonymousName}
+                />
+                <ToolProfile />
+            </>
+        );
+    };
+
+    const RenderItemPost = useCallback(
+        (item: TypeCreatePostResponse) => {
+            return (
+                <PostStatus
+                    key={item.id}
+                    itemPost={item}
+                    deleteAPostInList={() => {
+                        onDeleteAPostInList(item.id);
+                    }}
+                    onGoToDetailPost={onGoToDetailPost}
+                />
+            );
+        },
+        [list],
+    );
+
+    const ListPostStatus = () => {
+        return (
+            <View
+                style={{
+                    width: '100%',
+                    flexDirection: 'row',
+                }}>
+                <View style={{flex: 1}}>{left.map(RenderItemPost)}</View>
+                <View style={{flex: 1}}>{right.map(RenderItemPost)}</View>
+            </View>
+        );
+    };
+
+    return (
+        <>
+            <AvatarBackground avatar={profile.avatar} />
+
+            <StyleList
+                data={[]}
+                renderItem={() => null}
+                ListHeaderComponent={HeaderComponent()}
+                ListFooterComponent={ListPostStatus()}
+                ListEmptyComponent={() => null}
+                style={styles.container}
+                contentContainerStyle={styles.contentContainer}
+                onLoadMore={onLoadMore}
+            />
+
+            {(displaySearchView || !!search) && false && <SearchView />}
+            {/* develop later */}
+            <SearchAndSetting
+                search={search}
+                onSearch={setSearch}
+                onShowOptions={onShowOption}
+                onSubmitSearch={onSubmitSearch}
+                hasBackBtn={false}
+                hasGuideButton
+                onFocus={() => setDisplaySearchView(true)}
+                onBlur={() => setDisplaySearchView(false)}
+            />
+
+            <StyleActionSheet
+                ref={optionRef}
+                listTextAndAction={modalizeMyProfile}
+            />
+        </>
+    );
+};
+
+/** ------------------------
+ * Profile User
+ * -------------------------
+ */
+const ProfileAccount = ({routeName}: ChildrenProps) => {
+    const {profile} = Redux.getPassport();
+    const bubblePalaceAction = Redux.getBubblePalaceAction();
+
+    const {list, setList, refreshing, onRefresh, onLoadMore} = usePaging({
+        request: apiGetListPost,
+        params: {
+            userId: profile.id,
+        },
+    });
+
+    const optionRef = useRef<any>(null);
+
+    const [search, setSearch] = useState('');
+    const [displaySearchView, setDisplaySearchView] = useState(false);
 
     const [left, setLeft] = useState<Array<TypeCreatePostResponse>>([]);
     const [right, setRight] = useState<Array<TypeCreatePostResponse>>([]);
@@ -85,11 +241,24 @@ const MyProfile = ({route}: any) => {
         }
     }, [bubblePalaceAction]);
 
+    /**
+     * Functions
+     */
     const onShowOption = () => {
         optionRef.current.show();
     };
 
     const onSubmitSearch = () => {};
+
+    const onGoToDetailPost = (bubbleId: string) => {
+        const temp = list.findIndex(item => item.id === bubbleId);
+        const initIndex = temp < 0 ? 0 : temp;
+        navigate(ROOT_SCREEN.listDetailPost, {
+            listInProfile: list,
+            initIndex,
+            setListInProfile: setList,
+        });
+    };
 
     const onDeleteAPostInList = async (idPost: string) => {
         const agreeDelete = async () => {
@@ -112,36 +281,26 @@ const MyProfile = ({route}: any) => {
 
     const onRefreshPage = async () => {
         try {
-            if (!isModeExp) {
-                const res = await apiGetProfile(profile.id);
-                Redux.updatePassport({
-                    profile: res.data,
-                });
-                onRefresh();
-            }
+            const res = await apiGetProfile(profile.id);
+            Redux.updatePassport({
+                profile: res.data,
+            });
+            onRefresh();
         } catch (err) {
             appAlert(err);
         }
     };
 
-    const onGoToDetailPost = (bubbleId: string) => {
-        const temp = list.findIndex(item => item.id === bubbleId);
-        const initIndex = temp < 0 ? 0 : temp;
-        navigate(ROOT_SCREEN.listDetailPost, {
-            listInProfile: list,
-            initIndex,
-            setListInProfile: setList,
-        });
-    };
-
-    // render_view
-    const HeaderComponent = useMemo(() => {
+    /**
+     * Render views
+     */
+    const HeaderComponent = () => {
         return (
             <>
                 {/* Information: avatar, cover, follower, following */}
                 <InformationProfile
                     profile={profile}
-                    routeName={route.name}
+                    routeName={routeName}
                     havingEditProfile
                     anonymousName={profile.anonymousName}
                 />
@@ -150,7 +309,7 @@ const MyProfile = ({route}: any) => {
                 <ToolProfile />
             </>
         );
-    }, [profile, list, theme]);
+    };
 
     const RenderItemPost = useCallback(
         (item: TypeCreatePostResponse) => {
@@ -193,12 +352,11 @@ const MyProfile = ({route}: any) => {
                 ListEmptyComponent={() => null}
                 style={styles.container}
                 contentContainerStyle={styles.contentContainer}
+                onLoadMore={onLoadMore}
                 refreshing={refreshing}
                 onRefresh={onRefreshPage}
-                onLoadMore={onLoadMore}
             />
 
-            {/* develop later */}
             {(displaySearchView || !!search) && false && <SearchView />}
             <SearchAndSetting
                 search={search}
@@ -217,6 +375,19 @@ const MyProfile = ({route}: any) => {
             />
         </>
     );
+};
+
+/**
+ * BOSS HERE
+ */
+const MyProfile = ({route}: any) => {
+    const isModeExp = Redux.getModeExp();
+    const token = Redux.getToken();
+
+    if (!isModeExp && token) {
+        return <ProfileAccount routeName={route.name} />;
+    }
+    return <ProfileEnjoy routeName={route.name} />;
 };
 
 const styles = ScaledSheet.create({

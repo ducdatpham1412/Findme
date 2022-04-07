@@ -39,7 +39,7 @@ export const initialAccountState = {
         },
     },
     // modeExp
-    modeExp: true,
+    modeExp: false,
 };
 
 const accountSlice = createSlice({

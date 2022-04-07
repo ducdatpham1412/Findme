@@ -22,7 +22,7 @@ import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
 import TabBarProvider from 'navigation/config/TabBarProvider';
 import {navigationRef} from 'navigation/NavigationService';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StatusBar, StyleProp, ViewStyle} from 'react-native';
 import CodePush from 'react-native-code-push';
 import Config from 'react-native-config';
@@ -41,6 +41,10 @@ const RootScreen = () => {
     const theme = Redux.getTheme();
     const barStyle =
         theme === Theme.darkTheme ? 'light-content' : 'dark-content';
+    const isModeExp = Redux.getModeExp();
+    const token = Redux.getToken();
+
+    const [initLoading, setInitLoading] = useState(true);
 
     const initApp = async () => {
         try {
@@ -49,7 +53,7 @@ const RootScreen = () => {
             logger(err);
         } finally {
             SplashScreen.hide();
-            Redux.setIsLoading(false);
+            setInitLoading(false);
         }
     };
 
@@ -70,6 +74,126 @@ const RootScreen = () => {
         checkUpdate();
     }, []);
 
+    const RenderAuthenticationStack = () => {
+        return (
+            <RootStack.Screen
+                name={ROOT_SCREEN.loginRoute}
+                component={LoginRoute}
+                options={{
+                    cardStyle: [{backgroundColor: theme.backgroundColor}],
+                }}
+            />
+        );
+    };
+
+    const RenderAppStack = () => {
+        return (
+            <>
+                <RootStack.Screen
+                    name={ROOT_SCREEN.mainScreen}
+                    component={MainTabs}
+                    options={{
+                        cardStyleInterpolator:
+                            CardStyleInterpolators.forHorizontalIOS,
+                    }}
+                />
+                <RootStack.Screen
+                    name={ROOT_SCREEN.otherProfile}
+                    component={OtherProfile}
+                    options={{
+                        cardStyle: [
+                            cardStyleSafeTop,
+                            {
+                                backgroundColor: theme.backgroundColor,
+                            },
+                        ],
+                    }}
+                />
+                <RootStack.Screen
+                    name={ROOT_SCREEN.listFollows}
+                    component={ListFollows}
+                    options={{
+                        cardStyle: [
+                            cardStyleSafeTop,
+                            {
+                                backgroundColor: theme.backgroundColor,
+                            },
+                        ],
+                    }}
+                />
+
+                <RootStack.Screen
+                    name={ROOT_SCREEN.detailBubble}
+                    component={DetailBubble}
+                    options={{
+                        cardStyle: [
+                            cardStyleSafeTop,
+                            {
+                                backgroundColor: theme.backgroundColor,
+                            },
+                        ],
+                        gestureEnabled: true,
+                    }}
+                />
+                <RootStack.Screen
+                    name={ROOT_SCREEN.listDetailPost}
+                    component={ListDetailPost}
+                    options={{
+                        // cardStyleInterpolator:
+                        //     CardStyleInterpolators.forScaleFromCenterAndroid,
+                        cardStyle: {
+                            backgroundColor: theme.backgroundColor,
+                        },
+                    }}
+                />
+
+                {/* Interact Bubble */}
+                <RootStack.Screen
+                    options={{
+                        cardStyle: [
+                            {backgroundColor: selectBgCardStyle(0.3)},
+                            cardStyleSafeTop,
+                        ],
+                        cardStyleInterpolator:
+                            CardStyleInterpolators.forFadeFromBottomAndroid,
+                    }}
+                    name={ROOT_SCREEN.interactBubble}
+                    component={InteractBubble}
+                />
+
+                {/* Swipe Image */}
+                <RootStack.Screen
+                    options={{
+                        cardStyle: [
+                            {backgroundColor: theme.backgroundColor},
+                            cardStyleSafeTop,
+                        ],
+                        cardStyleInterpolator:
+                            CardStyleInterpolators.forFadeFromBottomAndroid,
+                    }}
+                    name={ROOT_SCREEN.swipeImages}
+                    component={SwipeImages}
+                />
+
+                {/* Report user */}
+                <RootStack.Screen
+                    name={ROOT_SCREEN.reportUser}
+                    component={ReportUser}
+                    options={{
+                        cardStyle: [
+                            {backgroundColor: theme.backgroundColor},
+                            cardStyleSafeTop,
+                        ],
+                    }}
+                />
+            </>
+        );
+    };
+
+    if (initLoading) {
+        return null;
+    }
+
     return (
         <NavigationContainer ref={navigationRef}>
             <TabBarProvider>
@@ -86,70 +210,9 @@ const RootScreen = () => {
                             gestureEnabled: false,
                             headerShown: false,
                         }}>
-                        {/* Authentication */}
-                        <RootStack.Screen
-                            name={ROOT_SCREEN.loginRoute}
-                            component={LoginRoute}
-                            options={{
-                                cardStyle: [
-                                    cardStyleSafeTop,
-                                    {backgroundColor: theme.backgroundColor},
-                                ],
-                            }}
-                        />
-
-                        {/* Main Tabs */}
-                        <RootStack.Screen
-                            name={ROOT_SCREEN.mainScreen}
-                            component={MainTabs}
-                            options={{
-                                cardStyleInterpolator:
-                                    CardStyleInterpolators.forHorizontalIOS,
-                            }}
-                        />
-                        <RootStack.Screen
-                            name={ROOT_SCREEN.otherProfile}
-                            component={OtherProfile}
-                            options={{
-                                cardStyle: [
-                                    cardStyleSafeTop,
-                                    {backgroundColor: theme.backgroundColor},
-                                ],
-                            }}
-                        />
-                        <RootStack.Screen
-                            name={ROOT_SCREEN.listFollows}
-                            component={ListFollows}
-                            options={{
-                                cardStyle: [
-                                    cardStyleSafeTop,
-                                    {backgroundColor: theme.backgroundColor},
-                                ],
-                            }}
-                        />
-
-                        <RootStack.Screen
-                            name={ROOT_SCREEN.detailBubble}
-                            component={DetailBubble}
-                            options={{
-                                cardStyle: [
-                                    cardStyleSafeTop,
-                                    {backgroundColor: theme.backgroundColor},
-                                ],
-                                gestureEnabled: true,
-                            }}
-                        />
-                        <RootStack.Screen
-                            name={ROOT_SCREEN.listDetailPost}
-                            component={ListDetailPost}
-                            options={{
-                                // cardStyleInterpolator:
-                                //     CardStyleInterpolators.forScaleFromCenterAndroid,
-                                cardStyle: {
-                                    backgroundColor: theme.backgroundColor,
-                                },
-                            }}
-                        />
+                        {isModeExp || token
+                            ? RenderAppStack()
+                            : RenderAuthenticationStack()}
 
                         {/* Alert */}
                         <RootStack.Screen
@@ -185,46 +248,6 @@ const RootScreen = () => {
                             }}
                             name={ROOT_SCREEN.modalize}
                             component={Modalize}
-                        />
-
-                        {/* Interact Bubble */}
-                        <RootStack.Screen
-                            options={{
-                                cardStyle: [
-                                    {backgroundColor: selectBgCardStyle(0.3)},
-                                    cardStyleSafeTop,
-                                ],
-                                cardStyleInterpolator:
-                                    CardStyleInterpolators.forFadeFromBottomAndroid,
-                            }}
-                            name={ROOT_SCREEN.interactBubble}
-                            component={InteractBubble}
-                        />
-
-                        {/* Swipe Image */}
-                        <RootStack.Screen
-                            options={{
-                                cardStyle: [
-                                    {backgroundColor: theme.backgroundColor},
-                                    cardStyleSafeTop,
-                                ],
-                                cardStyleInterpolator:
-                                    CardStyleInterpolators.forFadeFromBottomAndroid,
-                            }}
-                            name={ROOT_SCREEN.swipeImages}
-                            component={SwipeImages}
-                        />
-
-                        {/* Report user */}
-                        <RootStack.Screen
-                            name={ROOT_SCREEN.reportUser}
-                            component={ReportUser}
-                            options={{
-                                cardStyle: [
-                                    {backgroundColor: theme.backgroundColor},
-                                    cardStyleSafeTop,
-                                ],
-                            }}
                         />
 
                         {/* Web view */}

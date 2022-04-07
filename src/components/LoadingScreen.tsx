@@ -7,13 +7,14 @@ import {StyleImage} from './base';
 
 interface Props {
     hasLogo?: boolean;
+    opacityBackground?: number;
 }
 
 let x: any;
 
 const LoadingScreen = (props: Props) => {
     const aim = useRef(new Animated.Value(0.5)).current;
-    const {hasLogo = true} = props;
+    const {hasLogo = true, opacityBackground = 0.9} = props;
     const theme = Redux.getTheme();
 
     const movingLogo = () => {
@@ -41,7 +42,10 @@ const LoadingScreen = (props: Props) => {
         <View
             style={[
                 styles.container,
-                {backgroundColor: theme.backgroundColor},
+                {
+                    backgroundColor: theme.backgroundColor,
+                    opacity: opacityBackground,
+                },
             ]}>
             {hasLogo && (
                 <Animated.View
@@ -61,7 +65,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: Metrics.width,
         height: Metrics.height,
-        opacity: 0.9,
         alignItems: 'center',
         justifyContent: 'center',
     },

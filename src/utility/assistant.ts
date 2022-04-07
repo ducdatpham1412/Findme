@@ -25,6 +25,7 @@ import {appAlert, navigate} from 'navigation/NavigationService';
 import {useState} from 'react';
 import {Platform} from 'react-native';
 import ImageUploader, {ImagePickerParamsType} from './ImageUploader';
+import AuthenticateService from './login/loginService';
 import {checkCamera, checkPhoto} from './permission/permission';
 
 /**
@@ -264,9 +265,13 @@ export const renderIconGender = (_gender?: number) => {
 };
 
 export const onGoToSignUp = () => {
-    Redux.updateListChatTag([]);
-    navigate(LOGIN_ROUTE.signUpForm, {
-        typeSignUp: SIGN_UP_TYPE.email,
+    AuthenticateService.logOut({
+        hadRefreshTokenBlacked: true,
+        callBack: () => {
+            navigate(LOGIN_ROUTE.signUpForm, {
+                typeSignUp: SIGN_UP_TYPE.email,
+            });
+        },
     });
 };
 

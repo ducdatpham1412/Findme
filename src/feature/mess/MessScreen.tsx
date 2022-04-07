@@ -4,10 +4,7 @@ import {apiGetDetailChatTag} from 'api/module';
 import {StyleImage} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import Redux from 'hook/useRedux';
-import {
-    useSocketChatTagBubble,
-    useSocketChatTagBubbleEnjoy,
-} from 'hook/useSocketIO';
+import {useSocketChatTagBubble} from 'hook/useSocketIO';
 import Header from 'navigation/components/Header';
 import {MESS_ROUTE, PROFILE_ROUTE} from 'navigation/config/routes';
 import {useTabBar} from 'navigation/config/TabBarProvider';
@@ -17,15 +14,12 @@ import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import ChatTag from './components/ChatTag';
 
-const MessScreen = () => {
+const RenderMessages = () => {
     const {setShowTabBar} = useTabBar();
     const isFocus = useIsFocused();
 
     const chatTagFromNotification = Redux.getChatTagFromNotification();
-    const modeExp = Redux.getModeExp();
-    const {id, avatar} = Redux.getPassport().profile;
-    const borderMessRoute = Redux.getBorderMessRoute();
-    const theme = Redux.getTheme();
+    const {id} = Redux.getPassport().profile;
 
     const {
         listChatTags,
@@ -34,7 +28,7 @@ const MessScreen = () => {
         refreshing,
         onLoadMore,
         setListChatTags,
-    } = modeExp ? useSocketChatTagBubbleEnjoy() : useSocketChatTagBubble();
+    } = useSocketChatTagBubble();
 
     const goToChatDetailFromNotification = async () => {
         if (chatTagFromNotification) {
@@ -83,13 +77,35 @@ const MessScreen = () => {
     /**
      * Render view
      */
-    // if (chatTagFromNotification) {
-    //     return <View />;
-    // }
 
     const renderChatTag = (item: TypeChatTagResponse) => {
         return <ChatTag key={item?.id} item={item} onGoToChat={onGoToChat} />;
     };
+
+    return (
+        <StyleList
+            data={listChatTags}
+            renderItem={({item}) => {
+                return renderChatTag(item);
+            }}
+            contentContainerStyle={styles.contentList}
+            keyExtractor={item => item.id}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            onLoadMore={onLoadMore}
+        />
+    );
+};
+
+/**
+ * Boss here
+ */
+const MessScreen = () => {
+    const isModeExp = Redux.getModeExp();
+    const token = Redux.getToken();
+    const {avatar} = Redux.getPassport().profile;
+    const borderMessRoute = Redux.getBorderMessRoute();
+    const theme = Redux.getTheme();
 
     const renderAvatar = useMemo(() => {
         return (
@@ -120,17 +136,7 @@ const MessScreen = () => {
             />
 
             {/* List chat tags */}
-            <StyleList
-                data={listChatTags}
-                renderItem={({item}) => {
-                    return renderChatTag(item);
-                }}
-                contentContainerStyle={styles.contentList}
-                keyExtractor={item => item.id}
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                onLoadMore={onLoadMore}
-            />
+            {!isModeExp && token && <RenderMessages />}
         </View>
     );
 };

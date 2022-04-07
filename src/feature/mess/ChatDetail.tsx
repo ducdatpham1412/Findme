@@ -19,7 +19,6 @@ import {
     requestPublicChat,
     socketUnTyping,
     useSocketChatDetail,
-    useSocketChatDetailEnjoy,
 } from 'hook/useSocketIO';
 import Header from 'navigation/components/Header';
 import {MESS_ROUTE} from 'navigation/config/routes';
@@ -97,12 +96,10 @@ const ChatDetail = ({route}: ChatDetailProps) => {
         refreshing,
         onRefresh,
         onLoadMore,
-    } = isModeExp
-        ? useSocketChatDetailEnjoy({isMyChatTag})
-        : useSocketChatDetail({
-              isMyChatTag,
-              setListChatTags: route.params.setListChatTags,
-          });
+    } = useSocketChatDetail({
+        isMyChatTag,
+        setListChatTags: route.params.setListChatTags,
+    });
 
     const [content, setContent] = useState('');
     const [images, setImages] = useState([]);

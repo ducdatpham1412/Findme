@@ -151,7 +151,7 @@ const InformationProfile = (props: Props) => {
         );
     }, [followers, followings, theme]);
 
-    const RenderImageTellSignUp = useMemo(() => {
+    const RenderImageTellSignUp = () => {
         if (isModeExp) {
             return (
                 <View style={styles.signUpBox}>
@@ -179,7 +179,7 @@ const InformationProfile = (props: Props) => {
             );
         }
         return null;
-    }, [isModeExp, theme]);
+    };
 
     const RenderButtonEditProfile = useMemo(() => {
         if (havingEditProfile) {
@@ -213,7 +213,7 @@ const InformationProfile = (props: Props) => {
                 {RenderButtonEditProfile}
             </View>
 
-            {RenderImageTellSignUp}
+            {RenderImageTellSignUp()}
         </View>
     );
 };

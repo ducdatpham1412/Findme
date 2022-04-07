@@ -9,7 +9,7 @@ import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
-import {appAlert} from 'navigation/NavigationService';
+import {appAlert, goBack} from 'navigation/NavigationService';
 import React, {memo, useEffect, useState} from 'react';
 import {View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -75,7 +75,10 @@ const Bubble = (props: Props) => {
         } else {
             appAlert('discovery.bubble.goToSignUp', {
                 moreNotice: 'common.letGo',
-                moreAction: onGoToSignUp,
+                moreAction: () => {
+                    goBack();
+                    onGoToSignUp();
+                },
             });
         }
     };

@@ -1,7 +1,5 @@
 import {apiGetPassport, apiGetResource} from 'api/module';
 import Redux from 'hook/useRedux';
-import ROOT_SCREEN from 'navigation/config/routes';
-import {navigate} from 'navigation/NavigationService';
 import {chooseLanguageFromId} from 'utility/assistant';
 import FindmeAsyncStorage from 'utility/FindmeAsyncStorage';
 import I18Next from 'utility/I18Next';
@@ -37,8 +35,6 @@ export const selectIsHaveActiveUser = async () => {
         I18Next.changeLanguage(
             chooseLanguageFromId(passport.data.setting.language),
         );
-
-        navigate(ROOT_SCREEN.mainScreen);
     } else {
         await handleNotHaveActiveUser();
     }

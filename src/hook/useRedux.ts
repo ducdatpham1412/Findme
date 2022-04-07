@@ -265,6 +265,7 @@ export const Redux = {
         // Redux.setModeExp(true);
 
         Redux.setToken(null);
+        Redux.setModeExp(false);
         Redux.updatePassport({
             information: passport.information,
             profile: passport.profile,

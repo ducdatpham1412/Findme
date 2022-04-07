@@ -9,7 +9,7 @@ import {DEFAULT_IMAGE_BACKGROUND} from 'asset/standardValue';
 import {HobbyType} from 'hook/useRedux';
 
 export const initialLogicState = {
-    isLoading: true,
+    isLoading: false,
 
     token: null, // is set from active user in async, to handle SocketProvider
 

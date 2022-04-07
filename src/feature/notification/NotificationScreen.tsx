@@ -5,10 +5,7 @@ import {Metrics} from 'asset/metrics';
 import {StyleText} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import Redux from 'hook/useRedux';
-import {
-    useSocketNotification,
-    useSocketNotificationEnjoy,
-} from 'hook/useSocketIO';
+import {useSocketNotification} from 'hook/useSocketIO';
 import ROOT_SCREEN, {MAIN_SCREEN} from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
 import React, {useEffect} from 'react';
@@ -16,14 +13,39 @@ import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import ItemNotification from './components/ItemComment';
 
-const NotificationScreen = () => {
+/** ------------------------
+ * Notification Enjoy
+ * -------------------------
+ */
+const NotificationEnjoy = () => {
+    const theme = Redux.getTheme();
+
+    return (
+        <View
+            style={[
+                styles.container,
+                {backgroundColor: theme.backgroundColor},
+            ]}>
+            <View style={styles.titleView}>
+                <StyleText
+                    i18Text="notification.title"
+                    customStyle={[styles.textTitle, {color: theme.borderColor}]}
+                />
+            </View>
+        </View>
+    );
+};
+
+/** ------------------------
+ * Notification User
+ * -------------------------
+ */
+const NotificationAccount = () => {
     const theme = Redux.getTheme();
     const {id, name} = Redux.getPassport().profile;
-    const isModeExp = Redux.getModeExp();
 
-    const {list, setList, onRefresh, onLoadMore, refreshing} = !isModeExp
-        ? useSocketNotification()
-        : useSocketNotificationEnjoy();
+    const {list, setList, onRefresh, onLoadMore, refreshing} =
+        useSocketNotification();
 
     useEffect(() => {
         let checkNumberNew = 0;
@@ -114,6 +136,19 @@ const NotificationScreen = () => {
             />
         </View>
     );
+};
+
+/**
+ * BOSS HERE
+ */
+const NotificationScreen = () => {
+    const isModeExp = Redux.getModeExp();
+    const token = Redux.getToken();
+
+    if (!isModeExp && token) {
+        return <NotificationAccount />;
+    }
+    return <NotificationEnjoy />;
 };
 
 const styles = ScaledSheet.create({

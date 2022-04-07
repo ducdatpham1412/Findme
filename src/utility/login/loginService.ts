@@ -89,7 +89,10 @@ const AuthenticateService = {
         });
     },
 
-    logOut: async (params: {hadRefreshTokenBlacked: boolean}) => {
+    logOut: async (params: {
+        hadRefreshTokenBlacked: boolean;
+        callBack?(): void;
+    }) => {
         try {
             Redux.setIsLoading(true);
             const isModeExp = FindmeStore.getState().accountSlice.modeExp;
@@ -100,7 +103,7 @@ const AuthenticateService = {
             await FindmeAsyncStorage.logOut();
             Redux.logOut();
             closeSocket();
-            navigate(LOGIN_ROUTE.loginScreen);
+            params?.callBack?.();
         } catch (err) {
             appAlert(err);
         } finally {

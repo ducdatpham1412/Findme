@@ -45,11 +45,8 @@ const onMoveNavigation = (data: any) => {
 
 export const useNotification = () => {
     const myId = Redux.getPassport().profile.id;
-    const isModeExp = Redux.getModeExp();
 
     useEffect(() => {
-        const isLogin = myId && !isModeExp;
-
         try {
             OneSignal.setAppId(Config.ONESIGNAL_KEY);
 
@@ -67,7 +64,7 @@ export const useNotification = () => {
             }
 
             // Send tag
-            if (isLogin) {
+            if (myId) {
                 pushTagMember(myId);
             } else {
                 deleteTagMember();

@@ -29,10 +29,7 @@ const ChoosingLoginOrEnjoy = () => {
 
             Redux.updatePassport({profile: {id: res.data}});
             Redux.updateResource(resource.data);
-            Redux.setToken('enjoy_mode');
             Redux.setModeExp(true);
-
-            navigate(ROOT_SCREEN.mainScreen);
         } catch (err) {
             appAlert(err);
         }
@@ -55,76 +52,68 @@ const ChoosingLoginOrEnjoy = () => {
     /**
      * Render view
      */
+    const RenderLoginIcon = () => {
+        return (
+            <Animated.View
+                style={[
+                    styles.twoSideBox,
+                    {
+                        transform: [{scale: win}],
+                    },
+                ]}>
+                <StyleTouchable
+                    onPress={() => navigate(LOGIN_ROUTE.loginScreen)}
+                    customStyle={styles.buttonChoose}>
+                    <StyleText
+                        i18Text="login.loginScreen.goToLogin"
+                        customStyle={[styles.text, {color: theme.textColor}]}
+                    />
+                    <StyleImage
+                        source={Images.images.squirrelLogin}
+                        customStyle={styles.imgChoose}
+                        resizeMode="contain"
+                    />
+                </StyleTouchable>
+            </Animated.View>
+        );
+    };
 
-    return (
-        <View
-            style={[
-                styles.container,
-                {backgroundColor: theme.backgroundColor},
-            ]}>
-            <HeaderLogo />
+    const RenderDivider = () => {
+        return (
+            <Animated.View
+                style={[styles.pathBox, {backgroundColor: theme.borderColor}]}
+            />
+        );
+    };
 
-            <View style={styles.choosingView}>
-                {/* Go to login */}
-                <Animated.View
-                    style={[
-                        styles.twoSideBox,
-                        {
-                            transform: [{scale: win}],
-                        },
-                    ]}>
-                    <StyleTouchable
-                        onPress={() => navigate(LOGIN_ROUTE.loginScreen)}
-                        customStyle={styles.buttonChoose}>
-                        <StyleText
-                            i18Text="login.loginScreen.goToLogin"
-                            customStyle={[
-                                styles.text,
-                                {color: theme.textColor},
-                            ]}
-                        />
-                        <StyleImage
-                            source={Images.images.squirrelLogin}
-                            customStyle={styles.imgChoose}
-                            resizeMode="contain"
-                        />
-                    </StyleTouchable>
-                </Animated.View>
+    const RenderEnjoyIcon = () => {
+        return (
+            <Animated.View
+                style={[
+                    styles.twoSideBox,
+                    {
+                        transform: [{scale: win}],
+                    },
+                ]}>
+                <StyleTouchable
+                    onPress={onEnjoyModeExp}
+                    customStyle={styles.buttonChoose}>
+                    <StyleText
+                        i18Text="login.loginScreen.enjoyModeNoAcc"
+                        customStyle={[styles.text, {color: theme.textColor}]}
+                    />
+                    <StyleImage
+                        source={Images.images.squirrelEnjoy}
+                        customStyle={styles.imgChoose}
+                        resizeMode="contain"
+                    />
+                </StyleTouchable>
+            </Animated.View>
+        );
+    };
 
-                <Animated.View
-                    style={[
-                        styles.pathBox,
-                        {backgroundColor: theme.borderColor},
-                    ]}
-                />
-
-                {/* Enjoy no acc mode */}
-                <Animated.View
-                    style={[
-                        styles.twoSideBox,
-                        {
-                            transform: [{scale: win}],
-                        },
-                    ]}>
-                    <StyleTouchable
-                        onPress={onEnjoyModeExp}
-                        customStyle={styles.buttonChoose}>
-                        <StyleText
-                            i18Text="login.loginScreen.enjoyModeNoAcc"
-                            customStyle={[
-                                styles.text,
-                                {color: theme.textColor},
-                            ]}
-                        />
-                        <StyleImage
-                            source={Images.images.squirrelEnjoy}
-                            customStyle={styles.imgChoose}
-                            resizeMode="contain"
-                        />
-                    </StyleTouchable>
-                </Animated.View>
-            </View>
-
+    const RenderAgreeTerms = () => {
+        return (
             <View style={styles.ageeTermsView}>
                 <StyleText
                     i18Text="login.loginScreen.byLoginOrTappingEnjoy"
@@ -162,6 +151,24 @@ const ChoosingLoginOrEnjoy = () => {
                     {'.'}
                 </StyleText>
             </View>
+        );
+    };
+
+    return (
+        <View
+            style={[
+                styles.container,
+                {backgroundColor: theme.backgroundColor},
+            ]}>
+            <HeaderLogo />
+
+            <View style={styles.choosingView}>
+                {RenderLoginIcon()}
+                {RenderDivider()}
+                {RenderEnjoyIcon()}
+            </View>
+
+            {RenderAgreeTerms()}
         </View>
     );
 };

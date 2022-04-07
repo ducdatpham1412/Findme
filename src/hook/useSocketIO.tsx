@@ -62,23 +62,16 @@ class SocketClass {
  */
 export const SocketProvider = ({children}: any) => {
     const token = Redux.getToken();
-    const isModeExp = Redux.getModeExp();
 
     const handleOnConnect = () => {
         if (token) {
             SocketClass.close();
             SocketClass.start();
             socket.on('connect', () => {
-                if (!isModeExp) {
-                    socket.emit(SOCKET_EVENT.authenticate, {
-                        token,
-                    });
-                } else {
-                    socket.emit(SOCKET_EVENT.authenticate, {
-                        myId: FindmeStore.getState().accountSlice.passport
-                            .profile.id,
-                    });
-                }
+                socket.emit(SOCKET_EVENT.authenticate, {
+                    myId: FindmeStore.getState().accountSlice.passport.profile
+                        .id,
+                });
             });
         } else {
             SocketClass.close();
@@ -95,7 +88,7 @@ export const SocketProvider = ({children}: any) => {
 
     useEffect(() => {
         handleOnConnect();
-    }, [token, isModeExp]);
+    }, [token]);
 
     useEffect(() => {
         AppState.addEventListener('change', handleAppState);
@@ -116,6 +109,7 @@ export const useSocketChatTagBubble = () => {
     const listChatTags = Redux.getListChatTag();
     const chatTagFocusing = Redux.getChatTagFocusing();
     const myId = Redux.getPassport().profile.id;
+    const token = Redux.getModeExp();
 
     const {list, setList, refreshing, onRefresh, onLoadMore} = usePaging({
         request: apiGetListChatTags,
@@ -448,8 +442,10 @@ export const useSocketChatTagBubble = () => {
     };
 
     useEffect(() => {
-        hearingOtherSocket();
-    }, [myId]);
+        if (token) {
+            hearingOtherSocket();
+        }
+    }, [myId, token]);
 
     useEffect(() => {
         Redux.updateListChatTag(list);
@@ -774,37 +770,6 @@ export const useSocketNotification = () => {
  * THIS IS FOR USER ENJOY MODE
  * ----------------------------------- /
  */
-export const useSocketChatTagBubbleEnjoy = () => {
-    return {
-        listChatTags: [],
-        refreshing: false,
-        onRefresh: () => null,
-        onLoadMore: () => null,
-        setListChatTags: () => null,
-        seenMessage: () => null,
-    };
-};
-
-export const useSocketChatDetailEnjoy = (params: {isMyChatTag: boolean}) => {
-    return {
-        messages: [],
-        sendMessage: () => null,
-        deleteMessage: async (idMessage: string) => {},
-        refreshing: false,
-        onRefresh: () => null,
-        onLoadMore: () => null,
-    };
-};
-
-export const useSocketNotificationEnjoy = () => {
-    return {
-        list: [],
-        setList: (newList: any) => null,
-        onRefresh: () => null,
-        refreshing: false,
-        onLoadMore: () => null,
-    };
-};
 
 /**
  *

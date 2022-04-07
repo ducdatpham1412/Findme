@@ -11,7 +11,7 @@ import LoadingScreen from 'components/LoadingScreen';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
-import {appAlert, navigate} from 'navigation/NavigationService';
+import {appAlert, goBack, navigate} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
@@ -22,17 +22,19 @@ import Bubble from './components/Bubble';
 const bubbleHeight = Metrics.height - Metrics.safeBottomPadding;
 
 const DiscoveryScreen = () => {
-    useNotification();
-
-    const theme = Redux.getTheme();
+    const token = Redux.getToken();
     const isModeExp = Redux.getModeExp();
+    const theme = Redux.getTheme();
     const myId = Redux.getPassport().profile.id;
 
+    const hadLogan = token && !isModeExp;
+    useNotification();
+
     const selectedApi = useMemo(() => {
-        return isModeExp
-            ? apiGetListBubbleActiveOfUserEnjoy
-            : apiGetListBubbleActive;
-    }, [isModeExp]);
+        return token
+            ? apiGetListBubbleActive
+            : apiGetListBubbleActiveOfUserEnjoy;
+    }, [token]);
 
     const {list, setList, onLoadMore, refreshing, onRefresh} = usePaging({
         request: selectedApi,
@@ -67,12 +69,17 @@ const DiscoveryScreen = () => {
         }
     }, [bubbleFocusing, preNumberComment, displayComment]);
 
+    const onGoToSignUpFromAlert = () => {
+        goBack();
+        onGoToSignUp();
+    };
+
     const onShowModalComment = useCallback(
         (post: TypeBubblePalace) => {
-            if (isModeExp) {
+            if (!hadLogan) {
                 appAlert('discovery.bubble.goToSignUp', {
                     moreNotice: 'common.letGo',
-                    moreAction: onGoToSignUp,
+                    moreAction: onGoToSignUpFromAlert,
                 });
             } else {
                 Redux.updateBubbleFocusing(post);
@@ -80,12 +87,12 @@ const DiscoveryScreen = () => {
                 setPreNumberComment(post.totalComments);
             }
         },
-        [isModeExp],
+        [hadLogan],
     );
 
     const onInteractBubble = useCallback(
         (itemBubble: TypeBubblePalace) => {
-            if (!isModeExp) {
+            if (hadLogan) {
                 interactBubble({
                     itemBubble,
                     isBubble: !itemBubble.hadKnowEachOther,
@@ -93,11 +100,11 @@ const DiscoveryScreen = () => {
             } else {
                 appAlert('discovery.bubble.goToSignUp', {
                     moreNotice: 'common.letGo',
-                    moreAction: onGoToSignUp,
+                    moreAction: onGoToSignUpFromAlert,
                 });
             }
         },
-        [isModeExp],
+        [hadLogan],
     );
 
     const onReportUser = useCallback((idUser: number) => {
@@ -109,9 +116,9 @@ const DiscoveryScreen = () => {
     const onRefreshItem = useCallback(
         async (idBubble: string) => {
             try {
-                const res = isModeExp
-                    ? await apiGetDetailBubbleEnjoy(idBubble)
-                    : await apiGetDetailBubble(idBubble);
+                const res = hadLogan
+                    ? await apiGetDetailBubble(idBubble)
+                    : await apiGetDetailBubbleEnjoy(idBubble);
                 setList((preValue: Array<TypeBubblePalace>) => {
                     return preValue.map(item => {
                         if (item.id !== idBubble) {
@@ -124,7 +131,7 @@ const DiscoveryScreen = () => {
                 appAlert(err);
             }
         },
-        [isModeExp],
+        [hadLogan],
     );
 
     const onGoToProfile = useCallback(
