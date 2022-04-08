@@ -113,10 +113,14 @@ const discovery = {
     discoveryScreen: {
         searchHobbies: 'Find hobbies',
         searchChat: 'Find chat',
+        personal: 'Personal',
+        community: 'Community',
     },
     bubble: {
         startChat: 'Start chat now',
         goToSignUp: 'Go to login so you can start chatting with everyone',
+        joinCommunity: 'Join community',
+        goToConversation: 'Go to conversation',
     },
     report: {
         title: 'Report',
@@ -183,6 +187,9 @@ const profile = {
         sendMessage: 'Send message',
         follow: 'Follow',
         unFollow: 'Unfollow',
+        goToChatTag: 'Go to conversation',
+        confirmDeleteGroup:
+            "After deleting, people won't see and join your group\nAre you sure delete?",
     },
     modalize: {
         setting: 'Setting',

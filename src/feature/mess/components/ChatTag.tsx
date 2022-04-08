@@ -1,4 +1,5 @@
 import {TypeChatTagResponse} from 'api/interface';
+import {CHAT_TAG} from 'asset/enum';
 import Images from 'asset/img/images';
 import {
     StyleIcon,
@@ -7,7 +8,7 @@ import {
     StyleTouchable,
 } from 'components/base';
 import Redux from 'hook/useRedux';
-import React, {memo, useMemo} from 'react';
+import React, {memo} from 'react';
 import {Platform, View} from 'react-native';
 import {scale, ScaledSheet} from 'react-native-size-matters';
 
@@ -24,21 +25,25 @@ const ChatTag = (props: Props) => {
     const isRequest = !!item?.isRequestingPublic;
     const haveSeenLatestMessage = item.userSeenMessage[String(myId)]?.isLatest;
 
-    const RenderPartnerAvatar = useMemo(() => {
-        const renderPartnerAvatar = () => {
-            let temp = item.listUser[0].avatar;
-            for (let i = 0; i < item.listUser.length; i++) {
-                if (item.listUser[i].id !== myId) {
-                    temp = item.listUser[i].avatar;
-                    break;
+    const RenderImageChatTag = () => {
+        const chooseLink = () => {
+            if (item.type !== CHAT_TAG.group) {
+                let temp = item.listUser[0].avatar;
+                for (let i = 0; i < item.listUser.length; i++) {
+                    if (item.listUser[i].id !== myId) {
+                        temp = item.listUser[i].avatar;
+                        break;
+                    }
                 }
+                return temp;
             }
-            return temp;
+
+            return item?.image;
         };
 
         return (
             <StyleImage
-                source={{uri: renderPartnerAvatar()}}
+                source={{uri: chooseLink()}}
                 customStyle={[
                     styles.avatar,
                     {
@@ -48,9 +53,9 @@ const ChatTag = (props: Props) => {
                 ]}
             />
         );
-    }, [item.listUser, haveSeenLatestMessage, theme]);
+    };
 
-    const RenderNameChatTag = useMemo(() => {
+    const RenderNameChatTag = () => {
         let color = theme.textColor;
         if (item.isRequestingPublic || !haveSeenLatestMessage) {
             color = theme.highlightColor;
@@ -72,9 +77,9 @@ const ChatTag = (props: Props) => {
                 />
             </View>
         );
-    }, [item.groupName, haveSeenLatestMessage, theme]);
+    };
 
-    const RenderStatus = useMemo(() => {
+    const RenderStatus = () => {
         if (item.userTyping && item.userTyping.length) {
             return (
                 <StyleText
@@ -101,7 +106,7 @@ const ChatTag = (props: Props) => {
             );
         }
         return null;
-    }, [item.isPrivate, isRequest, item.userTyping, theme]);
+    };
 
     return (
         <StyleTouchable
@@ -112,11 +117,11 @@ const ChatTag = (props: Props) => {
                 },
             ]}
             onPress={() => onGoToChat(item)}>
-            {RenderPartnerAvatar}
+            {RenderImageChatTag()}
 
             <View style={styles.contentPart}>
-                {RenderNameChatTag}
-                <View style={styles.statusBox}>{RenderStatus}</View>
+                {RenderNameChatTag()}
+                <View style={styles.statusBox}>{RenderStatus()}</View>
             </View>
         </StyleTouchable>
     );
@@ -171,9 +176,11 @@ const styles = ScaledSheet.create({
     },
 });
 
-export default memo(ChatTag, (preProps: Props, nextProps: Props) => {
-    if (preProps.item !== nextProps.item) {
-        return false;
+export default memo(ChatTag, (preProps: Props, nextProps: any) => {
+    for (const [key, value] of Object.entries(preProps.item)) {
+        if (value !== nextProps.item?.[key]) {
+            return false;
+        }
     }
     return true;
 });

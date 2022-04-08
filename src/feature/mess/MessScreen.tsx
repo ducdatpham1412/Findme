@@ -1,6 +1,7 @@
 import {useIsFocused} from '@react-navigation/native';
 import {TypeChatTagResponse} from 'api/interface';
 import {apiGetDetailChatTag} from 'api/module';
+import {CHAT_TAG} from 'asset/enum';
 import {StyleImage} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import Redux from 'hook/useRedux';
@@ -37,11 +38,27 @@ const RenderMessages = () => {
                 const res = await apiGetDetailChatTag(chatTagFromNotification);
                 seenMessage(chatTagFromNotification);
                 setShowTabBar(false);
-                navigate(MESS_ROUTE.chatDetail, {
-                    itemChatTag: res.data,
-                    setListChatTags,
-                });
+                if (res.data.type === CHAT_TAG.group) {
+                    navigate(MESS_ROUTE.chatDetailGroup, {
+                        itemChatTag: res.data,
+                        setListChatTags,
+                    });
+                } else {
+                    navigate(MESS_ROUTE.chatDetail, {
+                        itemChatTag: res.data,
+                        setListChatTags,
+                    });
+                }
                 Redux.setChatTagFromNotification(undefined);
+                setListChatTags((preValue: Array<TypeChatTagResponse>) => {
+                    const check = preValue.find(
+                        item => item.id === chatTagFromNotification,
+                    );
+                    if (check) {
+                        return preValue;
+                    }
+                    return [res.data].concat(preValue);
+                });
             } catch (err) {
                 appAlert(err);
             }
@@ -60,14 +77,25 @@ const RenderMessages = () => {
 
     const onGoToChat = useCallback(async (chatTag: TypeChatTagResponse) => {
         try {
-            if (!chatTag.userSeenMessage[String(id)].isLatest) {
+            if (
+                !chatTag.userSeenMessage[String(id)].isLatest &&
+                !chatTag.isBlock &&
+                !chatTag.isStop
+            ) {
                 seenMessage(chatTag.id);
             }
             Redux.setChatTagFocusing(chatTag.id);
-            navigate(MESS_ROUTE.chatDetail, {
-                itemChatTag: chatTag,
-                setListChatTags,
-            });
+            if (chatTag.type === CHAT_TAG.group) {
+                navigate(MESS_ROUTE.chatDetailGroup, {
+                    itemChatTag: chatTag,
+                    setListChatTags,
+                });
+            } else {
+                navigate(MESS_ROUTE.chatDetail, {
+                    itemChatTag: chatTag,
+                    setListChatTags,
+                });
+            }
             setShowTabBar(false);
         } catch (err) {
             appAlert(err);

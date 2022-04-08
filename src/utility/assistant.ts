@@ -1,5 +1,6 @@
 import {
     TypeChatTagResponse,
+    TypeCreateGroupResponse,
     TypeCreatePostResponse,
     TypeGradient,
     TypeMemberInListChatTag,
@@ -185,15 +186,9 @@ export const optionsImagePicker = [
     'common.cancel',
 ];
 
-export function logger(one: any, two?: any, three?: any, four?: any) {
-    // console.log(...arguments);
+export function logger(...args: any) {
     if (__DEV__) {
-        console.log(
-            one,
-            two !== undefined ? two : '',
-            three !== undefined ? three : '',
-            four !== undefined ? four : '',
-        );
+        console.log(...args);
     }
 }
 
@@ -239,6 +234,45 @@ export const modalizeOptionPost = (params: {
         {
             text: 'profile.post.delete',
             action: params.deleteAPostInList,
+        },
+        {
+            text: 'common.cancel',
+            action: () => null,
+        },
+    ];
+};
+
+export const modalizeGoToChatTagFromGroup = (params: {chatTagId: string}) => {
+    return [
+        {
+            text: 'profile.screen.goToChatTag',
+            action: () => {
+                Redux.setChatTagFromNotification(params.chatTagId);
+            },
+        },
+        {
+            text: 'common.cancel',
+            action: () => null,
+        },
+    ];
+};
+
+export const modalizeOptionBubbleGroup = (params: {
+    itemGroupFromEdit: TypeCreateGroupResponse | undefined;
+    deleteAGroupFromList: any;
+}) => {
+    return [
+        {
+            text: 'profile.post.editPost',
+            action: () => {
+                navigate(PROFILE_ROUTE.createGroup, {
+                    itemGroupFromEdit: params.itemGroupFromEdit,
+                });
+            },
+        },
+        {
+            text: 'profile.post.delete',
+            action: params.deleteAGroupFromList,
         },
         {
             text: 'common.cancel',
@@ -433,3 +467,11 @@ export const chooseColorGradient = (params: {
     }
     return color;
 };
+
+export function sleep(milliseconds: number) {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+        currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
+}

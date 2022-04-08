@@ -4,19 +4,13 @@ import {MESSAGE_TYPE} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
-import {
-    StyleIcon,
-    StyleImage,
-    StyleText,
-    StyleTouchable,
-} from 'components/base';
+import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import StyleKeyboardAwareView from 'components/StyleKeyboardAwareView';
 import ModalPickImage from 'feature/mess/components/ModalPickImage';
 import Redux from 'hook/useRedux';
 import {
     agreePublicChat,
-    requestPublicChat,
     socketUnTyping,
     useSocketChatDetail,
 } from 'hook/useSocketIO';
@@ -30,12 +24,16 @@ import {
 } from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {FlatList, Keyboard, TextInput, View} from 'react-native';
-import {ScaledSheet, verticalScale} from 'react-native-size-matters';
+import {
+    moderateScale,
+    ScaledSheet,
+    verticalScale,
+} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
 import {chooseColorGradient, isIOS} from 'utility/assistant';
 import HeaderRequestPublic from './components/HeaderRequestPublic';
-import ItemMessage from './components/ItemMessage';
+import ItemMessageGroup from './components/ItemMessageGroup';
 import Typing from './components/Typing';
 import UserInput from './components/UserInput';
 
@@ -48,7 +46,12 @@ interface ChatDetailProps {
     };
 }
 
-const ChatDetail = ({route}: ChatDetailProps) => {
+export interface MessageSeen {
+    userId: number;
+    avatar: string;
+}
+
+const ChatDetailGroup = ({route}: ChatDetailProps) => {
     const {profile} = Redux.getPassport();
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
@@ -66,17 +69,9 @@ const ChatDetail = ({route}: ChatDetailProps) => {
     const [modalPickImgHeight, setModalPickImgHeight] = useState(0);
 
     const [itemChatTag, setItemChatTag] = useState(route.params.itemChatTag);
-
-    const partnerId = useMemo(() => {
-        const result = itemChatTag.listUser.find(
-            item => item.id !== profile.id,
-        );
-        return result?.id || profile.id;
-    }, [itemChatTag.listUser]);
-
-    const isMyChatTag = useMemo(() => {
-        return partnerId === profile.id;
-    }, []);
+    const [messageSeen, setMessageSeen] = useState<{
+        [key: string]: Array<MessageSeen>;
+    }>({});
 
     const {
         messages,
@@ -86,7 +81,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
         onRefresh,
         onLoadMore,
     } = useSocketChatDetail({
-        isMyChatTag,
+        isMyChatTag: false,
         setListChatTags: route.params.setListChatTags,
     });
 
@@ -182,6 +177,34 @@ const ChatDetail = ({route}: ChatDetailProps) => {
         }
     }, [isFocused]);
 
+    const choosingAvatar = (userId: number) => {
+        const checkUser = itemChatTag.listUser.find(item => item.id === userId);
+        return checkUser?.avatar || '';
+    };
+
+    useEffect(() => {
+        const temp: {[key: string]: Array<MessageSeen>} = {};
+        const userSeenMessage = itemChatTag.userSeenMessage;
+        for (const [key, value] of Object.entries(userSeenMessage)) {
+            if (value.latestMessage) {
+                if (temp?.[value.latestMessage]) {
+                    temp[value.latestMessage].push({
+                        userId: Number(key),
+                        avatar: choosingAvatar(Number(key)),
+                    });
+                } else {
+                    temp[value.latestMessage] = [];
+                    temp[value.latestMessage].push({
+                        userId: Number(key),
+                        avatar: choosingAvatar(Number(key)),
+                    });
+                }
+            }
+        }
+
+        setMessageSeen(temp);
+    }, [itemChatTag]);
+
     /**
      * Send message
      */
@@ -219,34 +242,6 @@ const ChatDetail = ({route}: ChatDetailProps) => {
         }
         listRef.current?.scrollToOffset({offset: 0});
     };
-
-    /**
-     * Request public Shh
-     */
-    const onRequestPublic = useCallback(() => {
-        if (
-            !isModeExp &&
-            itemChatTag.isPrivate &&
-            !itemChatTag.isStop &&
-            !itemChatTag.isBlock
-        ) {
-            if (!itemChatTag.isRequestingPublic) {
-                requestPublicChat(itemChatTag.id);
-            } else {
-                appAlertYesNo({
-                    i18Title: itemChatTag?.hadRequestedPublic
-                        ? 'mess.messScreen.waitingOther'
-                        : 'mess.messScreen.requestPublic',
-                    agreeChange: onAgreeRequestPublic,
-                    refuseChange: onRefuseRequestPublic,
-                    headerNode: (
-                        <HeaderRequestPublic itemChatTag={itemChatTag} />
-                    ),
-                    displayButton: !itemChatTag?.hadRequestedPublic,
-                });
-            }
-        }
-    }, [itemChatTag]);
 
     /**
      * Go to setting chat
@@ -323,26 +318,12 @@ const ChatDetail = ({route}: ChatDetailProps) => {
         };
 
         const headerShh = () => {
-            if (!itemChatTag.isPrivate) {
-                // return (
-                //     <AntDesign
-                //         name="team"
-                //         style={{
-                //             fontSize: moderateScale(17),
-                //             color: borderMessRoute,
-                //         }}
-                //     />
-                // );
-                return null;
-            }
             return (
-                <StyleIcon
-                    source={Images.icons.shh}
-                    size={30}
-                    customStyle={{
-                        tintColor: itemChatTag?.isRequestingPublic
-                            ? theme.highlightColor
-                            : borderMessRoute,
+                <AntDesign
+                    name="team"
+                    style={{
+                        fontSize: moderateScale(17),
+                        color: borderMessRoute,
                     }}
                 />
             );
@@ -372,7 +353,6 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                 headerLeft={headerLeft()}
                 headerLeftMission={onGoBack}
                 headerRight2={headerShh()}
-                headerRight2Mission={onRequestPublic}
                 headerRight3={headerOption()}
                 headerRight3Mission={onNavigateToMessSetting}
                 containerStyle={{
@@ -393,16 +373,14 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                 messages?.[index + 1]?.relationship === item.relationship;
             const displayPartnerAvatar =
                 messages[index - 1]?.relationship !== item.relationship;
-            const displayMeAvatar =
-                item.id ===
-                itemChatTag.userSeenMessage[String(partnerId)].latestMessage;
+            const listUserSeen = messageSeen[item.id] || [];
 
             return (
-                <ItemMessage
+                <ItemMessageGroup
                     itemMessage={item}
                     isSameMessageAfter={isSameMessageAfter}
                     displayPartnerAvatar={displayPartnerAvatar}
-                    displayMeAvatar={displayMeAvatar}
+                    listUsersSeen={listUserSeen}
                     onDeleteMessage={deleteMessage}
                     listMessagesLength={messages.length}
                     chatColor={chatColor}
@@ -410,39 +388,37 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                 />
             );
         },
-        [messages, itemChatTag],
+        [messages, itemChatTag, messageSeen],
     );
 
     const RenderTyping = useMemo(() => {
         if (!itemChatTag?.userTyping || !itemChatTag?.userTyping.length) {
             return null;
         }
-        // If is my chat tag, show typing when me typing
-        // Else, only show typing when partner is typing
-        let userIdDisplay: number | undefined;
-        if (isMyChatTag) {
-            userIdDisplay = itemChatTag.userTyping.find(
-                item => item === profile.id,
-            );
-            if (!userIdDisplay) {
-                return null;
-            }
-        } else {
-            userIdDisplay = itemChatTag.userTyping.find(
-                item => item === partnerId,
-            );
-            if (!userIdDisplay) {
-                return null;
-            }
-        }
-        const avatarDisplay =
-            itemChatTag.listUser.find(item => item.id === userIdDisplay)
-                ?.avatar || '';
 
-        return <Typing avatar={avatarDisplay} isMyChatTag={isMyChatTag} />;
+        const listAvatarsDisplay: Array<string> = [];
+        itemChatTag.userTyping.forEach(userId => {
+            if (userId === profile.id) {
+                return;
+            }
+            const avatar = itemChatTag.listUser.find(
+                item => item.id === userId,
+            )?.avatar;
+            if (avatar) {
+                listAvatarsDisplay.push(avatar);
+            }
+        });
+
+        return (
+            <>
+                {listAvatarsDisplay.map((avatar, index) => (
+                    <Typing key={index} avatar={avatar} isMyChatTag={false} />
+                ))}
+            </>
+        );
     }, [itemChatTag?.userTyping]);
 
-    const RenderListMessage = useMemo(() => {
+    const RenderListMessage = () => {
         return (
             <View style={{flex: 1}}>
                 <StyleList
@@ -459,7 +435,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                 />
             </View>
         );
-    }, [messages, itemChatTag, refreshing]);
+    };
 
     const RenderImagePreview = useMemo(() => {
         if (images.length) {
@@ -537,7 +513,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                     setModalPickImgHeight(value - Metrics.safeBottomPadding)
                 }>
                 {RenderHeader}
-                {RenderListMessage}
+                {RenderListMessage()}
                 {RenderImagePreview}
                 {RenderStopOrBlock}
                 {!(itemChatTag.isStop || itemChatTag.isBlock) && (
@@ -629,4 +605,4 @@ const styles = ScaledSheet.create({
     },
 });
 
-export default ChatDetail;
+export default ChatDetailGroup;

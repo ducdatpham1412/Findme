@@ -10,6 +10,7 @@ import {
     TypeCommentResponse,
     TypeCreatePostResponse,
     TypeDeleteMessageResponse,
+    TypeJoinCommunityRequest,
     TypeNotificationResponse,
     TypeSeenMessageResponse,
     TypingResponse,
@@ -69,8 +70,7 @@ export const SocketProvider = ({children}: any) => {
             SocketClass.start();
             socket.on('connect', () => {
                 socket.emit(SOCKET_EVENT.authenticate, {
-                    myId: FindmeStore.getState().accountSlice.passport.profile
-                        .id,
+                    token,
                 });
             });
         } else {
@@ -109,7 +109,7 @@ export const useSocketChatTagBubble = () => {
     const listChatTags = Redux.getListChatTag();
     const chatTagFocusing = Redux.getChatTagFocusing();
     const myId = Redux.getPassport().profile.id;
-    const token = Redux.getModeExp();
+    const token = Redux.getToken();
 
     const {list, setList, refreshing, onRefresh, onLoadMore} = usePaging({
         request: apiGetListChatTags,
@@ -218,6 +218,11 @@ export const useSocketChatTagBubble = () => {
                     appAlert(err);
                 }
             }
+        });
+
+        socket?.off(SOCKET_EVENT.joinCommunity);
+        socket.on(SOCKET_EVENT.joinCommunity, (chatTagId: string) => {
+            Redux.setChatTagFromNotification(chatTagId);
         });
 
         // request public chat
@@ -343,6 +348,7 @@ export const useSocketChatTagBubble = () => {
 
         socket?.off(SOCKET_EVENT.typing);
         socket.on(SOCKET_EVENT.typing, (data: TypingResponse) => {
+            console.log('data typing: ', data);
             setList((previousChatTags: Array<TypeChatTagResponse>) => {
                 return previousChatTags.map(item => {
                     if (item.id !== data.chatTagId) {
@@ -442,10 +448,10 @@ export const useSocketChatTagBubble = () => {
     };
 
     useEffect(() => {
-        if (token) {
+        if (token && socket) {
             hearingOtherSocket();
         }
-    }, [myId, token]);
+    }, [myId, token, socket]);
 
     useEffect(() => {
         Redux.updateListChatTag(list);
@@ -842,6 +848,17 @@ export const socketUnTyping = (params: TypingResponse) => {
 
 export const socketAddComment = (params: TypeAddCommentRequest) => {
     socket.emit(SOCKET_EVENT.addComment, params);
+};
+
+export const socketJoinCommunity = (params: TypeJoinCommunityRequest) => {
+    socket.emit(SOCKET_EVENT.joinCommunity, {
+        token: FindmeStore.getState().logicSlice.token,
+        profilePostGroupId: params.profilePostGroupId,
+    });
+};
+
+export const socketJoinRoom = (roomId: string) => {
+    socket.emit(SOCKET_EVENT.joinRoom, roomId);
 };
 
 export const socketLeaveRoom = (roomId: string) => {

@@ -7,6 +7,7 @@ import {
     TypeCheckOTPRequest,
     TypeCheckOTPResponse,
     TypeCommentResponse,
+    TypeCreateGroupResponse,
     TypeCreatePostRequest,
     TypeCreatePostResponse,
     TypeDeleteMessageRequest,
@@ -126,6 +127,12 @@ export const apiGetListBubbleActiveOfUserEnjoy = ({
     params,
 }: TypeParamsPaging): Promise<TypeBubblePalace> => {
     return request.get('/common/get-list-bubble-profile-enjoy', {
+        params,
+    });
+};
+
+export const apiGetListBubbleGroup = ({params}: TypeParamsPaging) => {
+    return request.get('/common/get-list-bubble-group', {
         params,
     });
 };
@@ -279,8 +286,35 @@ export const apiEditPost = (params: {
     return request.put(`/profile/edit-post/${params.idPost}`, params.data);
 };
 
+export const apiEditGroup = (params: {
+    idGroup: string;
+    data: TypeCreatePostRequest;
+}) => {
+    return request.put(`/profile/edit-group/${params.idGroup}`, params.data);
+};
+
+export const apiCreateGroup = (
+    params: TypeCreatePostRequest,
+): Promise<{
+    success: boolean;
+    data: TypeCreateGroupResponse;
+}> => {
+    return request.post('/profile/create-group', params);
+};
+
+export const apiGetListMyGroups = (): Promise<{
+    success: boolean;
+    data: Array<TypeCreateGroupResponse>;
+}> => {
+    return request.get('/profile/list-my-groups');
+};
+
 export const apiDeletePost = (idPost: string) => {
     return request.put(`/profile/delete-post/${idPost}`);
+};
+
+export const apiDeleteGroup = (bubbleId: string) => {
+    return request.put(`profile/delete-group/${bubbleId}`);
 };
 
 export const apiGetListPost = ({

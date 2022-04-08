@@ -163,7 +163,8 @@ const Bubble = (props: Props) => {
             <View style={styles.reportView}>
                 <StyleTouchable
                     customStyle={styles.iconReportTouch}
-                    onPress={() => onReportUser(item.creatorId)}>
+                    onPress={() => onReportUser(item.creatorId)}
+                    hitSlop={{left: 10, top: 10, right: 10, bottom: 10}}>
                     <Feather
                         name="flag"
                         style={[styles.iconReport, {color: theme.textColor}]}
@@ -171,7 +172,8 @@ const Bubble = (props: Props) => {
                 </StyleTouchable>
                 <StyleTouchable
                     customStyle={styles.iconReportTouch}
-                    onPress={() => onRefreshItem(item.id)}>
+                    onPress={() => onRefreshItem(item.id)}
+                    hitSlop={{left: 10, top: 10, right: 10, bottom: 10}}>
                     <Feather
                         name="refresh-ccw"
                         style={[styles.iconReport, {color: theme.textColor}]}
@@ -388,7 +390,7 @@ const styles = ScaledSheet.create({
     reportView: {
         position: 'absolute',
         width: '50@ms',
-        top: Metrics.safeTopPadding + verticalScale(10),
+        top: Metrics.safeTopPadding + verticalScale(40),
         right: '10@s',
         alignItems: 'center',
         borderRadius: '30@ms',
@@ -397,7 +399,7 @@ const styles = ScaledSheet.create({
         marginBottom: '30@vs',
     },
     iconReport: {
-        fontSize: '25@ms',
+        fontSize: '18@ms',
     },
     reportBox: {
         position: 'absolute',
@@ -407,7 +409,7 @@ const styles = ScaledSheet.create({
     // avatar, name and content
     avatarNameContentView: {
         position: 'absolute',
-        top: Metrics.safeTopPadding + verticalScale(10),
+        top: Metrics.safeTopPadding + verticalScale(50),
         left: '10@s',
         width: '70%',
     },

@@ -115,11 +115,15 @@ const discovery = {
     discoveryScreen: {
         searchHobbies: 'Tìm sở thích',
         searchChat: 'Tìm cuộc trò chuyện',
+        personal: 'Cá nhân',
+        community: 'Cộng đồng',
     },
     bubble: {
         startChat: 'Bắt chuyện ngay',
         goToSignUp:
             'Đi tới đăng nhập để có thể bắt đầu trò chuyện với mọi người nhé',
+        joinCommunity: 'Tham gia nhóm',
+        goToConversation: 'Đi tới trò chuyện',
     },
     report: {
         title: 'Tố cáo',
@@ -161,6 +165,9 @@ const profile = {
         sendMessage: 'Gửi tin nhắn',
         follow: 'Theo dõi',
         unFollow: 'Huỷ theo dõi',
+        goToChatTag: 'Đi tới cuộc trò chuyện',
+        confirmDeleteGroup:
+            'Sau khi xoá, mọi người sẽ không thấy và tham gia nhóm của bạn nữa\nBạn vẫn chắc chắn xoá chứ?',
     },
     modalize: {
         setting: 'Cài đặt',

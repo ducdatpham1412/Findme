@@ -44,7 +44,7 @@ const ImageUploader = {
             width: params?.maxWidth || MAX_WIDTH,
             height: params?.maxHeight || MAX_HEIGHT,
             waitAnimationEnd: true,
-            cropping: params?.crop || true,
+            cropping: params?.crop === undefined ? true : params?.crop,
             freeStyleCropEnabled: params?.freeStyleCrop || false,
             maxFiles: params?.maxFiles || 1,
             multiple: params?.multiple || false,

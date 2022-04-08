@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useRef} from 'react';
-import {Animated, View} from 'react-native';
+import {Animated, StyleProp, View, ViewStyle} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {chooseIconHobby} from 'utility/assistant';
 
@@ -8,9 +8,15 @@ interface Props {
     color: number;
     onTouchStart(): void;
     onTouchEnd(): void;
+    containerStyle?: StyleProp<ViewStyle>;
 }
 
-const IconHobby = ({color, onTouchStart, onTouchEnd}: Props) => {
+const IconHobby = ({
+    color,
+    onTouchStart,
+    onTouchEnd,
+    containerStyle,
+}: Props) => {
     const aim = useRef(new Animated.Value(0)).current;
     const degree = aim.interpolate({
         inputRange: [0, 1],
@@ -35,7 +41,7 @@ const IconHobby = ({color, onTouchStart, onTouchEnd}: Props) => {
         <View
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
-            style={styles.container}>
+            style={[styles.container, containerStyle]}>
             <Animated.Image
                 source={{uri: chooseIconHobby(color)}}
                 style={[
