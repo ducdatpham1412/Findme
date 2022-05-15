@@ -7,12 +7,14 @@ import {formatDateMessage} from 'utility/format';
 
 interface Props {
     datetime: string;
+    senderName: string;
     isMyMessage: boolean;
     mostHeightDateTime: boolean;
 }
 
 const DatetimeMessage = ({
     datetime,
+    senderName,
     isMyMessage,
     mostHeightDateTime,
 }: Props) => {
@@ -41,7 +43,9 @@ const DatetimeMessage = ({
             ]}>
             {mostHeightDateTime && (
                 <StyleText
-                    originValue={formatDateMessage(datetime)}
+                    originValue={`${senderName}, ${formatDateMessage(
+                        datetime,
+                    )}`}
                     customStyle={[
                         styles.textDatetime,
                         {color: theme.borderColor},

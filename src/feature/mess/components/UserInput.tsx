@@ -28,6 +28,12 @@ interface UserInputProps {
 }
 
 const durationStretch = isIOS ? 400 : 300;
+const hitSlop = {
+    left: moderateScale(10),
+    top: moderateScale(10),
+    right: moderateScale(10),
+    bottom: moderateScale(10),
+};
 
 const UserInput = (props: UserInputProps, inputRef: any) => {
     const {
@@ -153,7 +159,9 @@ const UserInput = (props: UserInputProps, inputRef: any) => {
             <View style={styles.toolView}>
                 {showImgTool && (
                     <View style={styles.iconToolBox}>
-                        <StyleTouchable onPress={onChooseImageFromCamera}>
+                        <StyleTouchable
+                            onPress={onChooseImageFromCamera}
+                            hitSlop={hitSlop}>
                             <MaterialCommunityIcons
                                 name="camera-outline"
                                 style={[
@@ -166,7 +174,9 @@ const UserInput = (props: UserInputProps, inputRef: any) => {
                 )}
                 {showImgTool && (
                     <View style={styles.iconToolBox}>
-                        <StyleTouchable onPress={onChooseImageFromLibrary}>
+                        <StyleTouchable
+                            onPress={onChooseImageFromLibrary}
+                            hitSlop={hitSlop}>
                             <MaterialCommunityIcons
                                 name="image-outline"
                                 style={[
@@ -180,7 +190,8 @@ const UserInput = (props: UserInputProps, inputRef: any) => {
                 {!showImgTool && (
                     <View style={styles.iconToolBox}>
                         <StyleTouchable
-                            onPress={() => stretchInput(false, true)}>
+                            onPress={() => stretchInput(false, true)}
+                            hitSlop={hitSlop}>
                             <MaterialCommunityIcons
                                 name="chevron-right"
                                 style={[

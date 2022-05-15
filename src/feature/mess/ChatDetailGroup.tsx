@@ -34,6 +34,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import {chooseColorGradient, isIOS} from 'utility/assistant';
 import HeaderRequestPublic from './components/HeaderRequestPublic';
 import ItemMessageGroup from './components/ItemMessageGroup';
+import MessageEvent from './components/MessageEvent';
 import Typing from './components/Typing';
 import UserInput from './components/UserInput';
 
@@ -51,10 +52,11 @@ export interface MessageSeen {
     avatar: string;
 }
 
+const initHeightModal = ((Metrics.width - 6) * 2) / 3;
+
 const ChatDetailGroup = ({route}: ChatDetailProps) => {
     const {profile} = Redux.getPassport();
     const theme = Redux.getTheme();
-    const isModeExp = Redux.getModeExp();
     const listChatTag = Redux.getListChatTag();
     const numberNewMessages = Redux.getNumberNewMessages();
     const {gradient} = Redux.getResource();
@@ -66,7 +68,8 @@ const ChatDetailGroup = ({route}: ChatDetailProps) => {
 
     const [shouldNotiShh, setShouldNotiShh] = useState(false);
     const [displayPickImg, setDisplayPickImg] = useState(false);
-    const [modalPickImgHeight, setModalPickImgHeight] = useState(0);
+    const [modalPickImgHeight, setModalPickImgHeight] =
+        useState(initHeightModal);
 
     const [itemChatTag, setItemChatTag] = useState(route.params.itemChatTag);
     const [messageSeen, setMessageSeen] = useState<{
@@ -374,6 +377,15 @@ const ChatDetailGroup = ({route}: ChatDetailProps) => {
             const displayPartnerAvatar =
                 messages[index - 1]?.relationship !== item.relationship;
             const listUserSeen = messageSeen[item.id] || [];
+
+            if (item.type === MESSAGE_TYPE.joinCommunity) {
+                return (
+                    <MessageEvent
+                        creatorName={item.content}
+                        i18Content="mess.hadJoinGroup"
+                    />
+                );
+            }
 
             return (
                 <ItemMessageGroup

@@ -1,12 +1,15 @@
 import {TypeCreateGroupResponse} from 'api/interface';
-import {apiGetListBubbleGroup} from 'api/module';
+import {
+    apiGetListBubbleGroup,
+    apiGetListBubbleGroupOfUserEnjoy,
+} from 'api/module';
 import {Metrics} from 'asset/metrics';
 import StyleList from 'components/base/StyleList';
 import LoadingScreen from 'components/LoadingScreen';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import {socketJoinCommunity} from 'hook/useSocketIO';
-import React, {useCallback} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import BubblePalaceGroup from './components/BubblePalaceGroup';
@@ -15,9 +18,14 @@ const bubbleHeight = Metrics.height - Metrics.safeBottomPadding;
 
 const ListBubbleGroup = () => {
     const theme = Redux.getTheme();
+    const token = Redux.getToken();
+
+    const selectApi = useMemo(() => {
+        return token ? apiGetListBubbleGroup : apiGetListBubbleGroupOfUserEnjoy;
+    }, [token]);
 
     const {list, refreshing, onRefresh, onLoadMore} = usePaging({
-        request: apiGetListBubbleGroup,
+        request: selectApi,
         params: {
             take: 30,
         },

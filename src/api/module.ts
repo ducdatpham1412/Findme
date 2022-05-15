@@ -137,6 +137,14 @@ export const apiGetListBubbleGroup = ({params}: TypeParamsPaging) => {
     });
 };
 
+export const apiGetListBubbleGroupOfUserEnjoy = ({
+    params,
+}: TypeParamsPaging) => {
+    return request.get('/common/get-list-bubble-group-enjoy', {
+        params,
+    });
+};
+
 export const apiGetDetailBubble = (
     idBubble: string,
 ): Promise<{

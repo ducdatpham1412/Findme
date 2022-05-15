@@ -215,6 +215,7 @@ const mess = {
         report: 'Tố cáo',
     },
     typing: 'typing',
+    hadJoinGroup: 'vừa tham gia nhóm',
 };
 
 // SETTING ROUTE

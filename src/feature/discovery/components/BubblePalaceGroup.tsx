@@ -26,6 +26,7 @@ const BubblePalaceGroup = (props: Props) => {
     const {item, onJoinGroup, onGoToConversation} = props;
 
     const theme = Redux.getTheme();
+    const isModeExp = Redux.getModeExp();
 
     const image = item.images[0];
 
@@ -97,7 +98,8 @@ const BubblePalaceGroup = (props: Props) => {
                     styles.buttonJoinView,
                     {borderColor: theme.borderColor},
                 ]}
-                onPress={onPress}>
+                onPress={onPress}
+                disable={isModeExp}>
                 <MaterialIcons
                     name="groups"
                     style={[styles.iconGroup, {color: theme.borderColor}]}

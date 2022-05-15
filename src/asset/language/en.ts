@@ -162,6 +162,7 @@ const mess = {
         report: 'Report',
     },
     typing: 'typing',
+    hadJoinGroup: 'had joined group',
 };
 
 // PROFILE ROUTE

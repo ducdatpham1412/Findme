@@ -343,8 +343,9 @@ export interface TypeChatMessageResponse {
     content: string & Array<string>;
     senderId: number;
     senderAvatar: string;
+    senderName: string;
     createdTime: string;
-    tag?: string; // to check message comeback sender after set local message
+    tag?: string | undefined; // to check message comeback sender after set local message
     // in front-end
     relationship: number;
 }

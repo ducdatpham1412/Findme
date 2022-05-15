@@ -100,8 +100,8 @@ const ImageUploader = {
         arrLocalPath.forEach((path: any) => {
             const formatImage: any = {
                 uri: path,
-                name: 'image.jpg',
                 type: 'image/jpeg',
+                name: 'image.jpg',
                 filename: 'fileName.jpg',
             };
             payload.append('image', formatImage);

@@ -48,13 +48,16 @@ const ItemMessage = (props: Props) => {
         const displayAvatar = isMyMessage
             ? displayMeAvatar
             : displayPartnerAvatar;
+        const isText = itemMessage.type === MESSAGE_TYPE.text;
 
-        const isEmoji =
-            !!itemMessage.content && checkIsSingleEmoji(itemMessage.content);
-        const isMessageText =
-            itemMessage.type === MESSAGE_TYPE.text && !isEmoji;
-        const isMessageEmoji =
-            itemMessage.type === MESSAGE_TYPE.text && isEmoji;
+        let isEmoji = false;
+        if (isText) {
+            isEmoji =
+                !!itemMessage.content &&
+                checkIsSingleEmoji(itemMessage.content);
+        }
+        const isMessageText = isText && !isEmoji;
+        const isMessageEmoji = isText && isEmoji;
         const isMessageImage =
             itemMessage.type === MESSAGE_TYPE.image &&
             !!itemMessage.content.length;
@@ -259,6 +262,7 @@ const ItemMessage = (props: Props) => {
                     datetime={itemMessage.createdTime}
                     isMyMessage={initValue.isMyMessage}
                     mostHeightDateTime={mostHeightDateTime}
+                    senderName={itemMessage.senderName}
                 />
             )}
 
@@ -270,6 +274,7 @@ const ItemMessage = (props: Props) => {
                             ? 'row-reverse'
                             : 'row',
                         marginTop: isSameMessageAfter ? 0 : verticalScale(30),
+                        opacity: itemMessage?.tag ? 0.4 : 1,
                     },
                 ]}>
                 <View
@@ -319,7 +324,6 @@ const ItemMessage = (props: Props) => {
                     // {...panResponse.panHandlers}
                     // onResponderRelease={onResponderRelease}
                 >
-                    {/* message image */}
                     {initValue.isMessageImage && (
                         <View style={styles.imageBox}>
                             {itemMessage.content.map((item, index) => (
@@ -356,7 +360,6 @@ const ItemMessage = (props: Props) => {
                         </StyleTouchable>
                     )}
 
-                    {/* message text */}
                     {initValue.isMessageText && (
                         <StyleTouchable
                             customStyle={[

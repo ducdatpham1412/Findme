@@ -47,6 +47,7 @@ interface ChatDetailProps {
         };
     };
 }
+const initHeightModal = ((Metrics.width - 6) * 2) / 3;
 
 const ChatDetail = ({route}: ChatDetailProps) => {
     const {profile} = Redux.getPassport();
@@ -63,7 +64,8 @@ const ChatDetail = ({route}: ChatDetailProps) => {
 
     const [shouldNotiShh, setShouldNotiShh] = useState(false);
     const [displayPickImg, setDisplayPickImg] = useState(false);
-    const [modalPickImgHeight, setModalPickImgHeight] = useState(0);
+    const [modalPickImgHeight, setModalPickImgHeight] =
+        useState(initHeightModal);
 
     const [itemChatTag, setItemChatTag] = useState(route.params.itemChatTag);
 

@@ -17,6 +17,7 @@ import {
 } from 'api/interface';
 import {
     apiDeleteMessage,
+    apiGetDetailChatTag,
     apiGetListChatTags,
     apiGetListComments,
     apiGetListMessages,
@@ -225,6 +226,34 @@ export const useSocketChatTagBubble = () => {
             Redux.setChatTagFromNotification(chatTagId);
         });
 
+        socket?.off(SOCKET_EVENT.hadNewUserJoinCommunity);
+        socket.on(
+            SOCKET_EVENT.hadNewUserJoinCommunity,
+            async (chatTagId: string) => {
+                const res = await apiGetDetailChatTag(chatTagId);
+                setList((previousChatTags: Array<TypeChatTagResponse>) => {
+                    const check = previousChatTags.find(
+                        item => item.id === chatTagId,
+                    );
+                    if (check) {
+                        let indexNeedToReorder = 0;
+                        const temp = previousChatTags.map((item, index) => {
+                            if (item.id !== chatTagId) {
+                                return item;
+                            }
+                            indexNeedToReorder = index;
+                            return res.data;
+                        });
+                        if (indexNeedToReorder > 0) {
+                            return reorderListChatTag(temp, indexNeedToReorder);
+                        }
+                        return temp;
+                    }
+                    return [res.data].concat(previousChatTags);
+                });
+            },
+        );
+
         // request public chat
         socket?.off(SOCKET_EVENT.requestPublicChat);
         socket.on(SOCKET_EVENT.requestPublicChat, (chatTagId: string) => {
@@ -348,7 +377,6 @@ export const useSocketChatTagBubble = () => {
 
         socket?.off(SOCKET_EVENT.typing);
         socket.on(SOCKET_EVENT.typing, (data: TypingResponse) => {
-            console.log('data typing: ', data);
             setList((previousChatTags: Array<TypeChatTagResponse>) => {
                 return previousChatTags.map(item => {
                     if (item.id !== data.chatTagId) {
@@ -505,6 +533,7 @@ export const useSocketChatDetail = (params: {
                                 }
                                 return {
                                     ...data,
+                                    tag: undefined,
                                     relationship: RELATIONSHIP.self,
                                 };
                             });
@@ -523,9 +552,12 @@ export const useSocketChatDetail = (params: {
                 else if (data.senderId !== myId) {
                     setList(
                         (previousMessages: Array<TypeChatMessageResponse>) => {
-                            return [
-                                {...data, relationship: RELATIONSHIP.notKnow},
-                            ].concat(previousMessages);
+                            const temp: TypeChatMessageResponse = {
+                                ...data,
+                                tag: undefined,
+                                relationship: RELATIONSHIP.notKnow,
+                            };
+                            return [temp].concat(previousMessages);
                         },
                     );
                     socket.emit(SOCKET_EVENT.seenMessage, {
@@ -619,13 +651,14 @@ export const useSocketChatDetail = (params: {
                     1080,
                 );
                 _params.content = messImages;
+                socket.emit(SOCKET_EVENT.message, _params);
             } catch (err) {
                 appAlert(err);
                 return;
             }
+        } else {
+            socket.emit(SOCKET_EVENT.message, _params);
         }
-
-        socket.emit(SOCKET_EVENT.message, _params);
     }, []);
 
     const deleteMessage = useCallback(

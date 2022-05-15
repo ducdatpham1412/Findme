@@ -75,6 +75,7 @@ export enum MESSAGE_TYPE {
     text = 0,
     image = 1,
     sticker = 2,
+    joinCommunity = 3,
 }
 
 export enum SOCKET_EVENT {
@@ -87,6 +88,7 @@ export enum SOCKET_EVENT {
     // bubble
     addComment = '1.0',
     joinCommunity = '1.1',
+    hadNewUserJoinCommunity = '1.2',
     // chat tag
     createChatTag = '2.0',
     joinRoom = '2.1',

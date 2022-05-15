@@ -47,13 +47,16 @@ const ItemMessageGroup = (props: Props) => {
     const initValue = useMemo(() => {
         const isMyMessage = itemMessage.relationship === RELATIONSHIP.self;
         const displayAvatar = isMyMessage ? false : displayPartnerAvatar;
+        const isText = itemMessage.type === MESSAGE_TYPE.text;
 
-        const isEmoji =
-            !!itemMessage.content && checkIsSingleEmoji(itemMessage.content);
-        const isMessageText =
-            itemMessage.type === MESSAGE_TYPE.text && !isEmoji;
-        const isMessageEmoji =
-            itemMessage.type === MESSAGE_TYPE.text && isEmoji;
+        let isEmoji = false;
+        if (isText) {
+            isEmoji =
+                !!itemMessage.content &&
+                checkIsSingleEmoji(itemMessage.content);
+        }
+        const isMessageText = isText && !isEmoji;
+        const isMessageEmoji = isText && isEmoji;
         const isMessageImage =
             itemMessage.type === MESSAGE_TYPE.image &&
             !!itemMessage.content.length;
@@ -255,6 +258,7 @@ const ItemMessageGroup = (props: Props) => {
         return isDisplayDatetime ? (
             <DatetimeMessage
                 datetime={itemMessage.createdTime}
+                senderName={itemMessage.senderName}
                 isMyMessage={initValue.isMyMessage}
                 mostHeightDateTime={mostHeightDateTime}
             />
@@ -299,6 +303,7 @@ const ItemMessageGroup = (props: Props) => {
                             ? 'row-reverse'
                             : 'row',
                         marginTop: isSameMessageAfter ? 0 : verticalScale(30),
+                        opacity: itemMessage?.tag ? 0.4 : 1,
                     },
                 ]}>
                 <View
