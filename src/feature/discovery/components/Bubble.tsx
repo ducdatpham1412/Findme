@@ -358,6 +358,20 @@ const styles = ScaledSheet.create({
     iconComment: {
         fontSize: '40@ms',
     },
+    iconReload: {
+        marginTop: '30@vs',
+    },
+    iconReport: {
+        fontSize: '18@ms',
+    },
+    reportBox: {
+        position: 'absolute',
+        right: '60@ms',
+        top: '60@ms',
+    },
+    avatarBox: {
+        marginTop: '80@vs',
+    },
     // gradient
     linearGradient: {
         height: '40@s',
@@ -375,21 +389,6 @@ const styles = ScaledSheet.create({
     textStart: {
         fontSize: '15@ms',
         fontWeight: 'bold',
-    },
-    // report
-    iconReload: {
-        marginTop: '30@vs',
-    },
-    iconReport: {
-        fontSize: '18@ms',
-    },
-    reportBox: {
-        position: 'absolute',
-        right: '60@ms',
-        top: '60@ms',
-    },
-    avatarBox: {
-        marginTop: '80@vs',
     },
     // avatar, name and content
     avatarNameContentView: {

@@ -196,103 +196,111 @@ const DetailBubble = ({route}: Props) => {
         );
     };
 
-    const RenderExtensionTool = () => {
-        return (
-            <View style={styles.reportView}>
+    const RenderTool = () => {
+        const RenderIconLikeUnLike = () => {
+            const color = isLiked ? Theme.common.pink : theme.unLikeHeart;
+            return (
+                <View style={styles.likeBox}>
+                    {isLiked ? (
+                        <IconLiked
+                            onPress={onLikeUnLike}
+                            customStyle={styles.iconLike}
+                        />
+                    ) : (
+                        <IconNotLiked
+                            onPress={onLikeUnLike}
+                            customStyle={[styles.iconUnLike, {color}]}
+                        />
+                    )}
+
+                    <View style={styles.textLikeCommentBox}>
+                        {!!totalLikes && (
+                            <StyleText
+                                originValue={totalLikes}
+                                customStyle={[
+                                    styles.textLikeComment,
+                                    {color: theme.unLikeHeart},
+                                ]}
+                            />
+                        )}
+                    </View>
+                </View>
+            );
+        };
+
+        const RenderComment = () => {
+            return (
                 <StyleTouchable
-                    customStyle={styles.iconReportTouch}
-                    onPress={onReportUser}>
+                    customStyle={styles.commentBox}
+                    onPress={onShowModalComment}
+                    hitSlop={15}>
+                    <FontAwesome
+                        name="comments-o"
+                        style={[styles.iconComment, {color: theme.unLikeHeart}]}
+                    />
+                    <View style={styles.textLikeCommentBox}>
+                        {!!bubble?.totalComments && (
+                            <StyleText
+                                originValue={bubble?.totalComments}
+                                customStyle={[
+                                    styles.textLikeComment,
+                                    {color: theme.unLikeHeart},
+                                ]}
+                            />
+                        )}
+                    </View>
+                </StyleTouchable>
+            );
+        };
+
+        const RenderIconHobby = () => {
+            if (bubble?.id === undefined || bubble?.color === undefined) {
+                return null;
+            }
+            return (
+                <IconHobby
+                    bubbleId={bubble?.id}
+                    color={bubble?.color}
+                    onTouchStart={() => setDisplayLayer(true)}
+                    onTouchEnd={() => setDisplayLayer(false)}
+                />
+            );
+        };
+
+        return (
+            <View style={styles.toolView}>
+                <StyleTouchable
+                    onPress={onReportUser}
+                    hitSlop={{left: 10, top: 10, right: 10, bottom: 10}}>
                     <Feather
                         name="flag"
                         style={[styles.iconReport, {color: theme.textColor}]}
                     />
                 </StyleTouchable>
+
                 <StyleTouchable
-                    customStyle={styles.iconReportTouch}
-                    onPress={onRefreshItem}>
+                    customStyle={styles.iconReload}
+                    onPress={onRefreshItem}
+                    hitSlop={{left: 10, top: 10, right: 10, bottom: 10}}>
                     <Feather
                         name="refresh-ccw"
                         style={[styles.iconReport, {color: theme.textColor}]}
                     />
                 </StyleTouchable>
-            </View>
-        );
-    };
 
-    const RenderAvatar = () => {
-        return (
-            <StyleTouchable onPress={onGoToProfile}>
-                <StyleImage
-                    source={{uri: avatar}}
-                    customStyle={styles.avatar}
-                />
-            </StyleTouchable>
-        );
-    };
-
-    const RenderIconLikeUnLike = () => {
-        const color = isLiked ? Theme.common.pink : theme.unLikeHeart;
-        return (
-            <View style={styles.likeBox}>
-                {isLiked ? (
-                    <IconLiked
-                        onPress={onLikeUnLike}
-                        customStyle={styles.iconLike}
+                <StyleTouchable
+                    onPress={onGoToProfile}
+                    customStyle={styles.avatarBox}>
+                    <StyleImage
+                        source={{uri: avatar}}
+                        customStyle={styles.avatar}
                     />
-                ) : (
-                    <IconNotLiked
-                        onPress={onLikeUnLike}
-                        customStyle={[styles.iconUnLike, {color}]}
-                    />
-                )}
+                </StyleTouchable>
 
-                <View style={styles.textLikeCommentBox}>
-                    {!!totalLikes && (
-                        <StyleText
-                            originValue={totalLikes}
-                            customStyle={[styles.textLikeComment, {color}]}
-                        />
-                    )}
-                </View>
+                {RenderIconLikeUnLike()}
+                {RenderComment()}
+                {RenderIconHobby()}
             </View>
-        );
-    };
-
-    const RenderComment = () => {
-        return (
-            <StyleTouchable
-                customStyle={styles.commentBox}
-                onPress={onShowModalComment}>
-                <FontAwesome
-                    name="comments-o"
-                    style={[styles.iconComment, {color: theme.unLikeHeart}]}
-                />
-                <View style={styles.textLikeCommentBox}>
-                    {!!bubble?.totalComments && (
-                        <StyleText
-                            originValue={bubble.totalComments}
-                            customStyle={[
-                                styles.textLikeComment,
-                                {color: theme.unLikeHeart},
-                            ]}
-                        />
-                    )}
-                </View>
-            </StyleTouchable>
-        );
-    };
-
-    const RenderIconHobby = () => {
-        if (bubble?.id === undefined || bubble?.color === undefined) {
-            return null;
-        }
-        return (
-            <IconHobby
-                bubbleId={bubble?.id}
-                color={bubble?.color}
-                onTouchStart={() => setDisplayLayer(true)}
-                onTouchEnd={() => setDisplayLayer(false)}
-            />
         );
     };
 
@@ -302,13 +310,7 @@ const DetailBubble = ({route}: Props) => {
                 {RenderImage()}
                 {RenderLayer()}
                 {RenderNameAndContent()}
-                {RenderExtensionTool()}
-                <View style={styles.toolView}>
-                    {RenderAvatar()}
-                    {RenderIconLikeUnLike()}
-                    {RenderComment()}
-                    {RenderIconHobby()}
-                </View>
+                {RenderTool()}
             </View>
 
             {!!bubble && displayComment && (
@@ -350,10 +352,8 @@ const styles = ScaledSheet.create({
     // tool
     toolView: {
         position: 'absolute',
-        width: '66@s',
-        paddingVertical: '10@vs',
-        bottom: '200@s',
-        right: 0,
+        top: '20@vs',
+        right: '5@s',
         alignItems: 'center',
     },
     avatar: {
@@ -363,7 +363,6 @@ const styles = ScaledSheet.create({
     },
     likeBox: {
         width: '100%',
-        height: '70@vs',
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: '40@vs',
@@ -375,7 +374,6 @@ const styles = ScaledSheet.create({
         fontSize: '40@ms',
     },
     textLikeCommentBox: {
-        height: '30@ms',
         marginTop: '7@vs',
         alignSelf: 'center',
     },
@@ -387,6 +385,20 @@ const styles = ScaledSheet.create({
     },
     iconComment: {
         fontSize: '40@ms',
+    },
+    iconReload: {
+        marginTop: '30@vs',
+    },
+    iconReport: {
+        fontSize: '18@ms',
+    },
+    reportBox: {
+        position: 'absolute',
+        right: '60@ms',
+        top: '60@ms',
+    },
+    avatarBox: {
+        marginTop: '100@vs',
     },
     // gradient
     linearGradient: {
@@ -405,26 +417,6 @@ const styles = ScaledSheet.create({
     textStart: {
         fontSize: '15@ms',
         fontWeight: 'bold',
-    },
-    // report
-    reportView: {
-        position: 'absolute',
-        width: '50@ms',
-        top: '10@vs',
-        right: '10@s',
-        alignItems: 'center',
-        borderRadius: '30@ms',
-    },
-    iconReportTouch: {
-        marginBottom: '30@vs',
-    },
-    iconReport: {
-        fontSize: '25@ms',
-    },
-    reportBox: {
-        position: 'absolute',
-        right: '60@ms',
-        top: '60@ms',
     },
     // avatar, name and content
     avatarNameContentView: {
