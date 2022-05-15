@@ -5,9 +5,9 @@ import {
     apiStopConversation,
     apiUnBlockUser,
 } from 'api/module';
+import {CHAT_TAG} from 'asset/enum';
 import {
     StyleContainer,
-    StyleIcon,
     StyleImage,
     StyleInput,
     StyleText,
@@ -31,13 +31,13 @@ import {
     goBack,
     navigate,
 } from 'navigation/NavigationService';
-import React, {useCallback, useMemo, useRef, useState} from 'react';
+import React, {useMemo, useRef, useState} from 'react';
 import {TextInput, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Octicons from 'react-native-vector-icons/Octicons';
-import {moveMeToEndOfListMember, renderIconGender} from 'utility/assistant';
+import {moveMeToEndOfListMember} from 'utility/assistant';
 import ButtonChangeTheme from './components/ButtonChangeTheme';
 
 interface Props {
@@ -49,6 +49,8 @@ interface Props {
 }
 
 const ChatDetailSetting = ({route}: Props) => {
+    const routeItemChatTag = route.params.itemChatTag;
+
     const shouldRenderOtherProfile = Redux.getShouldRenderOtherProfile();
     const borderMessRoute = Redux.getBorderMessRoute();
     const chatTagFocusing = Redux.getChatTagFocusing();
@@ -56,39 +58,43 @@ const ChatDetailSetting = ({route}: Props) => {
     const {id} = Redux.getPassport().profile;
 
     const listMembers = useMemo(() => {
-        return moveMeToEndOfListMember(route.params.itemChatTag.listUser);
-    }, [route.params.itemChatTag.listUser]);
+        return moveMeToEndOfListMember(routeItemChatTag.listUser);
+    }, [routeItemChatTag.listUser]);
+
     const isChatTagOfMe = useMemo(() => {
-        return listMembers[0].id === listMembers[1].id;
-    }, [listMembers]);
+        if (routeItemChatTag.type === CHAT_TAG.group) {
+            return false;
+        }
+        return listMembers[0]?.id === listMembers[1]?.id;
+    }, []);
 
     const inputGroupNameRef = useRef<TextInput>(null);
 
-    const [itemChatTag, setItemChatTag] = useState(route.params.itemChatTag);
+    const [itemChatTag, setItemChatTag] = useState(routeItemChatTag);
     const [groupName, setGroupName] = useState(itemChatTag.groupName);
     const canChangeName = groupName !== itemChatTag.groupName;
 
     /**
      * Function
      */
-    const agreeChangeName = async () => {
-        try {
-            changeGroupName({
-                chatTagId: itemChatTag.id,
-                newName: groupName,
-            });
-            goBack();
-            goBack();
-        } catch (err) {
-            appAlert(err);
-        }
-    };
-    const refuseChangeName = () => {
-        setGroupName(itemChatTag.groupName);
-        goBack();
-    };
-
     const onPressIconEditName = () => {
+        const agreeChangeName = async () => {
+            try {
+                changeGroupName({
+                    chatTagId: itemChatTag.id,
+                    newName: groupName,
+                });
+                goBack();
+                goBack();
+            } catch (err) {
+                appAlert(err);
+            }
+        };
+        const refuseChangeName = () => {
+            setGroupName(itemChatTag.groupName);
+            goBack();
+        };
+
         if (!inputGroupNameRef.current?.isFocused() && !canChangeName) {
             inputGroupNameRef.current?.focus();
         } else if (!canChangeName) {
@@ -103,29 +109,26 @@ const ChatDetailSetting = ({route}: Props) => {
         }
     };
 
-    const onChangeChatTheme = useCallback(
-        (newColor: number) => {
-            changeChatTheme({
-                newColor,
-                chatTagId: chatTagFocusing,
-            });
-            setItemChatTag((preValue: TypeChatTagResponse) => ({
-                ...preValue,
-                color: newColor,
-            }));
-        },
-        [chatTagFocusing],
-    );
+    const onChangeChatTheme = (newColor: number) => {
+        changeChatTheme({
+            newColor,
+            chatTagId: chatTagFocusing,
+        });
+        setItemChatTag((preValue: TypeChatTagResponse) => ({
+            ...preValue,
+            color: newColor,
+        }));
+    };
 
     // go to partner profile
-    const onGoToProfile = useCallback(() => {
+    const onGoToProfile = (userId: number) => {
         navigate(ROOT_SCREEN.otherProfile, {
-            id: listMembers[0].id,
+            id: userId,
             onGoBack: () => {
                 navigate(MAIN_SCREEN.messRoute);
             },
         });
-    }, [listMembers[0].id]);
+    };
 
     const onBlockOrUnBlock = async () => {
         const agreeBlock = async () => {
@@ -196,13 +199,13 @@ const ChatDetailSetting = ({route}: Props) => {
         }
     };
 
-    const onReportUser = useCallback(() => {
+    const onReportUser = () => {
         navigate(ROOT_SCREEN.reportUser, {
             idUser: listMembers[0].id,
         });
-    }, [listMembers[0].id]);
+    };
 
-    const onGoBack = useCallback(() => {
+    const onGoBack = () => {
         if (inputGroupNameRef.current?.isFocused) {
             inputGroupNameRef.current.blur();
             const x = setTimeout(() => {
@@ -212,32 +215,11 @@ const ChatDetailSetting = ({route}: Props) => {
         } else {
             goBack();
         }
-    }, []);
+    };
 
     /**
      * Render view
      */
-    const RenderListMember = useMemo(() => {
-        return (
-            <>
-                {listMembers.map(item => (
-                    <StyleImage
-                        source={{uri: item.avatar}}
-                        customStyle={[
-                            styles.imgAvatar,
-                            {
-                                borderColor:
-                                    item.id === id
-                                        ? theme.highlightColor
-                                        : theme.borderColor,
-                            },
-                        ]}
-                    />
-                ))}
-            </>
-        );
-    }, []);
-
     const RenderBlockOrUnBlock = useMemo(() => {
         if (itemChatTag.isBlock) {
             return {
@@ -290,25 +272,15 @@ const ChatDetailSetting = ({route}: Props) => {
         };
     }, [itemChatTag.isStop]);
 
-    return (
-        <View
-            style={[
-                styles.container,
-                {backgroundColor: theme.backgroundColor},
-            ]}>
-            {/* Header */}
+    const RenderBtnBackAndChatTagName = () => {
+        return (
             <View style={styles.headerView}>
                 <HeaderLeftIcon
                     style={styles.iconBackView}
                     onPress={onGoBack}
                     iconStyle={{color: borderMessRoute}}
                 />
-                <View style={styles.listMemberBox}>{RenderListMember}</View>
-            </View>
 
-            {/* Content */}
-            <StyleContainer scrollEnabled nestedScrollEnabled>
-                {/* Group name */}
                 <View style={styles.groupNameView}>
                     <StyleInput
                         ref={inputGroupNameRef}
@@ -343,98 +315,139 @@ const ChatDetailSetting = ({route}: Props) => {
                         )}
                     </StyleTouchable>
                 </View>
+            </View>
+        );
+    };
 
-                {/* Button profile
-                check icon follow gender of my partner */}
+    const RenderListMember = () => {
+        return (
+            <View style={styles.listMemberView}>
+                {listMembers.map(item => {
+                    const color =
+                        item.id === id
+                            ? theme.highlightColor
+                            : theme.borderColor;
+                    return (
+                        <StyleTouchable
+                            customStyle={styles.memberBox}
+                            onPress={() => onGoToProfile(item.id)}
+                            disable={itemChatTag.isPrivate}
+                            disableOpacity={0.7}>
+                            <StyleImage
+                                source={{uri: item.avatar}}
+                                customStyle={[
+                                    styles.imgAvatar,
+                                    {
+                                        borderColor: color,
+                                    },
+                                ]}
+                            />
+                            <View style={styles.nameTouch}>
+                                <StyleText
+                                    originValue={item.name}
+                                    customStyle={[
+                                        styles.nameText,
+                                        {color: theme.textColor},
+                                    ]}
+                                    numberOfLines={1}
+                                />
+                            </View>
+                        </StyleTouchable>
+                    );
+                })}
+            </View>
+        );
+    };
+
+    const RenderChangeTheme = () => {
+        return (
+            <ButtonChangeTheme
+                colorNow={itemChatTag.color}
+                onChangeChatTheme={onChangeChatTheme}
+            />
+        );
+    };
+
+    const RenderButtonFunction = () => {
+        if (isChatTagOfMe || itemChatTag.type === CHAT_TAG.group) {
+            return null;
+        }
+        return (
+            <View style={styles.twoButtonView}>
+                {/* Stop or open conversation */}
                 <FlyButton
                     containerStyle={[
-                        styles.buttonProfile,
-                        {borderColor: borderMessRoute},
+                        styles.buttonStop,
+                        {
+                            borderColor: RenderStopOrOpen.color,
+                        },
                     ]}
-                    disable={itemChatTag.isPrivate || itemChatTag.isBlock}
-                    onPress={onGoToProfile}>
-                    <StyleIcon
-                        source={renderIconGender(listMembers[0].gender)}
-                        size={40}
-                    />
+                    onPress={onStopOrOpenConversation}>
+                    {RenderStopOrOpen.icon}
                     <StyleText
-                        i18Text="mess.detailSetting.profile"
+                        i18Text={RenderStopOrOpen.text}
                         customStyle={[
-                            styles.textProfile,
-                            {color: borderMessRoute},
+                            styles.stopText,
+                            {color: RenderStopOrOpen.color},
                         ]}
                     />
                 </FlyButton>
 
-                {/* Button change color chat */}
-                <ButtonChangeTheme
-                    colorNow={itemChatTag.color}
-                    onChangeChatTheme={onChangeChatTheme}
-                />
+                {/* Report */}
+                <FlyButton
+                    containerStyle={[
+                        styles.buttonStop,
+                        {borderColor: RenderBlockOrUnBlock.color},
+                    ]}
+                    onPress={onReportUser}>
+                    <Octicons
+                        name="report"
+                        style={[
+                            styles.stopIcon,
+                            {color: RenderBlockOrUnBlock.color},
+                        ]}
+                    />
+                    <StyleText
+                        i18Text="mess.detailSetting.report"
+                        customStyle={[
+                            styles.stopText,
+                            {color: RenderBlockOrUnBlock.color},
+                        ]}
+                    />
+                </FlyButton>
 
-                {/* Button stop or block chat */}
-                {!isChatTagOfMe && (
-                    <View style={styles.twoButtonView}>
-                        {/* Stop or open conversation */}
-                        <FlyButton
-                            containerStyle={[
-                                styles.buttonStop,
-                                {
-                                    borderColor: RenderStopOrOpen.color,
-                                },
-                            ]}
-                            onPress={onStopOrOpenConversation}>
-                            {RenderStopOrOpen.icon}
-                            <StyleText
-                                i18Text={RenderStopOrOpen.text}
-                                customStyle={[
-                                    styles.stopText,
-                                    {color: RenderStopOrOpen.color},
-                                ]}
-                            />
-                        </FlyButton>
+                {/* Block user */}
+                <FlyButton
+                    containerStyle={[
+                        styles.buttonStop,
+                        {borderColor: RenderBlockOrUnBlock.color},
+                    ]}
+                    onPress={onBlockOrUnBlock}>
+                    {RenderBlockOrUnBlock.icon}
+                    <StyleText
+                        i18Text={RenderBlockOrUnBlock.text}
+                        customStyle={[
+                            styles.stopText,
+                            {color: RenderBlockOrUnBlock.color},
+                        ]}
+                    />
+                </FlyButton>
+            </View>
+        );
+    };
 
-                        {/* Report */}
-                        <FlyButton
-                            containerStyle={[
-                                styles.buttonStop,
-                                {borderColor: RenderBlockOrUnBlock.color},
-                            ]}
-                            onPress={onReportUser}>
-                            <Octicons
-                                name="report"
-                                style={[
-                                    styles.stopIcon,
-                                    {color: theme.borderColor},
-                                ]}
-                            />
-                            <StyleText
-                                i18Text="mess.detailSetting.report"
-                                customStyle={[
-                                    styles.stopText,
-                                    {color: RenderBlockOrUnBlock.color},
-                                ]}
-                            />
-                        </FlyButton>
+    return (
+        <View
+            style={[
+                styles.container,
+                {backgroundColor: theme.backgroundColor},
+            ]}>
+            {RenderBtnBackAndChatTagName()}
 
-                        {/* Block user */}
-                        <FlyButton
-                            containerStyle={[
-                                styles.buttonStop,
-                                {borderColor: RenderBlockOrUnBlock.color},
-                            ]}
-                            onPress={onBlockOrUnBlock}>
-                            {RenderBlockOrUnBlock.icon}
-                            <StyleText
-                                i18Text={RenderBlockOrUnBlock.text}
-                                customStyle={[
-                                    styles.stopText,
-                                    {color: RenderBlockOrUnBlock.color},
-                                ]}
-                            />
-                        </FlyButton>
-                    </View>
-                )}
+            <StyleContainer scrollEnabled nestedScrollEnabled>
+                {RenderListMember()}
+                {RenderChangeTheme()}
+                {RenderButtonFunction()}
             </StyleContainer>
         </View>
     );
@@ -448,33 +461,17 @@ const styles = ScaledSheet.create({
     headerView: {
         width: '100%',
         justifyContent: 'center',
-    },
-    iconBackView: {
-        position: 'absolute',
-        zIndex: 2,
-        left: '15@s',
-    },
-    listMemberBox: {
-        width: '100%',
-        paddingVertical: '20@vs',
         flexDirection: 'row',
-        justifyContent: 'center',
+        paddingHorizontal: '20@s',
+        marginTop: '20@vs',
     },
-    imgAvatar: {
-        width: '50@s',
-        height: '50@s',
-        borderRadius: '25@s',
-        borderWidth: '2@s',
-        marginHorizontal: '5@s',
-    },
+    iconBackView: {},
     // group name view
     groupNameView: {
         width: '100%',
-        paddingVertical: '20@vs',
         flexDirection: 'row',
         alignItems: 'flex-end',
         justifyContent: 'center',
-        marginBottom: '40@vs',
     },
     containerInputView: {
         width: '60%',
@@ -488,18 +485,33 @@ const styles = ScaledSheet.create({
         fontSize: '25@ms',
         marginLeft: '5@s',
     },
-    // button view
-    buttonProfile: {
-        alignSelf: 'center',
-        width: '70@s',
-        height: '70@s',
+    // list members
+    listMemberView: {
+        width: '100%',
+        marginTop: '10@vs',
     },
-    iconProfile: {
+    memberBox: {
+        width: '80%',
+        flexDirection: 'row',
+        marginTop: '20@vs',
+        alignSelf: 'center',
+    },
+    imgAvatar: {
+        width: '40@s',
+        height: '40@s',
+        borderRadius: '25@s',
+        borderWidth: '2@s',
+        marginHorizontal: '5@s',
+    },
+    nameTouch: {
+        flex: 1,
+        justifyContent: 'center',
+        paddingLeft: '10@s',
+    },
+    nameText: {
         fontSize: '17@ms',
     },
-    textProfile: {
-        fontSize: '11@ms',
-    },
+    // button view
     buttonStop: {
         width: '50@s',
         height: '50@s',

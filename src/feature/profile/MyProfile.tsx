@@ -1,5 +1,10 @@
-import {TypeCreatePostResponse} from 'api/interface';
-import {apiDeletePost, apiGetListPost, apiGetProfile} from 'api/module';
+import {TypeCreateGroupResponse, TypeCreatePostResponse} from 'api/interface';
+import {
+    apiDeletePost,
+    apiGetListMyGroups,
+    apiGetListPost,
+    apiGetProfile,
+} from 'api/module';
 import {TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
@@ -21,6 +26,7 @@ import InformationProfile from './components/InformationProfile';
 import SearchAndSetting from './components/SearchAndSetting';
 import SearchView from './components/SearchView';
 import ToolProfile from './components/ToolProfile';
+import ListMyGroups from './group/ListMyGroups';
 import PostStatus from './post/PostStatus';
 
 interface ChildrenProps {
@@ -35,11 +41,15 @@ const ProfileEnjoy = ({routeName}: ChildrenProps) => {
     const {profile} = Redux.getPassport();
 
     const optionRef = useRef<any>(null);
+    const bubblePalaceAction = Redux.getBubblePalaceAction();
 
     const [search, setSearch] = useState('');
     const [displaySearchView, setDisplaySearchView] = useState(false);
 
     const {list, setList, onLoadMore} = modeExpUsePaging();
+    const [listGroups, setListGroups] = useState<
+        Array<TypeCreateGroupResponse>
+    >([]);
 
     const [left, setLeft] = useState<Array<TypeCreatePostResponse>>([]);
     const [right, setRight] = useState<Array<TypeCreatePostResponse>>([]);
@@ -57,6 +67,54 @@ const ProfileEnjoy = ({routeName}: ChildrenProps) => {
         setLeft(tempLeft);
         setRight(tempRight);
     }, [list]);
+
+    useEffect(() => {
+        if (
+            bubblePalaceAction.action ===
+            TYPE_BUBBLE_PALACE_ACTION.createNewPostFromProfile
+        ) {
+            setList((preValue: Array<TypeCreatePostResponse>) =>
+                [bubblePalaceAction.payload].concat(preValue),
+            );
+        } else if (
+            bubblePalaceAction.action ===
+            TYPE_BUBBLE_PALACE_ACTION.editPostFromProfile
+        ) {
+            setList((preValue: Array<TypeCreatePostResponse>) => {
+                return preValue.map(item => {
+                    if (item.id !== bubblePalaceAction.payload.id) {
+                        return item;
+                    }
+                    return {
+                        ...item,
+                        ...bubblePalaceAction.payload,
+                    };
+                });
+            });
+        } else if (
+            bubblePalaceAction.action ===
+            TYPE_BUBBLE_PALACE_ACTION.createNewGroupFromProfile
+        ) {
+            setListGroups(preValue =>
+                [bubblePalaceAction.payload].concat(preValue),
+            );
+        } else if (
+            bubblePalaceAction.action ===
+            TYPE_BUBBLE_PALACE_ACTION.editGroupFromProfile
+        ) {
+            setListGroups(preValue => {
+                return preValue.map(item => {
+                    if (item.id !== bubblePalaceAction.payload.id) {
+                        return item;
+                    }
+                    return {
+                        ...item,
+                        ...bubblePalaceAction.payload,
+                    };
+                });
+            });
+        }
+    }, [bubblePalaceAction]);
 
     /**
      * Function
@@ -80,7 +138,6 @@ const ProfileEnjoy = ({routeName}: ChildrenProps) => {
     const onDeleteAPostInList = async (idPost: string) => {
         const agreeDelete = async () => {
             try {
-                await apiDeletePost(idPost);
                 setList((preValue: Array<TypeCreatePostResponse>) => {
                     return preValue.filter(item => item.id !== idPost);
                 });
@@ -131,14 +188,16 @@ const ProfileEnjoy = ({routeName}: ChildrenProps) => {
 
     const ListPostStatus = () => {
         return (
-            <View
-                style={{
-                    width: '100%',
-                    flexDirection: 'row',
-                }}>
-                <View style={{flex: 1}}>{left.map(RenderItemPost)}</View>
-                <View style={{flex: 1}}>{right.map(RenderItemPost)}</View>
-            </View>
+            <>
+                <ListMyGroups
+                    listGroups={listGroups}
+                    setListGroups={setListGroups}
+                />
+                <View style={styles.listBubbleView}>
+                    <View style={{flex: 1}}>{left.map(RenderItemPost)}</View>
+                    <View style={{flex: 1}}>{right.map(RenderItemPost)}</View>
+                </View>
+            </>
         );
     };
 
@@ -192,6 +251,9 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             userId: profile.id,
         },
     });
+    const [listGroups, setListGroups] = useState<
+        Array<TypeCreateGroupResponse>
+    >([]);
 
     const optionRef = useRef<any>(null);
 
@@ -200,6 +262,19 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
 
     const [left, setLeft] = useState<Array<TypeCreatePostResponse>>([]);
     const [right, setRight] = useState<Array<TypeCreatePostResponse>>([]);
+
+    const getDataListGroups = async () => {
+        try {
+            const res = await apiGetListMyGroups();
+            setListGroups(res.data);
+        } catch (err) {
+            appAlert(err);
+        }
+    };
+
+    useEffect(() => {
+        getDataListGroups();
+    }, []);
 
     useEffect(() => {
         const tempLeft: Array<TypeCreatePostResponse> = [];
@@ -228,6 +303,28 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             TYPE_BUBBLE_PALACE_ACTION.editPostFromProfile
         ) {
             setList((preValue: Array<TypeCreatePostResponse>) => {
+                return preValue.map(item => {
+                    if (item.id !== bubblePalaceAction.payload.id) {
+                        return item;
+                    }
+                    return {
+                        ...item,
+                        ...bubblePalaceAction.payload,
+                    };
+                });
+            });
+        } else if (
+            bubblePalaceAction.action ===
+            TYPE_BUBBLE_PALACE_ACTION.createNewGroupFromProfile
+        ) {
+            setListGroups(preValue =>
+                [bubblePalaceAction.payload].concat(preValue),
+            );
+        } else if (
+            bubblePalaceAction.action ===
+            TYPE_BUBBLE_PALACE_ACTION.editGroupFromProfile
+        ) {
+            setListGroups(preValue => {
                 return preValue.map(item => {
                     if (item.id !== bubblePalaceAction.payload.id) {
                         return item;
@@ -286,6 +383,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 profile: res.data,
             });
             onRefresh();
+            getDataListGroups();
         } catch (err) {
             appAlert(err);
         }
@@ -329,14 +427,16 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
 
     const ListPostStatus = () => {
         return (
-            <View
-                style={{
-                    width: '100%',
-                    flexDirection: 'row',
-                }}>
-                <View style={{flex: 1}}>{left.map(RenderItemPost)}</View>
-                <View style={{flex: 1}}>{right.map(RenderItemPost)}</View>
-            </View>
+            <>
+                <ListMyGroups
+                    listGroups={listGroups}
+                    setListGroups={setListGroups}
+                />
+                <View style={styles.listBubbleView}>
+                    <View style={{flex: 1}}>{left.map(RenderItemPost)}</View>
+                    <View style={{flex: 1}}>{right.map(RenderItemPost)}</View>
+                </View>
+            </>
         );
     };
 
@@ -397,6 +497,10 @@ const styles = ScaledSheet.create({
     },
     contentContainer: {
         paddingBottom: '100@vs',
+    },
+    listBubbleView: {
+        width: '100%',
+        flexDirection: 'row',
     },
 });
 

@@ -15,6 +15,12 @@ export enum RELATIONSHIP {
     notKnow = 10,
 }
 
+export enum RELATIONSHIP_GROUP {
+    self = 0,
+    joined = 1,
+    notJoined = 2,
+}
+
 export enum GENDER_TYPE {
     man = 0,
     woman = 1,
@@ -63,6 +69,7 @@ export enum TYPE_OTP {
 export enum CHAT_TAG {
     newFromBubble = 0,
     newFromProfile = 1,
+    group = 2,
 }
 export enum MESSAGE_TYPE {
     text = 0,
@@ -79,6 +86,7 @@ export enum SOCKET_EVENT {
     appBackground = '0.4',
     // bubble
     addComment = '1.0',
+    joinCommunity = '1.1',
     // chat tag
     createChatTag = '2.0',
     joinRoom = '2.1',
@@ -133,4 +141,6 @@ export enum TYPE_BUBBLE_PALACE_ACTION {
     disableBubble = 0,
     createNewPostFromProfile = 1,
     editPostFromProfile = 2,
+    createNewGroupFromProfile = 3,
+    editGroupFromProfile = 4,
 }

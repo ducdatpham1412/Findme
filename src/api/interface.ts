@@ -136,6 +136,10 @@ export interface TypeAddCommentRequest {
     commentReplied: string;
 }
 
+export interface TypeJoinCommunityRequest {
+    profilePostGroupId: string;
+}
+
 /**
  * SETTING
  */
@@ -208,6 +212,18 @@ export interface TypeCreatePostResponse {
     color: number;
     name: string;
     isLiked: boolean;
+    relationship: number;
+}
+
+export interface TypeCreateGroupResponse {
+    id: string;
+    content: string;
+    images: Array<string>;
+    chatTagId: string;
+    creatorId: number;
+    createdTime: string;
+    color: number;
+    name: string;
     relationship: number;
 }
 
@@ -285,6 +301,7 @@ export interface TypeChatTagResponse {
     id: any;
     listUser: Array<TypeMemberInListChatTag>;
     groupName: string;
+    image?: string;
     isPrivate: boolean;
     isStop: boolean;
     isBlock: boolean;

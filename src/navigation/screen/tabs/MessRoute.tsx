@@ -4,6 +4,7 @@ import {
 } from '@react-navigation/stack';
 import {Metrics} from 'asset/metrics';
 import ChatDetail from 'feature/mess/ChatDetail';
+import ChatDetailGroup from 'feature/mess/ChatDetailGroup';
 import ChatDetailSetting from 'feature/mess/ChatDetailSetting';
 import MessScreen from 'feature/mess/MessScreen';
 import PublicChatting from 'feature/mess/PublicChatting';
@@ -18,7 +19,6 @@ const MessStack = createStackNavigator();
 
 const MessRoute = () => {
     const theme = Redux.getTheme();
-    const isModeExp = Redux.getModeExp();
 
     useEffect(() => {
         Redux.setBorderMessRoute(theme.borderColor);
@@ -54,7 +54,15 @@ const MessRoute = () => {
                     name={MESS_ROUTE.chatDetail}
                     component={ChatDetail}
                     options={{
-                        gestureEnabled: isIOS ? !isModeExp : false,
+                        gestureEnabled: isIOS,
+                    }}
+                />
+
+                <MessStack.Screen
+                    name={MESS_ROUTE.chatDetailGroup}
+                    component={ChatDetailGroup}
+                    options={{
+                        gestureEnabled: isIOS,
                     }}
                 />
 

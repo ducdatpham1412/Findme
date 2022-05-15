@@ -1,5 +1,5 @@
 import {createStackNavigator} from '@react-navigation/stack';
-import CreatePost from 'feature/profile/CreatePost';
+import CreateGroup from 'feature/profile/CreateGroup';
 import CreatePostPreview from 'feature/profile/CreatePostPreview';
 import EditProfile from 'feature/profile/EditProfile';
 import MyProfile from 'feature/profile/MyProfile';
@@ -61,8 +61,8 @@ const ProfileRoute = () => {
             />
 
             <ProfileStack.Screen
-                name={PROFILE_ROUTE.createPost}
-                component={CreatePost}
+                name={PROFILE_ROUTE.createGroup}
+                component={CreateGroup}
             />
 
             <ProfileStack.Screen

@@ -55,11 +55,14 @@ const DISCOVERY_ROUTE = {
     discoveryScreen: '@DISCOVERY_ROUTE/discoveryScreen',
     heartScreen: '@DISCOVERY_ROUTE/heartScreen',
     plusScreen: '@DISCOVERY_ROUTE/plusScreen',
+    listBubbleCouple: '@DISCOVERY_ROUTE/listBubbleCouple',
+    listBubbleGroup: '@DISCOVERY_ROUTE/listBubbleGroup',
 };
 
 const MESS_ROUTE = {
     messScreen: '@MESS_ROUTE/messScreen',
     chatDetail: '@MESS_ROUTE/chatDetail',
+    chatDetailGroup: '@MESS_ROUTE/chatDetailGroup',
     chatDetailSetting: '@MESS_ROUTE/chatDetailSetting',
     publicChatting: '@MESS_ROUTE/publicChatting',
 };
@@ -68,7 +71,7 @@ const PROFILE_ROUTE = {
     myProfile: '@PROFILE_ROUTE/myProfile',
     editProfile: '@PROFILE_ROUTE/editProfile',
     settingRoute: '@PROFILE_ROUTE/settingRoute',
-    createPost: '@PROFILE_ROUTE/createPost',
+    createGroup: '@PROFILE_ROUTE/createGroup',
     createPostPreview: '@PROFILE_ROUTE/createPostPreview',
 };
 /**
