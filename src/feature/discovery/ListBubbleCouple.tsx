@@ -7,20 +7,34 @@ import {
 } from 'api/module';
 import {Metrics} from 'asset/metrics';
 import StyleList from 'components/base/StyleList';
+import StyleActionSheet from 'components/common/StyleActionSheet';
 import LoadingScreen from 'components/LoadingScreen';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
-import {appAlert, goBack, navigate} from 'navigation/NavigationService';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {
+    appAlert,
+    goBack,
+    navigate,
+    showSwipeImages,
+} from 'navigation/NavigationService';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {interactBubble, onGoToSignUp} from 'utility/assistant';
-import Bubble from './components/Bubble';
+import Bubble, {bubbleHeight} from './components/Bubble';
 
-const bubbleHeight = Metrics.height - Metrics.safeBottomPadding;
+export interface TypeShowMoreOptions {
+    idUser: number;
+    imageWantToSee: string;
+}
+
+let idUserReport = 0;
+let imageSeeDetail = '';
 
 const ListBubbleCouple = () => {
+    const optionsRef = useRef<any>(null);
+
     const theme = Redux.getTheme();
     const token = Redux.getToken();
     const isModeExp = Redux.getModeExp();
@@ -72,81 +86,68 @@ const ListBubbleCouple = () => {
         onGoToSignUp();
     };
 
-    const onShowModalComment = useCallback(
-        (post: TypeBubblePalace) => {
-            if (!hadLogan) {
-                appAlert('discovery.bubble.goToSignUp', {
-                    moreNotice: 'common.letGo',
-                    moreAction: onGoToSignUpFromAlert,
+    const onShowModalComment = (post: TypeBubblePalace) => {
+        if (!hadLogan) {
+            appAlert('discovery.bubble.goToSignUp', {
+                moreNotice: 'common.letGo',
+                moreAction: onGoToSignUpFromAlert,
+            });
+        } else {
+            Redux.updateBubbleFocusing(post);
+            Redux.setDisplayComment(true);
+            setPreNumberComment(post.totalComments);
+        }
+    };
+
+    const onInteractBubble = (itemBubble: TypeBubblePalace) => {
+        if (hadLogan) {
+            interactBubble({
+                itemBubble,
+                isBubble: !itemBubble.hadKnowEachOther,
+            });
+        } else {
+            appAlert('discovery.bubble.goToSignUp', {
+                moreNotice: 'common.letGo',
+                moreAction: onGoToSignUpFromAlert,
+            });
+        }
+    };
+
+    const onShowOptions = (params: TypeShowMoreOptions) => {
+        idUserReport = params.idUser;
+        imageSeeDetail = params.imageWantToSee;
+        optionsRef.current?.show();
+    };
+
+    const onRefreshItem = async (idBubble: string) => {
+        try {
+            const res = hadLogan
+                ? await apiGetDetailBubble(idBubble)
+                : await apiGetDetailBubbleEnjoy(idBubble);
+            setList((preValue: Array<TypeBubblePalace>) => {
+                return preValue.map(item => {
+                    if (item.id !== idBubble) {
+                        return item;
+                    }
+                    return res.data;
                 });
+            });
+        } catch (err) {
+            appAlert(err);
+        }
+    };
+
+    const onGoToProfile = (item: TypeBubblePalace) => {
+        if (item.hadKnowEachOther) {
+            if (item.creatorId === myId) {
+                navigate(PROFILE_ROUTE.myProfile);
             } else {
-                Redux.updateBubbleFocusing(post);
-                Redux.setDisplayComment(true);
-                setPreNumberComment(post.totalComments);
-            }
-        },
-        [hadLogan],
-    );
-
-    const onInteractBubble = useCallback(
-        (itemBubble: TypeBubblePalace) => {
-            if (hadLogan) {
-                interactBubble({
-                    itemBubble,
-                    isBubble: !itemBubble.hadKnowEachOther,
-                });
-            } else {
-                appAlert('discovery.bubble.goToSignUp', {
-                    moreNotice: 'common.letGo',
-                    moreAction: onGoToSignUpFromAlert,
+                navigate(ROOT_SCREEN.otherProfile, {
+                    id: item.creatorId,
                 });
             }
-        },
-        [hadLogan],
-    );
-
-    const onReportUser = useCallback((idUser: number) => {
-        navigate(ROOT_SCREEN.reportUser, {
-            idUser,
-        });
-    }, []);
-
-    const onRefreshItem = useCallback(
-        async (idBubble: string) => {
-            try {
-                const res = hadLogan
-                    ? await apiGetDetailBubble(idBubble)
-                    : await apiGetDetailBubbleEnjoy(idBubble);
-                setList((preValue: Array<TypeBubblePalace>) => {
-                    return preValue.map(item => {
-                        if (item.id !== idBubble) {
-                            return item;
-                        }
-                        return res.data;
-                    });
-                });
-            } catch (err) {
-                appAlert(err);
-            }
-        },
-        [hadLogan],
-    );
-
-    const onGoToProfile = useCallback(
-        (item: TypeBubblePalace) => {
-            if (item.hadKnowEachOther) {
-                if (item.creatorId === myId) {
-                    navigate(PROFILE_ROUTE.myProfile);
-                } else {
-                    navigate(ROOT_SCREEN.otherProfile, {
-                        id: item.creatorId,
-                    });
-                }
-            }
-        },
-        [myId],
-    );
-
+        }
+    };
     /**
      * Render view
      */
@@ -155,7 +156,7 @@ const ListBubbleCouple = () => {
             <Bubble
                 item={item}
                 onInteractBubble={onInteractBubble}
-                onReportUser={onReportUser}
+                onShowMoreOption={onShowOptions}
                 onRefreshItem={onRefreshItem}
                 onGoToProfile={onGoToProfile}
                 onShowModalComment={() => onShowModalComment(item)}
@@ -170,7 +171,7 @@ const ListBubbleCouple = () => {
                 renderItem={({item}) => RenderItemBubble(item)}
                 keyExtractor={(_, index) => String(index)}
                 snapToInterval={bubbleHeight}
-                // scrollEventThrottle={16}
+                scrollEventThrottle={16}
                 decelerationRate="fast"
                 refreshing={refreshing}
                 onRefresh={onRefresh}
@@ -196,6 +197,32 @@ const ListBubbleCouple = () => {
                 {backgroundColor: theme.backgroundColor},
             ]}>
             {RenderBubblePlaceStatic()}
+
+            <StyleActionSheet
+                ref={optionsRef}
+                listTextAndAction={[
+                    {
+                        text: 'discovery.report.title',
+                        action: () => {
+                            navigate(ROOT_SCREEN.reportUser, {
+                                idUser: idUserReport,
+                            });
+                        },
+                    },
+                    {
+                        text: 'discovery.seeDetailImage',
+                        action: () => {
+                            showSwipeImages({
+                                listImages: [{url: imageSeeDetail}],
+                            });
+                        },
+                    },
+                    {
+                        text: 'common.cancel',
+                        action: () => null,
+                    },
+                ]}
+            />
         </View>
     );
 };
@@ -203,6 +230,7 @@ const ListBubbleCouple = () => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
+        paddingTop: Metrics.tabBarUp,
     },
 });
 

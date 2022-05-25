@@ -35,7 +35,6 @@ const IconLiked = ({onPress, customStyle}: Props) => {
 const styles = ScaledSheet.create({
     heartIcon: {
         fontSize: '40@ms',
-        color: Theme.common.pink,
     },
 });
 

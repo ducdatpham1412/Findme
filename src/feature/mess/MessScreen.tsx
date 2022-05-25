@@ -1,24 +1,18 @@
-import {useIsFocused} from '@react-navigation/native';
 import {TypeChatTagResponse} from 'api/interface';
 import {apiGetDetailChatTag} from 'api/module';
 import {CHAT_TAG} from 'asset/enum';
-import {StyleImage} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import Redux from 'hook/useRedux';
 import {useSocketChatTagBubble} from 'hook/useSocketIO';
 import Header from 'navigation/components/Header';
 import {MESS_ROUTE, PROFILE_ROUTE} from 'navigation/config/routes';
-import {useTabBar} from 'navigation/config/TabBarProvider';
 import {appAlert, navigate} from 'navigation/NavigationService';
-import React, {memo, useCallback, useEffect, useMemo} from 'react';
+import React, {memo, useCallback, useEffect} from 'react';
 import {View} from 'react-native';
-import {ScaledSheet} from 'react-native-size-matters';
+import {scale, ScaledSheet} from 'react-native-size-matters';
 import ChatTag from './components/ChatTag';
 
 const RenderMessages = () => {
-    const {setShowTabBar} = useTabBar();
-    const isFocus = useIsFocused();
-
     const chatTagFromNotification = Redux.getChatTagFromNotification();
     const {id} = Redux.getPassport().profile;
 
@@ -37,7 +31,7 @@ const RenderMessages = () => {
                 Redux.setChatTagFocusing(chatTagFromNotification);
                 const res = await apiGetDetailChatTag(chatTagFromNotification);
                 seenMessage(chatTagFromNotification);
-                setShowTabBar(false);
+
                 if (res.data.type === CHAT_TAG.group) {
                     navigate(MESS_ROUTE.chatDetailGroup, {
                         itemChatTag: res.data,
@@ -66,12 +60,6 @@ const RenderMessages = () => {
     };
 
     useEffect(() => {
-        if (isFocus) {
-            setShowTabBar(true);
-        }
-    }, [isFocus]);
-
-    useEffect(() => {
         goToChatDetailFromNotification();
     }, [chatTagFromNotification]);
 
@@ -96,7 +84,6 @@ const RenderMessages = () => {
                     setListChatTags,
                 });
             }
-            setShowTabBar(false);
         } catch (err) {
             appAlert(err);
         }
@@ -131,20 +118,8 @@ const RenderMessages = () => {
 const MessScreen = () => {
     const isModeExp = Redux.getModeExp();
     const token = Redux.getToken();
-    const {avatar} = Redux.getPassport().profile;
     const borderMessRoute = Redux.getBorderMessRoute();
     const theme = Redux.getTheme();
-
-    const renderAvatar = useMemo(() => {
-        return (
-            <View style={[styles.avatarView, {borderColor: borderMessRoute}]}>
-                <StyleImage
-                    customStyle={styles.avatar}
-                    source={{uri: avatar}}
-                />
-            </View>
-        );
-    }, [borderMessRoute, avatar]);
 
     return (
         <View
@@ -154,11 +129,11 @@ const MessScreen = () => {
             ]}>
             {/* Header */}
             <Header
-                headerLeft={renderAvatar}
                 headerLeftMission={() => navigate(PROFILE_ROUTE.myProfile)}
                 headerTitle={'mess.messScreen.headerTitle'}
                 headerTitleStyle={{
                     color: borderMessRoute,
+                    left: scale(30),
                 }}
                 containerStyle={styles.headerView}
             />
@@ -175,26 +150,11 @@ const styles = ScaledSheet.create({
         backgroundColor: 'transparent',
     },
     headerView: {
-        height: '50@vs',
+        height: '50@ms',
         paddingHorizontal: '20@s',
-    },
-    listTagBox: {
-        paddingHorizontal: '10@s',
-        backgroundColor: 'transparent',
     },
     contentList: {
         paddingBottom: '50@vs',
-    },
-    avatarView: {
-        width: '35@s',
-        height: '35@s',
-        borderWidth: '2@ms',
-        borderRadius: '30@s',
-    },
-    avatar: {
-        width: '100%',
-        height: '100%',
-        borderRadius: '30@s',
     },
 });
 

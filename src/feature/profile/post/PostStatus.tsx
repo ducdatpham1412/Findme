@@ -9,6 +9,7 @@ import {View} from 'react-native';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {chooseIconHobby, modalizeOptionPost} from 'utility/assistant';
+import isEqual from 'react-fast-compare';
 
 interface Props {
     itemPost: TypeCreatePostResponse;
@@ -235,10 +236,8 @@ const styles = ScaledSheet.create({
 });
 
 export default memo(PostStatus, (preProps: Props, nextProps: any) => {
-    for (const [key, value] of Object.entries(preProps.itemPost)) {
-        if (nextProps.itemPost?.[key] !== value) {
-            return false;
-        }
+    if (!isEqual(preProps.itemPost, nextProps.itemPost)) {
+        return false;
     }
     return true;
 });

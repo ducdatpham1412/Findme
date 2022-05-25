@@ -24,7 +24,8 @@ const ToolProfile = () => {
                 customStyle={[
                     styles.touchIconCamera,
                     {borderColor: theme.textColor},
-                ]}>
+                ]}
+                hitSlop={15}>
                 <Feather
                     name="instagram"
                     style={[styles.iconCamera, {color: theme.textHightLight}]}
@@ -43,7 +44,8 @@ const ToolProfile = () => {
                 customStyle={[
                     styles.touchIconCamera,
                     {borderColor: theme.textColor},
-                ]}>
+                ]}
+                hitSlop={15}>
                 <MaterialIcons
                     name="groups"
                     style={[styles.iconCamera, {color: theme.textHightLight}]}

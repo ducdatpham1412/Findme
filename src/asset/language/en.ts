@@ -137,6 +137,7 @@ const discovery = {
             'Your report has been sent\nWe will review this report and the denounced user for timely handling measures\n\nThank you for joining hands for a better Doffy community\n\nBest regards!\nDoffy Co.',
     },
     numberComments: '{{numberComments}} comments',
+    seeDetailImage: 'Watch image',
 };
 
 // MESS ROUTE
@@ -179,7 +180,6 @@ const profile = {
         searchAndSetting: 'Finding others',
     },
     edit: {
-        headerTitle: 'Edit own profile',
         confirmButton: 'Update',
         name: 'Your name',
         anonymousName: 'Anonymous name',

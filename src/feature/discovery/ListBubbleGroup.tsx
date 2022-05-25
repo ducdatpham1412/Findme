@@ -12,9 +12,8 @@ import {socketJoinCommunity} from 'hook/useSocketIO';
 import React, {useCallback, useMemo} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
+import {bubbleHeight} from './components/Bubble';
 import BubblePalaceGroup from './components/BubblePalaceGroup';
-
-const bubbleHeight = Metrics.height - Metrics.safeBottomPadding;
 
 const ListBubbleGroup = () => {
     const theme = Redux.getTheme();
@@ -97,6 +96,7 @@ const ListBubbleGroup = () => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
+        paddingTop: Metrics.tabBarUp,
     },
 });
 

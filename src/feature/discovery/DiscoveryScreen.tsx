@@ -6,6 +6,7 @@ import {DISCOVERY_ROUTE} from 'navigation/config/routes';
 import React from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
+import {useNotification} from 'utility/notification';
 import TabBarCoupleGroup from './components/TabBarCoupleGroup';
 import ListBubbleCouple from './ListBubbleCouple';
 import ListBubbleGroup from './ListBubbleGroup';
@@ -13,6 +14,8 @@ import ListBubbleGroup from './ListBubbleGroup';
 const TopTab = createMaterialTopTabNavigator();
 
 const DiscoveryScreen = () => {
+    useNotification();
+
     return (
         <View style={styles.container}>
             <TopTab.Navigator

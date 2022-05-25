@@ -19,6 +19,7 @@ import {checkIsSingleEmoji} from 'utility/validate';
 import {MessageSeen} from '../ChatDetailGroup';
 import DatetimeMessage from './DatetimeMessage';
 import MessageImage from './MessageImage';
+import isEqual from 'react-fast-compare';
 
 interface Props {
     itemMessage: TypeChatMessageResponse;
@@ -505,10 +506,8 @@ const styles = ScaledSheet.create({
 });
 
 export default memo(ItemMessageGroup, (prevProps: Props, nextProps: any) => {
-    for (const [key, value] of Object.entries(prevProps.itemMessage)) {
-        if (nextProps.itemMessage?.[key] !== value) {
-            return false;
-        }
+    if (!isEqual(prevProps.itemMessage, nextProps.itemMessage)) {
+        return false;
     }
     if (nextProps.listMessagesLength < prevProps.listMessagesLength) {
         return false;

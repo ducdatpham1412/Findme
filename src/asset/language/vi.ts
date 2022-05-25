@@ -140,6 +140,7 @@ const discovery = {
             'Tố cáo của bạn đã được gửi đi\nChúng tôi sẽ xem xét đối với tố cáo của bạn và người dùng bị tố cáo để có những biện pháp xử lý kịp thời\n\nCám ơn bạn đã chung tay vì một cộng đồng Doffy ngày càng tốt hơn\n\nTrân trọng!\nDoffy Co.',
     },
     numberComments: '{{numberComments}} bình luận',
+    seeDetailImage: 'Xem ảnh',
 };
 
 // PROFILE SCREEN
@@ -156,7 +157,6 @@ const profile = {
         searchAndSetting: 'Tìm những người khác',
     },
     edit: {
-        headerTitle: 'Trang cá nhân',
         confirmButton: 'Cập nhật',
         name: 'Tên hiển thị',
         anonymousName: 'Tên ẩn danh',

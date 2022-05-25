@@ -1,4 +1,3 @@
-import {useIsFocused} from '@react-navigation/native';
 import {
     TypeBubblePalace,
     TypeCreateGroupResponse,
@@ -17,15 +16,8 @@ import {
 import ButtonBack from 'components/common/ButtonBack';
 import IconHobby from 'feature/discovery/components/IconHobby';
 import Redux from 'hook/useRedux';
-import {PROFILE_ROUTE} from 'navigation/config/routes';
-import {useTabBar} from 'navigation/config/TabBarProvider';
-import {
-    appAlert,
-    goBack,
-    navigate,
-    popUpPicker,
-} from 'navigation/NavigationService';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {appAlert, goBack, popUpPicker} from 'navigation/NavigationService';
+import React, {useCallback, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Animated, View} from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
@@ -56,9 +48,7 @@ interface Props {
 const CreateGroup = ({route}: Props) => {
     const itemGroupFromEdit = route.params?.itemGroupFromEdit;
 
-    const isFocused = useIsFocused();
     const {t} = useTranslation();
-    const {setShowTabBar} = useTabBar();
 
     const theme = Redux.getTheme();
     const profile = Redux.getPassport().profile;
@@ -77,14 +67,6 @@ const CreateGroup = ({route}: Props) => {
     const [name, setName] = useState(itemGroupFromEdit?.name || '');
 
     const optionsImgPicker = optionsImagePicker.map(text => t(text));
-
-    useEffect(() => {
-        if (isFocused) {
-            setShowTabBar(false);
-        } else {
-            setShowTabBar(true);
-        }
-    }, [isFocused]);
 
     const onConfirmPost = async () => {
         if (color === undefined) {
@@ -198,7 +180,7 @@ const CreateGroup = ({route}: Props) => {
                 });
             }
 
-            navigate(PROFILE_ROUTE.myProfile);
+            goBack();
         } catch (err) {
             appAlert(err);
         } finally {

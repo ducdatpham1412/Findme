@@ -53,7 +53,6 @@ const OtherProfile = ({route}: Props) => {
 
     const optionsRef = useRef<any>(null);
 
-    const [search, setSearch] = useState('');
     const [profile, setProfile] = useState<TypeGetProfileResponse>();
     const [isFollowing, setIsFollowing] = useState(false);
 
@@ -119,11 +118,6 @@ const OtherProfile = ({route}: Props) => {
                 isEffectTabBar: false,
             });
         }
-    };
-
-    // on search
-    const onSubmitSearch = () => {
-        console.log('search');
     };
 
     // block, report
@@ -307,10 +301,7 @@ const OtherProfile = ({route}: Props) => {
 
             {/* Header */}
             <SearchAndSetting
-                search={search}
-                onSearch={setSearch}
                 onShowOptions={onShowOption}
-                onSubmitSearch={onSubmitSearch}
                 hasSettingBtn={false}
                 onGoBack={onGoBack}
             />

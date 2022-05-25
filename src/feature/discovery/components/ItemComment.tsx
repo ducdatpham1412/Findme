@@ -10,6 +10,7 @@ import {
     verticalScale,
 } from 'react-native-size-matters';
 import {formatFromNow} from 'utility/format';
+import isEqual from 'react-fast-compare';
 
 interface Props {
     item: TypeCommentResponse;
@@ -26,7 +27,7 @@ const ItemComment = (props: Props) => {
     // const [numberLikes, setNumberLikes] = useState(item.numberLikes);
     // const [isLiked, setIsLiked] = useState(item.isLiked);
 
-    // const color = isLiked ? Theme.common.pink : theme.unLikeHeart;
+    // const color = isLiked ? theme.likeHeart : theme.unLikeHeart;
 
     const paddingLeft = !commentReplied
         ? scale(15)
@@ -212,10 +213,8 @@ const styles = ScaledSheet.create({
 });
 
 export default memo(ItemComment, (preProps: Props, nextProps: any) => {
-    for (const [key, value] of Object.entries(preProps.item)) {
-        if (nextProps?.item?.[key] !== value) {
-            return false;
-        }
+    if (!isEqual(preProps.item, nextProps.item)) {
+        return false;
     }
     if (preProps.commentReplied !== nextProps.commentReplied) {
         return false;

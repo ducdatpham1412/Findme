@@ -12,6 +12,7 @@ import React from 'react';
 import {View} from 'react-native';
 import {scale, ScaledSheet, verticalScale} from 'react-native-size-matters';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {bubbleHeight} from './Bubble';
 import IconHobby from './IconHobby';
 
 interface Props {
@@ -19,8 +20,6 @@ interface Props {
     onJoinGroup(itemGroup: TypeCreateGroupResponse): void;
     onGoToConversation(chatTagId: string): void;
 }
-
-const bubbleHeight = Metrics.height - Metrics.safeBottomPadding;
 
 const BubblePalaceGroup = (props: Props) => {
     const {item, onJoinGroup, onGoToConversation} = props;

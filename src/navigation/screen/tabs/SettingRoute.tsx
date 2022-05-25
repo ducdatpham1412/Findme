@@ -11,19 +11,24 @@ import ConfirmDeleteAccount from 'feature/setting/security/ConfirmDeleteAccount'
 import ConfirmLockAccount from 'feature/setting/security/ConfirmLockAccount';
 import SecurityAndLogin from 'feature/setting/security/SecurityAndLogin';
 import SettingScreen from 'feature/setting/SettingScreen';
+import Redux from 'hook/useRedux';
 import {SETTING_ROUTE} from 'navigation/config/routes';
 import React from 'react';
 
 const SettingStack = createStackNavigator();
 
 const SettingRoute = () => {
+    const theme = Redux.getTheme();
+
     return (
         <SettingStack.Navigator
             screenOptions={{
-                gestureEnabled: true,
                 gestureDirection: 'horizontal',
                 cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
                 headerShown: false,
+                cardStyle: {
+                    backgroundColor: theme.backgroundColor,
+                },
             }}>
             <SettingStack.Screen
                 name={SETTING_ROUTE.settingScreen}

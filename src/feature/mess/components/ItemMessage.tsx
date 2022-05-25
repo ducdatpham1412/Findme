@@ -18,6 +18,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {checkIsSingleEmoji} from 'utility/validate';
 import DatetimeMessage from './DatetimeMessage';
 import MessageImage from './MessageImage';
+import isEqual from 'react-fast-compare';
 
 interface Props {
     itemMessage: TypeChatMessageResponse;
@@ -461,7 +462,7 @@ const styles = ScaledSheet.create({
 
 export default memo(ItemMessage, (prevProps: Props, nextProps: Props) => {
     if (
-        prevProps.itemMessage !== nextProps.itemMessage ||
+        !isEqual(prevProps.itemMessage, nextProps.itemMessage) ||
         prevProps.isSameMessageAfter !== nextProps.isSameMessageAfter ||
         prevProps.displayMeAvatar !== nextProps.displayMeAvatar ||
         prevProps.displayPartnerAvatar !== nextProps.displayPartnerAvatar ||
@@ -469,6 +470,7 @@ export default memo(ItemMessage, (prevProps: Props, nextProps: Props) => {
     ) {
         return false;
     }
+
     if (nextProps.listMessagesLength < prevProps.listMessagesLength) {
         return false;
     }

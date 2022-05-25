@@ -2,10 +2,13 @@ const Theme = {
     common: {
         white: 'white',
         black: '#333333',
-        pink: '#F067D6',
+        darkPink: '#EC1395',
         textMe: '#e4f0f4',
-        orange: 'orange',
         comment: '#c5e3ff',
+        commentGreen: '#3ACF37',
+        reloadPurple: '#5D5FEF',
+        gradientTabBar1: '#54B3E9',
+        gradientTabBar2: '#31EDE2',
     },
     darkTheme: {
         backgroundColor: '#081019',
@@ -18,6 +21,7 @@ const Theme = {
         backgroundButtonColor: '#102a47',
         backgroundTextInput: '#202E44',
         tabBarIconColor: '#75adcb',
+        likeHeart: '#DD0B0B',
         unLikeHeart: 'white',
     },
     lightTheme: {
@@ -31,7 +35,8 @@ const Theme = {
         backgroundButtonColor: '#c5e3ff',
         backgroundTextInput: '#cbe1ef',
         tabBarIconColor: '#102a47',
-        unLikeHeart: '#acc2e2',
+        likeHeart: '#DD0B0B',
+        unLikeHeart: '#c5e3ff',
     },
 };
 
