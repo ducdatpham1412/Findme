@@ -142,8 +142,6 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
         paddingHorizontal: '12@s',
         paddingVertical: '7@ms',
-        borderTopLeftRadius: '30@ms',
-        borderTopRightRadius: '30@ms',
     },
     replyView: {
         position: 'absolute',

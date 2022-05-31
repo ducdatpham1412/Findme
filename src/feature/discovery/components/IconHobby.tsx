@@ -6,8 +6,8 @@ import {chooseIconHobby} from 'utility/assistant';
 interface Props {
     bubbleId?: string;
     color: number;
-    onTouchStart(): void;
-    onTouchEnd(): void;
+    onTouchStart?(): void;
+    onTouchEnd?(): void;
     containerStyle?: StyleProp<ViewStyle>;
 }
 
@@ -60,8 +60,8 @@ const styles = ScaledSheet.create({
         marginTop: '38@vs',
     },
     iconHobby: {
-        width: '40@s',
-        height: '40@s',
+        width: '35@s',
+        height: '35@s',
     },
 });
 

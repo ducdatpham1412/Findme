@@ -17,10 +17,11 @@ import {
 } from 'hook/useSocketIO';
 import ROOT_SCREEN from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Animated, Keyboard, TextInput, View} from 'react-native';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {Animated, FlatList, Keyboard, TextInput, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
+import {selectBgCardStyle} from 'utility/assistant';
 import ItemComment from './ItemComment';
 
 interface Props {
@@ -41,6 +42,7 @@ const ModalComment = (props: Props) => {
     } = props;
 
     const isFocused = useIsFocused();
+    const listCommentRef = useRef<FlatList>(null);
 
     const theme = Redux.getTheme();
     const token = Redux.getToken();
@@ -83,6 +85,7 @@ const ModalComment = (props: Props) => {
         );
         setCommentReplied('');
         setTextComment('');
+        listCommentRef.current?.scrollToEnd();
     };
 
     const onFocusingTypingComment = () => {
@@ -154,9 +157,10 @@ const ModalComment = (props: Props) => {
         );
     }, []);
 
-    const RenderListComments = useMemo(() => {
+    const RenderListComments = () => {
         return (
             <StyleList
+                ref={listCommentRef}
                 style={styles.listCommentBox}
                 data={list}
                 renderItem={({item}) => RenderItemComment(item)}
@@ -166,7 +170,7 @@ const ModalComment = (props: Props) => {
                 onRefresh={onRefresh}
             />
         );
-    }, [list, loading]);
+    };
 
     return (
         <Animated.View style={[styles.container, {transform: [{translateY}]}]}>
@@ -183,7 +187,7 @@ const ModalComment = (props: Props) => {
                     ]}>
                     {RenderHeader()}
 
-                    {RenderListComments}
+                    {RenderListComments()}
 
                     <InputComment
                         ref={inputRef}

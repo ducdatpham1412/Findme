@@ -1,5 +1,5 @@
 import Theme from 'asset/theme/Theme';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
     NativeSyntheticEvent,
     ScrollView,
@@ -51,7 +51,7 @@ const StyleMoreText = (props: Props) => {
         setNumberOfLines(undefined);
     }, [value]);
 
-    const RenderButtonShowMoreOrLess = useMemo(() => {
+    const RenderButtonShowMoreOrLess = () => {
         const text = isShowMore ? 'common.seeMore' : 'common.seeLess';
 
         const onPressText = () => {
@@ -66,11 +66,14 @@ const StyleMoreText = (props: Props) => {
             <StyleTouchable onPress={onPressText}>
                 <StyleText
                     i18Text={text}
-                    customStyle={styles.textSeeMoreOrLess}
+                    customStyle={[
+                        styles.textSeeMoreOrLess,
+                        {color: Theme.darkTheme.borderColor},
+                    ]}
                 />
             </StyleTouchable>
         );
-    }, [isShowMore, numberOfLines, saveNumber]);
+    };
 
     const styleScroll = displayButton ? (isShowMore ? {} : {maxHeight}) : {};
 
@@ -88,7 +91,7 @@ const StyleMoreText = (props: Props) => {
                 />
             </ScrollView>
 
-            {displayButton && RenderButtonShowMoreOrLess}
+            {displayButton && RenderButtonShowMoreOrLess()}
         </View>
     );
 };
@@ -98,10 +101,9 @@ const styles = ScaledSheet.create({
         width: '100%',
     },
     textSeeMoreOrLess: {
-        fontSize: '14@ms',
-        color: Theme.common.textMe,
+        fontSize: '12@ms',
         fontWeight: 'bold',
-        marginTop: '10@vs',
+        marginTop: '10@ms',
         fontStyle: 'italic',
     },
 });

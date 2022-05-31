@@ -1,45 +1,32 @@
 import {GUIDELINE_URL} from 'asset/standardValue';
 import {StyleTouchable} from 'components/base';
 import OptionsButton from 'components/common/OptionsButton';
-import SearchButton from 'components/common/SearchButton';
 import SettingButton from 'components/common/SettingButton';
 import Redux from 'hook/useRedux';
 import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {goBack, navigate} from 'navigation/NavigationService';
 import React from 'react';
-import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
-import {moderateScale, scale, ScaledSheet} from 'react-native-size-matters';
+import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 interface Props {
-    search: string;
-    onSearch: any;
     onShowOptions(): void;
     hasGuideButton?: boolean;
     hasBackBtn?: boolean;
     hasSettingBtn?: boolean;
-    onSubmitSearch?(): void;
-    onFocus?(): void;
-    onBlur?(): void;
     onGoBack?(): void;
 }
 
 const SearchAndSetting = (props: Props) => {
     const {
-        search,
-        onSearch,
         onShowOptions,
         hasGuideButton = false,
         hasBackBtn = true,
         hasSettingBtn = true,
-        onSubmitSearch,
-        onFocus,
-        onBlur,
         onGoBack,
     } = props;
-    const {t} = useTranslation();
     const theme = Redux.getTheme();
 
     const onGoToUserGuide = () => {
@@ -52,20 +39,6 @@ const SearchAndSetting = (props: Props) => {
     return (
         <View style={styles.container}>
             {hasBackBtn && <HeaderLeftIcon onPress={onGoBack || goBack} />}
-
-            {/* Develop search tool later */}
-            {false && (
-                <SearchButton
-                    keyWordSearch={search}
-                    setKeyWordSearch={onSearch}
-                    placeholder={t('profile.component.searchAndSetting')}
-                    onSubmitEditing={onSubmitSearch}
-                    customStyle={{marginLeft: hasBackBtn ? 0 : scale(14)}}
-                    maxWidthScale={hasBackBtn ? 200 : 170}
-                    onFocus={onFocus}
-                    onBlur={onBlur}
-                />
-            )}
 
             <View style={styles.leftBtnView}>
                 {hasGuideButton && (

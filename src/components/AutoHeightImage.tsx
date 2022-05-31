@@ -18,7 +18,7 @@ const AutoHeightImage = (props: Props) => {
         Image.getSize(uri, (width, height) => {
             setRatio(height / width);
         });
-    }, []);
+    }, [uri]);
 
     useEffect(() => {
         if (checkWidth && ratio) {

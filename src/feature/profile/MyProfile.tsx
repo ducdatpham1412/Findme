@@ -24,7 +24,6 @@ import {modalizeMyProfile, modeExpUsePaging} from 'utility/assistant';
 import AvatarBackground from './components/AvatarBackground';
 import InformationProfile from './components/InformationProfile';
 import SearchAndSetting from './components/SearchAndSetting';
-import SearchView from './components/SearchView';
 import ToolProfile from './components/ToolProfile';
 import ListMyGroups from './group/ListMyGroups';
 import PostStatus from './post/PostStatus';
@@ -42,9 +41,6 @@ const ProfileEnjoy = ({routeName}: ChildrenProps) => {
 
     const optionRef = useRef<any>(null);
     const bubblePalaceAction = Redux.getBubblePalaceAction();
-
-    const [search, setSearch] = useState('');
-    const [displaySearchView, setDisplaySearchView] = useState(false);
 
     const {list, setList, onLoadMore} = modeExpUsePaging();
     const [listGroups, setListGroups] = useState<
@@ -122,8 +118,6 @@ const ProfileEnjoy = ({routeName}: ChildrenProps) => {
     const onShowOption = () => {
         optionRef.current.show();
     };
-
-    const onSubmitSearch = () => {};
 
     const onGoToDetailPost = (bubbleId: string) => {
         const temp = list.findIndex(item => item.id === bubbleId);
@@ -216,17 +210,10 @@ const ProfileEnjoy = ({routeName}: ChildrenProps) => {
                 onLoadMore={onLoadMore}
             />
 
-            {(displaySearchView || !!search) && false && <SearchView />}
-            {/* develop later */}
             <SearchAndSetting
-                search={search}
-                onSearch={setSearch}
                 onShowOptions={onShowOption}
-                onSubmitSearch={onSubmitSearch}
                 hasBackBtn={false}
                 hasGuideButton
-                onFocus={() => setDisplaySearchView(true)}
-                onBlur={() => setDisplaySearchView(false)}
             />
 
             <StyleActionSheet
@@ -256,9 +243,6 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     >([]);
 
     const optionRef = useRef<any>(null);
-
-    const [search, setSearch] = useState('');
-    const [displaySearchView, setDisplaySearchView] = useState(false);
 
     const [left, setLeft] = useState<Array<TypeCreatePostResponse>>([]);
     const [right, setRight] = useState<Array<TypeCreatePostResponse>>([]);
@@ -344,8 +328,6 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     const onShowOption = () => {
         optionRef.current.show();
     };
-
-    const onSubmitSearch = () => {};
 
     const onGoToDetailPost = (bubbleId: string) => {
         const temp = list.findIndex(item => item.id === bubbleId);
@@ -457,16 +439,10 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 onRefresh={onRefreshPage}
             />
 
-            {(displaySearchView || !!search) && false && <SearchView />}
             <SearchAndSetting
-                search={search}
-                onSearch={setSearch}
                 onShowOptions={onShowOption}
-                onSubmitSearch={onSubmitSearch}
                 hasBackBtn={false}
                 hasGuideButton
-                onFocus={() => setDisplaySearchView(true)}
-                onBlur={() => setDisplaySearchView(false)}
             />
 
             <StyleActionSheet

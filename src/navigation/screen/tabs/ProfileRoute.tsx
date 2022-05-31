@@ -1,76 +1,63 @@
 import {createStackNavigator} from '@react-navigation/stack';
+import {Metrics} from 'asset/metrics';
+import {StyleText} from 'components/base';
 import CreateGroup from 'feature/profile/CreateGroup';
-import CreatePostPreview from 'feature/profile/CreatePostPreview';
 import EditProfile from 'feature/profile/EditProfile';
 import MyProfile from 'feature/profile/MyProfile';
 import Redux from 'hook/useRedux';
-import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
-import SettingRoute from 'navigation/screen/tabs/SettingRoute';
 import React from 'react';
-import {useTranslation} from 'react-i18next';
-import {StyleProp} from 'react-native';
-import {moderateScale} from 'react-native-size-matters';
-import {cardStyleSafeTop} from '../RootScreen';
+import {View} from 'react-native';
+import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 
 const ProfileStack = createStackNavigator();
 
 const ProfileRoute = () => {
     const theme = Redux.getTheme();
-    const {t} = useTranslation();
-
-    const optionStyle: StyleProp<any> = {
-        headerTintColor: theme.textColor,
-        headerTitleStyle: {
-            fontSize: moderateScale(17),
-            fontWeight: 'bold',
-        },
-        headerStyle: {
-            backgroundColor: theme.backgroundColor,
-        },
-    };
 
     return (
-        <ProfileStack.Navigator
-            screenOptions={{
-                headerShown: false,
-                cardStyle: [
-                    {backgroundColor: theme.backgroundColor},
-                    cardStyleSafeTop,
-                ],
-            }}>
-            <ProfileStack.Screen
-                name={PROFILE_ROUTE.myProfile}
-                component={MyProfile}
-            />
+        <>
+            <ProfileStack.Navigator
+                screenOptions={{
+                    headerShown: false,
+                    cardStyle: {
+                        backgroundColor: theme.backgroundColor,
+                        paddingTop: Metrics.tabBarUp,
+                    },
+                }}>
+                <ProfileStack.Screen
+                    name={PROFILE_ROUTE.myProfile}
+                    component={MyProfile}
+                />
 
-            <ProfileStack.Screen
-                name={PROFILE_ROUTE.editProfile}
-                component={EditProfile}
-                options={{
-                    headerShown: true,
-                    ...optionStyle,
-                    headerLeft: (props: any) => <HeaderLeftIcon {...props} />,
-                    headerTitle: t('profile.edit.headerTitle'),
-                }}
-            />
+                <ProfileStack.Screen
+                    name={PROFILE_ROUTE.editProfile}
+                    component={EditProfile}
+                />
+            </ProfileStack.Navigator>
 
-            <ProfileStack.Screen
-                name={PROFILE_ROUTE.settingRoute}
-                component={SettingRoute}
-            />
-
-            <ProfileStack.Screen
-                name={PROFILE_ROUTE.createGroup}
-                component={CreateGroup}
-            />
-
-            <ProfileStack.Screen
-                name={PROFILE_ROUTE.createPostPreview}
-                component={CreatePostPreview}
-            />
-        </ProfileStack.Navigator>
+            <View style={styles.headerView}>
+                <StyleText
+                    originValue="DOFFY"
+                    customStyle={[styles.doffyText, {color: theme.borderColor}]}
+                />
+            </View>
+        </>
     );
 };
+
+const styles = ScaledSheet.create({
+    headerView: {
+        position: 'absolute',
+        top: moderateScale(10),
+        alignSelf: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    doffyText: {
+        fontSize: '20@ms',
+        fontWeight: 'bold',
+    },
+});
 
 export default ProfileRoute;

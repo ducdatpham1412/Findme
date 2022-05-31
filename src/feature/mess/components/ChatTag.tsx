@@ -11,6 +11,7 @@ import Redux from 'hook/useRedux';
 import React, {memo} from 'react';
 import {Platform, View} from 'react-native';
 import {scale, ScaledSheet} from 'react-native-size-matters';
+import isEqual from 'react-fast-compare';
 
 interface Props {
     item: TypeChatTagResponse;
@@ -177,10 +178,8 @@ const styles = ScaledSheet.create({
 });
 
 export default memo(ChatTag, (preProps: Props, nextProps: any) => {
-    for (const [key, value] of Object.entries(preProps.item)) {
-        if (value !== nextProps.item?.[key]) {
-            return false;
-        }
+    if (!isEqual(nextProps.item, preProps.item)) {
+        return false;
     }
     return true;
 });

@@ -1,94 +1,58 @@
 import {MaterialTopTabBarProps} from '@react-navigation/material-top-tabs';
-import {Metrics} from 'asset/metrics';
-import {StyleTouchable} from 'components/base';
-import Redux from 'hook/useRedux';
+import Images from 'asset/img/images';
+import Theme from 'asset/theme/Theme';
+import {StyleImage, StyleTouchable} from 'components/base';
+import {DISCOVERY_ROUTE} from 'navigation/config/routes';
 import React from 'react';
-import {useTranslation} from 'react-i18next';
 import {Animated, View} from 'react-native';
-import {ScaledSheet, verticalScale} from 'react-native-size-matters';
+import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 
 interface Props {
     materialProps: MaterialTopTabBarProps;
 }
-// personal - community
-const listIcon = [
-    'discovery.discoveryScreen.personal',
-    'discovery.discoveryScreen.community',
-];
 
 const TabBarCoupleGroup = (props: Props) => {
     const {materialProps} = props;
     const {state, navigation, position} = materialProps;
-    const {t} = useTranslation();
 
-    const theme = Redux.getTheme();
+    const isFocusCouple = state.index === 0;
+
+    const imageBackground = isFocusCouple
+        ? Images.images.skyCouple
+        : Images.images.skyGroup;
+    const iconTab = isFocusCouple
+        ? Images.icons.personal
+        : Images.icons.community;
+
+    const translateX = position.interpolate({
+        inputRange: [0, 1],
+        outputRange: [moderateScale(-14), moderateScale(14)],
+    });
+
+    const onSwitchTab = () => {
+        if (isFocusCouple) {
+            navigation.navigate(DISCOVERY_ROUTE.listBubbleGroup);
+        } else {
+            navigation.navigate(DISCOVERY_ROUTE.listBubbleCouple);
+        }
+    };
 
     return (
         <View style={styles.container}>
-            <View style={{flexDirection: 'row'}}>
-                {state.routes.map((route, index) => {
-                    const label = listIcon?.[index];
-
-                    const isFocused = state.index === index;
-
-                    const onPress = () => {
-                        navigation.emit({
-                            type: 'tabLongPress',
-                            target: route.key,
-                        });
-
-                        if (!isFocused) {
-                            navigation.navigate(route.name);
-                        }
-                    };
-
-                    const onLongPress = () => {
-                        navigation.emit({
-                            type: 'tabLongPress',
-                            target: route.key,
-                        });
-                    };
-                    // modify inputRange for custom behavior
-                    const inputRange = state.routes.map((_, i) => i);
-                    const opacity = position.interpolate({
-                        inputRange,
-                        outputRange: inputRange.map(i =>
-                            i === index ? 1 : 0.4,
-                        ),
-                    });
-
-                    return (
-                        <>
-                            <StyleTouchable
-                                accessibilityState={
-                                    isFocused ? {selected: true} : {}
-                                }
-                                // accessibilityLabel={options.tabBarAccessibilityLabel}
-                                // testID={options.tabBarTestID}
-                                onPress={onPress}
-                                onLongPress={onLongPress}
-                                style={styles.buttonView}>
-                                <Animated.Text
-                                    style={[
-                                        styles.iconLabel,
-                                        {opacity, color: theme.textHightLight},
-                                    ]}>
-                                    {t(label)}
-                                </Animated.Text>
-                            </StyleTouchable>
-
-                            {index === 0 && (
-                                <View
-                                    style={[
-                                        styles.divider,
-                                        {backgroundColor: theme.borderColor},
-                                    ]}
-                                />
-                            )}
-                        </>
-                    );
-                })}
-            </View>
+            <StyleTouchable
+                customStyle={styles.switchView}
+                onPress={onSwitchTab}
+                activeOpacity={0.95}>
+                <StyleImage
+                    source={imageBackground}
+                    customStyle={styles.imageBackground}
+                    resizeMode="stretch"
+                />
+                <Animated.View
+                    style={[styles.switchRound, {transform: [{translateX}]}]}>
+                    <StyleImage source={iconTab} customStyle={styles.iconTab} />
+                </Animated.View>
+            </StyleTouchable>
         </View>
     );
 };
@@ -96,23 +60,34 @@ const TabBarCoupleGroup = (props: Props) => {
 const styles = ScaledSheet.create({
     container: {
         position: 'absolute',
-        zIndex: 2,
+        zIndex: 1,
         alignSelf: 'center',
-        top: Metrics.safeTopPadding + verticalScale(10),
+        height: '45@ms',
+        justifyContent: 'center',
     },
-    buttonView: {
+    switchView: {
+        width: '60@ms',
+        height: '30@ms',
+        borderRadius: '40@ms',
+        justifyContent: 'center',
         alignItems: 'center',
     },
-    iconLabel: {
-        fontSize: '15@ms',
-        color: 'white',
-        fontWeight: 'bold',
-    },
-    divider: {
-        width: '1@ms',
+    imageBackground: {
+        width: '100%',
         height: '100%',
-        backgroundColor: 'red',
-        marginHorizontal: '15@s',
+        position: 'absolute',
+    },
+    switchRound: {
+        width: '28@ms',
+        height: '28@ms',
+        borderRadius: '20@ms',
+        backgroundColor: Theme.common.comment,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    iconTab: {
+        width: '65%',
+        height: '65%',
     },
 });
 

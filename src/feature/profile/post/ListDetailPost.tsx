@@ -2,13 +2,20 @@ import {TypeCreatePostResponse} from 'api/interface';
 import {apiGetDetailBubble, apiLikePost, apiUnLikePost} from 'api/module';
 import {Metrics} from 'asset/metrics';
 import StyleList from 'components/base/StyleList';
+import StyleActionSheet from 'components/common/StyleActionSheet';
 import ModalComment from 'feature/discovery/components/ModalComment';
+import {TypeShowMoreOptions} from 'feature/discovery/ListBubbleCouple';
 import Redux from 'hook/useRedux';
 import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
 import ROOT_SCREEN from 'navigation/config/routes';
-import {appAlert, goBack, navigate} from 'navigation/NavigationService';
-import React, {useCallback, useEffect, useState} from 'react';
-import {Animated} from 'react-native';
+import {
+    appAlert,
+    goBack,
+    navigate,
+    showSwipeImages,
+} from 'navigation/NavigationService';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {onGoToSignUp} from 'utility/assistant';
 import BubbleProfile from './BubbleProfile';
@@ -31,12 +38,20 @@ export interface TypeLikeUnlikeParams {
     setTotalLikes: Function;
 }
 
-const bubbleHeight = Metrics.height - Metrics.safeBottomPadding;
+export const bubbleProfileHeight =
+    Metrics.height - Metrics.safeBottomPadding - Metrics.safeTopPadding;
+export const bubbleProfileWidth =
+    Metrics.width - Metrics.safeLeftPadding - Metrics.safeRightPadding;
+
+let idUserReport = 0;
+let imageWantToSee = '';
 
 const ListDetailPost = ({route}: Props) => {
     const {listInProfile, initIndex, setListInProfile} = route.params;
 
     const isModeExp = Redux.getModeExp();
+
+    const optionsRef = useRef<any>(null);
 
     const [bubbleFocusing, setBubbleFocusing] = useState(
         listInProfile[initIndex],
@@ -60,11 +75,11 @@ const ListDetailPost = ({route}: Props) => {
         });
     }, [bubbleFocusing]);
 
-    const onReportUser = useCallback((idUser: number) => {
-        navigate(ROOT_SCREEN.reportUser, {
-            idUser,
-        });
-    }, []);
+    const onShowOptions = (params: TypeShowMoreOptions) => {
+        imageWantToSee = params.imageWantToSee;
+        idUserReport = params.idUser;
+        optionsRef.current?.show();
+    };
 
     const onRefreshItem = async (idBubble: string) => {
         if (isModeExp) {
@@ -128,35 +143,41 @@ const ListDetailPost = ({route}: Props) => {
         setDisplayComment(true);
     };
 
+    const onSeeDetailImage = (imageUrl: string) => {
+        showSwipeImages({
+            listImages: [{url: imageUrl}],
+        });
+    };
+
     /**
      * Render view
      */
-
     const RenderItemBubble = useCallback((item: TypeCreatePostResponse) => {
         return (
             <BubbleProfile
                 item={item}
-                onReportUser={onReportUser}
+                onShowOptions={onShowOptions}
                 onRefreshItem={onRefreshItem}
                 onShowModalComment={onShowModalComment}
                 onLikeOrUnLike={onLikeOrUnLike}
+                onSeeDetailImage={onSeeDetailImage}
             />
         );
     }, []);
 
     return (
-        <Animated.View style={styles.container}>
+        <View style={styles.container}>
             <StyleList
                 data={list}
                 renderItem={({item}) => RenderItemBubble(item)}
                 keyExtractor={(_, index) => String(index)}
-                snapToInterval={bubbleHeight}
+                snapToInterval={bubbleProfileHeight}
                 // scrollEventThrottle={16}
                 decelerationRate="fast"
                 initialScrollIndex={initIndex}
                 getItemLayout={(_, index) => ({
-                    length: bubbleHeight,
-                    offset: bubbleHeight * index,
+                    length: bubbleProfileHeight,
+                    offset: bubbleProfileHeight * index,
                     index,
                 })}
             />
@@ -170,19 +191,46 @@ const ListDetailPost = ({route}: Props) => {
                 setDisplayComment={setDisplayComment}
                 isNotModalOfMainTab
             />
-        </Animated.View>
+
+            <StyleActionSheet
+                ref={optionsRef}
+                listTextAndAction={[
+                    {
+                        text: 'discovery.report.title',
+                        action: () => {
+                            navigate(ROOT_SCREEN.reportUser, {
+                                idUser: idUserReport,
+                            });
+                        },
+                    },
+                    {
+                        text: 'discovery.seeDetailImage',
+                        action: () => {
+                            showSwipeImages({
+                                listImages: [{url: imageWantToSee}],
+                            });
+                        },
+                    },
+                    {
+                        text: 'common.cancel',
+                        action: () => null,
+                    },
+                ]}
+            />
+        </View>
     );
 };
 
 const styles = ScaledSheet.create({
     container: {
-        width:
-            Metrics.width - Metrics.safeLeftPadding - Metrics.safeRightPadding,
-        height: Metrics.height - Metrics.safeBottomPadding,
+        width: bubbleProfileWidth,
+        height: bubbleProfileHeight,
     },
     backIcon: {
         position: 'absolute',
-        top: Metrics.safeTopPadding,
+        top: '100@vs',
+        backgroundColor: `rgba(8, 16, 25, ${0.4})`,
+        borderRadius: '20@vs',
     },
 });
 

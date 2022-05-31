@@ -1,4 +1,3 @@
-import {useIsFocused} from '@react-navigation/native';
 import {TypeBubblePalace, TypeCreatePostRequest} from 'api/interface';
 import {apiCreatePost, apiEditPost} from 'api/module';
 import {RELATIONSHIP, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
@@ -12,17 +11,11 @@ import {
 import StyleTouchHaveDouble from 'components/base/StyleTouchHaveDouble';
 import ButtonBack from 'components/common/ButtonBack';
 import StyleMoreText from 'components/StyleMoreText';
+import {bubbleHeight} from 'feature/discovery/components/Bubble';
 import IconHobby from 'feature/discovery/components/IconHobby';
 import Redux from 'hook/useRedux';
-import {PROFILE_ROUTE} from 'navigation/config/routes';
-import {useTabBar} from 'navigation/config/TabBarProvider';
-import {
-    appAlert,
-    goBack,
-    navigate,
-    popUpPicker,
-} from 'navigation/NavigationService';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {appAlert, goBack, popUpPicker} from 'navigation/NavigationService';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Animated, ScrollView, TextInput, View} from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
@@ -47,9 +40,8 @@ interface Props {
 const CreatePostPreview = ({route}: Props) => {
     const itemPostFromEdit = route.params?.itemPostFromEdit;
 
-    const isFocused = useIsFocused();
     const {t} = useTranslation();
-    const {setShowTabBar} = useTabBar();
+
     const theme = Redux.getTheme();
     const {gender} = Redux.getPassport().information;
     const profile = Redux.getPassport().profile;
@@ -72,14 +64,6 @@ const CreatePostPreview = ({route}: Props) => {
     const [displayLayerContent, setDisplayLayerContent] = useState(false);
 
     const optionsImgPicker = optionsImagePicker.map(text => t(text));
-
-    useEffect(() => {
-        if (isFocused) {
-            setShowTabBar(false);
-        } else {
-            setShowTabBar(true);
-        }
-    }, [isFocused]);
 
     const onConfirmPost = async () => {
         if (color === undefined) {
@@ -183,7 +167,7 @@ const CreatePostPreview = ({route}: Props) => {
                 });
             }
 
-            navigate(PROFILE_ROUTE.myProfile);
+            goBack();
         } catch (err) {
             appAlert(err);
         } finally {
@@ -195,10 +179,14 @@ const CreatePostPreview = ({route}: Props) => {
         if (index === 0) {
             await chooseImageFromCamera(setImage, {
                 freeStyleCrop: true,
+                maxWidth: Metrics.width,
+                maxHeight: bubbleHeight,
             });
         } else if (index === 1) {
             await chooseImageFromLibrary(setImage, {
                 freeStyleCrop: true,
+                maxWidth: Metrics.width,
+                maxHeight: bubbleHeight,
             });
         }
     }, []);
@@ -494,7 +482,11 @@ const CreatePostPreview = ({route}: Props) => {
     }, [content, image, color, name]);
 
     return (
-        <View style={styles.container}>
+        <View
+            style={[
+                styles.container,
+                {backgroundColor: theme.backgroundColor},
+            ]}>
             {RenderImage}
             {RenderButtonComeback}
             {RenderToolUp}

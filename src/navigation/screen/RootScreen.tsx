@@ -4,7 +4,6 @@ import {
     createStackNavigator,
     StackNavigationOptions,
 } from '@react-navigation/stack';
-import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
 import Alert from 'components/Alert';
 import AlertYesNo from 'components/AlerYesNo';
@@ -15,15 +14,21 @@ import SwipeImages from 'components/SwipeImages';
 import DetailBubble from 'feature/discovery/DetailBubble';
 import InteractBubble from 'feature/discovery/InteractBubble';
 import ReportUser from 'feature/discovery/ReportUser';
+import ChatDetail from 'feature/mess/ChatDetail';
+import ChatDetailGroup from 'feature/mess/ChatDetailGroup';
+import ChatDetailSetting from 'feature/mess/ChatDetailSetting';
+import PublicChatting from 'feature/mess/PublicChatting';
+import CreateGroup from 'feature/profile/CreateGroup';
+import CreatePostPreview from 'feature/profile/CreatePostPreview';
 import ListFollows from 'feature/profile/ListFollows';
 import OtherProfile from 'feature/profile/OtherProfile';
 import ListDetailPost from 'feature/profile/post/ListDetailPost';
 import Redux from 'hook/useRedux';
-import ROOT_SCREEN from 'navigation/config/routes';
+import ROOT_SCREEN, {MESS_ROUTE, PROFILE_ROUTE} from 'navigation/config/routes';
 import TabBarProvider from 'navigation/config/TabBarProvider';
 import {navigationRef} from 'navigation/NavigationService';
 import React, {useEffect, useState} from 'react';
-import {StatusBar, StyleProp, ViewStyle} from 'react-native';
+import {StatusBar} from 'react-native';
 import CodePush from 'react-native-code-push';
 import Config from 'react-native-config';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -32,6 +37,7 @@ import {isIOS, logger, selectBgCardStyle} from 'utility/assistant';
 import {selectIsHaveActiveUser} from 'utility/login/selectScreen';
 import LoginRoute from './LoginRoute';
 import MainTabs from './MainTabs';
+import SettingRoute from './tabs/SettingRoute';
 import WebViewScreen from './WebViewScreen';
 
 const RootStack = createStackNavigator();
@@ -45,6 +51,10 @@ const RootScreen = () => {
     const token = Redux.getToken();
 
     const [initLoading, setInitLoading] = useState(true);
+
+    const cardStyle = {
+        backgroundColor: theme.backgroundColor,
+    };
 
     const initApp = async () => {
         try {
@@ -101,24 +111,14 @@ const RootScreen = () => {
                     name={ROOT_SCREEN.otherProfile}
                     component={OtherProfile}
                     options={{
-                        cardStyle: [
-                            cardStyleSafeTop,
-                            {
-                                backgroundColor: theme.backgroundColor,
-                            },
-                        ],
+                        cardStyle,
                     }}
                 />
                 <RootStack.Screen
                     name={ROOT_SCREEN.listFollows}
                     component={ListFollows}
                     options={{
-                        cardStyle: [
-                            cardStyleSafeTop,
-                            {
-                                backgroundColor: theme.backgroundColor,
-                            },
-                        ],
+                        cardStyle,
                     }}
                 />
 
@@ -126,13 +126,7 @@ const RootScreen = () => {
                     name={ROOT_SCREEN.detailBubble}
                     component={DetailBubble}
                     options={{
-                        cardStyle: [
-                            cardStyleSafeTop,
-                            {
-                                backgroundColor: theme.backgroundColor,
-                            },
-                        ],
-                        gestureEnabled: true,
+                        cardStyle,
                     }}
                 />
                 <RootStack.Screen
@@ -141,19 +135,14 @@ const RootScreen = () => {
                     options={{
                         // cardStyleInterpolator:
                         //     CardStyleInterpolators.forScaleFromCenterAndroid,
-                        cardStyle: {
-                            backgroundColor: theme.backgroundColor,
-                        },
+                        cardStyle,
                     }}
                 />
 
                 {/* Interact Bubble */}
                 <RootStack.Screen
                     options={{
-                        cardStyle: [
-                            {backgroundColor: selectBgCardStyle(0.3)},
-                            cardStyleSafeTop,
-                        ],
+                        cardStyle: [{backgroundColor: selectBgCardStyle(0.3)}],
                         cardStyleInterpolator:
                             CardStyleInterpolators.forFadeFromBottomAndroid,
                     }}
@@ -164,10 +153,7 @@ const RootScreen = () => {
                 {/* Swipe Image */}
                 <RootStack.Screen
                     options={{
-                        cardStyle: [
-                            {backgroundColor: theme.backgroundColor},
-                            cardStyleSafeTop,
-                        ],
+                        cardStyle,
                         cardStyleInterpolator:
                             CardStyleInterpolators.forFadeFromBottomAndroid,
                     }}
@@ -175,15 +161,53 @@ const RootScreen = () => {
                     component={SwipeImages}
                 />
 
-                {/* Report user */}
                 <RootStack.Screen
                     name={ROOT_SCREEN.reportUser}
                     component={ReportUser}
                     options={{
-                        cardStyle: [
-                            {backgroundColor: theme.backgroundColor},
-                            cardStyleSafeTop,
-                        ],
+                        cardStyle,
+                    }}
+                />
+
+                <RootStack.Screen
+                    name={PROFILE_ROUTE.settingRoute}
+                    component={SettingRoute}
+                />
+
+                <RootStack.Screen
+                    name={PROFILE_ROUTE.createPostPreview}
+                    component={CreatePostPreview}
+                />
+                <RootStack.Screen
+                    name={PROFILE_ROUTE.createGroup}
+                    component={CreateGroup}
+                />
+                <RootStack.Screen
+                    name={MESS_ROUTE.chatDetail}
+                    component={ChatDetail}
+                    options={{
+                        gestureEnabled: isIOS,
+                    }}
+                />
+                <RootStack.Screen
+                    name={MESS_ROUTE.chatDetailGroup}
+                    component={ChatDetailGroup}
+                    options={{
+                        gestureEnabled: isIOS,
+                    }}
+                />
+                <RootStack.Screen
+                    name={MESS_ROUTE.chatDetailSetting}
+                    component={ChatDetailSetting}
+                />
+
+                <RootStack.Screen
+                    name={MESS_ROUTE.publicChatting}
+                    component={PublicChatting}
+                    options={{
+                        cardStyleInterpolator:
+                            CardStyleInterpolators.forFadeFromBottomAndroid,
+                        animationEnabled: false,
                     }}
                 />
             </>
@@ -204,10 +228,9 @@ const RootScreen = () => {
                         overflow: 'visible',
                         backgroundColor: theme.backgroundColor,
                     }}
-                    edges={['bottom', 'left', 'right']}>
+                    edges={['bottom', 'left', 'right', 'top']}>
                     <RootStack.Navigator
                         screenOptions={{
-                            gestureEnabled: false,
                             headerShown: false,
                         }}>
                         {isModeExp || token
@@ -241,10 +264,7 @@ const RootScreen = () => {
                         <RootStack.Screen
                             options={{
                                 ...alertOption,
-                                cardStyle: [
-                                    {backgroundColor: selectBgCardStyle(0.6)},
-                                    cardStyleSafeTop,
-                                ],
+                                cardStyle,
                             }}
                             name={ROOT_SCREEN.modalize}
                             component={Modalize}
@@ -255,10 +275,7 @@ const RootScreen = () => {
                             name={ROOT_SCREEN.webView}
                             component={WebViewScreen}
                             options={{
-                                cardStyle: [
-                                    {backgroundColor: theme.backgroundColor},
-                                    cardStyleSafeTop,
-                                ],
+                                cardStyle,
                             }}
                         />
 
@@ -269,7 +286,6 @@ const RootScreen = () => {
                             options={{
                                 cardStyle: [
                                     {backgroundColor: selectBgCardStyle(0.6)},
-                                    cardStyleSafeTop,
                                 ],
                                 cardStyleInterpolator:
                                     CardStyleInterpolators.forFadeFromBottomAndroid,
@@ -289,10 +305,6 @@ const alertOption: StackNavigationOptions = {
     animationEnabled: false,
     cardOverlayEnabled: true,
     headerShown: false,
-};
-
-export const cardStyleSafeTop: StyleProp<ViewStyle> = {
-    paddingTop: Metrics.safeTopPadding,
 };
 
 export default RootScreen;

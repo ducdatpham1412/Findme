@@ -154,7 +154,6 @@ const NotificationScreen = () => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
-        paddingTop: Metrics.safeTopPadding,
         paddingHorizontal: '15@s',
     },
     titleView: {
@@ -163,6 +162,7 @@ const styles = ScaledSheet.create({
     textTitle: {
         fontSize: '25@ms',
         fontWeight: 'bold',
+        left: '50@s',
     },
     listContainer: {
         paddingBottom: '100@vs',

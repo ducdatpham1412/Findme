@@ -1,48 +1,58 @@
 import {TypeCreatePostResponse} from 'api/interface';
 import {RELATIONSHIP} from 'asset/enum';
+import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
+import AutoHeightImage from 'components/AutoHeightImage';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import StyleTouchHaveDouble from 'components/base/StyleTouchHaveDouble';
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import StyleMoreText from 'components/StyleMoreText';
 import IconHobby from 'feature/discovery/components/IconHobby';
+import {TypeShowMoreOptions} from 'feature/discovery/ListBubbleCouple';
 import Redux from 'hook/useRedux';
 import React, {memo, useEffect, useState} from 'react';
+import isEqual from 'react-fast-compare';
 import {View} from 'react-native';
-import {ScaledSheet, verticalScale} from 'react-native-size-matters';
-import Feather from 'react-native-vector-icons/Feather';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {TypeLikeUnlikeParams} from './ListDetailPost';
+import LinearGradient from 'react-native-linear-gradient';
+import {moderateScale, ScaledSheet} from 'react-native-size-matters';
+import {chooseColorGradient, logger} from 'utility/assistant';
+import {
+    bubbleProfileHeight,
+    bubbleProfileWidth,
+    TypeLikeUnlikeParams,
+} from './ListDetailPost';
 
 interface Props {
     item: TypeCreatePostResponse;
-    onReportUser(idUser: number): void;
+    onShowOptions(params: TypeShowMoreOptions): void;
     onRefreshItem(idBubble: string): Promise<void>;
     onShowModalComment(bubble: TypeCreatePostResponse): void;
     onLikeOrUnLike(params: TypeLikeUnlikeParams): Promise<void>;
+    onSeeDetailImage(imageUrl: string): void;
 }
-
-const bubbleWidth =
-    Metrics.width - Metrics.safeLeftPadding - Metrics.safeRightPadding;
-const bubbleHeight = Metrics.height - Metrics.safeBottomPadding;
 
 const BubbleProfile = (props: Props) => {
     const {
         item,
-        onReportUser,
+        onShowOptions,
         onRefreshItem,
         onShowModalComment,
         onLikeOrUnLike,
+        onSeeDetailImage,
     } = props;
 
     const theme = Redux.getTheme();
+    const {gradient} = Redux.getResource();
 
     const [isLiked, setIsLiked] = useState(item.isLiked);
     const [totalLikes, setTotalLikes] = useState(item.totalLikes);
 
-    const [displayLayer, setDisplayLayer] = useState(false);
+    const color = chooseColorGradient({
+        listGradients: gradient,
+        colorChoose: item.color,
+    });
 
     const avatar = item.creatorAvatar;
 
@@ -67,315 +77,355 @@ const BubbleProfile = (props: Props) => {
     const RenderImage = () => {
         const imageChoose = item.images[0] ? item.images[0] : avatar;
         const opacity = item.images[0] ? 1 : 0.3;
+
+        const onShowNameBubble = () => {
+            logger(item.name);
+        };
+
         return (
             <StyleTouchHaveDouble
                 customStyle={styles.imageView}
                 onDoubleClick={() => {
                     if (!isLiked) {
                         onLikeUnLike();
+                    } else {
+                        onSeeDetailImage(imageChoose);
                     }
                 }}>
-                <StyleImage
-                    source={{uri: imageChoose}}
+                <AutoHeightImage
+                    uri={imageChoose}
                     customStyle={[styles.image, {opacity}]}
+                />
+
+                <StyleTouchable
+                    customStyle={styles.moreTouch}
+                    onPress={() =>
+                        onShowOptions({
+                            idUser: item.creatorId,
+                            imageWantToSee: imageChoose,
+                        })
+                    }
+                    hitSlop={15}>
+                    <StyleImage
+                        source={Images.icons.more}
+                        customStyle={styles.iconMore}
+                        resizeMode="contain"
+                    />
+                </StyleTouchable>
+
+                <IconHobby
+                    bubbleId={item.id}
+                    color={item.color}
+                    containerStyle={styles.iconHobby}
+                    onTouchStart={onShowNameBubble}
                 />
             </StyleTouchHaveDouble>
         );
     };
 
-    const RenderLayer = () => {
-        if (!displayLayer) {
-            return null;
-        }
-        return (
-            <View
-                style={[
-                    styles.layerView,
-                    {backgroundColor: theme.backgroundColor},
-                ]}
-            />
-        );
-    };
-
-    const RenderNameAndContent = () => {
-        const color =
+    const RenderContentName = () => {
+        const textColor =
             item.relationship === RELATIONSHIP.self
                 ? theme.highlightColor
-                : theme.textHightLight;
+                : Theme.darkTheme.textHightLight;
         return (
-            <View style={styles.avatarNameContentView}>
-                <View style={styles.avatarNameBox}>
-                    <StyleText
-                        originValue={`@${item.creatorName}`}
-                        customStyle={[styles.textName, {color}]}
-                    />
-                </View>
-                <View style={styles.contentBox}>
-                    <StyleText
-                        originValue={`🌙  ${item.name}`}
-                        customStyle={[
-                            styles.textNameBubble,
-                            {color: theme.textHightLight},
-                        ]}
-                    />
-                    <StyleMoreText
-                        value={item.content}
-                        textStyle={[
-                            styles.textContent,
-                            {color: theme.textHightLight},
-                        ]}
-                    />
-                </View>
-            </View>
-        );
-    };
-
-    const RenderExtensionTool = () => {
-        return (
-            <View style={styles.reportView}>
-                <StyleTouchable
-                    customStyle={styles.iconReportTouch}
-                    onPress={() => onReportUser(item.creatorId)}>
-                    <Feather
-                        name="flag"
-                        style={[styles.iconReport, {color: theme.textColor}]}
-                    />
-                </StyleTouchable>
-                <StyleTouchable
-                    customStyle={styles.iconReportTouch}
-                    onPress={() => onRefreshItem(item.id)}>
-                    <Feather
-                        name="refresh-ccw"
-                        style={[styles.iconReport, {color: theme.textColor}]}
-                    />
-                </StyleTouchable>
-            </View>
-        );
-    };
-
-    const RenderAvatar = () => {
-        return (
-            <StyleImage source={{uri: avatar}} customStyle={styles.avatar} />
-        );
-    };
-
-    const RenderIconLikeUnLike = () => {
-        const color = isLiked ? Theme.common.pink : theme.unLikeHeart;
-        return (
-            <View style={styles.likeBox}>
-                {isLiked ? (
-                    <IconLiked
-                        onPress={onLikeUnLike}
-                        customStyle={styles.iconLike}
-                    />
-                ) : (
-                    <IconNotLiked
-                        onPress={onLikeUnLike}
-                        customStyle={[styles.iconUnLike, {color}]}
-                    />
-                )}
-
-                <View style={styles.textLikeCommentBox}>
-                    {!!totalLikes && (
-                        <StyleText
-                            originValue={totalLikes}
-                            customStyle={[styles.textLikeComment, {color}]}
+            <LinearGradient
+                colors={['transparent', Theme.darkTheme.backgroundColor]}
+                style={styles.linearGradient}
+                start={{x: 0.5, y: 0}}
+                end={{x: 0.5, y: 1}}>
+                <View style={styles.avatarNameContentView}>
+                    <View>
+                        <StyleImage
+                            source={{uri: avatar}}
+                            customStyle={styles.avatar}
                         />
-                    )}
-                </View>
-            </View>
-        );
-    };
+                    </View>
 
-    const RenderComment = () => {
-        return (
-            <StyleTouchable
-                customStyle={styles.commentBox}
-                onPress={() => onShowModalComment(item)}
-                hitSlop={15}>
-                <FontAwesome
-                    name="comments-o"
-                    style={[styles.iconComment, {color: theme.unLikeHeart}]}
-                />
-                <View style={styles.textLikeCommentBox}>
-                    {!!item.totalComments && (
+                    <View style={styles.contentBox}>
                         <StyleText
-                            originValue={item.totalComments}
-                            customStyle={[
-                                styles.textLikeComment,
-                                {color: theme.unLikeHeart},
+                            originValue={`${item.creatorName}`}
+                            customStyle={[styles.textName, {color: textColor}]}
+                        />
+                        <StyleMoreText
+                            value={item.content}
+                            textStyle={[
+                                styles.textContent,
+                                {color: Theme.darkTheme.textHightLight},
                             ]}
+                            maxRows={2}
+                            maxHeight={Metrics.height / 2}
                         />
-                    )}
+                    </View>
                 </View>
-            </StyleTouchable>
+            </LinearGradient>
         );
     };
 
-    const RenderIconHobby = () => {
+    const RenderTool = () => {
+        const backgroundColor = theme.backgroundColor;
+
+        const RenderStartChat = () => {
+            return (
+                <StyleTouchable
+                    customStyle={[
+                        styles.buttonTouch,
+                        {
+                            width: moderateScale(55),
+                            height: moderateScale(55),
+                            backgroundColor,
+                        },
+                    ]}
+                    disable>
+                    <StyleImage
+                        source={Images.icons.chatNow}
+                        customStyle={styles.iconChatNow}
+                    />
+                </StyleTouchable>
+            );
+        };
+
+        const RenderIconLikeUnLike = () => {
+            const iconColor = isLiked ? theme.likeHeart : theme.unLikeHeart;
+            return (
+                <View>
+                    <StyleTouchable
+                        customStyle={[styles.buttonTouch, {backgroundColor}]}
+                        onPress={onLikeUnLike}
+                        hitSlop={15}>
+                        {isLiked ? (
+                            <IconLiked
+                                onPress={onLikeUnLike}
+                                customStyle={[
+                                    styles.iconLike,
+                                    {color: iconColor},
+                                ]}
+                            />
+                        ) : (
+                            <IconNotLiked
+                                onPress={onLikeUnLike}
+                                customStyle={[
+                                    styles.iconUnLike,
+                                    {color: iconColor},
+                                ]}
+                            />
+                        )}
+                    </StyleTouchable>
+                    <View style={styles.textLikeCommentBox}>
+                        {!!totalLikes && (
+                            <StyleText
+                                originValue={totalLikes}
+                                customStyle={[
+                                    styles.textLikeComment,
+                                    {color: theme.unLikeHeart},
+                                ]}
+                            />
+                        )}
+                    </View>
+                </View>
+            );
+        };
+
+        const RenderComment = () => {
+            return (
+                <View>
+                    <StyleTouchable
+                        customStyle={[styles.buttonTouch, {backgroundColor}]}
+                        onPress={() => onShowModalComment(item)}
+                        hitSlop={15}>
+                        <StyleImage
+                            source={Images.icons.comment}
+                            customStyle={styles.iconComment}
+                        />
+                    </StyleTouchable>
+
+                    <View style={styles.textLikeCommentBox}>
+                        {!!item.totalComments && (
+                            <StyleText
+                                originValue={item.totalComments}
+                                customStyle={[
+                                    styles.textLikeComment,
+                                    {color: theme.unLikeHeart},
+                                ]}
+                            />
+                        )}
+                    </View>
+                </View>
+            );
+        };
+
+        const RenderReload = () => {
+            return (
+                <StyleTouchable
+                    customStyle={[styles.buttonTouch, {backgroundColor}]}
+                    onPress={() => onRefreshItem(item.id)}
+                    hitSlop={{left: 10, top: 10, right: 10, bottom: 10}}>
+                    <StyleImage
+                        source={Images.icons.reload}
+                        customStyle={styles.iconReload}
+                    />
+                </StyleTouchable>
+            );
+        };
+
         return (
-            <IconHobby
-                bubbleId={item.id}
-                color={item.color}
-                onTouchStart={() => setDisplayLayer(true)}
-                onTouchEnd={() => setDisplayLayer(false)}
-            />
+            <View style={styles.toolView}>
+                {RenderStartChat()}
+                {RenderIconLikeUnLike()}
+                {RenderComment()}
+                {RenderReload()}
+            </View>
         );
     };
 
     return (
-        <View style={styles.itemBubbleView}>
-            {RenderImage()}
-            {RenderLayer()}
-            {RenderNameAndContent()}
-            {RenderExtensionTool()}
-            <View style={styles.toolView}>
-                {RenderAvatar()}
-                {RenderIconLikeUnLike()}
-                {RenderComment()}
-                {RenderIconHobby()}
+        <LinearGradient
+            style={styles.container}
+            colors={color}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 1}}>
+            <View
+                style={[styles.body, {backgroundColor: theme.backgroundColor}]}>
+                {RenderImage()}
+                {RenderContentName()}
+                {RenderTool()}
             </View>
-        </View>
+        </LinearGradient>
     );
 };
 
 const styles = ScaledSheet.create({
-    itemBubbleView: {
-        width: bubbleWidth,
-        height: bubbleHeight,
+    container: {
+        width: bubbleProfileWidth,
+        height: bubbleProfileHeight,
+        padding: '15@ms',
+        overflow: 'hidden',
+    },
+    body: {
+        flex: 1,
+        borderRadius: '15@ms',
+    },
+    // avatar, name and content
+    avatarNameContentView: {
+        width: '100%',
+        paddingHorizontal: '10@s',
+        paddingVertical: '10@ms', // 00
+        borderRadius: '15@ms',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    avatar: {
+        width: '35@ms',
+        height: '35@ms',
+        borderRadius: '20@ms',
+    },
+    contentBox: {
+        flex: 1,
+        paddingLeft: '10@s',
+    },
+    textName: {
+        fontSize: '20@ms',
+        fontWeight: 'bold',
+    },
+    textContent: {
+        fontSize: '17@ms',
+        color: Theme.common.white,
     },
     // image
     imageView: {
         flex: 1,
-        alignItems: 'center',
+        backgroundColor: Theme.darkTheme.backgroundColor,
+        borderRadius: '15@ms',
         justifyContent: 'center',
+        overflow: 'hidden',
     },
     image: {
         width: '100%',
-        height: '100%',
-        resizeMode: 'contain',
     },
-    // layer
-    layerView: {
+    moreTouch: {
         position: 'absolute',
-        width: '100%',
-        height: '100%',
-        opacity: 0.6,
+        right: '8@s',
+        top: '15@ms',
+    },
+    iconMore: {
+        width: '30@ms',
+        height: '10@ms',
+    },
+    iconHobby: {
+        position: 'absolute',
+        marginTop: 0,
+        top: '10@ms',
+        left: '10@ms',
     },
     // tool
     toolView: {
         position: 'absolute',
-        width: '66@s',
-        paddingVertical: '10@vs',
-        bottom: '150@s',
-        right: 0,
-        alignItems: 'center',
+        bottom: 0,
+        width: '95%',
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        justifyContent: 'space-around',
+        alignSelf: 'center',
+        height: '75@ms',
     },
-    avatar: {
+    buttonTouch: {
         width: '45@ms',
         height: '45@ms',
-        borderRadius: '30@ms',
-    },
-    likeBox: {
-        width: '100%',
-        height: '70@vs',
+        borderWidth: '0@ms',
+        borderRadius: '40@ms',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: '40@vs',
+        backgroundColor: Theme.common.white,
+    },
+    iconChatNow: {
+        width: '35@ms',
+        height: '35@ms',
     },
     iconLike: {
-        fontSize: '40@ms',
+        fontSize: '25@ms',
     },
     iconUnLike: {
-        fontSize: '40@ms',
+        fontSize: '25@ms',
     },
     textLikeCommentBox: {
-        height: '30@ms',
         marginTop: '7@vs',
         alignSelf: 'center',
     },
     textLikeComment: {
-        fontSize: '20@ms',
+        fontSize: '12@ms',
     },
-    commentBox: {
-        marginTop: '20@vs',
-    },
+    commentBox: {},
     iconComment: {
-        fontSize: '40@ms',
+        width: '30@ms',
+        height: '30@ms',
     },
-    // gradient
-    linearGradient: {
-        height: '40@s',
-        position: 'absolute',
-        alignSelf: 'center',
-        bottom: '100@vs',
-        borderRadius: '50@s',
-    },
-    touchStartChat: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: '50@s',
-    },
-    textStart: {
-        fontSize: '15@ms',
-        fontWeight: 'bold',
-    },
-    // report
-    reportView: {
-        position: 'absolute',
-        width: '50@ms',
-        top: Metrics.safeTopPadding + verticalScale(10),
-        right: '10@s',
-        alignItems: 'center',
-        borderRadius: '30@ms',
-    },
-    iconReportTouch: {
-        marginBottom: '30@vs',
+    iconReload: {
+        width: '30@ms',
+        height: '30@ms',
     },
     iconReport: {
-        fontSize: '25@ms',
+        fontSize: '18@ms',
     },
     reportBox: {
         position: 'absolute',
         right: '60@ms',
         top: '60@ms',
     },
-    // avatar, name and content
-    avatarNameContentView: {
+    // linear gradient
+    linearGradient: {
         position: 'absolute',
-        top: Metrics.safeTopPadding + verticalScale(30),
-        left: '10@s',
-        width: '70%',
-    },
-    avatarNameBox: {
+        bottom: 0,
         width: '100%',
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    textName: {
-        fontSize: '16@ms',
-        fontWeight: 'bold',
-    },
-    contentBox: {
-        width: '100%',
-        paddingTop: '7@vs',
-    },
-    textNameBubble: {
-        fontSize: '15@ms',
-        marginBottom: '10@vs',
-    },
-    textContent: {
-        fontSize: '14@ms',
-        color: Theme.common.white,
+        borderBottomLeftRadius: '15@ms',
+        borderBottomRightRadius: '15@ms',
+        paddingBottom: '85@ms',
+        paddingTop: '40@ms',
     },
 });
 
 export default memo(BubbleProfile, (preProps: Props, nextProps: any) => {
-    for (const [key, value] of Object.entries(preProps.item)) {
-        if (nextProps.item?.[key] !== value) {
-            return false;
-        }
+    if (!isEqual(preProps.item, nextProps.item)) {
+        return false;
     }
     return true;
 });
