@@ -176,7 +176,7 @@ const Bubble = (props: Props) => {
                             value={item.content}
                             textStyle={[
                                 styles.textContent,
-                                {color: Theme.darkTheme.textHightLight},
+                                {color: Theme.common.white},
                             ]}
                             maxRows={2}
                             maxHeight={Metrics.height / 2}
@@ -383,7 +383,7 @@ const styles = ScaledSheet.create({
         top: '15@ms',
     },
     iconMore: {
-        width: '30@ms',
+        width: '20@ms',
         height: '10@ms',
     },
     iconHobby: {
@@ -431,8 +431,8 @@ const styles = ScaledSheet.create({
     },
     commentBox: {},
     iconComment: {
-        width: '30@ms',
-        height: '30@ms',
+        width: '28@ms',
+        height: '28@ms',
     },
     iconReload: {
         width: '30@ms',

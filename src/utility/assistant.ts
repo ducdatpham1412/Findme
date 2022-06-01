@@ -14,6 +14,7 @@ import {
     TYPE_COLOR,
 } from 'asset/enum';
 import Images from 'asset/img/images';
+import {Metrics} from 'asset/metrics';
 import {PRIVATE_AVATAR} from 'asset/standardValue';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {
@@ -475,3 +476,9 @@ export function sleep(milliseconds: number) {
         currentDate = Date.now();
     } while (currentDate - date < milliseconds);
 }
+
+export const bubbleProfileHeight = () =>
+    Metrics.height - Metrics.safeBottomPadding - Metrics.safeTopPadding;
+
+export const bubbleProfileWidth = () =>
+    Metrics.width - Metrics.safeLeftPadding - Metrics.safeRightPadding;

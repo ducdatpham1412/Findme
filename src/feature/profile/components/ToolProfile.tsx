@@ -1,11 +1,11 @@
-import {StyleTouchable} from 'components/base';
+import Images from 'asset/img/images';
+import {StyleImage, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
 import React from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import Feather from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const ToolProfile = () => {
@@ -26,9 +26,12 @@ const ToolProfile = () => {
                     {borderColor: theme.textColor},
                 ]}
                 hitSlop={15}>
-                <Feather
-                    name="instagram"
-                    style={[styles.iconCamera, {color: theme.textHightLight}]}
+                <StyleImage
+                    source={Images.icons.plus}
+                    customStyle={[
+                        styles.iconCamera,
+                        {tintColor: theme.textHightLight},
+                    ]}
                 />
             </StyleTouchable>
 
@@ -48,7 +51,7 @@ const ToolProfile = () => {
                 hitSlop={15}>
                 <MaterialIcons
                     name="groups"
-                    style={[styles.iconCamera, {color: theme.textHightLight}]}
+                    style={[styles.iconGroup, {color: theme.textHightLight}]}
                 />
             </StyleTouchable>
         </View>
@@ -80,7 +83,11 @@ const styles = ScaledSheet.create({
         marginHorizontal: '10%',
     },
     iconCamera: {
-        fontSize: '25@ms',
+        width: '25@ms',
+        height: '25@ms',
+    },
+    iconGroup: {
+        fontSize: '27@ms',
     },
     dividerBetween: {
         height: '70%',
