@@ -29,6 +29,14 @@ interface SignUpFormProps {
     };
 }
 
+const defaultFormSignUp = __DEV__
+    ? {
+          username: 'yeuquaimo@gmail.com',
+          password: '12345678',
+          confirmPass: '12345678',
+      }
+    : {};
+
 const SignUpForm = ({route}: SignUpFormProps) => {
     const {typeSignUp} = route.params;
     const theme = Redux.getTheme();
@@ -65,6 +73,7 @@ const SignUpForm = ({route}: SignUpFormProps) => {
     const form = useForm({
         mode: 'all',
         resolver: yupResolver(signUpSchema),
+        defaultValues: defaultFormSignUp,
     });
     const {
         handleSubmit,
