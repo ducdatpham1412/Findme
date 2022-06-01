@@ -1,6 +1,6 @@
 import {TypeCreatePostResponse} from 'api/interface';
 import {apiGetDetailBubble, apiLikePost, apiUnLikePost} from 'api/module';
-import {Metrics} from 'asset/metrics';
+import Theme from 'asset/theme/Theme';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import ModalComment from 'feature/discovery/components/ModalComment';
@@ -17,7 +17,11 @@ import {
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import {onGoToSignUp} from 'utility/assistant';
+import {
+    bubbleProfileHeight,
+    bubbleProfileWidth,
+    onGoToSignUp,
+} from 'utility/assistant';
 import BubbleProfile from './BubbleProfile';
 
 interface Props {
@@ -38,11 +42,6 @@ export interface TypeLikeUnlikeParams {
     setTotalLikes: Function;
 }
 
-export const bubbleProfileHeight =
-    Metrics.height - Metrics.safeBottomPadding - Metrics.safeTopPadding;
-export const bubbleProfileWidth =
-    Metrics.width - Metrics.safeLeftPadding - Metrics.safeRightPadding;
-
 let idUserReport = 0;
 let imageWantToSee = '';
 
@@ -57,8 +56,9 @@ const ListDetailPost = ({route}: Props) => {
         listInProfile[initIndex],
     );
     const [displayComment, setDisplayComment] = useState(false);
-
     const [list, setList] = useState(listInProfile);
+
+    const height = bubbleProfileHeight();
 
     useEffect(() => {
         setListInProfile(list);
@@ -171,18 +171,23 @@ const ListDetailPost = ({route}: Props) => {
                 data={list}
                 renderItem={({item}) => RenderItemBubble(item)}
                 keyExtractor={(_, index) => String(index)}
-                snapToInterval={bubbleProfileHeight}
-                // scrollEventThrottle={16}
+                snapToInterval={height}
+                scrollEventThrottle={16}
                 decelerationRate="fast"
                 initialScrollIndex={initIndex}
                 getItemLayout={(_, index) => ({
-                    length: bubbleProfileHeight,
-                    offset: bubbleProfileHeight * index,
+                    length: height,
+                    offset: height * index,
                     index,
                 })}
+                snapToOffsets={list.map((_, index) => index * height)}
             />
 
-            <HeaderLeftIcon style={styles.backIcon} onPress={goBack} />
+            <HeaderLeftIcon
+                style={styles.backIcon}
+                onPress={goBack}
+                iconStyle={{color: Theme.darkTheme.textColor}}
+            />
 
             <ModalComment
                 bubbleFocusing={bubbleFocusing}
@@ -223,8 +228,8 @@ const ListDetailPost = ({route}: Props) => {
 
 const styles = ScaledSheet.create({
     container: {
-        width: bubbleProfileWidth,
-        height: bubbleProfileHeight,
+        width: bubbleProfileWidth(),
+        height: bubbleProfileHeight(),
     },
     backIcon: {
         position: 'absolute',

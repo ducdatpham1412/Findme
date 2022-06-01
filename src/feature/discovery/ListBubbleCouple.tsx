@@ -171,12 +171,14 @@ const ListBubbleCouple = () => {
                 renderItem={({item}) => RenderItemBubble(item)}
                 keyExtractor={(_, index) => String(index)}
                 snapToInterval={bubbleHeight}
-                scrollEventThrottle={16}
+                snapToOffsets={list.map((_, index) => index * bubbleHeight)}
+                // scrollEventThrottle={16}
                 decelerationRate="fast"
                 refreshing={refreshing}
                 onRefresh={onRefresh}
                 onLoadMore={onLoadMore}
                 ListEmptyComponent={LoadingScreen}
+                // removeClippedSubviews={true}
                 // onEndReached={undefined}
                 // onScroll={e => {
                 //     const indexToLast = Math.round(

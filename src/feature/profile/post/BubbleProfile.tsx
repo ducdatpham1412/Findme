@@ -17,12 +17,13 @@ import isEqual from 'react-fast-compare';
 import {View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
-import {chooseColorGradient, logger} from 'utility/assistant';
 import {
     bubbleProfileHeight,
     bubbleProfileWidth,
-    TypeLikeUnlikeParams,
-} from './ListDetailPost';
+    chooseColorGradient,
+    logger,
+} from 'utility/assistant';
+import {TypeLikeUnlikeParams} from './ListDetailPost';
 
 interface Props {
     item: TypeCreatePostResponse;
@@ -151,7 +152,7 @@ const BubbleProfile = (props: Props) => {
                             value={item.content}
                             textStyle={[
                                 styles.textContent,
-                                {color: Theme.darkTheme.textHightLight},
+                                {color: Theme.common.white},
                             ]}
                             maxRows={2}
                             maxHeight={Metrics.height / 2}
@@ -296,8 +297,8 @@ const BubbleProfile = (props: Props) => {
 
 const styles = ScaledSheet.create({
     container: {
-        width: bubbleProfileWidth,
-        height: bubbleProfileHeight,
+        width: bubbleProfileWidth(),
+        height: bubbleProfileHeight(),
         padding: '15@ms',
         overflow: 'hidden',
     },

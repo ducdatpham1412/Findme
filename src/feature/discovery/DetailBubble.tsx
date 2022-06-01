@@ -11,10 +11,6 @@ import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import StyleMoreText from 'components/StyleMoreText';
-import {
-    bubbleProfileHeight,
-    bubbleProfileWidth,
-} from 'feature/profile/post/ListDetailPost';
 import Redux from 'hook/useRedux';
 import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
 import ROOT_SCREEN from 'navigation/config/routes';
@@ -29,6 +25,8 @@ import {View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import {
+    bubbleProfileHeight,
+    bubbleProfileWidth,
     chooseColorGradient,
     choosePrivateAvatar,
     logger,
@@ -410,8 +408,8 @@ const DetailBubble = ({route}: Props) => {
 
 const styles = ScaledSheet.create({
     container: {
-        width: bubbleProfileWidth,
-        height: bubbleProfileHeight,
+        width: bubbleProfileWidth(),
+        height: bubbleProfileHeight(),
         padding: '15@ms',
         overflow: 'hidden',
     },
