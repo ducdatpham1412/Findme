@@ -21,6 +21,13 @@ import AuthenticateService from 'utility/login/loginService';
 import ListSaveAcc from './components/ListSaveAcc';
 import RemForPass from './components/RemForPass';
 
+const loginForm = __DEV__
+    ? {
+          username: 'yeuquaimo@gmail.com',
+          password: '12345678',
+      }
+    : {username: '', password: ''};
+
 const LoginScreen = () => {
     const theme = Redux.getTheme();
 
@@ -29,8 +36,8 @@ const LoginScreen = () => {
     const passRef = useRef<any>(null);
 
     const {username, password} = Redux.getLogin();
-    const [user, setUser] = useState(username);
-    const [pass, setPass] = useState(password);
+    const [user, setUser] = useState(username || loginForm?.username);
+    const [pass, setPass] = useState(password || loginForm?.password);
     const [isKeepSign, setIsKeepSign] = useState(false);
 
     const getListAcc = useCallback(async () => {
