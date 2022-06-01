@@ -8,10 +8,13 @@ import {
     StyleTouchable,
 } from 'components/base';
 import Redux from 'hook/useRedux';
-import React from 'react';
+import React, {memo} from 'react';
+import isEqual from 'react-fast-compare';
 import {View} from 'react-native';
-import {scale, ScaledSheet, verticalScale} from 'react-native-size-matters';
+import LinearGradient from 'react-native-linear-gradient';
+import {scale, ScaledSheet} from 'react-native-size-matters';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {chooseColorGradient} from 'utility/assistant';
 import {bubbleHeight} from './Bubble';
 import IconHobby from './IconHobby';
 
@@ -26,12 +29,26 @@ const BubblePalaceGroup = (props: Props) => {
 
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
+    const {gradient} = Redux.getResource();
 
     const image = item.images[0];
+    const color = chooseColorGradient({
+        listGradients: gradient,
+        colorChoose: item.color,
+    });
 
     /**
      * Render Image
      */
+    const RenderImageBackground = () => {
+        return (
+            <StyleImage
+                source={{uri: image}}
+                customStyle={styles.imageBackground}
+            />
+        );
+    };
+
     const RenderImage = () => {
         return (
             <View style={[styles.imageBox, {borderColor: theme.borderColor}]}>
@@ -47,7 +64,8 @@ const BubblePalaceGroup = (props: Props) => {
 
     const RenderContent = () => {
         return (
-            <View style={[styles.textView, {borderColor: theme.borderColor}]}>
+            <View
+                style={[styles.textView, {borderColor: theme.backgroundColor}]}>
                 <View
                     style={[
                         styles.spaceBackground,
@@ -72,6 +90,10 @@ const BubblePalaceGroup = (props: Props) => {
                         editable={false}
                         hasErrorBox={false}
                         hasUnderLine={false}
+                        inputStyle={[
+                            styles.input,
+                            {color: theme.textHightLight},
+                        ]}
                     />
                 </View>
             </View>
@@ -95,7 +117,10 @@ const BubblePalaceGroup = (props: Props) => {
             <StyleTouchable
                 customStyle={[
                     styles.buttonJoinView,
-                    {borderColor: theme.borderColor},
+                    {
+                        borderColor: theme.borderColor,
+                        backgroundColor: theme.backgroundColor,
+                    },
                 ]}
                 onPress={onPress}
                 disable={isModeExp}>
@@ -107,7 +132,7 @@ const BubblePalaceGroup = (props: Props) => {
                     i18Text={text}
                     customStyle={[
                         styles.textJoin,
-                        {color: theme.holderColorLighter},
+                        {color: theme.joinGroupChat},
                     ]}
                 />
             </StyleTouchable>
@@ -115,11 +140,16 @@ const BubblePalaceGroup = (props: Props) => {
     };
 
     return (
-        <View style={styles.container}>
+        <LinearGradient
+            style={styles.container}
+            colors={color}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 1}}>
+            {RenderImageBackground()}
             {RenderImage()}
             {RenderContent()}
             {RenderButtonJoinGroup()}
-        </View>
+        </LinearGradient>
     );
 };
 
@@ -128,6 +158,15 @@ const styles = ScaledSheet.create({
         width: '100%',
         height: bubbleHeight,
         alignItems: 'center',
+        padding: '15@ms',
+    },
+    imageBackground: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        opacity: 0.5,
+        top: '15@ms',
+        borderRadius: '10@ms',
     },
     imageBox: {
         width: bubbleHeight * 0.35,
@@ -137,7 +176,7 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: '6@ms',
-        marginTop: Metrics.safeTopPadding + verticalScale(60),
+        marginTop: '60@vs',
     },
     image: {
         width: '100%',
@@ -147,15 +186,16 @@ const styles = ScaledSheet.create({
         width: Metrics.width * 0.6 + scale(100),
         maxHeight: '130@vs',
         flexDirection: 'row',
-        borderWidth: '1.5@ms',
-        borderRadius: '20@ms',
+        borderWidth: '0@ms',
+        borderRadius: '10@ms',
         marginTop: '20@vs',
     },
     spaceBackground: {
         position: 'absolute',
         width: '100%',
         height: '100%',
-        opacity: 0.4,
+        opacity: 0.95,
+        borderRadius: '10@ms',
     },
     iconHobbyBox: {
         height: '100%',
@@ -193,6 +233,10 @@ const styles = ScaledSheet.create({
     inputContainer: {
         width: '100%',
     },
+    input: {
+        fontSize: '14@ms',
+        paddingHorizontal: 0,
+    },
     // button join
     buttonJoinView: {
         paddingVertical: '5@vs',
@@ -208,8 +252,14 @@ const styles = ScaledSheet.create({
         marginRight: '10@s',
     },
     textJoin: {
-        fontSize: '17@ms',
+        fontSize: '13@ms',
+        fontWeight: 'bold',
     },
 });
 
-export default BubblePalaceGroup;
+export default memo(BubblePalaceGroup, (preProps: Props, nextProps: any) => {
+    if (!isEqual(nextProps.item, preProps.item)) {
+        return false;
+    }
+    return true;
+});

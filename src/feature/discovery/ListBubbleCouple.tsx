@@ -170,7 +170,7 @@ const ListBubbleCouple = () => {
                 data={list}
                 renderItem={({item}) => RenderItemBubble(item)}
                 keyExtractor={(_, index) => String(index)}
-                snapToInterval={bubbleHeight}
+                // snapToInterval={bubbleHeight}
                 snapToOffsets={list.map((_, index) => index * bubbleHeight)}
                 // scrollEventThrottle={16}
                 decelerationRate="fast"

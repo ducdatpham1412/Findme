@@ -349,7 +349,7 @@ const styles = ScaledSheet.create({
         top: '15@ms',
     },
     iconMore: {
-        width: '30@ms',
+        width: '20@ms',
         height: '10@ms',
     },
     iconHobby: {
