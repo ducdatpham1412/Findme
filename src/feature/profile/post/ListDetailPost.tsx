@@ -30,6 +30,7 @@ interface Props {
             listInProfile: Array<TypeCreatePostResponse>;
             initIndex: number;
             setListInProfile: Function;
+            allowSaveImage?: boolean;
         };
     };
 }
@@ -47,6 +48,7 @@ let imageWantToSee = '';
 
 const ListDetailPost = ({route}: Props) => {
     const {listInProfile, initIndex, setListInProfile} = route.params;
+    const allowSaveImage = route.params?.allowSaveImage;
 
     const isModeExp = Redux.getModeExp();
 
@@ -146,6 +148,7 @@ const ListDetailPost = ({route}: Props) => {
     const onSeeDetailImage = (imageUrl: string) => {
         showSwipeImages({
             listImages: [{url: imageUrl}],
+            allowSaveImage,
         });
     };
 

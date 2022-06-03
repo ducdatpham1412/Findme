@@ -11,6 +11,7 @@ const common = {
     cancel: 'Huỷ',
     done: 'Xong',
     save: 'Lưu',
+    canNotSave: 'Không thể lưu',
     success: 'Thành công',
     seeMore: '...Xem thêm',
     seeLess: '...Ẩn bớt',

@@ -126,6 +126,7 @@ const ProfileEnjoy = ({routeName}: ChildrenProps) => {
             listInProfile: list,
             initIndex,
             setListInProfile: setList,
+            allowSaveImage: true,
         });
     };
 
@@ -164,21 +165,18 @@ const ProfileEnjoy = ({routeName}: ChildrenProps) => {
         );
     };
 
-    const RenderItemPost = useCallback(
-        (item: TypeCreatePostResponse) => {
-            return (
-                <PostStatus
-                    key={item.id}
-                    itemPost={item}
-                    deleteAPostInList={() => {
-                        onDeleteAPostInList(item.id);
-                    }}
-                    onGoToDetailPost={onGoToDetailPost}
-                />
-            );
-        },
-        [list],
-    );
+    const RenderItemPost = (item: TypeCreatePostResponse) => {
+        return (
+            <PostStatus
+                key={item.id}
+                itemPost={item}
+                deleteAPostInList={() => {
+                    onDeleteAPostInList(item.id);
+                }}
+                onGoToDetailPost={onGoToDetailPost}
+            />
+        );
+    };
 
     const ListPostStatus = () => {
         return (
@@ -336,6 +334,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             listInProfile: list,
             initIndex,
             setListInProfile: setList,
+            allowSaveImage: true,
         });
     };
 
@@ -391,21 +390,18 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
         );
     };
 
-    const RenderItemPost = useCallback(
-        (item: TypeCreatePostResponse) => {
-            return (
-                <PostStatus
-                    key={item.id}
-                    itemPost={item}
-                    deleteAPostInList={() => {
-                        onDeleteAPostInList(item.id);
-                    }}
-                    onGoToDetailPost={onGoToDetailPost}
-                />
-            );
-        },
-        [list],
-    );
+    const RenderItemPost = (item: TypeCreatePostResponse) => {
+        return (
+            <PostStatus
+                key={item.id}
+                itemPost={item}
+                deleteAPostInList={() => {
+                    onDeleteAPostInList(item.id);
+                }}
+                onGoToDetailPost={onGoToDetailPost}
+            />
+        );
+    };
 
     const ListPostStatus = () => {
         return (
