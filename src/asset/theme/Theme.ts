@@ -23,6 +23,7 @@ const Theme = {
         tabBarIconColor: '#75adcb',
         likeHeart: '#DD0B0B',
         unLikeHeart: 'white',
+        joinGroupChat: '#90BEE9',
     },
     lightTheme: {
         backgroundColor: 'white',
@@ -37,6 +38,7 @@ const Theme = {
         tabBarIconColor: '#102a47',
         likeHeart: '#DD0B0B',
         unLikeHeart: '#c5e3ff',
+        joinGroupChat: '#90BEE9',
     },
 };
 
