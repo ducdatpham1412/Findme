@@ -1,7 +1,5 @@
+import Theme from 'asset/theme/Theme';
 import {StyleText, StyleTouchable} from 'components/base';
-import Redux from 'hook/useRedux';
-import {LOGIN_ROUTE} from 'navigation/config/routes';
-import {navigate} from 'navigation/NavigationService';
 import React from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
@@ -14,62 +12,31 @@ interface RemForPassProps {
 
 const RemForPass = (props: RemForPassProps) => {
     const {isKeepSignIn, onClickKeepSignIn} = props;
-    const theme = Redux.getTheme();
 
     return (
-        <View style={styles.remember_forgotPassword}>
-            {/* Remember password */}
-            <View style={styles.rememberView}>
-                <StyleTouchable
-                    customStyle={[
-                        styles.rememberButton,
-                        {borderColor: theme.borderColor},
-                    ]}
-                    onPress={onClickKeepSignIn}>
-                    {isKeepSignIn && (
-                        <AntDesign
-                            name="check"
-                            style={[
-                                styles.checkIcon,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                    )}
-                </StyleTouchable>
-
-                <StyleText
-                    i18Text="login.loginScreen.keepSignIn"
-                    customStyle={[
-                        styles.keepSignInText,
-                        {color: theme.borderColor},
-                    ]}
-                />
-            </View>
-
-            {/* Forgot password */}
+        <View style={styles.container}>
             <StyleTouchable
-                customStyle={styles.forgotButton}
-                onPress={() => navigate(LOGIN_ROUTE.forgetPasswordType)}>
-                <StyleText
-                    i18Text="login.loginScreen.forgotPass"
-                    customStyle={[
-                        styles.forgotButtonText,
-                        {color: theme.borderColor},
-                    ]}
-                />
+                customStyle={styles.rememberButton}
+                onPress={onClickKeepSignIn}>
+                {isKeepSignIn && (
+                    <AntDesign name="check" style={styles.checkIcon} />
+                )}
             </StyleTouchable>
+
+            <StyleText
+                i18Text="login.loginScreen.keepSignIn"
+                customStyle={styles.keepSignInText}
+            />
         </View>
     );
 };
 
 const styles = ScaledSheet.create({
-    remember_forgotPassword: {
-        width: '85%',
+    container: {
         flexDirection: 'row',
-        marginVertical: '20@vs',
-    },
-    rememberView: {
-        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: '10%',
+        marginTop: '20@vs',
     },
     rememberButton: {
         width: '20@vs',
@@ -79,12 +46,15 @@ const styles = ScaledSheet.create({
         marginRight: '7@vs',
         alignItems: 'center',
         justifyContent: 'center',
+        borderColor: Theme.darkTheme.textColor,
     },
     checkIcon: {
         fontSize: '20@ms',
+        color: Theme.darkTheme.textColor,
     },
     keepSignInText: {
         fontSize: '13@ms',
+        color: Theme.darkTheme.textHightLight,
     },
     forgotButton: {
         position: 'absolute',

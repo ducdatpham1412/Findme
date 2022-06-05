@@ -84,12 +84,7 @@ const login = {
         username: 'Email',
         password: 'Mật khẩu',
         keepSignIn: 'Duy trì đăng nhập',
-        forgotPass: 'Quên mật khẩu ?',
         signIn: 'Đăng nhập',
-        notHaveAcc: 'Chưa có tài khoản?',
-        signUp: ' Đăng ký',
-        enjoyModeNoAcc: 'Trải nghiệm\nkhông tài khoản',
-        goToLogin: 'Đi tới\nđăng nhập',
         byLoginOrTappingEnjoy:
             'Bằng việc đăng nhập hoặc sử dụng "Trải nghiệm không tài khoản", bạn đồng ý với',
         termsOfUse: 'Điều khoản sử dụng',
@@ -105,6 +100,12 @@ const login = {
         registerSuccess: 'Đăng ký thành công',
         agreeTermOfService: 'Đi thôi',
     },
+    enjoy: 'Trải nghiệm',
+    login: 'Đăng nhập',
+    register: 'Đăng ký',
+    enjoyModeNoAcc: 'Trải nghiệm app không dùng tài khoản',
+    forgotPassword: 'Quên mật khẩu?',
+    orSignIn: 'Đăng nhập với:',
 };
 
 // DISCOVERY ROUTE

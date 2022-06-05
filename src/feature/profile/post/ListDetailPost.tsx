@@ -216,6 +216,7 @@ const ListDetailPost = ({route}: Props) => {
                         action: () => {
                             showSwipeImages({
                                 listImages: [{url: imageWantToSee}],
+                                allowSaveImage,
                             });
                         },
                     },

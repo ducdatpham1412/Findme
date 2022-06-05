@@ -1,17 +1,16 @@
 import {apiGetIdEnjoyMode, apiGetResource} from 'api/module';
 import Images from 'asset/img/images';
 import {PRIVACY_URL, TERMS_URL} from 'asset/standardValue';
+import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
-import ROOT_SCREEN, {LOGIN_ROUTE} from 'navigation/config/routes';
+import ROOT_SCREEN from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {useEffect, useRef} from 'react';
 import {Animated, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import HeaderLogo from './components/HeaderLogo';
 
 const ChoosingLoginOrEnjoy = () => {
-    const theme = Redux.getTheme();
     const win = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
@@ -62,48 +61,14 @@ const ChoosingLoginOrEnjoy = () => {
                     },
                 ]}>
                 <StyleTouchable
-                    onPress={() => navigate(LOGIN_ROUTE.loginScreen)}
-                    customStyle={styles.buttonChoose}>
-                    <StyleText
-                        i18Text="login.loginScreen.goToLogin"
-                        customStyle={[styles.text, {color: theme.textColor}]}
-                    />
-                    <StyleImage
-                        source={Images.images.squirrelLogin}
-                        customStyle={styles.imgChoose}
-                        resizeMode="contain"
-                    />
-                </StyleTouchable>
-            </Animated.View>
-        );
-    };
-
-    const RenderDivider = () => {
-        return (
-            <Animated.View
-                style={[styles.pathBox, {backgroundColor: theme.borderColor}]}
-            />
-        );
-    };
-
-    const RenderEnjoyIcon = () => {
-        return (
-            <Animated.View
-                style={[
-                    styles.twoSideBox,
-                    {
-                        transform: [{scale: win}],
-                    },
-                ]}>
-                <StyleTouchable
                     onPress={onEnjoyModeExp}
                     customStyle={styles.buttonChoose}>
                     <StyleText
-                        i18Text="login.loginScreen.enjoyModeNoAcc"
-                        customStyle={[styles.text, {color: theme.textColor}]}
+                        i18Text="login.enjoyModeNoAcc"
+                        customStyle={[styles.text, {color: Theme.common.white}]}
                     />
                     <StyleImage
-                        source={Images.images.squirrelEnjoy}
+                        source={Images.images.squirrelLogin}
                         customStyle={styles.imgChoose}
                         resizeMode="contain"
                     />
@@ -119,7 +84,7 @@ const ChoosingLoginOrEnjoy = () => {
                     i18Text="login.loginScreen.byLoginOrTappingEnjoy"
                     customStyle={[
                         styles.textTermAndPolicy,
-                        {color: theme.textColor},
+                        {color: Theme.common.white},
                     ]}>
                     {' '}
                     <StyleText
@@ -128,7 +93,7 @@ const ChoosingLoginOrEnjoy = () => {
                         customStyle={[
                             styles.textTermAndPolicy,
                             styles.textLink,
-                            {color: theme.textColor},
+                            {color: Theme.common.white},
                         ]}
                     />
                     <StyleText
@@ -136,7 +101,7 @@ const ChoosingLoginOrEnjoy = () => {
                         onPress={onGoToTermsOfUse}
                         customStyle={[
                             styles.textTermAndPolicy,
-                            {color: theme.textColor},
+                            {color: Theme.common.white},
                         ]}
                     />{' '}
                     <StyleText
@@ -145,7 +110,7 @@ const ChoosingLoginOrEnjoy = () => {
                         customStyle={[
                             styles.textTermAndPolicy,
                             styles.textLink,
-                            {color: theme.textColor},
+                            {color: Theme.common.white},
                         ]}
                     />
                     {'.'}
@@ -155,19 +120,8 @@ const ChoosingLoginOrEnjoy = () => {
     };
 
     return (
-        <View
-            style={[
-                styles.container,
-                {backgroundColor: theme.backgroundColor},
-            ]}>
-            <HeaderLogo />
-
-            <View style={styles.choosingView}>
-                {RenderLoginIcon()}
-                {RenderDivider()}
-                {RenderEnjoyIcon()}
-            </View>
-
+        <View style={[styles.container]}>
+            {RenderLoginIcon()}
             {RenderAgreeTerms()}
         </View>
     );
@@ -183,32 +137,27 @@ const styles = ScaledSheet.create({
         marginTop: '40@vs',
     },
     twoSideBox: {
-        flex: 1,
         alignItems: 'center',
+        marginTop: '40@vs',
     },
     buttonChoose: {
-        width: '100%',
-        height: '150@vs',
         alignItems: 'center',
         justifyContent: 'center',
     },
-    pathBox: {
-        width: 1,
-        height: '150@vs',
-    },
     text: {
-        fontSize: '13@ms',
+        fontSize: '15@ms',
+        fontWeight: 'bold',
         marginBottom: '20@vs',
         textAlign: 'center',
     },
     imgChoose: {
-        width: '40%',
-        height: '40%',
+        width: '150@s',
+        height: '200@s',
     },
     ageeTermsView: {
         width: '100%',
-        marginTop: '70@vs',
         paddingHorizontal: '30@s',
+        marginTop: '50@vs',
     },
     textTermAndPolicy: {
         fontSize: '10@ms',

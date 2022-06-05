@@ -1,6 +1,6 @@
 import Redux from 'hook/useRedux';
 import {useTabBar} from 'navigation/config/TabBarProvider';
-import React, {forwardRef, useCallback, useMemo, useRef} from 'react';
+import React, {forwardRef, useRef} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
     StyleProp,
@@ -45,7 +45,7 @@ const StyleInput = (props: StyleInputProps, ref: any) => {
     const inputRef = useRef<TextInput>(null);
     const {setShowTabBar} = useTabBar();
 
-    const RenderErrorLabel = useMemo(() => {
+    const RenderErrorLabel = () => {
         return (
             <View style={styles.errorLabel}>
                 {label || (
@@ -60,9 +60,9 @@ const StyleInput = (props: StyleInputProps, ref: any) => {
                 )}
             </View>
         );
-    }, []);
+    };
 
-    const RenderMoreText = useMemo(() => {
+    const RenderMoreText = () => {
         return hasErrorBox ? (
             <View
                 style={[
@@ -75,7 +75,7 @@ const StyleInput = (props: StyleInputProps, ref: any) => {
                 ]}>
                 {!!errorMessage && (
                     <>
-                        {RenderErrorLabel}
+                        {RenderErrorLabel()}
                         <View style={styles.errorText}>
                             <StyleText
                                 i18Text={errorMessage}
@@ -90,18 +90,18 @@ const StyleInput = (props: StyleInputProps, ref: any) => {
                 )}
             </View>
         ) : null;
-    }, [errorMessage]);
+    };
 
-    const onFocus = useCallback(() => {
+    const onFocus = () => {
         if (isEffectTabBar) {
             setShowTabBar(false);
         }
-    }, [isEffectTabBar]);
-    const onBlur = useCallback(() => {
+    };
+    const onBlur = () => {
         if (isEffectTabBar) {
             setShowTabBar(true);
         }
-    }, [isEffectTabBar]);
+    };
 
     return (
         <View style={[styles.container, containerStyle]}>
@@ -119,7 +119,7 @@ const StyleInput = (props: StyleInputProps, ref: any) => {
                 {...props}
             />
 
-            {RenderMoreText}
+            {RenderMoreText()}
         </View>
     );
 };

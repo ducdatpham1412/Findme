@@ -1,4 +1,4 @@
-import Redux from 'hook/useRedux';
+import Theme from 'asset/theme/Theme';
 import React from 'react';
 import {StyleProp, TextStyle, ViewStyle} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
@@ -14,25 +14,16 @@ interface StyleTouchableProps {
 }
 
 const StyleButton = (props: StyleTouchableProps) => {
-    const theme = Redux.getTheme();
     const {title, containerStyle, titleStyle, disable, onPress} = props;
 
     return (
         <StyleTouchable
-            customStyle={[
-                styles.container,
-                {borderColor: theme.borderColor},
-                containerStyle,
-            ]}
+            customStyle={[styles.container, containerStyle]}
             onPress={onPress}
             disable={disable}>
             <StyleText
-                i18Text={title || 'hehe'}
-                customStyle={[
-                    styles.title,
-                    {color: theme.textColor},
-                    titleStyle,
-                ]}
+                i18Text={title || 'Button'}
+                customStyle={[styles.title, titleStyle]}
             />
         </StyleTouchable>
     );
@@ -40,16 +31,18 @@ const StyleButton = (props: StyleTouchableProps) => {
 
 const styles = ScaledSheet.create({
     container: {
-        borderWidth: 2,
-        borderRadius: '30@vs',
+        borderRadius: '8@vs',
         paddingVertical: '10@vs',
-        paddingHorizontal: '40@vs',
+        paddingHorizontal: '60@vs',
         alignItems: 'center',
         justifyContent: 'center',
         alignSelf: 'center',
+        backgroundColor: Theme.common.joinGroupChat,
     },
     title: {
         fontSize: '17@ms',
+        fontWeight: 'bold',
+        color: Theme.common.white,
     },
 });
 
