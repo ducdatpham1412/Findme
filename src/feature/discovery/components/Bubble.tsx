@@ -127,6 +127,7 @@ const Bubble = (props: Props) => {
                         onShowMoreOption({
                             idUser: item.creatorId,
                             imageWantToSee: imageChoose,
+                            allowSaveImage: item.hadKnowEachOther,
                         })
                     }
                     hitSlop={15}>

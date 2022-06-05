@@ -11,6 +11,7 @@ const common = {
     cancel: 'Cancel',
     done: 'Done',
     save: 'Save',
+    canNotSave: 'Can not save',
     success: 'Success',
     seeMore: '...See more',
     seeLess: '...See less',

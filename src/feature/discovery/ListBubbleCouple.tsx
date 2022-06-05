@@ -27,10 +27,12 @@ import Bubble, {bubbleHeight} from './components/Bubble';
 export interface TypeShowMoreOptions {
     idUser: number;
     imageWantToSee: string;
+    allowSaveImage: boolean;
 }
 
 let idUserReport = 0;
 let imageSeeDetail = '';
+let allowSaveImage = false;
 
 const ListBubbleCouple = () => {
     const optionsRef = useRef<any>(null);
@@ -116,6 +118,7 @@ const ListBubbleCouple = () => {
     const onShowOptions = (params: TypeShowMoreOptions) => {
         idUserReport = params.idUser;
         imageSeeDetail = params.imageWantToSee;
+        allowSaveImage = params.allowSaveImage;
         optionsRef.current?.show();
     };
 
@@ -216,6 +219,7 @@ const ListBubbleCouple = () => {
                         action: () => {
                             showSwipeImages({
                                 listImages: [{url: imageSeeDetail}],
+                                allowSaveImage,
                             });
                         },
                     },

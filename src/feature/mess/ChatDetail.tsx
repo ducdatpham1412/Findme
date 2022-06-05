@@ -281,6 +281,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                     showSwipeImages({
                         listImages,
                         initIndex: index,
+                        allowSaveImage: !itemChatTag.isPrivate,
                     });
                 }, 100);
                 return () => clearTimeout(x);
@@ -288,6 +289,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                 showSwipeImages({
                     listImages,
                     initIndex: index,
+                    allowSaveImage: !itemChatTag.isPrivate,
                 });
             }
         },

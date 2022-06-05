@@ -19,36 +19,44 @@ interface Props {
     };
 }
 
+let uriToSave = '';
+
 const SwipeImages = ({route}: Props) => {
-    const {listImages, initIndex = 0} = route.params;
+    const {
+        listImages,
+        initIndex = 0,
+        allowSaveImage = false,
+        textSaveImage = 'common.canNotSave',
+    } = route.params;
     const theme = Redux.getTheme();
     const optionsRef = useRef<any>(null);
-    const [uriToSave, setUriToSave] = useState('');
 
     const onSaveToLibrary = async () => {
-        try {
-            if (isIOS) {
-                await CameraRoll.save(uriToSave, {
-                    type: 'photo',
-                });
-            } else {
-                await checkSaveImage();
-                const res = await RNFetchBlob.config({
-                    fileCache: true,
-                    appendExt: 'png',
-                }).fetch('GET', uriToSave);
-                await CameraRoll.save(`file://${res.data}`, {
-                    type: 'photo',
-                    album: 'Doffy',
-                });
+        if (allowSaveImage) {
+            try {
+                if (isIOS) {
+                    await CameraRoll.save(uriToSave, {
+                        type: 'photo',
+                    });
+                } else {
+                    await checkSaveImage();
+                    const res = await RNFetchBlob.config({
+                        fileCache: true,
+                        appendExt: 'png',
+                    }).fetch('GET', uriToSave);
+                    await CameraRoll.save(`file://${res.data}`, {
+                        type: 'photo',
+                        album: 'Doffy',
+                    });
+                }
+            } catch (err) {
+                appAlert(err);
             }
-        } catch (err) {
-            appAlert(err);
         }
     };
 
     const onSetAndShowOption = (uri: string) => {
-        setUriToSave(uri);
+        uriToSave = uri;
         optionsRef.current.show();
     };
 
@@ -109,7 +117,7 @@ const SwipeImages = ({route}: Props) => {
                 ref={optionsRef}
                 listTextAndAction={[
                     {
-                        text: 'common.save',
+                        text: allowSaveImage ? 'common.save' : textSaveImage,
                         action: onSaveToLibrary,
                     },
                     {
