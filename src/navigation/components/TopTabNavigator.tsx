@@ -2,13 +2,16 @@ import {MaterialTopTabBarProps} from '@react-navigation/material-top-tabs';
 import {StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import React, {useState} from 'react';
-import {Animated, View} from 'react-native';
+import {useTranslation} from 'react-i18next';
+import {Animated, StyleProp, TextStyle, View, ViewStyle} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 
 interface Props {
     materialProps: MaterialTopTabBarProps;
     listRouteName?: Array<string>;
     listRouteParams?: Array<object>;
+    containerStyle?: StyleProp<ViewStyle>;
+    titleStyle?: StyleProp<TextStyle>;
     // length of listRouteName, listRouteParams must be equal to state.routes
 }
 
@@ -17,8 +20,11 @@ const TopTabNavigator = (props: Props) => {
         materialProps,
         listRouteName = props.materialProps.state.routeNames,
         listRouteParams,
+        containerStyle,
+        titleStyle,
     } = props;
     const {state, navigation, position} = materialProps;
+    const {t} = useTranslation();
 
     const theme = Redux.getTheme();
 
@@ -28,11 +34,12 @@ const TopTabNavigator = (props: Props) => {
 
     const translateX = position.interpolate({
         inputRange: state.routes.map((_, i) => i),
-        outputRange: [0, indicatorWidth * (numberTabs - 1)],
+        outputRange: state.routes.map((_, i) => indicatorWidth * i),
     });
 
     return (
-        <View style={{backgroundColor: theme.backgroundColor}}>
+        <View
+            style={[{backgroundColor: theme.backgroundColor}, containerStyle]}>
             <View
                 style={styles.container}
                 onLayout={({nativeEvent}) =>
@@ -88,8 +95,9 @@ const TopTabNavigator = (props: Props) => {
                                 style={[
                                     styles.titleText,
                                     {opacity, color: theme.textColor},
+                                    titleStyle,
                                 ]}>
-                                {label}
+                                {t(label)}
                             </Animated.Text>
                         </StyleTouchable>
                     );

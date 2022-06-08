@@ -32,7 +32,7 @@ export enum PRIVATE_AVATAR {
 }
 
 export const DEFAULT_IMAGE_BACKGROUND =
-    'https://doffy-production.s3.ap-southeast-1.amazonaws.com/image/__admin_background.png';
+    'https://doffy-production.s3.ap-southeast-1.amazonaws.com/admin/background.png';
 
 export const TIMING_BUBBLE_FLY = 40000;
 

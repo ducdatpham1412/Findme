@@ -3,6 +3,7 @@ import {TypeRegisterReq, TypeRequestOTPRequest} from 'api/interface';
 import {apiRequestOTP} from 'api/module';
 import {SIGN_UP_TYPE, TYPE_OTP} from 'asset/enum';
 import {standValue, TERMS_URL} from 'asset/standardValue';
+import Theme from 'asset/theme/Theme';
 import {
     StyleButton,
     StyleContainer,
@@ -13,21 +14,13 @@ import {
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {LOGIN_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
 import {TextInput, View} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {yupValidate} from 'utility/validate';
 import * as yup from 'yup';
-
-interface SignUpFormProps {
-    route: {
-        params: {
-            typeSignUp: number;
-        };
-    };
-}
 
 const defaultFormSignUp = __DEV__
     ? {
@@ -37,14 +30,9 @@ const defaultFormSignUp = __DEV__
       }
     : {};
 
-const SignUpForm = ({route}: SignUpFormProps) => {
-    const {typeSignUp} = route.params;
-    const theme = Redux.getTheme();
-
-    // const isApple = typeSignUp === SIGN_UP_TYPE.apple;
-    // const isFacebook = typeSignUp === SIGN_UP_TYPE.facebook;
-    const isEmail = typeSignUp === SIGN_UP_TYPE.email;
-    const isPhone = typeSignUp === SIGN_UP_TYPE.phone;
+const SignUpForm = () => {
+    const isEmail = true;
+    const isPhone = false;
 
     const usernameRef = useRef<TextInput>(null);
     const passwordRef = useRef<TextInput>(null);
@@ -52,7 +40,7 @@ const SignUpForm = ({route}: SignUpFormProps) => {
 
     const [haveAgreed, setHaveAgreed] = useState(false);
 
-    const chooseYupUsername = useCallback(() => {
+    const chooseYupUsername = () => {
         if (isEmail) {
             return yupValidate.email();
         }
@@ -60,15 +48,13 @@ const SignUpForm = ({route}: SignUpFormProps) => {
             return yupValidate.phone();
         }
         return yupValidate.default();
-    }, [isEmail, isPhone]);
+    };
 
-    const signUpSchema = useMemo(() => {
-        return yup.object().shape({
-            username: chooseYupUsername(),
-            password: yupValidate.password(),
-            confirmPass: yupValidate.password(),
-        });
-    }, [isEmail, isPhone]);
+    const signUpSchema = yup.object().shape({
+        username: chooseYupUsername(),
+        password: yupValidate.password(),
+        confirmPass: yupValidate.password(),
+    });
 
     const form = useForm({
         mode: 'all',
@@ -79,10 +65,6 @@ const SignUpForm = ({route}: SignUpFormProps) => {
         handleSubmit,
         formState: {isValid},
     } = form;
-
-    useEffect(() => {
-        usernameRef.current?.focus();
-    }, []);
 
     const onSignUp = async (data: any) => {
         const itemSignUp: TypeRegisterReq = {
@@ -96,7 +78,7 @@ const SignUpForm = ({route}: SignUpFormProps) => {
         // params to check code
         const params: TypeRequestOTPRequest = {
             username: data.username,
-            targetInfo: typeSignUp,
+            targetInfo: SIGN_UP_TYPE.email,
             password: data.password,
             confirmPassword: data.confirmPass,
             typeOTP: TYPE_OTP.register,
@@ -130,34 +112,27 @@ const SignUpForm = ({route}: SignUpFormProps) => {
     const RenderButtonCheckAgree = useMemo(() => {
         return (
             <StyleTouchable
-                customStyle={[
-                    styles.boxTappingAgree,
-                    {borderColor: theme.borderColor},
-                ]}
+                customStyle={styles.boxTappingAgree}
                 onPress={() => setHaveAgreed(!haveAgreed)}>
                 {haveAgreed && (
-                    <AntDesign
-                        name="check"
-                        style={[styles.iconCheck, {color: theme.textColor}]}
-                    />
+                    <AntDesign name="check" style={styles.iconCheck} />
                 )}
             </StyleTouchable>
         );
     }, [haveAgreed]);
 
-    const RenderTitleCheckAgree = useMemo(() => {
+    const CheckAgreeOrSignIn = () => {
         return (
             <View style={styles.boxTitleAgree}>
                 <StyleText
                     i18Text="login.signUp.hadReadAndAgree"
-                    customStyle={[styles.titleAgree, {color: theme.textColor}]}>
+                    customStyle={styles.titleAgree}>
                     {' '}
                     <StyleText
                         i18Text="login.signUp.doffyTermsAndPolicy"
                         customStyle={[
                             styles.titleAgree,
                             {
-                                color: theme.textColor,
                                 textDecorationLine: 'underline',
                                 fontWeight: 'bold',
                             },
@@ -172,20 +147,18 @@ const SignUpForm = ({route}: SignUpFormProps) => {
                 </StyleText>
             </View>
         );
-    }, []);
+    };
 
     return (
-        <StyleContainer>
+        <StyleContainer containerStyle={styles.container}>
             <FormProvider {...form}>
                 <StyleInputForm
                     ref={usernameRef}
                     name="username"
                     i18Placeholder={UserNameHolder}
-                    containerStyle={[
-                        styles.inputForm,
-                        {marginTop: verticalScale(35)},
-                    ]}
+                    containerStyle={{marginTop: verticalScale(50)}}
                     onSubmitEditing={() => passwordRef.current?.focus()}
+                    selectionColor={Theme.darkTheme.textHightLight}
                 />
 
                 <StyleInputForm
@@ -193,9 +166,10 @@ const SignUpForm = ({route}: SignUpFormProps) => {
                     name="password"
                     i18Placeholder="login.signUp.form.password"
                     containerStyle={styles.inputForm}
-                    secureTextEntry
                     maxLength={standValue.PASSWORD_MAX_LENGTH}
                     onSubmitEditing={() => confirmPasswordRef.current?.focus()}
+                    secureTextEntry
+                    selectionColor={Theme.darkTheme.textHightLight}
                 />
 
                 <StyleInputForm
@@ -205,12 +179,13 @@ const SignUpForm = ({route}: SignUpFormProps) => {
                     containerStyle={styles.inputForm}
                     maxLength={standValue.PASSWORD_MAX_LENGTH}
                     secureTextEntry
+                    selectionColor={Theme.darkTheme.textHightLight}
                 />
             </FormProvider>
 
             <View style={styles.termPolicyView}>
                 {RenderButtonCheckAgree}
-                {RenderTitleCheckAgree}
+                {CheckAgreeOrSignIn()}
             </View>
 
             <StyleButton
@@ -225,18 +200,16 @@ const SignUpForm = ({route}: SignUpFormProps) => {
 
 const styles = ScaledSheet.create({
     container: {
-        flex: 1,
-        alignItems: 'center',
+        backgroundColor: 'transparent',
     },
     inputForm: {
-        marginTop: '30@vs',
-        width: '85%',
+        marginTop: '20@vs',
     },
     // terms and policy
     termPolicyView: {
         width: '100%',
         flexDirection: 'row',
-        paddingHorizontal: '20@s',
+        paddingHorizontal: '10%',
         marginTop: '30@vs',
     },
     boxTappingAgree: {
@@ -246,9 +219,11 @@ const styles = ScaledSheet.create({
         borderRadius: '4@s',
         alignItems: 'center',
         justifyContent: 'center',
+        borderColor: Theme.darkTheme.textColor,
     },
     iconCheck: {
         fontSize: '15@ms',
+        color: Theme.darkTheme.textHightLight,
     },
     boxTitleAgree: {
         flex: 1,
@@ -257,10 +232,10 @@ const styles = ScaledSheet.create({
     titleAgree: {
         fontSize: '14@ms',
         lineHeight: '20@ms',
+        color: Theme.darkTheme.textHightLight,
     },
     // button
     button: {
-        paddingHorizontal: '35@vs',
         marginTop: '60@vs',
     },
 });

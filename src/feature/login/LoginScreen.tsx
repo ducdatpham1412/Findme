@@ -1,21 +1,21 @@
 import {useIsFocused} from '@react-navigation/native';
 import {SIGN_UP_TYPE} from 'asset/enum';
 import Images from 'asset/img/images';
+import Theme from 'asset/theme/Theme';
 import {
     StyleButton,
     StyleContainer,
     StyleImage,
-    StyleInput,
     StyleText,
 } from 'components/base';
 import StyleTouchable from 'components/base/StyleTouchable';
+import InputBox from 'components/common/InputBox';
 import Redux from 'hook/useRedux';
 import {LOGIN_ROUTE} from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import FindmeAsyncStorage from 'utility/FindmeAsyncStorage';
 import AuthenticateService from 'utility/login/loginService';
 import ListSaveAcc from './components/ListSaveAcc';
@@ -29,8 +29,6 @@ const loginForm = __DEV__
     : {username: '', password: ''};
 
 const LoginScreen = () => {
-    const theme = Redux.getTheme();
-
     const [userRef, setUserRef] = useState(false);
     const isFocused = useIsFocused();
     const passRef = useRef<any>(null);
@@ -40,10 +38,10 @@ const LoginScreen = () => {
     const [pass, setPass] = useState(password || loginForm?.password);
     const [isKeepSign, setIsKeepSign] = useState(false);
 
-    const getListAcc = useCallback(async () => {
+    const getListAcc = async () => {
         const res = await FindmeAsyncStorage.getStorageAcc();
         setListSaveAcc(res);
-    }, []);
+    };
 
     useEffect(() => {
         getListAcc();
@@ -53,22 +51,17 @@ const LoginScreen = () => {
      * For list acc saved
      */
     const [listSaveAcc, setListSaveAcc] = useState<Array<any>>([]);
-    const selectSaveAcc = useCallback(
-        (index: number) => {
-            setUser(listSaveAcc[index].username);
-            setPass(listSaveAcc[index].password);
-        },
-        [listSaveAcc],
-    );
-    const deleteSaveAcc = useCallback(
-        async (index: number) => {
-            const tempt = listSaveAcc.slice();
-            tempt.splice(index, 1);
-            setListSaveAcc(tempt);
-            await FindmeAsyncStorage.deleteAccAtIndex(index);
-        },
-        [listSaveAcc],
-    );
+    const selectSaveAcc = (index: number) => {
+        setUser(listSaveAcc[index].username);
+        setPass(listSaveAcc[index].password);
+    };
+
+    const deleteSaveAcc = async (index: number) => {
+        const tempt = listSaveAcc.slice();
+        tempt.splice(index, 1);
+        setListSaveAcc(tempt);
+        await FindmeAsyncStorage.deleteAccAtIndex(index);
+    };
 
     // Click login
     const onSubmitLogin = async () => {
@@ -82,118 +75,21 @@ const LoginScreen = () => {
     /**
      * Render view
      */
-    const RenderBackground = useMemo(() => {
+
+    const InputUsernamePassword = () => {
         return (
-            <View style={styles.logoView}>
-                <StyleImage
-                    source={Images.images.logo}
-                    style={[
-                        styles.logoBlur,
-                        {
-                            tintColor: theme.backgroundButtonColor,
-                        },
-                    ]}
-                    blurRadius={10}
-                    resizeMode="contain"
-                />
-            </View>
-        );
-    }, [theme]);
-
-    const RenderSpaceView = useMemo(() => {
-        return (
-            <>
-                <View style={styles.spaceView} />
-                <StyleTouchable
-                    customStyle={styles.goToStater}
-                    onPress={() => navigate(LOGIN_ROUTE.choosingLoginOrEnjoy)}>
-                    <AntDesign
-                        name="leftcircleo"
-                        style={[
-                            styles.goToStaterIcon,
-                            {color: theme.borderColor},
-                        ]}
-                    />
-                </StyleTouchable>
-            </>
-        );
-    }, [theme]);
-
-    const RenderRememberForgotPassword = useMemo(() => {
-        return (
-            <RemForPass
-                isKeepSignIn={isKeepSign}
-                onClickKeepSignIn={() => setIsKeepSign(!isKeepSign)}
-            />
-        );
-    }, [isKeepSign]);
-
-    const RenderSignUpText = useMemo(() => {
-        return (
-            <View style={styles.signUpView}>
-                <View style={styles.signUpBox}>
-                    <StyleText
-                        i18Text="login.loginScreen.notHaveAcc"
-                        customStyle={[
-                            styles.notHaveAccText,
-                            {color: theme.borderColor},
-                        ]}
-                    />
-                    <StyleTouchable
-                        onPress={() =>
-                            navigate(LOGIN_ROUTE.signUpForm, {
-                                typeSignUp: SIGN_UP_TYPE.email,
-                            })
-                        }>
-                        <StyleText
-                            i18Text="login.loginScreen.signUp"
-                            customStyle={[
-                                styles.signUpText,
-                                {color: theme.textColor},
-                            ]}
-                        />
-                    </StyleTouchable>
-                </View>
-            </View>
-        );
-    }, [theme]);
-
-    const RenderListSaveAcc = useMemo(() => {
-        return userRef && !user ? (
-            <ListSaveAcc
-                listAcc={listSaveAcc}
-                selectAcc={selectSaveAcc}
-                deleteAcc={deleteSaveAcc}
-            />
-        ) : null;
-    }, [userRef, !!user, listSaveAcc]);
-
-    return (
-        <StyleContainer
-            keyboardShouldPersistTaps={
-                // userRef && !user && !!listSaveAcc.length ? 'always' : 'handled'
-                'handled'
-            }>
-            {/* Logo space view */}
-            {RenderBackground}
-
-            {/* Space view */}
-            {RenderSpaceView}
-
-            {/* LOGIN BOX */}
-            <View style={styles.login}>
-                {/* username - password */}
-                <StyleInput
+            <View style={styles.inputView}>
+                <InputBox
                     i18Placeholder="login.loginScreen.username"
                     value={user}
                     onChangeText={value => setUser(value)}
-                    containerStyle={styles.inputForm}
                     onFocus={() => setUserRef(true)}
                     onBlur={() => setUserRef(false)}
                     onSubmitEditing={() => passRef.current.focus()}
+                    selectionColor={Theme.darkTheme.textHightLight}
                 />
 
-                <StyleInput
+                <InputBox
                     ref={passRef}
                     i18Placeholder="login.loginScreen.password"
                     value={pass}
@@ -201,93 +97,157 @@ const LoginScreen = () => {
                     containerStyle={styles.inputForm}
                     returnKeyType="default"
                     secureTextEntry
+                    selectionColor={Theme.darkTheme.textHightLight}
                 />
 
-                {/* remember - forgot password */}
-                {RenderRememberForgotPassword}
+                {userRef && !user && (
+                    <ListSaveAcc
+                        listAcc={listSaveAcc}
+                        selectAcc={selectSaveAcc}
+                        deleteAcc={deleteSaveAcc}
+                    />
+                )}
+            </View>
+        );
+    };
 
-                {/* button login */}
+    const RememberPassword = () => {
+        return (
+            <RemForPass
+                isKeepSignIn={isKeepSign}
+                onClickKeepSignIn={() => setIsKeepSign(!isKeepSign)}
+            />
+        );
+    };
+
+    const ForgotPassword = () => {
+        return (
+            <StyleTouchable
+                customStyle={styles.forgotPasswordView}
+                onPress={() => navigate(LOGIN_ROUTE.forgetPasswordType)}>
+                <StyleText
+                    i18Text="login.forgotPassword"
+                    customStyle={styles.forgotPasswordText}
+                />
+            </StyleTouchable>
+        );
+    };
+
+    const SignInPlatforms = () => {
+        return (
+            <View style={styles.signUpView}>
+                <StyleText
+                    i18Text="login.orSignIn"
+                    customStyle={styles.textOrSignIn}
+                />
+                <View style={styles.signUpBox}>
+                    <StyleTouchable
+                        onPress={() =>
+                            navigate(LOGIN_ROUTE.signUpForm, {
+                                typeSignUp: SIGN_UP_TYPE.email,
+                            })
+                        }>
+                        <StyleImage
+                            source={Images.icons.apple}
+                            customStyle={styles.iconSignIn}
+                        />
+                    </StyleTouchable>
+                    <StyleTouchable
+                        onPress={() =>
+                            navigate(LOGIN_ROUTE.signUpForm, {
+                                typeSignUp: SIGN_UP_TYPE.email,
+                            })
+                        }>
+                        <StyleImage
+                            source={Images.icons.facebook}
+                            customStyle={styles.iconSignIn}
+                        />
+                    </StyleTouchable>
+                    <StyleTouchable
+                        onPress={() =>
+                            navigate(LOGIN_ROUTE.signUpForm, {
+                                typeSignUp: SIGN_UP_TYPE.email,
+                            })
+                        }>
+                        <StyleImage
+                            source={Images.icons.email}
+                            customStyle={styles.iconSignIn}
+                        />
+                    </StyleTouchable>
+                </View>
+            </View>
+        );
+    };
+
+    return (
+        <View style={styles.container}>
+            <StyleContainer containerStyle={styles.body}>
+                {InputUsernamePassword()}
+                {RememberPassword()}
                 <StyleButton
                     title="login.loginScreen.signIn"
                     containerStyle={styles.loginButton}
                     disable={!user || !pass}
                     onPress={onSubmitLogin}
                 />
-
-                {RenderListSaveAcc}
-            </View>
-
-            {/* Sign up */}
-            {RenderSignUpText}
-        </StyleContainer>
+                {ForgotPassword()}
+                {SignInPlatforms()}
+            </StyleContainer>
+        </View>
     );
 };
 
 const styles = ScaledSheet.create({
-    login: {
-        minHeight: '40%',
-        alignItems: 'center',
-        marginTop: '10@vs',
+    container: {
+        flex: 1,
     },
-    // logo view
-    logoView: {
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        alignItems: 'center',
-    },
-    logoBlur: {
-        width: '100%',
-        height: '350@vs',
-        opacity: 0.25,
-        marginTop: '20@vs',
-    },
-    // space view
-    spaceView: {
-        width: '100%',
-        height: '130@vs',
-    },
-    // button go to starter
-    goToStater: {
-        position: 'absolute',
-        left: '30@vs',
-        top: '80@vs',
-        opacity: 0.6,
-    },
-    goToStaterIcon: {
-        fontSize: '25@ms',
+    body: {
+        backgroundColor: 'transparent',
     },
     // input
+    inputView: {
+        marginTop: '50@vs',
+    },
     inputForm: {
-        marginVertical: '10@vs',
+        marginTop: '20@vs',
     },
     // button login
     loginButton: {
-        borderRadius: '20@vs',
-        paddingHorizontal: '60@vs',
         marginTop: '30@vs',
     },
     loginText: {
         fontSize: 25,
     },
+    // forgot password
+    forgotPasswordView: {
+        alignSelf: 'center',
+        marginTop: '20@vs',
+    },
+    forgotPasswordText: {
+        fontSize: '13@ms',
+        textDecorationLine: 'underline',
+        color: Theme.darkTheme.textHightLight,
+    },
     // question sign up
     signUpView: {
         flex: 1,
         justifyContent: 'center',
+        alignItems: 'center',
     },
-    notHaveAccText: {
-        fontSize: '17@ms',
-        fontStyle: 'italic',
-    },
-    signUpText: {
-        fontSize: '17@ms',
+    textOrSignIn: {
+        fontSize: '13@ms',
         fontWeight: 'bold',
+        color: Theme.common.white,
     },
     signUpBox: {
-        width: '100%',
         flexDirection: 'row',
         justifyContent: 'center',
-        marginBottom: '20@vs',
+        marginTop: '10@vs',
+    },
+    iconSignIn: {
+        width: '60@ms',
+        height: '60@ms',
+        marginHorizontal: '7@ms',
     },
 });
 

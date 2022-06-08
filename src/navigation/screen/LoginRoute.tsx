@@ -2,17 +2,15 @@ import {
     CardStyleInterpolators,
     createStackNavigator,
 } from '@react-navigation/stack';
-import ChoosingLoginOrEnjoy from 'feature/login/ChoosingLoginOrEnjoy';
 import ConfirmOpenAccount from 'feature/login/ConfirmOpenAccount';
 import ForgetPasswordForm from 'feature/login/forgetPassword/ForgetPasswordForm';
 import ForgetPasswordSend from 'feature/login/forgetPassword/ForgetPasswordSend';
 import ForgetPasswordType from 'feature/login/forgetPassword/ForgetPasswordType';
-import LoginScreen from 'feature/login/LoginScreen';
 import SendOTP from 'feature/login/SendOTP';
 import AgreeTermOfService from 'feature/login/signUp/AgreeTermOfService';
 import SignUpForm from 'feature/login/signUp/SignUpForm';
 import SignUpType from 'feature/login/signUp/SignUpType';
-import Stater from 'feature/login/Starter';
+import Starter from 'feature/login/Starter';
 import Redux from 'hook/useRedux';
 import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
 import {LOGIN_ROUTE} from 'navigation/config/routes';
@@ -46,26 +44,10 @@ const LoginRoute: React.FunctionComponent = () => {
             }}
             // initialRouteName={LOGIN_ROUTE.detailInformation}
         >
-            {/* STARTER */}
             <Stack.Screen
                 options={{headerShown: false}}
                 name={LOGIN_ROUTE.starter}
-                component={Stater}
-            />
-
-            <Stack.Screen
-                options={{headerShown: false, gestureEnabled: false}}
-                name={LOGIN_ROUTE.loginScreen}
-                component={LoginScreen}
-            />
-
-            <Stack.Screen
-                options={{
-                    headerShown: false,
-                    gestureEnabled: false,
-                }}
-                name={LOGIN_ROUTE.choosingLoginOrEnjoy}
-                component={ChoosingLoginOrEnjoy}
+                component={Starter}
             />
 
             <Stack.Screen

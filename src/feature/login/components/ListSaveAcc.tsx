@@ -1,6 +1,6 @@
 import Images from 'asset/img/images';
+import Theme from 'asset/theme/Theme';
 import {StyleIcon, StyleText, StyleTouchable} from 'components/base';
-import Redux from 'hook/useRedux';
 import React from 'react';
 import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -15,17 +15,13 @@ interface ListSaveAccProps {
 
 const ModuleTagAcc = (props: any) => {
     const {index, indexAcc, onSelectAcc, onDeleteAcc} = props;
-    const theme = Redux.getTheme();
 
     return (
         <StyleTouchable
-            customStyle={[
-                styles.moduleAcc,
-                {borderBottomColor: theme.borderColor},
-            ]}
+            customStyle={styles.moduleAcc}
             onPress={() => onSelectAcc(index)}>
             {/* Logo */}
-            <View style={[styles.iconBox, {borderColor: theme.highlightColor}]}>
+            <View style={styles.iconBox}>
                 <StyleIcon source={Images.images.logo} size={14} />
             </View>
 
@@ -33,10 +29,7 @@ const ModuleTagAcc = (props: any) => {
             <View style={styles.usernameBox}>
                 <StyleText
                     originValue={indexAcc.username}
-                    customStyle={[
-                        styles.textUsername,
-                        {color: theme.textColor},
-                    ]}
+                    customStyle={styles.textUsername}
                 />
             </View>
 
@@ -44,10 +37,7 @@ const ModuleTagAcc = (props: any) => {
             <StyleTouchable
                 style={styles.deleteAccBox}
                 onPress={() => onDeleteAcc(index)}>
-                <Feather
-                    name="x"
-                    style={[styles.iconCancel, {color: theme.borderColor}]}
-                />
+                <Feather name="x" style={styles.iconCancel} />
             </StyleTouchable>
         </StyleTouchable>
     );
@@ -56,14 +46,12 @@ const ModuleTagAcc = (props: any) => {
 /**
  *  BOSS HERE
  */
-
 const ListSaveAcc = (props: ListSaveAccProps) => {
     const {listAcc, selectAcc, deleteAcc} = props;
-    const {backgroundColor} = Redux.getTheme();
 
     return (
         <ScrollView style={styles.container} keyboardShouldPersistTaps="always">
-            <View style={[styles.background, {backgroundColor}]} />
+            <View style={styles.background} />
 
             {listAcc.map((item, index) => (
                 <ModuleTagAcc
@@ -86,6 +74,7 @@ const styles = ScaledSheet.create({
         paddingBottom: '20@vs',
         top: '45@vs',
         zIndex: 9,
+        alignSelf: 'center',
     },
     background: {
         position: 'absolute',
@@ -93,6 +82,7 @@ const styles = ScaledSheet.create({
         height: '100%',
         alignSelf: 'center',
         opacity: 0.9,
+        backgroundColor: Theme.darkTheme.backgroundColor,
     },
     moduleAcc: {
         width: '100%',
@@ -102,6 +92,7 @@ const styles = ScaledSheet.create({
         marginBottom: '8@vs',
         paddingHorizontal: '20@vs',
         borderBottomWidth: 0.3,
+        borderColor: Theme.darkTheme.borderColor,
     },
     iconBox: {
         width: '30@vs',
@@ -110,6 +101,7 @@ const styles = ScaledSheet.create({
         borderWidth: 0.5,
         alignItems: 'center',
         justifyContent: 'center',
+        borderColor: Theme.darkTheme.highlightColor,
     },
     usernameBox: {
         flex: 1,
@@ -124,9 +116,11 @@ const styles = ScaledSheet.create({
     },
     iconCancel: {
         fontSize: '17@ms',
+        color: Theme.darkTheme.borderColor,
     },
     textUsername: {
         fontSize: '13@ms',
+        color: Theme.darkTheme.textHightLight,
     },
 });
 

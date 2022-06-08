@@ -1,6 +1,7 @@
+import InputBox from 'components/common/InputBox';
 import React, {forwardRef} from 'react';
 import {Controller, RegisterOptions, useFormContext} from 'react-hook-form';
-import StyleInput, {StyleInputProps} from './StyleInput';
+import {StyleInputProps} from './StyleInput';
 import StyleText from './StyleText';
 
 interface StyleInputFormProps extends StyleInputProps {
@@ -29,7 +30,7 @@ const StyleInputForm = (props: StyleInputFormProps, ref: any) => {
             rules={rule}
             defaultValue={defaultValue}
             render={({field: {onChange, value}}) => (
-                <StyleInput
+                <InputBox
                     ref={ref}
                     onChangeText={text =>
                         onChangeText?.(text) || onChange(text)

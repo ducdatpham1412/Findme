@@ -9,6 +9,9 @@ const Theme = {
         reloadPurple: '#5D5FEF',
         gradientTabBar1: '#54B3E9',
         gradientTabBar2: '#31EDE2',
+        blueInput: '#3E7BAC',
+        blueInputHolder: '#A5C4CE',
+        joinGroupChat: '#90BEE9',
     },
     darkTheme: {
         backgroundColor: '#081019',

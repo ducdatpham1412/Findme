@@ -83,12 +83,7 @@ const login = {
         username: 'Email',
         password: 'Password',
         keepSignIn: 'Keep sign in',
-        forgotPass: 'Forgot password ?',
         signIn: 'Sign in',
-        notHaveAcc: "Haven't account?",
-        signUp: ' Sign up',
-        enjoyModeNoAcc: 'Enjoy without account',
-        goToLogin: 'Go to login',
         byLoginOrTappingEnjoy:
             'By logging in or tapping "Enjoy without account",\nyou agree to our',
         termsOfUse: 'Terms Of Use',
@@ -103,6 +98,12 @@ const login = {
         registerSuccess: 'Register successfully',
         agreeTermOfService: "Let's go",
     },
+    enjoy: 'Enjoy',
+    login: 'Login',
+    register: 'Sign up',
+    enjoyModeNoAcc: 'Enjoy app without account',
+    forgotPassword: 'Forgot password?',
+    orSignIn: 'Sign in with:',
 };
 
 // DISCOVERY ROUTE

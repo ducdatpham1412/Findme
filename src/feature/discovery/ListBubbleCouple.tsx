@@ -190,7 +190,7 @@ const ListBubbleCouple = () => {
                 //             bubbleHeight,
                 //     );
                 //     Redux.setBubbleFocusing(list[indexToLast].id);
-                // }}
+                // }}]
             />
         );
     };

@@ -7,6 +7,7 @@ const Images = {
         username: require('./ic_user.png'),
         email: require('./ic_google.png'),
         phone: require('./ic_phone.png'),
+        apple: require('./ic_apple.png'),
         // setting
         security: require('./ic_security.png'),
         extend: require('./ic_extend.png'),
