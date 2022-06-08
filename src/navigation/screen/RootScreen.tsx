@@ -4,6 +4,7 @@ import {
     createStackNavigator,
     StackNavigationOptions,
 } from '@react-navigation/stack';
+import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
 import Alert from 'components/Alert';
 import AlertYesNo from 'components/AlerYesNo';
@@ -14,7 +15,7 @@ import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
 import TabBarProvider from 'navigation/config/TabBarProvider';
 import {navigationRef} from 'navigation/NavigationService';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {StatusBar} from 'react-native';
 import CodePush from 'react-native-code-push';
 import Config from 'react-native-config';
@@ -26,6 +27,17 @@ import LoginRoute from './LoginRoute';
 import WebViewScreen from './WebViewScreen';
 
 const RootStack = createStackNavigator();
+
+const alertOption: StackNavigationOptions = {
+    animationEnabled: false,
+    cardOverlayEnabled: true,
+    headerShown: false,
+};
+
+const cardSafe = {
+    paddingTop: Metrics.safeTopPadding,
+    paddingBottom: Metrics.safeBottomPadding,
+};
 
 const RootScreen = () => {
     const isLoading = Redux.getIsLoading();
@@ -41,10 +53,11 @@ const RootScreen = () => {
         ? 'light-content'
         : 'dark-content';
 
-    const [initLoading, setInitLoading] = useState(true);
+    // const [initLoading, setInitLoading] = useState(true);
 
     const cardStyle = {
         backgroundColor: theme.backgroundColor,
+        ...cardSafe,
     };
 
     const initApp = async () => {
@@ -54,7 +67,7 @@ const RootScreen = () => {
             logger(err);
         } finally {
             SplashScreen.hide();
-            setInitLoading(false);
+            // setInitLoading(false);
         }
     };
 
@@ -75,9 +88,9 @@ const RootScreen = () => {
         checkUpdate();
     }, []);
 
-    if (initLoading) {
-        return null;
-    }
+    // if (initLoading) {
+    //     return null;
+    // }
 
     return (
         <NavigationContainer ref={navigationRef}>
@@ -90,7 +103,7 @@ const RootScreen = () => {
                     }}>
                     <RootStack.Screen
                         name="check"
-                        component={isModeExp || token ? AppStack : LoginRoute}
+                        component={isInApp ? AppStack : LoginRoute}
                     />
 
                     {/* Alert */}
@@ -142,6 +155,7 @@ const RootScreen = () => {
                         options={{
                             cardStyle: [
                                 {backgroundColor: selectBgCardStyle(0.6)},
+                                cardSafe,
                             ],
                             cardStyleInterpolator:
                                 CardStyleInterpolators.forFadeFromBottomAndroid,
@@ -154,12 +168,6 @@ const RootScreen = () => {
             </TabBarProvider>
         </NavigationContainer>
     );
-};
-
-const alertOption: StackNavigationOptions = {
-    animationEnabled: false,
-    cardOverlayEnabled: true,
-    headerShown: false,
 };
 
 export default RootScreen;
