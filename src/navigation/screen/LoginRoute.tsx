@@ -8,6 +8,7 @@ import ForgetPasswordSend from 'feature/login/forgetPassword/ForgetPasswordSend'
 import ForgetPasswordType from 'feature/login/forgetPassword/ForgetPasswordType';
 import SendOTP from 'feature/login/SendOTP';
 import AgreeTermOfService from 'feature/login/signUp/AgreeTermOfService';
+import EditBasicInformation from 'feature/login/signUp/EditBasicInformation';
 import SignUpForm from 'feature/login/signUp/SignUpForm';
 import SignUpType from 'feature/login/signUp/SignUpType';
 import Starter from 'feature/login/Starter';
@@ -42,7 +43,7 @@ const LoginRoute: React.FunctionComponent = () => {
                 cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
                 headerLeft: (props: any) => <HeaderLeftIcon {...props} />,
             }}
-            // initialRouteName={LOGIN_ROUTE.detailInformation}
+            // initialRouteName={LOGIN_ROUTE.editBasicInformation}
         >
             <Stack.Screen
                 options={{headerShown: false}}
@@ -69,7 +70,6 @@ const LoginRoute: React.FunctionComponent = () => {
                 name={LOGIN_ROUTE.signUpType}
                 component={SignUpType}
             />
-
             <Stack.Screen
                 options={{
                     headerTintColor: theme.textColor,
@@ -80,41 +80,24 @@ const LoginRoute: React.FunctionComponent = () => {
                 name={LOGIN_ROUTE.signUpForm}
                 component={SignUpForm}
             />
+            <Stack.Screen
+                options={{headerShown: false}}
+                name={LOGIN_ROUTE.editBasicInformation}
+                component={EditBasicInformation}
+            />
 
             {/* Send OTP */}
             <Stack.Screen
-                options={{
-                    headerTintColor: theme.textColor,
-                    headerTitle: t('login.component.sendOTP.header'),
-                    headerTitleStyle,
-                    headerStyle,
-                }}
+                options={{headerShown: false}}
                 name={LOGIN_ROUTE.sendOTP}
                 component={SendOTP}
             />
 
             <Stack.Screen
-                options={{
-                    headerTintColor: theme.textColor,
-                    headerTitle: t('login.agreeTermOfService.registerSuccess'),
-                    headerTitleStyle,
-                    headerStyle,
-                }}
+                options={{headerShown: false}}
                 name={LOGIN_ROUTE.agreeTermOfService}
                 component={AgreeTermOfService}
             />
-
-            {/* DetailInformation */}
-            {/* <Stack.Screen
-                options={{
-                    headerTintColor: theme.textColor,
-                    headerTitle: t('login.detailInformation.header'),
-                    headerTitleStyle,
-                    headerStyle,
-                }}
-                name={LOGIN_ROUTE.detailInformation}
-                component={DetailInformation}
-            /> */}
 
             {/* FORGET */}
             <Stack.Screen

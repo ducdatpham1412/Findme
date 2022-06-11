@@ -28,7 +28,7 @@ const login = {
             confirmButton: 'Xác nhận',
             sendAgain: 'Gửi lại ({{countdown}})',
             sendAgainNoCount: 'Gửi lại',
-            notiOTP: 'Nhập mã OTP Doffy gửi đến',
+            notiOTP: 'Vui lòng nhập mã xác minh Doffy đã gửi đến',
         },
     },
     forgetPassword: {
@@ -72,12 +72,10 @@ const login = {
         doffyTermsAndPolicy: 'Điều khoản sử dụng',
     },
     detailInformation: {
-        header: 'OK !',
-        noti: 'Thông tin của tôi',
+        title: 'Thông tin của tôi',
         man: 'Nam',
         woman: 'Nữ',
         notToSay: 'Không tiện nói',
-        done: 'Đi thôi',
     },
     loginScreen: {
         slogan: 'Trò chuyện và tìm những người bạn thú vị',
@@ -99,6 +97,8 @@ const login = {
     agreeTermOfService: {
         registerSuccess: 'Đăng ký thành công',
         agreeTermOfService: 'Đi thôi',
+        contentSuggest:
+            'Đăng ký thành công! 🥰\nBây giờ chúng ta hãy bắt đầu chỉnh sửa hồ sơ của bạn',
     },
     enjoy: 'Trải nghiệm',
     login: 'Đăng nhập',

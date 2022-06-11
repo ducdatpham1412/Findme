@@ -90,6 +90,7 @@ const TopTabNavigator = (props: Props) => {
                             // testID={options.tabBarTestID}
                             onPress={onPress}
                             onLongPress={onLongPress}
+                            key={route.key}
                             style={styles.buttonView}>
                             <Animated.Text
                                 style={[

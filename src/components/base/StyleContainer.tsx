@@ -1,5 +1,6 @@
 import Redux from 'hook/useRedux';
-import React, {ReactNode} from 'react';
+import StyleHeader, {StyleHeaderProps} from 'navigation/components/StyleHeader';
+import React, {ReactComponentElement, ReactNode} from 'react';
 import {ScrollViewProps, StyleProp, View, ViewStyle} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {verticalScale} from 'react-native-size-matters';
@@ -10,6 +11,9 @@ interface ScrollContainerProps extends ScrollViewProps {
     customStyle?: StyleProp<ViewStyle>;
     extraHeight?: number;
     isEffectTabBar?: boolean;
+    headerProps?: StyleHeaderProps;
+    TopComponent?: ReactNode;
+    BottomComponent?: ReactNode;
 }
 
 // let offsetY = 0;
@@ -20,6 +24,9 @@ const StyleContainer = (props: ScrollContainerProps) => {
         containerStyle,
         customStyle,
         extraHeight = verticalScale(120),
+        headerProps,
+        TopComponent,
+        BottomComponent,
     } = props;
     const theme = Redux.getTheme();
 
@@ -29,6 +36,8 @@ const StyleContainer = (props: ScrollContainerProps) => {
                 {flex: 1, backgroundColor: theme.backgroundColor},
                 containerStyle,
             ]}>
+            {headerProps && <StyleHeader {...headerProps} />}
+            {TopComponent}
             <KeyboardAwareScrollView
                 contentContainerStyle={[
                     {width: '100%', minHeight: '100%'},
@@ -43,6 +52,7 @@ const StyleContainer = (props: ScrollContainerProps) => {
                 {...props}>
                 {children}
             </KeyboardAwareScrollView>
+            {BottomComponent}
         </View>
     );
 };

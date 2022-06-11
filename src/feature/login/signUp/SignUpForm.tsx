@@ -14,7 +14,7 @@ import {
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {LOGIN_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useMemo, useRef, useState} from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
 import {TextInput, View} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
@@ -24,7 +24,7 @@ import * as yup from 'yup';
 
 const defaultFormSignUp = __DEV__
     ? {
-          username: 'yeuquaimo@gmail.com',
+          username: 'doffy@doffy.xyz',
           password: '12345678',
           confirmPass: '12345678',
       }
@@ -38,7 +38,7 @@ const SignUpForm = () => {
     const passwordRef = useRef<TextInput>(null);
     const confirmPasswordRef = useRef<TextInput>(null);
 
-    const [haveAgreed, setHaveAgreed] = useState(false);
+    const [haveAgreed, setHaveAgreed] = useState(__DEV__);
 
     const chooseYupUsername = () => {
         if (isEmail) {
@@ -68,11 +68,11 @@ const SignUpForm = () => {
 
     const onSignUp = async (data: any) => {
         const itemSignUp: TypeRegisterReq = {
-            facebook: '',
             email: isEmail ? data.username : '',
             phone: isPhone ? data.username : '',
             password: data.password,
             confirmPassword: data.confirmPass,
+            code: '',
         };
 
         // params to check code

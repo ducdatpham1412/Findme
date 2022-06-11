@@ -4,30 +4,22 @@ import {
 } from '@react-navigation/material-top-tabs';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
-import {StyleImage} from 'components/base';
-import Redux from 'hook/useRedux';
 import TopTabNavigator from 'navigation/components/TopTabNavigator';
 import {LOGIN_ROUTE} from 'navigation/config/routes';
 import React from 'react';
 import {View} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import ChoosingLoginOrEnjoy from './ChoosingLoginOrEnjoy';
+import BackgroundAuthen from './components/BackgroundAuthen';
 import LoginScreen from './LoginScreen';
 import SignUpForm from './signUp/SignUpForm';
 
 const TopTab = createMaterialTopTabNavigator();
 
 const Starter = () => {
-    const {imageBackground} = Redux.getResource();
-
     return (
         <View style={styles.container}>
-            <View style={styles.backgroundView}>
-                <StyleImage
-                    source={{uri: imageBackground}}
-                    customStyle={styles.imageBackground}
-                />
-            </View>
+            <BackgroundAuthen />
 
             <View style={styles.spaceView} />
 
@@ -69,18 +61,9 @@ const styles = ScaledSheet.create({
     container: {
         flex: 1,
     },
-    backgroundView: {
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-    },
     spaceView: {
         width: '100%',
         height: Metrics.safeTopPadding + verticalScale(10),
-    },
-    imageBackground: {
-        width: '100%',
-        height: '100%',
     },
     tabBarContainer: {
         width: '90%',
