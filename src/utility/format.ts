@@ -18,7 +18,11 @@ export const requireLength = (min: number, max: number) => {
 };
 
 export const formatUTCDate = (date: string | Date) => {
-    return dayjs(date, 'YYYY-MM-DD HH:mm:ss').utc();
+    return dayjs(date).utc().format('YYYY-MM-DD HH:mm:ss');
+};
+
+export const formatDateDayMonthYear = (date: string | Date) => {
+    return dayjs(date).locale('en').format('DD - MM - YYYY');
 };
 
 export const formatFromNow = (date: Date | string) => {

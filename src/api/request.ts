@@ -1,3 +1,4 @@
+import FindmeStore from 'app-redux/store';
 import {ERROR_KEY_ENUM} from 'asset/error';
 import axios from 'axios';
 import Redux from 'hook/useRedux';
@@ -35,10 +36,14 @@ const processQueue = (error: any, token: string | null | undefined = null) => {
 request.interceptors.request.use(
     async (config: any) => {
         // Do something before api is sent
-        const {token} = await FindmeAsyncStorage.getActiveUser();
+        let token: any = FindmeStore.getState().logicSlice.token;
+        if (!token) {
+            token = (await FindmeAsyncStorage.getActiveUser()).token;
+        }
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+
         return config;
     },
     (error: any) => {

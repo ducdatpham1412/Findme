@@ -35,16 +35,16 @@ interface TypeParamsLoginSuccess {
 const AuthenticateService = {
     loginSuccess: async (params: TypeParamsLoginSuccess) => {
         const {itemLoginSuccess, isKeepSign} = params;
-
         await FindmeAsyncStorage.updateActiveUser(itemLoginSuccess);
 
         const passport = await apiGetPassport();
         const resource = await apiGetResource();
 
         Redux.updatePassport(passport.data);
+        Redux.updateResource(resource.data);
+
         // passport must be above token to set in SocketProvider
         Redux.setToken(itemLoginSuccess.token);
-        Redux.updateResource(resource.data);
         Redux.setModeExp(false);
         Redux.setTheme(passport.data.setting.theme);
         const temp = chooseLanguageFromId(passport.data.setting.language);

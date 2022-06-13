@@ -157,6 +157,14 @@ export interface TypeGetListBlockedResponse {
     data: any;
 }
 
+export interface TypeChangeInformationRequest {
+    email?: string;
+    phone?: string;
+    gender?: number;
+    birthday?: string;
+    name?: string;
+}
+
 export interface TypeChangeInformationResponse {
     success: boolean;
     data: any;

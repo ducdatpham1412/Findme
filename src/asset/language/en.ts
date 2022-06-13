@@ -9,6 +9,7 @@ const common = {
     chooseFromLibrary: 'Choose from library',
     chooseFromCamera: 'Open camera',
     cancel: 'Cancel',
+    next: 'Next',
     done: 'Done',
     save: 'Save',
     canNotSave: 'Can not save',
@@ -71,10 +72,13 @@ const login = {
         doffyTermsAndPolicy: 'Terms Of Use',
     },
     detailInformation: {
-        title: 'My information',
+        title: 'Edit information',
         man: 'Male',
         woman: 'Female',
         notToSay: 'Prefer not to say',
+        firstChooseGender: 'First, choose your gender:',
+        enterYourName: 'Enter your name:',
+        chooseBirthday: 'Choosing birthday',
     },
     loginScreen: {
         slogan: 'Chat and find interesting friends',

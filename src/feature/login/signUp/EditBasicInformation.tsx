@@ -1,11 +1,26 @@
+import {apiChangeInformation} from 'api/module';
+import {GENDER_TYPE} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
-import {StyleText} from 'components/base';
-import React from 'react';
-import {View} from 'react-native';
+import {
+    StyleButton,
+    StyleContainer,
+    StyleText,
+    StyleTouchable,
+} from 'components/base';
+import StyleDatetimePicker from 'components/base/picker/StyleDatetimePicker';
+import InputBox from 'components/common/InputBox';
+import {appAlert} from 'navigation/NavigationService';
+import React, {useRef, useState} from 'react';
+import {ScrollView, View} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
-import {TypeItemLoginSuccess} from 'utility/login/loginService';
+import FindmeAsyncStorage from 'utility/FindmeAsyncStorage';
+import {formatDateDayMonthYear, formatUTCDate} from 'utility/format';
+import AuthenticateService, {
+    TypeItemLoginSuccess,
+} from 'utility/login/loginService';
 import BackgroundAuthen from '../components/BackgroundAuthen';
+import GenderSwipe from '../components/GenderSwipe';
 
 interface Props {
     route: {
@@ -15,17 +30,190 @@ interface Props {
     };
 }
 
+export const scrollItemHeight = verticalScale(140);
+const defaultDate = new Date(2000, 0, 1);
+
 const EditBasicInformation = ({route}: Props) => {
     const {itemLoginSuccess} = route.params;
 
+    const scrollPickerRef = useRef<ScrollView>(null);
+
+    const [gender, setGender] = useState(GENDER_TYPE.woman);
+    const [name, setName] = useState('');
+    const [birthday, setBirthday] = useState<Date | undefined>(undefined);
+
+    const [index, setIndex] = useState(0);
+    const [showBirthdayPicker, setShowBirthdayPicker] = useState(false);
+
+    const onPressButton = async () => {
+        if (index < 2) {
+            scrollPickerRef.current?.scrollTo({
+                y: scrollItemHeight * (index + 1),
+                animated: true,
+            });
+        } else {
+            if (birthday && name) {
+                try {
+                    await FindmeAsyncStorage.updateActiveUser(itemLoginSuccess);
+                    const updateObject = {
+                        gender,
+                        name,
+                        birthday: formatUTCDate(birthday),
+                    };
+
+                    await apiChangeInformation(updateObject);
+                    AuthenticateService.loginSuccess({
+                        itemLoginSuccess,
+                        isKeepSign: true,
+                    });
+                } catch (err) {
+                    appAlert(err);
+                }
+            }
+        }
+    };
+
+    /**
+     * Render views
+     */
+    const HeaderAndBackground = () => {
+        return (
+            <>
+                <BackgroundAuthen />
+                <View style={styles.spaceBackground} />
+                <StyleText
+                    i18Text="login.detailInformation.title"
+                    customStyle={styles.titleText}
+                />
+            </>
+        );
+    };
+
+    // const InformationPreview = () => {
+    //     return (
+    //         <View style={styles.previewView}>
+    //             <View style={styles.genderNameBox}>
+    //                 <View style={styles.genderTouch}>
+    //                     <StyleImage
+    //                         source={renderIconGender(gender)}
+    //                         customStyle={styles.iconGender}
+    //                     />
+    //                 </View>
+    //                 <View style={styles.nameTouch}>
+    //                     <StyleText
+    //                         originValue={name}
+    //                         customStyle={styles.nameText}
+    //                     />
+    //                 </View>
+    //             </View>
+
+    //             <View
+    //                 style={[
+    //                     styles.genderNameBox,
+    //                     {marginTop: verticalScale(10)},
+    //                 ]}>
+    //                 <View style={styles.genderTouch}>
+    //                     <StyleText
+    //                         originValue={birthday.getDate()}
+    //                         customStyle={styles.textBirthday}
+    //                     />
+    //                 </View>
+    //                 <View style={styles.genderTouch}>
+    //                     <StyleText
+    //                         originValue={birthday.getMonth() + 1}
+    //                         customStyle={styles.textBirthday}
+    //                     />
+    //                 </View>
+    //                 <View style={[styles.nameTouch, {flex: 0.85}]}>
+    //                     <StyleText
+    //                         originValue={birthday.getFullYear()}
+    //                         customStyle={styles.textBirthday}
+    //                     />
+    //                 </View>
+    //             </View>
+    //         </View>
+    //     );
+    // };
+
+    const RenderPicker = () => {
+        const textBirthday = birthday
+            ? String(formatDateDayMonthYear(birthday))
+            : 'login.detailInformation.chooseBirthday';
+        const titleButton = index === 2 ? 'common.done' : 'common.next';
+        const disableButton = index < 2 ? false : !birthday;
+
+        return (
+            <StyleContainer containerStyle={styles.pickerPart} extraHeight={50}>
+                <View style={styles.pickerView}>
+                    <ScrollView
+                        ref={scrollPickerRef}
+                        snapToInterval={scrollItemHeight}
+                        scrollEventThrottle={16}
+                        decelerationRate="fast"
+                        indicatorStyle="white"
+                        onMomentumScrollEnd={e => {
+                            const offSet = e.nativeEvent.contentOffset.y;
+                            setIndex(Math.round(offSet / scrollItemHeight));
+                        }}>
+                        {/* Gender */}
+                        <GenderSwipe gender={gender} setGender={setGender} />
+
+                        {/* Name */}
+                        <View style={styles.pickerBox}>
+                            <StyleText
+                                i18Text="login.detailInformation.enterYourName"
+                                customStyle={styles.title}
+                            />
+                            <InputBox
+                                value={name}
+                                onChangeText={text => setName(text)}
+                                containerStyle={{marginTop: verticalScale(30)}}
+                                i18Placeholder="profile.edit.name"
+                                onSubmitEditing={onPressButton}
+                            />
+                        </View>
+
+                        {/* Birthday */}
+                        <View style={styles.pickerBox}>
+                            <StyleTouchable
+                                hitSlop={20}
+                                onPress={() => setShowBirthdayPicker(true)}>
+                                <StyleText
+                                    i18Text={textBirthday}
+                                    customStyle={
+                                        birthday
+                                            ? styles.textBirthday
+                                            : styles.textChooseBirthday
+                                    }
+                                />
+                            </StyleTouchable>
+                        </View>
+                    </ScrollView>
+                </View>
+
+                <StyleButton
+                    title={titleButton}
+                    onPress={onPressButton}
+                    containerStyle={{marginTop: verticalScale(80)}}
+                    disable={disableButton}
+                />
+            </StyleContainer>
+        );
+    };
+
     return (
         <View style={styles.container}>
-            <BackgroundAuthen />
-            <View style={styles.spaceBackground} />
-            <StyleText
-                i18Text="login.detailInformation.title"
-                customStyle={styles.titleText}
-            />
+            {HeaderAndBackground()}
+            {/* {InformationPreview()} */}
+            {RenderPicker()}
+
+            {showBirthdayPicker && (
+                <StyleDatetimePicker
+                    initDate={birthday || defaultDate}
+                    onChangeDateTime={date => setBirthday(date)}
+                    onPressBackground={() => setShowBirthdayPicker(false)}
+                />
+            )}
         </View>
     );
 };
@@ -33,14 +221,77 @@ const EditBasicInformation = ({route}: Props) => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
     },
     spaceBackground: {
         width: '100%',
-        height: Metrics.safeTopPadding + verticalScale(70),
+        height: Metrics.safeTopPadding + verticalScale(10),
     },
     titleText: {
-        fontSize: '30@ms',
+        fontSize: '20@ms',
+        color: Theme.common.white,
+        alignSelf: 'center',
+    },
+    // preview
+    previewView: {
+        width: '100%',
+        paddingHorizontal: '20@s',
+        marginTop: '10@vs',
+    },
+    genderNameBox: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    genderTouch: {
+        width: '55@s',
+        height: '55@s',
+        backgroundColor: Theme.common.blueInput,
+        borderRadius: '8@ms',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    iconGender: {
+        width: '80%',
+        height: '80%',
+    },
+    nameTouch: {
+        flex: 0.95,
+        backgroundColor: Theme.common.blueInput,
+        borderRadius: '8@ms',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    // picker
+    pickerPart: {
+        flex: 1,
+        backgroundColor: 'transparent',
+    },
+    pickerView: {
+        width: '80%',
+        height: scrollItemHeight,
+        alignSelf: 'center',
+        marginTop: '70@vs',
+    },
+    pickerBox: {
+        width: '100%',
+        height: scrollItemHeight,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    title: {
+        fontSize: '15@ms',
+        color: Theme.common.white,
+    },
+    nameText: {
+        color: Theme.common.white,
+    },
+    textChooseBirthday: {
+        textDecorationLine: 'underline',
+        color: Theme.common.white,
+    },
+    textBirthday: {
+        fontSize: '40@ms',
+        fontWeight: 'bold',
         color: Theme.common.white,
     },
 });

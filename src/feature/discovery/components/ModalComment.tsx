@@ -21,7 +21,6 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Animated, FlatList, Keyboard, TextInput, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
-import {selectBgCardStyle} from 'utility/assistant';
 import ItemComment from './ItemComment';
 
 interface Props {
@@ -109,6 +108,16 @@ const ModalComment = (props: Props) => {
         });
     };
 
+    const onCloseModal = () => {
+        onDeleteReply();
+        if (!setDisplayComment) {
+            Redux.setDisplayComment(false);
+        } else {
+            setDisplayComment?.(false);
+        }
+        Keyboard.dismiss();
+    };
+
     /**
      * Render view
      */
@@ -127,15 +136,7 @@ const ModalComment = (props: Props) => {
                 />
                 <StyleTouchable
                     customStyle={styles.iconTurnOffTouch}
-                    onPress={() => {
-                        onDeleteReply();
-                        if (!setDisplayComment) {
-                            Redux.setDisplayComment(false);
-                        } else {
-                            setDisplayComment?.(false);
-                        }
-                        Keyboard.dismiss();
-                    }}
+                    onPress={onCloseModal}
                     hitSlop={15}>
                     <Feather
                         name="x"
@@ -177,6 +178,7 @@ const ModalComment = (props: Props) => {
             <StyleKeyboardAwareView
                 containerStyle={styles.body}
                 innerStyle={{justifyContent: 'flex-end'}}>
+                <View style={{flex: 1}} onTouchEnd={onCloseModal} />
                 <View
                     style={[
                         styles.commentBox,
@@ -215,7 +217,7 @@ const styles = ScaledSheet.create({
         flex: 1,
     },
     commentBox: {
-        flex: 0.65,
+        flex: 1.5,
         borderWidth: '1@ms',
         borderTopLeftRadius: '20@ms',
         borderTopRightRadius: '20@ms',

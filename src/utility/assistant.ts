@@ -284,8 +284,9 @@ export const modalizeOptionBubbleGroup = (params: {
 
 export const renderIconGender = (_gender?: number) => {
     const gender =
-        _gender ||
-        FindmeStore.getState().accountSlice.passport.information.gender;
+        _gender === undefined
+            ? FindmeStore.getState().accountSlice.passport.information.gender
+            : _gender;
 
     if (gender === GENDER_TYPE.man) {
         return Images.icons.boy;

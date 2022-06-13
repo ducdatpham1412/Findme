@@ -9,6 +9,7 @@ const common = {
     chooseFromLibrary: 'Chọn từ thư viện',
     chooseFromCamera: 'Chụp ảnh',
     cancel: 'Huỷ',
+    next: 'Tiếp',
     done: 'Xong',
     save: 'Lưu',
     canNotSave: 'Không thể lưu',
@@ -72,10 +73,13 @@ const login = {
         doffyTermsAndPolicy: 'Điều khoản sử dụng',
     },
     detailInformation: {
-        title: 'Thông tin của tôi',
+        title: 'Thông tin cá nhân',
         man: 'Nam',
         woman: 'Nữ',
         notToSay: 'Không tiện nói',
+        firstChooseGender: 'Đầu tiên, chọn giới tính của bạn',
+        enterYourName: 'Nhập tên của bạn:',
+        chooseBirthday: 'Chọn ngày sinh',
     },
     loginScreen: {
         slogan: 'Trò chuyện và tìm những người bạn thú vị',

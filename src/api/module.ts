@@ -1,5 +1,6 @@
 import {
     TypeBubblePalace,
+    TypeChangeInformationRequest,
     TypeChangeInformationResponse,
     TypeChangePasswordRequest,
     TypeChatMessageResponse,
@@ -249,7 +250,7 @@ export const apiOpenConversation = (chatTagId: string) => {
 };
 
 export const apiChangeInformation = (
-    body: any,
+    body: TypeChangeInformationRequest,
 ): Promise<TypeChangeInformationResponse> => {
     return request.put('/setting/change-information', body);
 };
