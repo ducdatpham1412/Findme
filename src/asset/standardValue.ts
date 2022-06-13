@@ -3,7 +3,8 @@ export const standValue = {
     USERNAME_MAX_LENGTH: 20,
     PASSWORD_MIN_LENGTH: 7,
     PASSWORD_MAX_LENGTH: 20,
-    COUNT_DOWN: 90,
+    COUNT_DOWN: 20,
+    OTP_LENGTH: 4,
 };
 
 export const STAND_FONT_SIZE = {

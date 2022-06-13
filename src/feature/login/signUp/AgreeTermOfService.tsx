@@ -1,59 +1,47 @@
-import {TypeRegisterReq} from 'api/interface';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
-import {StyleButton, StyleImage} from 'components/base';
-import Redux from 'hook/useRedux';
-import {appAlertYesNo, goBack} from 'navigation/NavigationService';
+import Theme from 'asset/theme/Theme';
+import {StyleButton, StyleImage, StyleText} from 'components/base';
+import {LOGIN_ROUTE} from 'navigation/config/routes';
+import {navigate} from 'navigation/NavigationService';
 import React from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import AuthenticateService from 'utility/login/loginService';
+import {TypeItemLoginSuccess} from 'utility/login/loginService';
+import BackgroundAuthen from '../components/BackgroundAuthen';
 
 interface Props {
     route: {
         params: {
-            itemSignUp: TypeRegisterReq;
+            itemLoginSuccess: TypeItemLoginSuccess;
         };
     };
 }
 
 const AgreeTermOfService = ({route}: Props) => {
-    const {itemSignUp} = route.params;
-    const theme = Redux.getTheme();
+    const {itemLoginSuccess} = route.params;
 
-    const onRegisterAndGo = async (isKeep: boolean) => {
-        goBack(); // go back to out screen alert yes or no
-
-        await AuthenticateService.requestLogin({
-            username: itemSignUp.email || itemSignUp.phone,
-            password: itemSignUp.password,
-            isKeepSign: isKeep,
-        });
-    };
-
-    const confirmTermsOfService = async () => {
-        appAlertYesNo({
-            i18Title: 'alert.wantToSave',
-            agreeChange: () => onRegisterAndGo(true),
-            refuseChange: () => onRegisterAndGo(false),
+    const onGoToEditInformation = async () => {
+        navigate(LOGIN_ROUTE.editBasicInformation, {
+            itemLoginSuccess,
         });
     };
 
     return (
-        <View
-            style={[
-                styles.container,
-                {backgroundColor: theme.backgroundColor},
-            ]}>
+        <View style={[styles.container]}>
+            <BackgroundAuthen />
             <StyleImage
                 source={Images.images.successful}
                 customStyle={styles.imageSuccess}
             />
+            <StyleText
+                i18Text="login.agreeTermOfService.contentSuggest"
+                customStyle={styles.contentSuggest}
+            />
 
             <StyleButton
                 title="login.agreeTermOfService.agreeTermOfService"
-                containerStyle={styles.buttonLetGo}
-                onPress={confirmTermsOfService}
+                onPress={onGoToEditInformation}
             />
         </View>
     );
@@ -63,15 +51,18 @@ const styles = ScaledSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
+        justifyContent: 'center',
     },
     imageSuccess: {
         width: Metrics.width / 2,
         height: Metrics.width / 2,
-        marginRight: '20@s',
-        marginTop: '50@vs',
     },
-    buttonLetGo: {
-        marginTop: '70@vs',
+    contentSuggest: {
+        marginVertical: '32@vs',
+        color: Theme.common.white,
+        fontSize: '15@ms',
+        textAlign: 'center',
+        paddingHorizontal: '40@s',
     },
 });
 

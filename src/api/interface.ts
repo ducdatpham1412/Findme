@@ -52,15 +52,18 @@ export interface TypeOpenAccountRequest {
 
 // 2. register
 export interface TypeRegisterReq {
-    facebook: any;
     email: string;
     phone: string;
     password: string;
     confirmPassword: string;
+    code: string;
 }
 export interface TypeRegisterRes {
     success: boolean;
-    data: any;
+    data: {
+        token: string;
+        refreshToken: string;
+    };
 }
 
 // 3. reset password

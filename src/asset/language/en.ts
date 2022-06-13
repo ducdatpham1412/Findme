@@ -26,9 +26,9 @@ const login = {
             header: 'Confirm OTP',
             enterCode: 'Enter',
             confirmButton: 'Confirm',
-            sendAgain: 'Send again ({{countdown}})',
-            sendAgainNoCount: 'Send again',
-            notiOTP: 'Enter OTP code Doffy sent to',
+            sendAgain: 'Re-send ({{countdown}})',
+            sendAgainNoCount: 'Re-send',
+            notiOTP: 'Please enter verification code Doffy have sent to',
         },
     },
     forgetPassword: {
@@ -71,12 +71,10 @@ const login = {
         doffyTermsAndPolicy: 'Terms Of Use',
     },
     detailInformation: {
-        header: 'OK !',
-        noti: 'My information',
+        title: 'My information',
         man: 'Male',
         woman: 'Female',
         notToSay: 'Prefer not to say',
-        done: "Let's go",
     },
     loginScreen: {
         slogan: 'Chat and find interesting friends',
@@ -97,6 +95,8 @@ const login = {
     agreeTermOfService: {
         registerSuccess: 'Register successfully',
         agreeTermOfService: "Let's go",
+        contentSuggest:
+            'Register successfully! 🥰\nNow let’s go editting your profile',
     },
     enjoy: 'Enjoy',
     login: 'Login',

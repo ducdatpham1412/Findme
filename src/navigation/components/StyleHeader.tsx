@@ -7,7 +7,7 @@ import {ScaledSheet} from 'react-native-size-matters';
 import {isIOS} from 'utility/assistant';
 import HeaderLeftIcon from './HeaderLeftIcon';
 
-interface Props {
+export interface StyleHeaderProps {
     title: string;
     onGoBack?(): void;
     containerStyle?: StyleProp<ViewStyle>;
@@ -15,7 +15,7 @@ interface Props {
     iconStyle?: StyleProp<TextStyle>;
 }
 
-const StyleHeader = (props: Props) => {
+const StyleHeader = (props: StyleHeaderProps) => {
     const {title, onGoBack, containerStyle, titleStyle, iconStyle} = props;
 
     const theme = Redux.getTheme();

@@ -1,4 +1,4 @@
-import {useEffect, useState, useMemo} from 'react';
+import {useEffect, useState, useMemo, useCallback} from 'react';
 
 const useCountdown = (initValue: number) => {
     const [reset, setReset] = useState(true);
@@ -9,7 +9,10 @@ const useCountdown = (initValue: number) => {
         return new Date().getTime() + (initValue - 1) * 1000;
     }, [reset]);
 
-    const resetCountdown = () => setReset(!reset);
+    const resetCountdown = useCallback(
+        () => setReset((prevReset: boolean) => !prevReset),
+        [],
+    );
 
     const clearCountdown = () => setCountdown(-1);
 

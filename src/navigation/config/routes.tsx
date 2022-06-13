@@ -27,7 +27,7 @@ const LOGIN_ROUTE = {
     // THIS BLOCK IS FOR SIGN_UP FORM
     signUpType: '@LOGIN_ROUTE/signUpType',
     signUpForm: '@LOGIN_ROUTE/signUpForm',
-    // detailInformation: '@LOGIN_ROUTE/detailInformation',
+    editBasicInformation: '@LOGIN_ROUTE/editBasicInformation',
     // ------------------------------
     // THIS BLOCK IF FOR FORGET_PASSWORD
     forgetPasswordType: '@LOGIN_ROUTE/forgetPasswordType',
@@ -37,7 +37,6 @@ const LOGIN_ROUTE = {
     // ------------------------------
     sendOTP: '@LOGIN_ROUTE/sendOTP',
     agreeTermOfService: '@LOGIN_ROUTE/agreeTermOfService',
-    detailInformation: '@LOGIN_ROUTE/detailInformation',
 };
 const MAIN_SCREEN = {
     discoveryRoute: '@MAIN_SCREEN/discoveryRoute',

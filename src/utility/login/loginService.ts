@@ -20,7 +20,49 @@ interface requestLoginParams {
     isKeepSign: boolean;
 }
 
+export interface TypeItemLoginSuccess {
+    username: string;
+    password: string;
+    token: string;
+    refreshToken: string;
+}
+
+interface TypeParamsLoginSuccess {
+    itemLoginSuccess: TypeItemLoginSuccess;
+    isKeepSign: boolean;
+}
+
 const AuthenticateService = {
+    loginSuccess: async (params: TypeParamsLoginSuccess) => {
+        const {itemLoginSuccess, isKeepSign} = params;
+
+        await FindmeAsyncStorage.updateActiveUser(itemLoginSuccess);
+
+        const passport = await apiGetPassport();
+        const resource = await apiGetResource();
+
+        Redux.updatePassport(passport.data);
+        // passport must be above token to set in SocketProvider
+        Redux.setToken(itemLoginSuccess.token);
+        Redux.updateResource(resource.data);
+        Redux.setModeExp(false);
+        Redux.setTheme(passport.data.setting.theme);
+        const temp = chooseLanguageFromId(passport.data.setting.language);
+        I18Next.changeLanguage(temp);
+        await FindmeAsyncStorage.editLanguageModeExp(temp);
+
+        if (isKeepSign) {
+            await FindmeAsyncStorage.addStorageAcc({
+                username: itemLoginSuccess.username,
+                password: itemLoginSuccess.password,
+            });
+        }
+
+        navigate(ROOT_SCREEN.mainScreen, {
+            screen: DISCOVERY_ROUTE.discoveryScreen,
+        });
+    },
+
     requestLogin: async (params: requestLoginParams) => {
         const {username, password, isKeepSign} = params;
 
@@ -42,38 +84,15 @@ const AuthenticateService = {
             /**
              * Login success
              */
-            if (res.data?.token) {
-                await FindmeAsyncStorage.updateActiveUser({
-                    username,
-                    password,
-                    token: res.data.token,
-                    refreshToken: res.data.refreshToken,
-                });
-
-                const passport = await apiGetPassport();
-                const resource = await apiGetResource();
-
-                Redux.updatePassport(passport.data);
-                // passport must be above token to set in SocketProvider
-                Redux.setToken(res.data.token);
-                Redux.updateResource(resource.data);
-                Redux.setModeExp(false);
-                Redux.setTheme(passport.data.setting.theme);
-                const temp = chooseLanguageFromId(
-                    passport.data.setting.language,
-                );
-                I18Next.changeLanguage(temp);
-                await FindmeAsyncStorage.editLanguageModeExp(temp);
-
-                if (isKeepSign) {
-                    await FindmeAsyncStorage.addStorageAcc({
+            if (res.data?.token && res.data?.refreshToken) {
+                AuthenticateService.loginSuccess({
+                    itemLoginSuccess: {
                         username,
                         password,
-                    });
-                }
-
-                navigate(ROOT_SCREEN.mainScreen, {
-                    screen: DISCOVERY_ROUTE.discoveryScreen,
+                        token: res.data.token,
+                        refreshToken: res.data.refreshToken,
+                    },
+                    isKeepSign,
                 });
             }
         } catch (err) {
