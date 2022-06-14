@@ -112,7 +112,7 @@ const PersonalInformation = () => {
         information?.birthday || new Date(2000, 11, 14),
     );
     const [birthdayShow, setBirthdayShow] = useState(false);
-    const onChangeDateTimePicker = (event: any, selectedDate: Date) => {
+    const onChangeDateTimePicker = (selectedDate: Date) => {
         const currentDate = selectedDate || temptBirthday;
         !isIOS && setBirthdayShow(!birthdayShow);
         setTemptBirthday(currentDate);
@@ -298,7 +298,8 @@ const PersonalInformation = () => {
                 {birthdayShow && (
                     <StyleDatetimePicker
                         initDate={temptBirthday}
-                        mission={onChangeDateTimePicker}
+                        onChangeDateTime={onChangeDateTimePicker}
+                        onPressBackground={() => setBirthdayShow(false)}
                     />
                 )}
             </StyleContainer>

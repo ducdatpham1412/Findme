@@ -1,11 +1,14 @@
 import Redux from 'hook/useRedux';
 import StyleHeader, {StyleHeaderProps} from 'navigation/components/StyleHeader';
-import React, {ReactComponentElement, ReactNode} from 'react';
-import {ScrollViewProps, StyleProp, View, ViewStyle} from 'react-native';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import React, {ReactNode} from 'react';
+import {StyleProp, View, ViewStyle} from 'react-native';
+import {
+    KeyboardAwareScrollView,
+    KeyboardAwareScrollViewProps,
+} from 'react-native-keyboard-aware-scroll-view';
 import {verticalScale} from 'react-native-size-matters';
 
-interface ScrollContainerProps extends ScrollViewProps {
+interface ScrollContainerProps extends KeyboardAwareScrollViewProps {
     children?: ReactNode;
     containerStyle?: StyleProp<ViewStyle>;
     customStyle?: StyleProp<ViewStyle>;
