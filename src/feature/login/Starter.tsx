@@ -60,6 +60,7 @@ const Starter = () => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
+        backgroundColor: Theme.darkTheme.backgroundColor,
     },
     spaceView: {
         width: '100%',
