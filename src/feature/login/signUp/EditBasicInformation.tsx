@@ -10,7 +10,8 @@ import {
 } from 'components/base';
 import StyleDatetimePicker from 'components/base/picker/StyleDatetimePicker';
 import InputBox from 'components/common/InputBox';
-import {appAlert} from 'navigation/NavigationService';
+import Redux from 'hook/useRedux';
+import {appAlert, appAlertYesNo, goBack} from 'navigation/NavigationService';
 import React, {useRef, useState} from 'react';
 import {ScrollView, View} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
@@ -45,7 +46,7 @@ const EditBasicInformation = ({route}: Props) => {
     const [index, setIndex] = useState(0);
     const [showBirthdayPicker, setShowBirthdayPicker] = useState(false);
 
-    const onPressButton = async () => {
+    const onPressButton = () => {
         if (index < 2) {
             scrollPickerRef.current?.scrollTo({
                 y: scrollItemHeight * (index + 1),
@@ -53,22 +54,36 @@ const EditBasicInformation = ({route}: Props) => {
             });
         } else {
             if (birthday && name) {
-                try {
-                    await FindmeAsyncStorage.updateActiveUser(itemLoginSuccess);
-                    const updateObject = {
-                        gender,
-                        name,
-                        birthday: formatUTCDate(birthday),
-                    };
+                const onEditProfileAndGo = async (isKeep: boolean) => {
+                    goBack();
+                    try {
+                        Redux.setIsLoading(true);
+                        await FindmeAsyncStorage.updateActiveUser(
+                            itemLoginSuccess,
+                        );
+                        const updateObject = {
+                            gender,
+                            name,
+                            birthday: formatUTCDate(birthday),
+                        };
 
-                    await apiChangeInformation(updateObject);
-                    AuthenticateService.loginSuccess({
-                        itemLoginSuccess,
-                        isKeepSign: true,
-                    });
-                } catch (err) {
-                    appAlert(err);
-                }
+                        await apiChangeInformation(updateObject);
+                        AuthenticateService.loginSuccess({
+                            itemLoginSuccess,
+                            isKeepSign: isKeep,
+                        });
+                    } catch (err) {
+                        appAlert(err);
+                    } finally {
+                        Redux.setIsLoading(false);
+                    }
+                };
+
+                appAlertYesNo({
+                    i18Title: 'alert.wantToSave',
+                    agreeChange: () => onEditProfileAndGo(true),
+                    refuseChange: () => onEditProfileAndGo(false),
+                });
             }
         }
     };
@@ -140,7 +155,13 @@ const EditBasicInformation = ({route}: Props) => {
             ? String(formatDateDayMonthYear(birthday))
             : 'login.detailInformation.chooseBirthday';
         const titleButton = index === 2 ? 'common.done' : 'common.next';
-        const disableButton = index < 2 ? false : !birthday;
+        // const disableButton = index < 2 ? false : !birthday;
+        let disableButton = false;
+        if (index === 1) {
+            disableButton = !name;
+        } else if (index === 2) {
+            disableButton = !birthday;
+        }
 
         return (
             <StyleContainer containerStyle={styles.pickerPart} extraHeight={50}>

@@ -56,6 +56,9 @@ const SwipeImages = ({route}: Props) => {
     };
 
     const onSetAndShowOption = (uri: string) => {
+        if (!allowSaveImage) {
+            return;
+        }
         uriToSave = uri;
         optionsRef.current.show();
     };

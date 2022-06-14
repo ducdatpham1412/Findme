@@ -15,7 +15,7 @@ import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
 import TabBarProvider from 'navigation/config/TabBarProvider';
 import {navigationRef} from 'navigation/NavigationService';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StatusBar} from 'react-native';
 import CodePush from 'react-native-code-push';
 import Config from 'react-native-config';
@@ -39,6 +39,10 @@ const cardSafe = {
     paddingBottom: Metrics.safeBottomPadding,
 };
 
+const NullNode = () => {
+    return <></>;
+};
+
 const RootScreen = () => {
     const isLoading = Redux.getIsLoading();
     const theme = Redux.getTheme();
@@ -46,14 +50,14 @@ const RootScreen = () => {
     const isModeExp = Redux.getModeExp();
     const token = Redux.getToken();
 
+    const [initLoading, setInitLoading] = useState(true);
+
     const isInApp = isModeExp || token;
     const barStyle = !isInApp
         ? 'light-content'
         : theme === Theme.darkTheme
         ? 'light-content'
         : 'dark-content';
-
-    // const [initLoading, setInitLoading] = useState(true);
 
     const cardStyle = {
         backgroundColor: theme.backgroundColor,
@@ -67,7 +71,7 @@ const RootScreen = () => {
             logger(err);
         } finally {
             SplashScreen.hide();
-            // setInitLoading(false);
+            setInitLoading(false);
         }
     };
 
@@ -88,10 +92,6 @@ const RootScreen = () => {
         checkUpdate();
     }, []);
 
-    // if (initLoading) {
-    //     return null;
-    // }
-
     return (
         <NavigationContainer ref={navigationRef}>
             <TabBarProvider>
@@ -103,7 +103,13 @@ const RootScreen = () => {
                     }}>
                     <RootStack.Screen
                         name="check"
-                        component={isInApp ? AppStack : LoginRoute}
+                        component={
+                            initLoading
+                                ? NullNode
+                                : isInApp
+                                ? AppStack
+                                : LoginRoute
+                        }
                     />
 
                     {/* Alert */}
