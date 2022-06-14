@@ -28,7 +28,7 @@ const AgreeTermOfService = ({route}: Props) => {
     };
 
     return (
-        <View style={[styles.container]}>
+        <View style={styles.container}>
             <BackgroundAuthen />
             <StyleImage
                 source={Images.images.successful}
@@ -52,6 +52,7 @@ const styles = ScaledSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: Theme.darkTheme.backgroundColor,
     },
     imageSuccess: {
         width: Metrics.width / 2,

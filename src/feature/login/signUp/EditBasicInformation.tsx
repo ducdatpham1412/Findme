@@ -221,6 +221,7 @@ const EditBasicInformation = ({route}: Props) => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
+        backgroundColor: Theme.darkTheme.backgroundColor,
     },
     spaceBackground: {
         width: '100%',

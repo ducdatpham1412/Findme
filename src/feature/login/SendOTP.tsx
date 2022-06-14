@@ -211,7 +211,7 @@ const SendOTP = ({route}: any) => {
     return (
         <StyleContainer
             customStyle={styles.container}
-            containerStyle={{backgroundColor: 'transparent'}}
+            containerStyle={{backgroundColor: Theme.darkTheme.backgroundColor}}
             TopComponent={<BackgroundAuthen />}
             headerProps={{
                 title: 'login.component.sendOTP.header',
