@@ -27,7 +27,8 @@
         "code-push-android-production": "appcenter codepush release-react -a Doffy-app/Doffy-Android -d Production -t 1.2",
         "rebase": "gco develop && git pull origin develop && gco - && git rebase -",
         "stash": "git stash && yarn rebase && git stash pop",
-        "no-edit": "git add . && git commit --amend --no-edit && git push origin head -f"
+        "no-edit": "git add . && git commit --amend --no-edit && git push origin head -f",
+        "no-verify": "git add . && git commit --amend --no-edit --no-verify && git push origin head -f"
     },
     "dependencies": {
         "@hookform/resolvers": "^2.5.0",

@@ -33,6 +33,7 @@ interface Props {
     onRefreshItem(idBubble: string): Promise<void>;
     onGoToProfile(item: TypeBubblePalace): void;
     onShowModalComment(): void;
+    onSeeDetailImage(url: string, allowSave: boolean): void;
 }
 
 const bubbleWidth =
@@ -51,6 +52,7 @@ const Bubble = (props: Props) => {
         onRefreshItem,
         onGoToProfile,
         onShowModalComment,
+        onSeeDetailImage,
     } = props;
 
     const isModeExp = Redux.getModeExp();
@@ -65,6 +67,7 @@ const Bubble = (props: Props) => {
         listGradients: gradient,
         colorChoose: item.color,
     });
+    const isMyBubble = item.relationship === RELATIONSHIP.self;
 
     const onLikeUnLike = async () => {
         if (!isModeExp) {
@@ -114,6 +117,8 @@ const Bubble = (props: Props) => {
                 onDoubleClick={() => {
                     if (!isLiked) {
                         onLikeUnLike();
+                    } else {
+                        onSeeDetailImage(imageChoose, isMyBubble);
                     }
                 }}>
                 <AutoHeightImage
@@ -149,10 +154,9 @@ const Bubble = (props: Props) => {
     };
 
     const RenderContentName = () => {
-        const textColor =
-            item.relationship === RELATIONSHIP.self
-                ? theme.highlightColor
-                : Theme.darkTheme.textHightLight;
+        const textColor = isMyBubble
+            ? theme.highlightColor
+            : Theme.darkTheme.textHightLight;
         return (
             <LinearGradient
                 colors={['transparent', Theme.darkTheme.backgroundColor]}

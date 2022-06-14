@@ -151,6 +151,13 @@ const ListBubbleCouple = () => {
             }
         }
     };
+
+    const onSeeDetailImage = (url: string, allowSave: boolean) => {
+        showSwipeImages({
+            listImages: [{url}],
+            allowSaveImage: allowSave,
+        });
+    };
     /**
      * Render view
      */
@@ -163,6 +170,7 @@ const ListBubbleCouple = () => {
                 onRefreshItem={onRefreshItem}
                 onGoToProfile={onGoToProfile}
                 onShowModalComment={() => onShowModalComment(item)}
+                onSeeDetailImage={onSeeDetailImage}
             />
         );
     }, []);

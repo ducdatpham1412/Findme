@@ -69,6 +69,7 @@ const DetailBubble = ({route}: Props) => {
     });
 
     const imageChoose = bubble?.images[0] ? bubble?.images[0] : avatar;
+    const isMyBubble = bubble?.relationship === RELATIONSHIP.self;
 
     const getData = async () => {
         try {
@@ -158,6 +159,7 @@ const DetailBubble = ({route}: Props) => {
                     } else {
                         showSwipeImages({
                             listImages: [{url: imageChoose}],
+                            allowSaveImage: isMyBubble,
                         });
                     }
                 }}>
@@ -190,10 +192,9 @@ const DetailBubble = ({route}: Props) => {
     };
 
     const RenderContentName = () => {
-        const textColor =
-            bubble?.relationship === RELATIONSHIP.self
-                ? theme.highlightColor
-                : Theme.darkTheme.textHightLight;
+        const textColor = isMyBubble
+            ? theme.highlightColor
+            : Theme.darkTheme.textHightLight;
         return (
             <LinearGradient
                 colors={['transparent', Theme.darkTheme.backgroundColor]}
@@ -393,6 +394,7 @@ const DetailBubble = ({route}: Props) => {
                         action: () => {
                             showSwipeImages({
                                 listImages: [{url: imageChoose}],
+                                allowSaveImage: isMyBubble,
                             });
                         },
                     },
@@ -466,8 +468,8 @@ const styles = ScaledSheet.create({
         top: '15@ms',
     },
     iconMore: {
-        width: '30@ms',
-        height: '10@ms',
+        width: '25@ms',
+        height: '8@ms',
     },
     iconHobby: {
         position: 'absolute',

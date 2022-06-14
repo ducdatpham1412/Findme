@@ -293,7 +293,7 @@ const alert = {
     notNull: 'Giá trị không được để trống !',
     passConfirmFalse: 'Mật khẩu xác nhận\nkhông đúng !',
     emailNotValid: 'Email không hợp lệ !',
-    wantToSave: 'Bạn muốn giữ trạng thái đăng nhập chứ ?',
+    wantToSave: 'Bạn muốn giữ trạng thái đăng nhập cho lần sau chứ?',
     loginFail: 'Đăng nhập thất bại',
     wantToChange: 'Xác nhận thay đổi',
 
