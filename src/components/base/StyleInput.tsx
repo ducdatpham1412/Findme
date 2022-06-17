@@ -139,16 +139,15 @@ const styles = ScaledSheet.create({
         minHeight: '20@vs',
         marginTop: '5@vs',
         flexDirection: 'row',
-        paddingHorizontal: '17@vs',
-        paddingTop: '5@vs',
+        paddingBottom: '5@vs',
     },
     errorLabel: {
-        flex: 1,
         justifyContent: 'center',
     },
     errorText: {
-        flex: 7,
+        flex: 1,
         justifyContent: 'center',
+        paddingLeft: '7@s',
     },
     text: {
         fontSize: '13@ms',
