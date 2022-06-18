@@ -9,4 +9,24 @@ export const listBubbles = [
     },
 ];
 
+export const responseApple = {
+    authorizationCode:
+        'ccc08f82c70354d19843161074cd352b4.0.strq.Z_9Gq9590gIJ75h0ULlSiw',
+    authorizedScopes: [],
+    email: 'phamducdat14122000@gmail.com',
+    fullName: {
+        familyName: 'Dat',
+        givenName: 'Pham',
+        middleName: null,
+        namePrefix: null,
+        nameSuffix: null,
+        nickname: null,
+    },
+    identityToken: 'token',
+    nonce: '2qJSh91.TMYzM9KwE0FzlisfjF3nPLVg',
+    realUserStatus: 2,
+    state: null,
+    user: '000310.3bceb39016454892808727fe96c5a7c1.0914',
+};
+
 // <uses-permission android:name="android.permission.RECORD_AUDIO" />

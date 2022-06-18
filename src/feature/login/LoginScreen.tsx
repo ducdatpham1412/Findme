@@ -1,3 +1,4 @@
+import {appleAuth} from '@invertase/react-native-apple-authentication';
 import {
     GoogleSignin,
     statusCodes,
@@ -16,7 +17,7 @@ import StyleTouchable from 'components/base/StyleTouchable';
 import InputBox from 'components/common/InputBox';
 import Redux from 'hook/useRedux';
 import {LOGIN_ROUTE} from 'navigation/config/routes';
-import {navigate} from 'navigation/NavigationService';
+import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
@@ -74,6 +75,56 @@ const LoginScreen = () => {
             password: pass.trim(),
             isKeepSign,
         });
+    };
+
+    const signInWithGoogle = async () => {
+        try {
+            Redux.setIsLoading(true);
+            await GoogleSignin.hasPlayServices({
+                showPlayServicesUpdateDialog: true,
+            });
+            const userInfo = await GoogleSignin.signIn();
+            const {idToken} = userInfo;
+            AuthenticateService.requestLoginSocial({
+                tokenSocial: idToken,
+                typeSocial: TYPE_SOCIAL_LOGIN.google,
+            });
+        } catch (error: any) {
+            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+                // user cancelled the login flow
+            } else if (error.code === statusCodes.IN_PROGRESS) {
+                // operation (e.g. sign in) is in progress already
+            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+                // play services not available or outdated
+            } else {
+                // some other error happened
+            }
+        } finally {
+            Redux.setIsLoading(false);
+        }
+    };
+
+    const onSignInWithApple = async () => {
+        try {
+            Redux.setIsLoading(true);
+            const res = await appleAuth.performRequest({
+                requestedOperation: appleAuth.Operation.LOGIN,
+                requestedScopes: [
+                    appleAuth.Scope.EMAIL,
+                    appleAuth.Scope.FULL_NAME,
+                ],
+            });
+
+            const tokenSocial = res.identityToken;
+            AuthenticateService.requestLoginSocial({
+                tokenSocial,
+                typeSocial: TYPE_SOCIAL_LOGIN.apple,
+            });
+        } catch (err) {
+            appAlert(err);
+        } finally {
+            Redux.setIsLoading(false);
+        }
     };
 
     /**
@@ -137,33 +188,6 @@ const LoginScreen = () => {
         );
     };
 
-    const signInWithGoogle = async () => {
-        try {
-            Redux.setIsLoading(true);
-            await GoogleSignin.hasPlayServices({
-                showPlayServicesUpdateDialog: true,
-            });
-            const userInfo = await GoogleSignin.signIn();
-            const {idToken} = userInfo;
-            AuthenticateService.requestLoginSocial({
-                tokenSocial: idToken,
-                typeSocial: TYPE_SOCIAL_LOGIN.google,
-            });
-        } catch (error: any) {
-            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-                // user cancelled the login flow
-            } else if (error.code === statusCodes.IN_PROGRESS) {
-                // operation (e.g. sign in) is in progress already
-            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-                // play services not available or outdated
-            } else {
-                // some other error happened
-            }
-        } finally {
-            Redux.setIsLoading(false);
-        }
-    };
-
     const SignInPlatforms = () => {
         return (
             <View style={styles.signUpView}>
@@ -172,17 +196,13 @@ const LoginScreen = () => {
                     customStyle={styles.textOrSignIn}
                 />
                 <View style={styles.signUpBox}>
-                    <StyleTouchable
-                        onPress={() =>
-                            navigate(LOGIN_ROUTE.signUpForm, {
-                                typeSignUp: SIGN_UP_TYPE.email,
-                            })
-                        }>
+                    <StyleTouchable onPress={onSignInWithApple}>
                         <StyleImage
                             source={Images.icons.apple}
                             customStyle={styles.iconSignIn}
                         />
                     </StyleTouchable>
+
                     <StyleTouchable
                         onPress={() => {
                             navigate(LOGIN_ROUTE.signUpForm, {
@@ -194,6 +214,7 @@ const LoginScreen = () => {
                             customStyle={styles.iconSignIn}
                         />
                     </StyleTouchable>
+
                     <StyleTouchable onPress={signInWithGoogle}>
                         <StyleImage
                             source={Images.icons.email}
@@ -271,8 +292,8 @@ const styles = ScaledSheet.create({
         marginTop: '10@vs',
     },
     iconSignIn: {
-        width: '60@ms',
-        height: '60@ms',
+        width: '45@ms',
+        height: '45@ms',
         marginHorizontal: '7@ms',
     },
 });

@@ -65,27 +65,27 @@ const EditBasicInformation = ({route}: Props) => {
                         birthday: formatUTCDate(birthday),
                     };
 
-                        await apiChangeInformation(updateObject);
-                        AuthenticateService.loginSuccess({
-                            itemLoginSuccess,
-                            isKeepSign: isKeep,
-                            isLoginSocial,
-                        });
-                    } catch (err) {
-                        appAlert(err);
-                    } finally {
-                        Redux.setIsLoading(false);
-                    }
-                };
-                if (isLoginSocial) {
-                    onEditProfileAndGo(true);
-                } else {
-                    appAlertYesNo({
-                        i18Title: 'alert.wantToSave',
-                        agreeChange: () => onEditProfileAndGo(true),
-                        refuseChange: () => onEditProfileAndGo(false),
+                    await apiChangeInformation(updateObject);
+                    AuthenticateService.loginSuccess({
+                        itemLoginSuccess,
+                        isKeepSign: isKeep,
+                        isLoginSocial,
                     });
+                } catch (err) {
+                    appAlert(err);
+                } finally {
+                    Redux.setIsLoading(false);
                 }
+            };
+
+            if (isLoginSocial) {
+                onEditProfileAndGo(true);
+            } else {
+                appAlertYesNo({
+                    i18Title: 'alert.wantToSave',
+                    agreeChange: () => onEditProfileAndGo(true),
+                    refuseChange: () => onEditProfileAndGo(false),
+                });
             }
         }
     };
