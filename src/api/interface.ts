@@ -50,6 +50,23 @@ export interface TypeOpenAccountRequest {
     verifyCode: any;
 }
 
+// Login Social
+export enum TypeProviderLoginSocial {
+    facebook = 'facebook',
+    google = 'google-oauth2',
+    apple = 'apple',
+}
+
+export enum TypeOsLoginSocial {
+    android = 0,
+    ios = 1,
+}
+
+export interface TypeLoginSocialRequest {
+    os: TypeOsLoginSocial;
+    provider: TypeProviderLoginSocial;
+}
+
 // 2. register
 export interface TypeRegisterReq {
     email: string;

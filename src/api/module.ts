@@ -19,6 +19,7 @@ import {
     TypeGetProfileResponse,
     TypeLoginRequest,
     TypeLoginResponse,
+    TypeLoginSocialRequest,
     TypeOpenAccountRequest,
     TypeParamsPaging,
     TypeRegisterReq,
@@ -52,6 +53,17 @@ export const apiLogin = (
     params: TypeLoginRequest,
 ): Promise<TypeLoginResponse> => {
     return request.post('/auth/login', params);
+};
+
+export const apiLoginSocial = (
+    params: TypeLoginSocialRequest,
+    tokenSocial?: string | null,
+) => {
+    return request.post(
+        '/auth/login-social',
+        params,
+        tokenSocial ? {headers: {Authorization: tokenSocial}} : {},
+    );
 };
 
 export const apiRegister = (

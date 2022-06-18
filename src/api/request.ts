@@ -35,6 +35,9 @@ const processQueue = (error: any, token: string | null | undefined = null) => {
 
 request.interceptors.request.use(
     async (config: any) => {
+        if (config?.headers?.Authorization) {
+            return config;
+        }
         // Do something before api is sent
         let token: any = FindmeStore.getState().logicSlice.token;
         if (!token) {

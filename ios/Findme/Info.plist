@@ -20,6 +20,17 @@
 	<string>RNC_IOS_APP_VERSION_CODE</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.647052846803-8gagoaetpkqlbbqd0lavnicsqs81hbfm</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>RNC_IOS_APP_BUILD_CODE</string>
 	<key>LSApplicationCategoryType</key>

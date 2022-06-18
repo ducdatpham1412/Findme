@@ -1,4 +1,12 @@
-import {apiGetPassport, apiGetResource, apiLogin, apiLogOut} from 'api/module';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {TypeProviderLoginSocial} from 'api/interface';
+import {
+    apiGetPassport,
+    apiGetResource,
+    apiLogin,
+    apiLoginSocial,
+    apiLogOut,
+} from 'api/module';
 import request from 'api/request';
 import FindmeStore from 'app-redux/store';
 import Redux from 'hook/useRedux';
@@ -8,7 +16,7 @@ import ROOT_SCREEN, {
     LOGIN_ROUTE,
 } from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
-import {chooseLanguageFromId} from 'utility/assistant';
+import {chooseLanguageFromId, isIOS} from 'utility/assistant';
 import FindmeAsyncStorage from 'utility/FindmeAsyncStorage';
 import I18Next from 'utility/I18Next';
 
@@ -19,10 +27,14 @@ interface requestLoginParams {
     password: string;
     isKeepSign: boolean;
 }
+interface requestLoginSocialParams {
+    tokenSocial: string | null;
+    typeSocial: TypeProviderLoginSocial;
+}
 
 export interface TypeItemLoginSuccess {
-    username: string;
-    password: string;
+    username?: string;
+    password?: string;
     token: string;
     refreshToken: string;
 }
@@ -51,7 +63,7 @@ const AuthenticateService = {
         I18Next.changeLanguage(temp);
         await FindmeAsyncStorage.editLanguageModeExp(temp);
 
-        if (isKeepSign) {
+        if (isKeepSign && itemLoginSuccess.username) {
             await FindmeAsyncStorage.addStorageAcc({
                 username: itemLoginSuccess.username,
                 password: itemLoginSuccess.password,
@@ -101,6 +113,38 @@ const AuthenticateService = {
             Redux.setIsLoading(false);
         }
     },
+    requestLoginSocial: async (params: requestLoginSocialParams) => {
+        const {tokenSocial, typeSocial} = params;
+
+        try {
+            const res = await apiLoginSocial(
+                {
+                    os: Number(isIOS),
+                    provider: typeSocial,
+                },
+                tokenSocial,
+            );
+            if (res.data?.token && res.data?.refreshToken) {
+                const itemLoginSuccess = {
+                    token: res.data.token,
+                    refreshToken: res.data?.refreshToken,
+                };
+                if (res.data?.isNewUser) {
+                    navigate(LOGIN_ROUTE.editBasicInformation, {
+                        itemLoginSuccess,
+                        loginSocial: typeSocial,
+                    });
+                } else {
+                    AuthenticateService.loginSuccess({
+                        itemLoginSuccess,
+                        isKeepSign: false,
+                    });
+                }
+            }
+        } catch (error) {
+            appAlert('alert.loginFail');
+        }
+    },
 
     refreshToken: (inputRefreshToken: string) => {
         request.post(AUTH_URL_REFRESH_TOKEN, {
@@ -115,6 +159,14 @@ const AuthenticateService = {
         try {
             Redux.setIsLoading(true);
             const isModeExp = FindmeStore.getState().accountSlice.modeExp;
+
+            // logout google
+            const isGoogleSignedIn = await GoogleSignin.isSignedIn();
+            if (isGoogleSignedIn) {
+                await GoogleSignin.revokeAccess();
+                await GoogleSignin.signOut();
+            }
+
             if (!isModeExp && !params.hadRefreshTokenBlacked) {
                 const {refreshToken} = await FindmeAsyncStorage.getActiveUser();
                 await apiLogOut(refreshToken || '');

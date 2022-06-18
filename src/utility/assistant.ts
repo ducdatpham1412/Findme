@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
     TypeChatTagResponse,
     TypeCreateGroupResponse,
@@ -25,7 +26,7 @@ import ROOT_SCREEN, {
 } from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
 import {useState} from 'react';
-import {Platform} from 'react-native';
+import {DevSettings, Platform} from 'react-native';
 import ImageUploader, {ImagePickerParamsType} from './ImageUploader';
 import AuthenticateService from './login/loginService';
 import {checkCamera, checkPhoto} from './permission/permission';
@@ -483,3 +484,12 @@ export const bubbleProfileHeight = () =>
 
 export const bubbleProfileWidth = () =>
     Metrics.width - Metrics.safeLeftPadding - Metrics.safeRightPadding;
+
+export const addMenuClearAsyncStorage = () => {
+    if (__DEV__) {
+        DevSettings.addMenuItem('Clear AsyncStorage', () => {
+            AsyncStorage.clear();
+            DevSettings.reload();
+        });
+    }
+};
