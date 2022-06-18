@@ -16,6 +16,8 @@
 		CE8EFD9C2759FACC00D9549E /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = CE8EFD9B2759FACC00D9549E /* Config.xcconfig */; };
 		CE8EFD9D2759FACC00D9549E /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = CE8EFD9B2759FACC00D9549E /* Config.xcconfig */; };
 		D94F6EB5584412E685531852 /* libPods-Findme.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DA7BF0C751B8037A5811AF29 /* libPods-Findme.a */; };
+		E1EDA080285E236800AC739E /* chim_cu_gay.wav in Resources */ = {isa = PBXBuildFile; fileRef = E1EDA07F285E236800AC739E /* chim_cu_gay.wav */; };
+		E1EDA081285E236800AC739E /* chim_cu_gay.wav in Resources */ = {isa = PBXBuildFile; fileRef = E1EDA07F285E236800AC739E /* chim_cu_gay.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +64,7 @@
 		CEB7AE99260DE15500487276 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
 		CECD88E327BF495800761A26 /* Findme.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Findme.entitlements; path = Findme/Findme.entitlements; sourceTree = "<group>"; };
 		DA7BF0C751B8037A5811AF29 /* libPods-Findme.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Findme.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E1EDA07F285E236800AC739E /* chim_cu_gay.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = chim_cu_gay.wav; sourceTree = "<group>"; };
 		EB06F3D7F6B75E502F1765C5 /* Pods-Findme.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Findme.debug.xcconfig"; path = "Target Support Files/Pods-Findme/Pods-Findme.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -149,6 +152,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				E1EDA07F285E236800AC739E /* chim_cu_gay.wav */,
 				CE8EFD9B2759FACC00D9549E /* Config.xcconfig */,
 				13B07FAE1A68108700A75B9A /* Findme */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -156,6 +160,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				4C0A12B435DCC9DDE3C7A16D /* Pods */,
+				F0660F1F8A0C4C0BBA4FB2B6 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -192,6 +197,13 @@
 				CEB7AE8E260DE15500487276 /* AntDesign.ttf */,
 			);
 			name = Fonts;
+			sourceTree = "<group>";
+		};
+		F0660F1F8A0C4C0BBA4FB2B6 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -282,6 +294,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E1EDA081285E236800AC739E /* chim_cu_gay.wav in Resources */,
 				CE8EFD9D2759FACC00D9549E /* Config.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -292,6 +305,7 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				CE8EFD9C2759FACC00D9549E /* Config.xcconfig in Resources */,
+				E1EDA080285E236800AC739E /* chim_cu_gay.wav in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

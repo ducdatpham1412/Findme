@@ -101,12 +101,7 @@ const LoginRoute: React.FunctionComponent = () => {
 
             {/* FORGET */}
             <Stack.Screen
-                options={{
-                    headerTintColor: theme.textColor,
-                    headerTitle: t('login.forgetPassword.type.header'),
-                    headerTitleStyle,
-                    headerStyle,
-                }}
+                options={{headerShown: false}}
                 name={LOGIN_ROUTE.forgetPasswordType}
                 component={ForgetPasswordType}
             />
