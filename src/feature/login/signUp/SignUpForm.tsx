@@ -53,7 +53,7 @@ const SignUpForm = () => {
     const signUpSchema = yup.object().shape({
         username: chooseYupUsername(),
         password: yupValidate.password(),
-        confirmPass: yupValidate.password(),
+        confirmPass: yupValidate.password('password'),
     });
 
     const form = useForm({
@@ -203,7 +203,7 @@ const styles = ScaledSheet.create({
         backgroundColor: 'transparent',
     },
     inputForm: {
-        marginTop: '20@vs',
+        marginTop: '7@vs',
     },
     // terms and policy
     termPolicyView: {

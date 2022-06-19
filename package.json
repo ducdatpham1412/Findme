@@ -3,8 +3,7 @@
     "version": "0.0.1",
     "private": true,
     "scripts": {
-        "postinstall": "cd scripts && sh custom-lib.sh && cd .. && cd ios && pod install && cd .. && npx jetifier",
-        "ios": "react-native run-ios",
+        "postinstall": "cd scripts && sh custom-lib.sh && cd .. && cd ios && pod install && cd .. && npx jetifier",        "ios": "react-native run-ios",
         "start": "npx react-native start",
         "test": "jest",
         "lint": "eslint .",

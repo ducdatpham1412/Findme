@@ -1,6 +1,7 @@
 import InputBox from 'components/common/InputBox';
 import React, {forwardRef} from 'react';
 import {Controller, RegisterOptions, useFormContext} from 'react-hook-form';
+import {ScaledSheet} from 'react-native-size-matters';
 import {StyleInputProps} from './StyleInput';
 import StyleText from './StyleText';
 
@@ -37,11 +38,19 @@ const StyleInputForm = (props: StyleInputFormProps, ref: any) => {
                     }
                     value={value}
                     errorMessage={errorMessage}
+                    hasErrorBox
+                    customErrorText={styles.errorText}
                     {...props}
                 />
             )}
         />
     );
 };
+
+const styles = ScaledSheet.create({
+    errorText: {
+        fontSize: '11@ms',
+    },
+});
 
 export default forwardRef(StyleInputForm);
