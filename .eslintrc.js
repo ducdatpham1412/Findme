@@ -1,16 +1,13 @@
 module.exports = {
     root: true,
     extends: [
+        'airbnb-base',
+        'airbnb/hooks',
+        'plugin:react/recommended',
         'eslint:recommended',
         'plugin:@typescript-eslint/recommended',
         'plugin:prettier/recommended',
-    ],
-    ignorePatterns: [
-        '*.svg',
-        '*.json',
-        '*.png',
-        'package.json',
-        'package-lock.json',
+        'plugin:import/errors',
     ],
     parser: '@typescript-eslint/parser',
     plugins: [
@@ -22,7 +19,7 @@ module.exports = {
     ],
     settings: {
         react: {
-            version: 'detect', // Tells eslint-plugin-react to automatically detect the version of React to use
+            version: 'detect',
         },
         'import/resolver': {
             typescript: {
@@ -31,6 +28,7 @@ module.exports = {
         },
     },
     rules: {
+        'no-unsafe-optional-chaining': 'off',
         'global-require': 'off',
         'react/prop-types': 'off',
         '@typescript-eslint/consistent-type-definitions': ['off'],
@@ -71,15 +69,14 @@ module.exports = {
                 tsx: 'never',
             },
         ],
+        'no-use-before-define': 'off',
         'no-param-reassign': 'off',
         '@typescript-eslint/explicit-module-boundary-types': ['off'],
         'react/display-name': 'off',
-        '@typescript-eslint/no-empty-function': 1,
-        'default-param-last': 'off',
-        'no-use-before-define': 'off',
+        camelcase: 'off',
     },
     parserOptions: {
-        ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
-        sourceType: 'module', // Allows for the use of imports
+        ecmaVersion: 2018,
+        sourceType: 'module',
     },
 };
