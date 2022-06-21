@@ -9,7 +9,7 @@
         "start": "npx react-native start",
         "test": "jest",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-        "lint:husky": "eslint $(git diff --name-only | grep -E '(.js$|.ts$|.tsx$)')",
+        "lint:husky": "eslint $(git diff --staged --name-only | grep -E '(.js$|.ts$|.tsx$)')",
         "android": "react-native run-android",
         "android-run-dev-debug": "react-native run-android --variant=developmentDebug --appId 'com.doffy.android.development'",
         "android-run-dev-release": "react-native run-android --variant=developmentRelease --appId 'com.doffy.android.development'",
@@ -98,11 +98,7 @@
         "babel-jest": "^26.6.3",
         "babel-plugin-module-resolver": "^4.1.0",
         "eslint": "7.14.0",
-        "jest": "^26.6.3",
-        "metro-react-native-babel-preset": "^0.64.0",
-        "react-test-renderer": "17.0.1",
-        "typescript": "^4.2.3",
-        "husky": "^8.0.1",
+        "eslint-config-airbnb": "^19.0.4",
         "eslint-config-prettier": "^8.3.0",
         "eslint-import-resolver-typescript": "^2.4.0",
         "eslint-plugin-import": "^2.23.4",
@@ -111,7 +107,12 @@
         "eslint-plugin-prettier": "^3.4.0",
         "eslint-plugin-react-hooks": "^4.2.0",
         "eslint-plugin-unused-imports": "^1.1.2",
-        "prettier": "^2.3.2"
+        "husky": "^8.0.1",
+        "jest": "^26.6.3",
+        "metro-react-native-babel-preset": "^0.64.0",
+        "prettier": "^2.3.2",
+        "react-test-renderer": "17.0.1",
+        "typescript": "^4.2.3"
     },
     "jest": {
         "preset": "react-native"

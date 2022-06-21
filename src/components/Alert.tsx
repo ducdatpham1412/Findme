@@ -69,7 +69,7 @@ const Alert = ({route}: Props) => {
                     />
                 </View>
 
-                {/* Button ok and more*/}
+                {/* Button ok and more */}
                 <View style={styles.buttonBox}>
                     {/* BUTTON OK */}
                     <TouchableOpacity
