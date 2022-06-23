@@ -74,6 +74,8 @@ module.exports = {
         '@typescript-eslint/explicit-module-boundary-types': ['off'],
         'react/display-name': 'off',
         camelcase: 'off',
+        'no-plusplus': 'off',
+        '@typescript-eslint/ban-types': 'off',
     },
     parserOptions: {
         ecmaVersion: 2018,
