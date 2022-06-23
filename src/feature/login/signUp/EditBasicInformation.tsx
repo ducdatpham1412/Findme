@@ -52,39 +52,35 @@ const EditBasicInformation = ({route}: Props) => {
                 y: scrollItemHeight * (index + 1),
                 animated: true,
             });
-        } else {
-            if (birthday && name) {
-                const onEditProfileAndGo = async (isKeep: boolean) => {
-                    goBack();
-                    try {
-                        Redux.setIsLoading(true);
-                        await FindmeAsyncStorage.updateActiveUser(
-                            itemLoginSuccess,
-                        );
-                        const updateObject = {
-                            gender,
-                            name,
-                            birthday: formatUTCDate(birthday),
-                        };
+        } else if (birthday && name) {
+            const onEditProfileAndGo = async (isKeep: boolean) => {
+                goBack();
+                try {
+                    Redux.setIsLoading(true);
+                    await FindmeAsyncStorage.updateActiveUser(itemLoginSuccess);
+                    const updateObject = {
+                        gender,
+                        name,
+                        birthday: formatUTCDate(birthday),
+                    };
 
-                        await apiChangeInformation(updateObject);
-                        AuthenticateService.loginSuccess({
-                            itemLoginSuccess,
-                            isKeepSign: isKeep,
-                        });
-                    } catch (err) {
-                        appAlert(err);
-                    } finally {
-                        Redux.setIsLoading(false);
-                    }
-                };
+                    await apiChangeInformation(updateObject);
+                    AuthenticateService.loginSuccess({
+                        itemLoginSuccess,
+                        isKeepSign: isKeep,
+                    });
+                } catch (err) {
+                    appAlert(err);
+                } finally {
+                    Redux.setIsLoading(false);
+                }
+            };
 
-                appAlertYesNo({
-                    i18Title: 'alert.wantToSave',
-                    agreeChange: () => onEditProfileAndGo(true),
-                    refuseChange: () => onEditProfileAndGo(false),
-                });
-            }
+            appAlertYesNo({
+                i18Title: 'alert.wantToSave',
+                agreeChange: () => onEditProfileAndGo(true),
+                refuseChange: () => onEditProfileAndGo(false),
+            });
         }
     };
 

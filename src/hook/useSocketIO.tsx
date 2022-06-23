@@ -455,9 +455,8 @@ export const useSocketChatTagBubble = () => {
                         indexNeedToReorder,
                     );
                     return updateList;
-                } else {
-                    return temp;
                 }
+                return temp;
             });
         });
     }, [myId]);
@@ -599,9 +598,8 @@ export const useSocketChatDetail = (params: {
 
                     if (indexNeedToReorder > 0) {
                         return reorderListChatTag(temp, indexNeedToReorder);
-                    } else {
-                        return temp;
                     }
+                    return temp;
                 },
             );
         });
@@ -654,7 +652,6 @@ export const useSocketChatDetail = (params: {
                 socket.emit(SOCKET_EVENT.message, _params);
             } catch (err) {
                 appAlert(err);
-                return;
             }
         } else {
             socket.emit(SOCKET_EVENT.message, _params);
@@ -828,8 +825,8 @@ export const requestPublicChat = (chatTagId: string) => {
     socket.emit(SOCKET_EVENT.requestPublicChat, chatTagId);
 };
 export const agreePublicChat = (chatTagId: string) => {
-    const token = FindmeStore.getState().logicSlice.token;
-    socket.emit(SOCKET_EVENT.agreePublicChat, {token, chatTagId});
+    const reduxToken = FindmeStore.getState().logicSlice.token;
+    socket.emit(SOCKET_EVENT.agreePublicChat, {token: reduxToken, chatTagId});
 };
 
 export const blockAllChatTag = (params: {
