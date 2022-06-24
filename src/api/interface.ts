@@ -1,3 +1,4 @@
+import {TYPE_SOCIAL_LOGIN} from 'asset/enum';
 import {HobbyType} from 'hook/useRedux';
 
 // OTP
@@ -51,12 +52,6 @@ export interface TypeOpenAccountRequest {
 }
 
 // Login Social
-export enum TypeProviderLoginSocial {
-    facebook = 'facebook',
-    google = 'google-oauth2',
-    apple = 'apple',
-}
-
 export enum TypeOsLoginSocial {
     android = 0,
     ios = 1,
@@ -64,7 +59,7 @@ export enum TypeOsLoginSocial {
 
 export interface TypeLoginSocialRequest {
     os: TypeOsLoginSocial;
-    provider: TypeProviderLoginSocial;
+    provider: TYPE_SOCIAL_LOGIN;
 }
 
 // 2. register

@@ -146,3 +146,9 @@ export enum TYPE_BUBBLE_PALACE_ACTION {
     createNewGroupFromProfile = 3,
     editGroupFromProfile = 4,
 }
+
+export enum TYPE_SOCIAL_LOGIN {
+    facebook = 'facebook',
+    google = 'google-oauth2',
+    apple = 'apple',
+}

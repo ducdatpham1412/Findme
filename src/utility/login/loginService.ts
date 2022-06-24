@@ -1,5 +1,4 @@
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {TypeProviderLoginSocial} from 'api/interface';
 import {
     apiGetPassport,
     apiGetResource,
@@ -9,6 +8,7 @@ import {
 } from 'api/module';
 import request from 'api/request';
 import FindmeStore from 'app-redux/store';
+import {TYPE_SOCIAL_LOGIN} from 'asset/enum';
 import Redux from 'hook/useRedux';
 import {closeSocket} from 'hook/useSocketIO';
 import ROOT_SCREEN, {
@@ -29,7 +29,7 @@ interface requestLoginParams {
 }
 interface requestLoginSocialParams {
     tokenSocial: string | null;
-    typeSocial: TypeProviderLoginSocial;
+    typeSocial: TYPE_SOCIAL_LOGIN;
 }
 
 export interface TypeItemLoginSuccess {

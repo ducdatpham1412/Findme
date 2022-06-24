@@ -3,8 +3,7 @@ import {
     statusCodes,
 } from '@react-native-google-signin/google-signin';
 import {useIsFocused} from '@react-navigation/native';
-import {TypeProviderLoginSocial} from 'api/interface';
-import {SIGN_UP_TYPE} from 'asset/enum';
+import {SIGN_UP_TYPE, TYPE_SOCIAL_LOGIN} from 'asset/enum';
 import Images from 'asset/img/images';
 import Theme from 'asset/theme/Theme';
 import {
@@ -148,7 +147,7 @@ const LoginScreen = () => {
             const {idToken} = userInfo;
             AuthenticateService.requestLoginSocial({
                 tokenSocial: idToken,
-                typeSocial: TypeProviderLoginSocial.google,
+                typeSocial: TYPE_SOCIAL_LOGIN.google,
             });
         } catch (error: any) {
             if (error.code === statusCodes.SIGN_IN_CANCELLED) {
