@@ -44,6 +44,7 @@ export enum ASYNC_TYPE {
     index = 'index',
     // logged = 'logged',
     language = 'language',
+    socialLoginAccount = 'socialLoginAccount',
 }
 
 // authentication
@@ -145,4 +146,10 @@ export enum TYPE_BUBBLE_PALACE_ACTION {
     editPostFromProfile = 2,
     createNewGroupFromProfile = 3,
     editGroupFromProfile = 4,
+}
+
+export enum TYPE_SOCIAL_LOGIN {
+    facebook = 'facebook',
+    google = 'google-oauth2',
+    apple = 'apple',
 }

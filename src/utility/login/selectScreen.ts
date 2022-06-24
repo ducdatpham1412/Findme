@@ -18,7 +18,11 @@ export const selectIsHaveActiveUser = async () => {
         // although activeUser still save in async from last login
         // but "index" not have -> handleNotHaveActiveUser and clear that user
         const index = await FindmeAsyncStorage.getIndexNow();
-        if (index === null) {
+        const isHavingSocialAccount =
+            await FindmeAsyncStorage.getIsHavingSocialAccount();
+
+        // If both username - password and socialLoginAccount not saved
+        if (index === null && !isHavingSocialAccount) {
             await handleNotHaveActiveUser();
             return;
         }
@@ -38,10 +42,4 @@ export const selectIsHaveActiveUser = async () => {
     } else {
         await handleNotHaveActiveUser();
     }
-};
-
-// Is called from Starter
-export const selectIsTheFirstTime = async () => {
-    const isFirstTime = await FindmeAsyncStorage.isFirstTimeOpenApp();
-    return isFirstTime;
 };

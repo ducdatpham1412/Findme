@@ -27,6 +27,7 @@ interface Props {
     route: {
         params: {
             itemLoginSuccess: TypeItemLoginSuccess;
+            isLoginSocial?: boolean;
         };
     };
 }
@@ -35,7 +36,7 @@ export const scrollItemHeight = verticalScale(140);
 const defaultDate = new Date(2000, 0, 1);
 
 const EditBasicInformation = ({route}: Props) => {
-    const {itemLoginSuccess} = route.params;
+    const {itemLoginSuccess, isLoginSocial = false} = route.params;
 
     const scrollPickerRef = useRef<ScrollView>(null);
 
@@ -64,23 +65,28 @@ const EditBasicInformation = ({route}: Props) => {
                         birthday: formatUTCDate(birthday),
                     };
 
-                    await apiChangeInformation(updateObject);
-                    AuthenticateService.loginSuccess({
-                        itemLoginSuccess,
-                        isKeepSign: isKeep,
+                        await apiChangeInformation(updateObject);
+                        AuthenticateService.loginSuccess({
+                            itemLoginSuccess,
+                            isKeepSign: isKeep,
+                            isLoginSocial,
+                        });
+                    } catch (err) {
+                        appAlert(err);
+                    } finally {
+                        Redux.setIsLoading(false);
+                    }
+                };
+                if (isLoginSocial) {
+                    onEditProfileAndGo(true);
+                } else {
+                    appAlertYesNo({
+                        i18Title: 'alert.wantToSave',
+                        agreeChange: () => onEditProfileAndGo(true),
+                        refuseChange: () => onEditProfileAndGo(false),
                     });
-                } catch (err) {
-                    appAlert(err);
-                } finally {
-                    Redux.setIsLoading(false);
                 }
-            };
-
-            appAlertYesNo({
-                i18Title: 'alert.wantToSave',
-                agreeChange: () => onEditProfileAndGo(true),
-                refuseChange: () => onEditProfileAndGo(false),
-            });
+            }
         }
     };
 

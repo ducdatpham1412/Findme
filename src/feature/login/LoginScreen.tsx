@@ -1,5 +1,9 @@
+import {
+    GoogleSignin,
+    statusCodes,
+} from '@react-native-google-signin/google-signin';
 import {useIsFocused} from '@react-navigation/native';
-import {SIGN_UP_TYPE} from 'asset/enum';
+import {SIGN_UP_TYPE, TYPE_SOCIAL_LOGIN} from 'asset/enum';
 import Images from 'asset/img/images';
 import Theme from 'asset/theme/Theme';
 import {
@@ -23,7 +27,7 @@ import RemForPass from './components/RemForPass';
 
 const loginForm = __DEV__
     ? {
-          username: 'doffy@doffy.xyz',
+          username: 'yeuquaimo@gmail.com',
           password: '12345678',
       }
     : {username: '', password: ''};
@@ -133,6 +137,33 @@ const LoginScreen = () => {
         );
     };
 
+    const signInWithGoogle = async () => {
+        try {
+            Redux.setIsLoading(true);
+            await GoogleSignin.hasPlayServices({
+                showPlayServicesUpdateDialog: true,
+            });
+            const userInfo = await GoogleSignin.signIn();
+            const {idToken} = userInfo;
+            AuthenticateService.requestLoginSocial({
+                tokenSocial: idToken,
+                typeSocial: TYPE_SOCIAL_LOGIN.google,
+            });
+        } catch (error: any) {
+            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+                // user cancelled the login flow
+            } else if (error.code === statusCodes.IN_PROGRESS) {
+                // operation (e.g. sign in) is in progress already
+            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+                // play services not available or outdated
+            } else {
+                // some other error happened
+            }
+        } finally {
+            Redux.setIsLoading(false);
+        }
+    };
+
     const SignInPlatforms = () => {
         return (
             <View style={styles.signUpView}>
@@ -153,22 +184,17 @@ const LoginScreen = () => {
                         />
                     </StyleTouchable>
                     <StyleTouchable
-                        onPress={() =>
+                        onPress={() => {
                             navigate(LOGIN_ROUTE.signUpForm, {
                                 typeSignUp: SIGN_UP_TYPE.email,
-                            })
-                        }>
+                            });
+                        }}>
                         <StyleImage
                             source={Images.icons.facebook}
                             customStyle={styles.iconSignIn}
                         />
                     </StyleTouchable>
-                    <StyleTouchable
-                        onPress={() =>
-                            navigate(LOGIN_ROUTE.signUpForm, {
-                                typeSignUp: SIGN_UP_TYPE.email,
-                            })
-                        }>
+                    <StyleTouchable onPress={signInWithGoogle}>
                         <StyleImage
                             source={Images.icons.email}
                             customStyle={styles.iconSignIn}

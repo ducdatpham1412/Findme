@@ -36,8 +36,8 @@ const Starter = () => {
                         titleStyle={styles.titleTabBar}
                     />
                 )}
-                sceneContainerStyle={styles.sceneContainer}
-                initialRouteName={LOGIN_ROUTE.loginScreen}>
+                initialRouteName={LOGIN_ROUTE.loginScreen}
+                sceneContainerStyle={styles.sceneContainer}>
                 <TopTab.Screen
                     name={LOGIN_ROUTE.choosingLoginOrEnjoy}
                     component={ChoosingLoginOrEnjoy}

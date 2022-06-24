@@ -19,6 +19,9 @@ declare module '@env' {
     export const CODEPUSH_ANDROID_DEVELOPMENT_KEY: string;
     export const CODEPUSH_IOS_DEVELOPMENT_KEY: string;
 
+    // WEB CLIENT ID GOOGLE SIGN IN
+    export const WEB_CLIENT_ID_GOOGLE_SIGN_IN: string;
+
     // other keys
     export const GOOGLE_MAPS_API_KEY: string;
 }

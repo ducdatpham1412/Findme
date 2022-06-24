@@ -4,6 +4,7 @@
     "private": true,
     "scripts": {
         "postinstall": "cd scripts && sh custom-lib.sh && cd .. && cd ios && pod install && cd .. && npx jetifier",
+        "pod-install-m1": "cd ios && arch -x86_64 pod install && cd ..",
         "prepare": "husky install",
         "ios": "react-native run-ios",
         "start": "npx react-native start",
@@ -27,7 +28,7 @@
         "code-push-android-development": "appcenter codepush release-react -a Doffy-app/Doffy-Android -d Development -t 1.3",
         "code-push-android-staging": "appcenter codepush release-react -a Doffy-app/Doffy-Android -d Staging -t 2.1",
         "code-push-android-production": "appcenter codepush release-react -a Doffy-app/Doffy-Android -d Production -t 1.2",
-        "rebase": "gco develop && git pull origin develop && gco - && git rebase -",
+        "rebase": "git checkout develop && git pull origin develop && git checkout - && git rebase -",
         "stash": "git stash && yarn rebase && git stash pop",
         "no-edit": "git add . && git commit --amend --no-edit && git push origin head -f",
         "no-verify": "git add . && git commit --amend --no-edit --no-verify && git push origin head -f"
@@ -41,6 +42,8 @@
         "@react-native-community/masked-view": "^0.1.10",
         "@react-native-firebase/app": "^15.0.0",
         "@react-native-firebase/dynamic-links": "^15.0.0",
+        "@react-native-firebase/auth": "^14.11.1",
+        "@react-native-google-signin/google-signin": "^7.2.2",
         "@react-native-picker/picker": "^1.12.0",
         "@react-navigation/bottom-tabs": "^6.2.0",
         "@react-navigation/material-top-tabs": "^6.0.6",
