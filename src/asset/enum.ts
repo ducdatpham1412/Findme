@@ -44,6 +44,7 @@ export enum ASYNC_TYPE {
     index = 'index',
     // logged = 'logged',
     language = 'language',
+    socialLoginAccount = 'socialLoginAccount',
 }
 
 // authentication

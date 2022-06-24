@@ -22,17 +22,6 @@
           }
         },
         {
-<<<<<<< HEAD
-=======
-          "client_id": "647052846803-404488utle5hjc0rh6afso8tjes9t7jj.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.doffy.android.production",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
-          }
-        },
-        {
->>>>>>> 16eb579 (feat/add-gg-signin)
           "client_id": "647052846803-fbvc9ru0jg933rfs14lpu8f7nv5ek6hl.apps.googleusercontent.com",
           "client_type": 3
         }

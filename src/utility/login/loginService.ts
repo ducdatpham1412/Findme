@@ -27,7 +27,7 @@ interface requestLoginParams {
     password: string;
     isKeepSign: boolean;
 }
-interface requestLoginSocialParams {
+interface RequestLoginSocialParams {
     tokenSocial: string | null;
     typeSocial: TYPE_SOCIAL_LOGIN;
 }
@@ -42,12 +42,23 @@ export interface TypeItemLoginSuccess {
 interface TypeParamsLoginSuccess {
     itemLoginSuccess: TypeItemLoginSuccess;
     isKeepSign: boolean;
+    isLoginSocial: boolean;
 }
 
 const AuthenticateService = {
     loginSuccess: async (params: TypeParamsLoginSuccess) => {
-        const {itemLoginSuccess, isKeepSign} = params;
+        const {itemLoginSuccess, isKeepSign, isLoginSocial} = params;
         await FindmeAsyncStorage.updateActiveUser(itemLoginSuccess);
+
+        if (isKeepSign && itemLoginSuccess.username && !isLoginSocial) {
+            await FindmeAsyncStorage.addStorageAcc({
+                username: itemLoginSuccess.username,
+                password: itemLoginSuccess.password,
+            });
+        }
+        if (isLoginSocial) {
+            await FindmeAsyncStorage.setIsHavingSocialAccount(true);
+        }
 
         const passport = await apiGetPassport();
         const resource = await apiGetResource();
@@ -62,13 +73,6 @@ const AuthenticateService = {
         const temp = chooseLanguageFromId(passport.data.setting.language);
         I18Next.changeLanguage(temp);
         await FindmeAsyncStorage.editLanguageModeExp(temp);
-
-        if (isKeepSign && itemLoginSuccess.username) {
-            await FindmeAsyncStorage.addStorageAcc({
-                username: itemLoginSuccess.username,
-                password: itemLoginSuccess.password,
-            });
-        }
 
         navigate(ROOT_SCREEN.mainScreen, {
             screen: DISCOVERY_ROUTE.discoveryScreen,
@@ -105,6 +109,7 @@ const AuthenticateService = {
                         refreshToken: res.data.refreshToken,
                     },
                     isKeepSign,
+                    isLoginSocial: false,
                 });
             }
         } catch (err) {
@@ -113,7 +118,7 @@ const AuthenticateService = {
             Redux.setIsLoading(false);
         }
     },
-    requestLoginSocial: async (params: requestLoginSocialParams) => {
+    requestLoginSocial: async (params: RequestLoginSocialParams) => {
         const {tokenSocial, typeSocial} = params;
 
         try {
@@ -125,19 +130,22 @@ const AuthenticateService = {
                 tokenSocial,
             );
             if (res.data?.token && res.data?.refreshToken) {
-                const itemLoginSuccess = {
+                const itemLoginSuccess: TypeItemLoginSuccess = {
+                    username: res.data.username,
+                    password: '',
                     token: res.data.token,
                     refreshToken: res.data?.refreshToken,
                 };
                 if (res.data?.isNewUser) {
                     navigate(LOGIN_ROUTE.editBasicInformation, {
                         itemLoginSuccess,
-                        loginSocial: typeSocial,
+                        isLoginSocial: true,
                     });
                 } else {
                     AuthenticateService.loginSuccess({
                         itemLoginSuccess,
                         isKeepSign: false,
+                        isLoginSocial: true,
                     });
                 }
             }

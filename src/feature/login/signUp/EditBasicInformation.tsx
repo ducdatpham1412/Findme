@@ -27,7 +27,7 @@ interface Props {
     route: {
         params: {
             itemLoginSuccess: TypeItemLoginSuccess;
-            loginSocial?: boolean | string;
+            isLoginSocial?: boolean;
         };
     };
 }
@@ -36,7 +36,7 @@ export const scrollItemHeight = verticalScale(140);
 const defaultDate = new Date(2000, 0, 1);
 
 const EditBasicInformation = ({route}: Props) => {
-    const {itemLoginSuccess, loginSocial = false} = route.params;
+    const {itemLoginSuccess, isLoginSocial = false} = route.params;
 
     const scrollPickerRef = useRef<ScrollView>(null);
 
@@ -69,6 +69,7 @@ const EditBasicInformation = ({route}: Props) => {
                         AuthenticateService.loginSuccess({
                             itemLoginSuccess,
                             isKeepSign: isKeep,
+                            isLoginSocial,
                         });
                     } catch (err) {
                         appAlert(err);
@@ -76,8 +77,8 @@ const EditBasicInformation = ({route}: Props) => {
                         Redux.setIsLoading(false);
                     }
                 };
-                if (loginSocial) {
-                    onEditProfileAndGo(false);
+                if (isLoginSocial) {
+                    onEditProfileAndGo(true);
                 } else {
                     appAlertYesNo({
                         i18Title: 'alert.wantToSave',

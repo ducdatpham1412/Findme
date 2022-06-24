@@ -68,6 +68,10 @@ export default class FindmeAsyncStorage {
     };
     static addStorageAcc = async (account: AccountSaveToAsync) => {
         let tempt = await FindmeAsyncStorage.getStorageAcc();
+        /**
+         * If this account have been saved in storage,
+         * only need to set "index" and return
+         */
         for (let i = 0; i < tempt.length; i++) {
             if (tempt[i].username === account.username) {
                 FindmeAsyncStorage.setIndexNow(i);
@@ -158,6 +162,29 @@ export default class FindmeAsyncStorage {
     };
     static setIndexNow = async (value: number) => {
         await AsyncStorage.setItem(ASYNC_TYPE.index, value.toString());
+    };
+    /**
+     * ---------------------------------------------
+     */
+
+    /**
+     * Check is saving login social account
+     */
+    static getIsHavingSocialAccount = async () => {
+        const socialLoginAccount = await AsyncStorage.getItem(
+            ASYNC_TYPE.socialLoginAccount,
+        );
+        if (socialLoginAccount === null) {
+            return false;
+        }
+        return true;
+    };
+
+    static setIsHavingSocialAccount = async (value: boolean) => {
+        await AsyncStorage.setItem(
+            ASYNC_TYPE.socialLoginAccount,
+            String(value),
+        );
     };
     /**
      * ---------------------------------------------
