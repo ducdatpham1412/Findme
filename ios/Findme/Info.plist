@@ -34,7 +34,7 @@
 	<key>CFBundleVersion</key>
 	<string>RNC_IOS_APP_BUILD_CODE</string>
 	<key>LSApplicationCategoryType</key>
-	<string/>
+	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -51,7 +51,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Camera permission</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string></string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Microphone permission</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
