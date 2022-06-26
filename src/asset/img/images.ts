@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 // These are images used for both light and dark Theme
 
 const Images = {
@@ -40,6 +41,13 @@ const Images = {
         reload: require('./ic_reload.png'),
         personal: require('./ic_personal.png'),
         community: require('./ic_community.png'),
+        share: require('./ic_share.png'),
+        close: require('./ic_close.png'),
+        shareLink: require('./ic_share_link.png'),
+        copyLink: require('./ic_copy_link.png'),
+        facebookLink: require('./ic_facebook_link.png'),
+        messageLink: require('./ic_message_link.png'),
+        zaloLink: require('./ic_zalo_link.png'),
     },
     images: {
         logo: require('./img_logo.png'),

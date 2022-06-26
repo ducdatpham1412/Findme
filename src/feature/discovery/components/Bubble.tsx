@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-shadow */
+/* eslint-disable react/jsx-key */
+/* eslint-disable no-unused-expressions */
 import {TypeBubblePalace} from 'api/interface';
 import {apiLikePost, apiUnLikePost} from 'api/module';
 import {RELATIONSHIP} from 'asset/enum';
@@ -12,17 +16,23 @@ import IconNotLiked from 'components/common/IconNotLiked';
 import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
 import {appAlert, goBack} from 'navigation/NavigationService';
-import React, {memo, useEffect, useState} from 'react';
+import React, {memo, useEffect, useRef, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import {View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {moderateScale, ScaledSheet} from 'react-native-size-matters';
+import {
+    moderateScale,
+    scale,
+    ScaledSheet,
+    verticalScale,
+} from 'react-native-size-matters';
 import {
     chooseColorGradient,
     choosePrivateAvatar,
     logger,
     onGoToSignUp,
 } from 'utility/assistant';
+import {Modalize} from 'react-native-modalize';
 import {TypeShowMoreOptions} from '../ListBubbleCouple';
 import IconHobby from './IconHobby';
 
@@ -68,6 +78,11 @@ const Bubble = (props: Props) => {
         colorChoose: item.color,
     });
     const isMyBubble = item.relationship === RELATIONSHIP.self;
+    const modalizeRef = useRef<Modalize>(null);
+
+    const onOpen = () => {
+        modalizeRef.current?.open();
+    };
 
     const onLikeUnLike = async () => {
         if (!isModeExp) {
@@ -193,7 +208,7 @@ const Bubble = (props: Props) => {
     };
 
     const RenderTool = () => {
-        const backgroundColor = theme.backgroundColor;
+        const {backgroundColor} = theme;
 
         const RenderStartChat = () => {
             return (
@@ -288,10 +303,10 @@ const Bubble = (props: Props) => {
             return (
                 <StyleTouchable
                     customStyle={[styles.buttonTouch, {backgroundColor}]}
-                    onPress={() => onRefreshItem(item.id)}
+                    onPress={() => onOpen()}
                     hitSlop={{left: 10, top: 10, right: 10, bottom: 10}}>
                     <StyleImage
-                        source={Images.icons.reload}
+                        source={Images.icons.share}
                         customStyle={styles.iconReload}
                     />
                 </StyleTouchable>
@@ -308,6 +323,92 @@ const Bubble = (props: Props) => {
         );
     };
 
+    const RenderModalShare = () => {
+        const activityShare = [
+            {
+                id: 0,
+                url: Images.icons.facebookLink,
+                width: scale(50),
+                height: scale(50),
+                title: 'Facebook',
+            },
+            {
+                id: 1,
+                url: Images.icons.messageLink,
+                width: scale(50),
+                height: scale(50),
+                title: 'Message',
+            },
+            {
+                id: 2,
+                url: Images.icons.zaloLink,
+                width: scale(50),
+                height: scale(50),
+                title: 'Zalo',
+            },
+        ];
+        return (
+            <View style={styles.wrapViewModalShare}>
+                <View style={styles.wrapViewHeaderModal}>
+                    <View style={styles.wrapViewIconShare} />
+                    <View>
+                        <StyleText
+                            i18Text="Have a pocketsized avocado"
+                            customStyle={styles.wrapTextTitleModal}
+                        />
+                        <StyleText
+                            i18Text="pocketsizedavocado.com"
+                            customStyle={styles.wrapTextContentModal}
+                        />
+                    </View>
+                    <StyleTouchable
+                        onPress={() => modalizeRef.current?.close()}
+                        customStyle={styles.wrapTouchCloseModal}>
+                        <StyleImage
+                            source={Images.icons.close}
+                            customStyle={styles.wrapIconClose}
+                        />
+                    </StyleTouchable>
+                </View>
+                <View style={styles.wrapViewBodyModal}>
+                    <StyleTouchable onPress={() => null}>
+                        <StyleImage
+                            source={Images.icons.shareLink}
+                            customStyle={styles.wrapIconActivityShare}
+                        />
+                    </StyleTouchable>
+                    <StyleTouchable onPress={() => null}>
+                        <StyleImage
+                            source={Images.icons.copyLink}
+                            customStyle={styles.wrapIconActivityShare}
+                        />
+                    </StyleTouchable>
+                </View>
+                <View style={styles.wrapViewBodyModalLink}>
+                    {activityShare.map((item: any) => {
+                        return (
+                            <StyleTouchable
+                                style={styles.wrapViewShare}
+                                onPress={() => null}>
+                                <StyleImage
+                                    source={item.url}
+                                    customStyle={{
+                                        width: item.width,
+                                        height: item.height,
+                                    }}
+                                />
+                                <StyleText
+                                    i18Text={item.title}
+                                    customStyle={styles.wrapTextTitleShare}
+                                />
+                            </StyleTouchable>
+                        );
+                    })}
+                </View>
+            </View>
+        );
+    };
+
     return (
         <LinearGradient
             style={styles.container}
@@ -320,6 +421,13 @@ const Bubble = (props: Props) => {
                 {RenderContentName()}
                 {RenderTool()}
             </View>
+            <Modalize
+                ref={modalizeRef}
+                modalHeight={verticalScale(280)}
+                withHandle={false}
+                rootStyle={[styles.wrapModal]}>
+                {RenderModalShare()}
+            </Modalize>
         </LinearGradient>
     );
 };
@@ -440,8 +548,8 @@ const styles = ScaledSheet.create({
         height: '28@ms',
     },
     iconReload: {
-        width: '30@ms',
-        height: '30@ms',
+        width: '36@ms',
+        height: '36@ms',
     },
     iconReport: {
         fontSize: '18@ms',
@@ -450,6 +558,74 @@ const styles = ScaledSheet.create({
         position: 'absolute',
         right: '60@ms',
         top: '60@ms',
+    },
+    wrapModal: {
+        borderTopRightRadius: 15,
+        borderTopLeftRadius: 15,
+    },
+    wrapViewModalShare: {
+        height: '100%',
+    },
+    wrapViewHeaderModal: {
+        flexDirection: 'row',
+        padding: '16@vs',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: Theme.common.textMe,
+    },
+    wrapViewIconShare: {
+        width: '41@s',
+        height: '41@s',
+        backgroundColor: Theme.common.blueInput,
+        borderRadius: 5,
+        marginRight: '8@s',
+    },
+    wrapTextTitleModal: {
+        fontWeight: '700',
+        fontSize: '15@ms0.3',
+        color: Theme.common.black,
+        marginBottom: '2@vs',
+    },
+    wrapTextContentModal: {
+        fontWeight: '400',
+        fontSize: '13@ms0.3',
+        color: Theme.common.gray,
+    },
+    wrapTouchCloseModal: {
+        position: 'absolute',
+        top: '10@vs',
+        right: '10@s',
+    },
+    wrapIconClose: {
+        width: '28@s',
+        height: '28@s',
+    },
+    wrapViewBodyModal: {
+        flexDirection: 'row',
+        paddingVertical: '30@vs',
+        paddingHorizontal: '18@s',
+        borderBottomWidth: 1,
+        borderBottomColor: Theme.common.textMe,
+    },
+    wrapViewBodyModalLink: {
+        flexDirection: 'row',
+        padding: '16@vs',
+        alignItems: 'center',
+    },
+    wrapIconActivityShare: {
+        width: '50@s',
+        height: '50@s',
+        marginRight: '29@s',
+    },
+    wrapViewShare: {
+        marginRight: '39@s',
+        alignItems: 'center',
+    },
+    wrapTextTitleShare: {
+        fontSize: '14@ms0.3',
+        fontWeight: '500',
+        color: Theme.common.black,
+        marginTop: '5@vs',
     },
 });
 
