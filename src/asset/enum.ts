@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 export enum INFO_TYPE {
     facebook = 'facebook',
     email = 'email',
@@ -152,4 +153,9 @@ export enum TYPE_SOCIAL_LOGIN {
     facebook = 'facebook',
     google = 'google-oauth2',
     apple = 'apple',
+}
+
+export enum TYPE_OS_LOGIN_SOCIAL {
+    android = 0,
+    ios = 1,
 }
