@@ -517,7 +517,7 @@ export const useSocketChatDetail = (params: {
         },
     });
 
-    const hearingSocket = useCallback(() => {
+    const hearingSocket = () => {
         socket?.off(SOCKET_EVENT.message);
         socket.on(SOCKET_EVENT.message, (data: TypeChatMessageResponse) => {
             if (data.chatTag === chatTagFocusing) {
@@ -619,19 +619,20 @@ export const useSocketChatDetail = (params: {
                 }
             },
         );
-    }, [chatTagFocusing, myId]);
+    };
 
     useEffect(() => {
         hearingSocket();
     }, [chatTagFocusing, myId]);
 
-    const sendMessage = useCallback(async (_params: TypeChatMessageSend) => {
+    const sendMessage = async (_params: TypeChatMessageSend) => {
         const newMessage: any = {
             id: _params.tag,
             chatTag: _params.chatTag,
             type: _params.type,
             content: _params.content,
             senderId: _params.senderId,
+            senderName: _params.senderName,
             senderAvatar: _params.senderAvatar,
             createdTime: _params.tag,
             tag: _params.tag,
@@ -656,30 +657,25 @@ export const useSocketChatDetail = (params: {
         } else {
             socket.emit(SOCKET_EVENT.message, _params);
         }
-    }, []);
+    };
 
-    const deleteMessage = useCallback(
-        async (idMessage: string) => {
-            try {
-                await apiDeleteMessage({
-                    chatTagId: chatTagFocusing,
-                    messageId: idMessage,
-                });
-                setList((previousMessage: Array<TypeChatMessageResponse>) => {
-                    return previousMessage.filter(
-                        item => item.id !== idMessage,
-                    );
-                });
-                socket.emit(SOCKET_EVENT.deleteMessage, {
-                    chatTagId: chatTagFocusing,
-                    messageId: idMessage,
-                });
-            } catch (err) {
-                appAlert(err);
-            }
-        },
-        [chatTagFocusing],
-    );
+    const deleteMessage = async (idMessage: string) => {
+        try {
+            await apiDeleteMessage({
+                chatTagId: chatTagFocusing,
+                messageId: idMessage,
+            });
+            setList((previousMessage: Array<TypeChatMessageResponse>) => {
+                return previousMessage.filter(item => item.id !== idMessage);
+            });
+            socket.emit(SOCKET_EVENT.deleteMessage, {
+                chatTagId: chatTagFocusing,
+                messageId: idMessage,
+            });
+        } catch (err) {
+            appAlert(err);
+        }
+    };
 
     return {
         messages: list,

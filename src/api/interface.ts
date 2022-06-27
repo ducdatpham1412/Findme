@@ -1,4 +1,4 @@
-import {TYPE_SOCIAL_LOGIN} from 'asset/enum';
+import {TYPE_OS_LOGIN_SOCIAL, TYPE_SOCIAL_LOGIN} from 'asset/enum';
 import {HobbyType} from 'hook/useRedux';
 
 // OTP
@@ -52,13 +52,8 @@ export interface TypeOpenAccountRequest {
 }
 
 // Login Social
-export enum TypeOsLoginSocial {
-    android = 0,
-    ios = 1,
-}
-
 export interface TypeLoginSocialRequest {
-    os: TypeOsLoginSocial;
+    os: TYPE_OS_LOGIN_SOCIAL;
     provider: TYPE_SOCIAL_LOGIN;
 }
 
@@ -354,6 +349,7 @@ export interface TypeChatMessageSend {
     type: number;
     content: string | Array<string>;
     senderId: number;
+    senderName: string;
     senderAvatar: string;
     listUser: Array<number>;
     tag: string; // to check message comeback sender after set local message, string Date

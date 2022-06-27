@@ -28,7 +28,7 @@ import {
     navigate,
     showSwipeImages,
 } from 'navigation/NavigationService';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {FlatList, Keyboard, TextInput, View} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -116,7 +116,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
     /**
      * Agree, refuse request public
      */
-    const onAgreeRequestPublic = useCallback(() => {
+    const onAgreeRequestPublic = () => {
         goBack();
         agreePublicChat(itemChatTag.id);
         setItemChatTag({
@@ -124,9 +124,9 @@ const ChatDetail = ({route}: ChatDetailProps) => {
             isRequestingPublic: true,
             hadRequestedPublic: true,
         });
-    }, [itemChatTag]);
+    };
 
-    const onRefuseRequestPublic = useCallback(() => {
+    const onRefuseRequestPublic = () => {
         const temp = listChatTag.map(item => {
             if (item.id !== itemChatTag.id) {
                 return item;
@@ -138,7 +138,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
         });
         route.params.setListChatTags(temp);
         goBack();
-    }, [listChatTag]);
+    };
 
     /**
      * Effect
@@ -188,6 +188,9 @@ const ChatDetail = ({route}: ChatDetailProps) => {
      * Send message
      */
     const onSend = async () => {
+        const senderName = itemChatTag.isPrivate
+            ? profile.anonymousName
+            : profile.name;
         if (profile?.id) {
             // send images
             if (images.length) {
@@ -198,6 +201,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                     type: MESSAGE_TYPE.image,
                     content: images,
                     senderId: profile.id,
+                    senderName,
                     senderAvatar: myAvatar,
                     listUser: itemChatTag.listUser.map(item => item.id),
                     tag: String(Date.now()),
@@ -213,19 +217,21 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                     type: MESSAGE_TYPE.text,
                     content: content.trimEnd(),
                     senderId: profile.id,
+                    senderName,
                     senderAvatar: myAvatar,
                     listUser: itemChatTag.listUser.map(item => item.id),
                     tag: String(Date.now()),
                 });
             }
         }
+
         listRef.current?.scrollToOffset({offset: 0});
     };
 
     /**
      * Request public Shh
      */
-    const onRequestPublic = useCallback(() => {
+    const onRequestPublic = () => {
         if (
             !isModeExp &&
             itemChatTag.isPrivate &&
@@ -248,58 +254,53 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                 });
             }
         }
-    }, [itemChatTag]);
+    };
 
     /**
      * Go to setting chat
      */
-    const onNavigateToMessSetting = useCallback(() => {
+    const onNavigateToMessSetting = () => {
         navigate(MESS_ROUTE.chatDetailSetting, {
             itemChatTag,
         });
-    }, [itemChatTag]);
+    };
 
-    const onDeleteImage = useCallback(
-        (index: number) => {
-            const temp = [...images];
-            temp.splice(index, 1);
-            setImages(temp);
-        },
-        [images],
-    );
+    const onDeleteImage = (index: number) => {
+        const temp = [...images];
+        temp.splice(index, 1);
+        setImages(temp);
+    };
 
-    const onGoBack = useCallback(() => {
+    const onGoBack = () => {
         Redux.setChatTagFocusing('');
         goBack();
-    }, [messages]);
+    };
 
-    const onSeeDetailImage = useCallback(
-        (listImages: Array<any>, index: number) => {
-            if (inputRef.current?.isFocused() && !isIOS) {
-                Keyboard.dismiss();
-                const x = setTimeout(() => {
-                    showSwipeImages({
-                        listImages,
-                        initIndex: index,
-                        allowSaveImage: !itemChatTag.isPrivate,
-                    });
-                }, 100);
-                return () => clearTimeout(x);
-            } else {
+    const onSeeDetailImage = (listImages: Array<any>, index: number) => {
+        if (inputRef.current?.isFocused() && !isIOS) {
+            Keyboard.dismiss();
+            const x = setTimeout(() => {
                 showSwipeImages({
                     listImages,
                     initIndex: index,
                     allowSaveImage: !itemChatTag.isPrivate,
                 });
-            }
-        },
-        [],
-    );
+            }, 100);
+            return () => clearTimeout(x);
+        }
+
+        showSwipeImages({
+            listImages,
+            initIndex: index,
+            allowSaveImage: !itemChatTag.isPrivate,
+        });
+        return () => null;
+    };
 
     /**
      * Render view
      */
-    const RenderHeader = useMemo(() => {
+    const RenderHeader = () => {
         const headerLeft = () => {
             return (
                 <View style={styles.headerLeftBox}>
@@ -388,34 +389,34 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                 }}
             />
         );
-    }, [itemChatTag, borderMessRoute, numberNewMessages]);
+    };
 
-    const RenderItemMessage = useCallback(
-        (params: {item: TypeChatMessageResponse; index: number}) => {
-            const {item, index} = params;
-            const isSameMessageAfter =
-                messages?.[index + 1]?.relationship === item.relationship;
-            const displayPartnerAvatar =
-                messages[index - 1]?.relationship !== item.relationship;
-            const displayMeAvatar =
-                item.id ===
-                itemChatTag.userSeenMessage[String(partnerId)].latestMessage;
+    const RenderItemMessage = (params: {
+        item: TypeChatMessageResponse;
+        index: number;
+    }) => {
+        const {item, index} = params;
+        const isSameMessageAfter =
+            messages?.[index + 1]?.relationship === item.relationship;
+        const displayPartnerAvatar =
+            messages[index - 1]?.relationship !== item.relationship;
+        const displayMeAvatar =
+            item.id ===
+            itemChatTag.userSeenMessage[String(partnerId)].latestMessage;
 
-            return (
-                <ItemMessage
-                    itemMessage={item}
-                    isSameMessageAfter={isSameMessageAfter}
-                    displayPartnerAvatar={displayPartnerAvatar}
-                    displayMeAvatar={displayMeAvatar}
-                    onDeleteMessage={deleteMessage}
-                    listMessagesLength={messages.length}
-                    chatColor={chatColor}
-                    onSeeDetailImage={onSeeDetailImage}
-                />
-            );
-        },
-        [messages, itemChatTag],
-    );
+        return (
+            <ItemMessage
+                itemMessage={item}
+                isSameMessageAfter={isSameMessageAfter}
+                displayPartnerAvatar={displayPartnerAvatar}
+                displayMeAvatar={displayMeAvatar}
+                onDeleteMessage={deleteMessage}
+                listMessagesLength={messages.length}
+                chatColor={chatColor}
+                onSeeDetailImage={onSeeDetailImage}
+            />
+        );
+    };
 
     const RenderTyping = useMemo(() => {
         if (!itemChatTag?.userTyping || !itemChatTag?.userTyping.length) {
@@ -446,7 +447,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
         return <Typing avatar={avatarDisplay} isMyChatTag={isMyChatTag} />;
     }, [itemChatTag?.userTyping]);
 
-    const RenderListMessage = useMemo(() => {
+    const RenderListMessage = () => {
         return (
             <View style={{flex: 1}}>
                 <StyleList
@@ -463,7 +464,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                 />
             </View>
         );
-    }, [messages, itemChatTag, refreshing]);
+    };
 
     const RenderImagePreview = useMemo(() => {
         if (images.length) {
@@ -540,8 +541,8 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                 onGetKeyBoardHeight={(value: number) =>
                     setModalPickImgHeight(value - Metrics.safeBottomPadding)
                 }>
-                {RenderHeader}
-                {RenderListMessage}
+                {RenderHeader()}
+                {RenderListMessage()}
                 {RenderImagePreview}
                 {RenderStopOrBlock}
                 {!(itemChatTag.isStop || itemChatTag.isBlock) && (

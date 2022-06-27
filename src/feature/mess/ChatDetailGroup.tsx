@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import {useIsFocused} from '@react-navigation/native';
 import {TypeChatMessageResponse, TypeChatTagResponse} from 'api/interface';
 import {MESSAGE_TYPE} from 'asset/enum';
@@ -22,7 +23,7 @@ import {
     navigate,
     showSwipeImages,
 } from 'navigation/NavigationService';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {FlatList, Keyboard, TextInput, View} from 'react-native';
 import {
     moderateScale,
@@ -112,7 +113,7 @@ const ChatDetailGroup = ({route}: ChatDetailProps) => {
     /**
      * Agree, refuse request public
      */
-    const onAgreeRequestPublic = useCallback(() => {
+    const onAgreeRequestPublic = () => {
         goBack();
         agreePublicChat(itemChatTag.id);
         setItemChatTag({
@@ -120,9 +121,9 @@ const ChatDetailGroup = ({route}: ChatDetailProps) => {
             isRequestingPublic: true,
             hadRequestedPublic: true,
         });
-    }, [itemChatTag]);
+    };
 
-    const onRefuseRequestPublic = useCallback(() => {
+    const onRefuseRequestPublic = () => {
         const temp = listChatTag.map(item => {
             if (item.id !== itemChatTag.id) {
                 return item;
@@ -134,7 +135,7 @@ const ChatDetailGroup = ({route}: ChatDetailProps) => {
         });
         route.params.setListChatTags(temp);
         goBack();
-    }, [listChatTag]);
+    };
 
     /**
      * Effect
@@ -187,7 +188,7 @@ const ChatDetailGroup = ({route}: ChatDetailProps) => {
 
     useEffect(() => {
         const temp: {[key: string]: Array<MessageSeen>} = {};
-        const userSeenMessage = itemChatTag.userSeenMessage;
+        const {userSeenMessage} = itemChatTag;
         for (const [key, value] of Object.entries(userSeenMessage)) {
             if (value.latestMessage) {
                 if (temp?.[value.latestMessage]) {
@@ -212,6 +213,10 @@ const ChatDetailGroup = ({route}: ChatDetailProps) => {
      * Send message
      */
     const onSend = async () => {
+        const senderName = itemChatTag.isPrivate
+            ? profile.anonymousName
+            : profile.name;
+
         if (profile?.id) {
             // send images
             if (images.length) {
@@ -222,6 +227,7 @@ const ChatDetailGroup = ({route}: ChatDetailProps) => {
                     type: MESSAGE_TYPE.image,
                     content: images,
                     senderId: profile.id,
+                    senderName,
                     senderAvatar: myAvatar,
                     listUser: itemChatTag.listUser.map(item => item.id),
                     tag: String(Date.now()),
@@ -237,63 +243,60 @@ const ChatDetailGroup = ({route}: ChatDetailProps) => {
                     type: MESSAGE_TYPE.text,
                     content: content.trimEnd(),
                     senderId: profile.id,
+                    senderName,
                     senderAvatar: myAvatar,
                     listUser: itemChatTag.listUser.map(item => item.id),
                     tag: String(Date.now()),
                 });
             }
         }
+
         listRef.current?.scrollToOffset({offset: 0});
     };
 
     /**
      * Go to setting chat
      */
-    const onNavigateToMessSetting = useCallback(() => {
+    const onNavigateToMessSetting = () => {
         navigate(MESS_ROUTE.chatDetailSetting, {
             itemChatTag,
         });
-    }, [itemChatTag]);
+    };
 
-    const onDeleteImage = useCallback(
-        (index: number) => {
-            const temp = [...images];
-            temp.splice(index, 1);
-            setImages(temp);
-        },
-        [images],
-    );
+    const onDeleteImage = (index: number) => {
+        const temp = [...images];
+        temp.splice(index, 1);
+        setImages(temp);
+    };
 
-    const onGoBack = useCallback(() => {
+    const onGoBack = () => {
         Redux.setChatTagFocusing('');
         goBack();
-    }, [messages]);
+    };
 
-    const onSeeDetailImage = useCallback(
-        (listImages: Array<any>, index: number) => {
-            if (inputRef.current?.isFocused() && !isIOS) {
-                Keyboard.dismiss();
-                const x = setTimeout(() => {
-                    showSwipeImages({
-                        listImages,
-                        initIndex: index,
-                    });
-                }, 100);
-                return () => clearTimeout(x);
-            } else {
+    const onSeeDetailImage = (listImages: Array<any>, index: number) => {
+        if (inputRef.current?.isFocused() && !isIOS) {
+            Keyboard.dismiss();
+            const x = setTimeout(() => {
                 showSwipeImages({
                     listImages,
                     initIndex: index,
                 });
-            }
-        },
-        [],
-    );
+            }, 100);
+            return () => clearTimeout(x);
+        }
+
+        showSwipeImages({
+            listImages,
+            initIndex: index,
+        });
+        return () => null;
+    };
 
     /**
      * Render view
      */
-    const RenderHeader = useMemo(() => {
+    const RenderHeader = () => {
         const headerLeft = () => {
             return (
                 <View style={styles.headerLeftBox}>
@@ -367,41 +370,41 @@ const ChatDetailGroup = ({route}: ChatDetailProps) => {
                 }}
             />
         );
-    }, [itemChatTag, borderMessRoute, numberNewMessages]);
+    };
 
-    const RenderItemMessage = useCallback(
-        (params: {item: TypeChatMessageResponse; index: number}) => {
-            const {item, index} = params;
-            const isSameMessageAfter =
-                messages?.[index + 1]?.relationship === item.relationship;
-            const displayPartnerAvatar =
-                messages[index - 1]?.relationship !== item.relationship;
-            const listUserSeen = messageSeen[item.id] || [];
+    const RenderItemMessage = (params: {
+        item: TypeChatMessageResponse;
+        index: number;
+    }) => {
+        const {item, index} = params;
+        const isSameMessageAfter =
+            messages?.[index + 1]?.relationship === item.relationship;
+        const displayPartnerAvatar =
+            messages[index - 1]?.relationship !== item.relationship;
+        const listUserSeen = messageSeen[item.id] || [];
 
-            if (item.type === MESSAGE_TYPE.joinCommunity) {
-                return (
-                    <MessageEvent
-                        creatorName={item.content}
-                        i18Content="mess.hadJoinGroup"
-                    />
-                );
-            }
-
+        if (item.type === MESSAGE_TYPE.joinCommunity) {
             return (
-                <ItemMessageGroup
-                    itemMessage={item}
-                    isSameMessageAfter={isSameMessageAfter}
-                    displayPartnerAvatar={displayPartnerAvatar}
-                    listUsersSeen={listUserSeen}
-                    onDeleteMessage={deleteMessage}
-                    listMessagesLength={messages.length}
-                    chatColor={chatColor}
-                    onSeeDetailImage={onSeeDetailImage}
+                <MessageEvent
+                    creatorName={item.content}
+                    i18Content="mess.hadJoinGroup"
                 />
             );
-        },
-        [messages, itemChatTag, messageSeen],
-    );
+        }
+
+        return (
+            <ItemMessageGroup
+                itemMessage={item}
+                isSameMessageAfter={isSameMessageAfter}
+                displayPartnerAvatar={displayPartnerAvatar}
+                listUsersSeen={listUserSeen}
+                onDeleteMessage={deleteMessage}
+                listMessagesLength={messages.length}
+                chatColor={chatColor}
+                onSeeDetailImage={onSeeDetailImage}
+            />
+        );
+    };
 
     const RenderTyping = useMemo(() => {
         if (!itemChatTag?.userTyping || !itemChatTag?.userTyping.length) {
@@ -524,7 +527,7 @@ const ChatDetailGroup = ({route}: ChatDetailProps) => {
                 onGetKeyBoardHeight={(value: number) =>
                     setModalPickImgHeight(value - Metrics.safeBottomPadding)
                 }>
-                {RenderHeader}
+                {RenderHeader()}
                 {RenderListMessage()}
                 {RenderImagePreview}
                 {RenderStopOrBlock}
