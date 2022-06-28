@@ -1,4 +1,3 @@
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {
     apiGetPassport,
     apiGetResource,
@@ -169,11 +168,11 @@ const AuthenticateService = {
             const isModeExp = FindmeStore.getState().accountSlice.modeExp;
 
             // logout google
-            const isGoogleSignedIn = await GoogleSignin.isSignedIn();
-            if (isGoogleSignedIn) {
-                await GoogleSignin.revokeAccess();
-                await GoogleSignin.signOut();
-            }
+            // const isGoogleSignedIn = await GoogleSignin.isSignedIn();
+            // if (isGoogleSignedIn) {
+            //     await GoogleSignin.revokeAccess();
+            //     await GoogleSignin.signOut();
+            // }
 
             if (!isModeExp && !params.hadRefreshTokenBlacked) {
                 const {refreshToken} = await FindmeAsyncStorage.getActiveUser();

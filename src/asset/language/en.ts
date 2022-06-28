@@ -19,6 +19,7 @@ const common = {
     letGo: "Let's go",
     continue: 'Continue',
     reply: 'Reply',
+    anonymous: '@Anonymous',
 };
 
 const login = {

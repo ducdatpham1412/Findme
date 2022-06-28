@@ -76,9 +76,11 @@ const Bubble = (props: Props) => {
             try {
                 setIsLiked(!currentLike);
                 setTotalLikes(currentNumberLikes + (currentLike ? -1 : 1));
-                currentLike
-                    ? await apiUnLikePost(item.id)
-                    : await apiLikePost(item.id);
+                if (currentLike) {
+                    await apiUnLikePost(item.id);
+                } else {
+                    apiLikePost(item.id);
+                }
             } catch (err) {
                 setIsLiked(currentLike);
                 setTotalLikes(currentNumberLikes);
@@ -157,6 +159,9 @@ const Bubble = (props: Props) => {
         const textColor = isMyBubble
             ? theme.highlightColor
             : Theme.darkTheme.textHightLight;
+        const creatorName =
+            item.creatorName === null ? 'common.anonymous' : item.creatorName;
+
         return (
             <LinearGradient
                 colors={['transparent', Theme.darkTheme.backgroundColor]}
@@ -173,7 +178,7 @@ const Bubble = (props: Props) => {
 
                     <View style={styles.contentBox}>
                         <StyleText
-                            originValue={`@${item.creatorName}`}
+                            i18Text={creatorName}
                             customStyle={[styles.textName, {color: textColor}]}
                             onPress={() => onGoToProfile(item)}
                         />
@@ -193,7 +198,7 @@ const Bubble = (props: Props) => {
     };
 
     const RenderTool = () => {
-        const backgroundColor = theme.backgroundColor;
+        const {backgroundColor} = theme;
 
         const RenderStartChat = () => {
             return (
