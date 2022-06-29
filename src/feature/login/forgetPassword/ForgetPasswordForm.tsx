@@ -5,7 +5,7 @@ import Theme from 'asset/theme/Theme';
 import {StyleButton, StyleContainer, StyleInputForm} from 'components/base';
 import Redux from 'hook/useRedux';
 import {LOGIN_ROUTE} from 'navigation/config/routes';
-import {appAlert, goBack, navigate} from 'navigation/NavigationService';
+import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {useRef} from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
 import {TextInput} from 'react-native';
@@ -87,6 +87,7 @@ const ForgetPasswordForm = ({route}: any) => {
                     containerStyle={styles.inputForm}
                     maxLength={standValue.PASSWORD_MAX_LENGTH}
                     onSubmitEditing={() => confirmRef.current?.focus()}
+                    selectionColor={Theme.darkTheme.textHightLight}
                 />
 
                 <StyleInputForm
@@ -96,6 +97,7 @@ const ForgetPasswordForm = ({route}: any) => {
                     secureTextEntry={true}
                     containerStyle={styles.inputForm}
                     maxLength={standValue.PASSWORD_MAX_LENGTH}
+                    selectionColor={Theme.darkTheme.textHightLight}
                 />
             </FormProvider>
 

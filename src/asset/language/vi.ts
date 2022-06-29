@@ -19,6 +19,7 @@ const common = {
     letGo: 'Đi thôi',
     continue: 'Tiếp tục',
     reply: 'Trả lời',
+    anonymous: '@Ẩn danh',
 };
 
 const login = {
