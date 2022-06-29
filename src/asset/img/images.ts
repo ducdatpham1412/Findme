@@ -48,6 +48,7 @@ const Images = {
         facebookLink: require('./ic_facebook_link.png'),
         messageLink: require('./ic_message_link.png'),
         zaloLink: require('./ic_zalo_link.png'),
+        reportLink: require('./ic_report_link.png'),
     },
     images: {
         logo: require('./img_logo.png'),
