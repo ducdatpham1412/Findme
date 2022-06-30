@@ -63,7 +63,6 @@ const ForgetPasswordForm = ({route}: any) => {
                 containerStyle: {
                     marginTop: insets?.top || 0,
                     backgroundColor: 'transparent',
-                    borderBottomWidth: 0,
                 },
                 iconStyle: {color: Theme.common.white},
                 titleStyle: {color: Theme.common.white},

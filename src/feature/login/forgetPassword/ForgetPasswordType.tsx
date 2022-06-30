@@ -5,7 +5,7 @@ import {StyleButton, StyleContainer} from 'components/base';
 import InputBox from 'components/common/InputBox';
 import Redux from 'hook/useRedux';
 import {LOGIN_ROUTE} from 'navigation/config/routes';
-import {appAlert, goBack, navigate} from 'navigation/NavigationService';
+import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {useEffect, useRef, useState} from 'react';
 import {TextInput, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -77,7 +77,6 @@ const ForgetPasswordType = () => {
                 containerStyle: {
                     marginTop: insets?.top || 0,
                     backgroundColor: 'transparent',
-                    borderBottomWidth: 0,
                 },
                 iconStyle: {color: Theme.common.white},
                 titleStyle: {color: Theme.common.white},
