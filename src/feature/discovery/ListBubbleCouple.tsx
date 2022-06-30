@@ -257,10 +257,7 @@ const ListBubbleCouple = () => {
                                 onPress={() => null}>
                                 <StyleImage
                                     source={item.url}
-                                    customStyle={{
-                                        width: item.width,
-                                        height: item.height,
-                                    }}
+                                    customStyle={styles.wrapIconLink}
                                 />
                                 <StyleText
                                     i18Text={item.title}
@@ -357,7 +354,7 @@ const styles = ScaledSheet.create({
         height: '41@vs',
         backgroundColor: Theme.common.blueInput,
         borderRadius: 5,
-        marginRight: '8@s',
+        marginRight: '8@ms',
     },
     wrapTextTitleModal: {
         fontWeight: '700',
@@ -372,7 +369,7 @@ const styles = ScaledSheet.create({
     wrapTouchCloseModal: {
         position: 'absolute',
         top: '10@vs',
-        right: '10@s',
+        right: '10@ms',
     },
     wrapIconClose: {
         width: '28@vs',
@@ -381,7 +378,7 @@ const styles = ScaledSheet.create({
     wrapViewBodyModal: {
         flexDirection: 'row',
         paddingVertical: '19@vs',
-        paddingHorizontal: '18@s',
+        paddingHorizontal: '18@ms',
         borderBottomWidth: 1,
         borderBottomColor: Theme.common.textMe,
     },
@@ -391,12 +388,12 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
     },
     wrapIconActivityShare: {
-        width: '50@vs',
-        height: '50@vs',
+        width: '50@ms',
+        height: '50@ms',
         marginRight: '29@s',
     },
     wrapViewShare: {
-        marginRight: '39@s',
+        marginRight: '39@ms',
         alignItems: 'center',
     },
     wrapTextTitleShare: {
@@ -404,6 +401,10 @@ const styles = ScaledSheet.create({
         fontWeight: '500',
         color: Theme.common.black,
         marginTop: '5@vs',
+    },
+    wrapIconLink: {
+        width: '50@ms',
+        height: '50@ms',
     },
 });
 

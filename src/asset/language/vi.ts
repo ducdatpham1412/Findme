@@ -148,7 +148,7 @@ const discovery = {
     numberComments: '{{numberComments}} bình luận',
     seeDetailImage: 'Xem ảnh',
     share: {
-        title: 'Share',
+        title: 'Chia sẻ',
     },
 };
 
