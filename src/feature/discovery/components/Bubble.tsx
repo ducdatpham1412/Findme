@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-shadow */
+/* eslint-disable react/jsx-key */
+/* eslint-disable no-unused-expressions */
 import {TypeBubblePalace} from 'api/interface';
 import {apiLikePost, apiUnLikePost} from 'api/module';
 import {RELATIONSHIP} from 'asset/enum';
@@ -11,18 +15,25 @@ import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
-import {appAlert, goBack} from 'navigation/NavigationService';
-import React, {memo, useEffect, useState} from 'react';
+import {appAlert, goBack, navigate} from 'navigation/NavigationService';
+import React, {memo, useEffect, useRef, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import {View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {moderateScale, ScaledSheet} from 'react-native-size-matters';
+import {
+    moderateScale,
+    scale,
+    ScaledSheet,
+    verticalScale,
+} from 'react-native-size-matters';
 import {
     chooseColorGradient,
     choosePrivateAvatar,
     logger,
     onGoToSignUp,
 } from 'utility/assistant';
+import {Modalize} from 'react-native-modalize';
+import ROOT_SCREEN from 'navigation/config/routes';
 import {TypeShowMoreOptions} from '../ListBubbleCouple';
 import IconHobby from './IconHobby';
 
@@ -34,6 +45,7 @@ interface Props {
     onGoToProfile(item: TypeBubblePalace): void;
     onShowModalComment(): void;
     onSeeDetailImage(url: string, allowSave: boolean): void;
+    onShowModalShare(item: any): void;
 }
 
 const bubbleWidth =
@@ -53,8 +65,8 @@ const Bubble = (props: Props) => {
         onGoToProfile,
         onShowModalComment,
         onSeeDetailImage,
+        onShowModalShare,
     } = props;
-
     const isModeExp = Redux.getModeExp();
     const {gradient} = Redux.getResource();
     const theme = Redux.getTheme();
@@ -293,10 +305,10 @@ const Bubble = (props: Props) => {
             return (
                 <StyleTouchable
                     customStyle={[styles.buttonTouch, {backgroundColor}]}
-                    onPress={() => onRefreshItem(item.id)}
+                    onPress={() => onShowModalShare(item)}
                     hitSlop={{left: 10, top: 10, right: 10, bottom: 10}}>
                     <StyleImage
-                        source={Images.icons.reload}
+                        source={Images.icons.share}
                         customStyle={styles.iconReload}
                     />
                 </StyleTouchable>
@@ -445,8 +457,8 @@ const styles = ScaledSheet.create({
         height: '28@ms',
     },
     iconReload: {
-        width: '30@ms',
-        height: '30@ms',
+        width: '36@ms',
+        height: '36@ms',
     },
     iconReport: {
         fontSize: '18@ms',

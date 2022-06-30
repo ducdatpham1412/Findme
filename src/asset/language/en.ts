@@ -145,6 +145,9 @@ const discovery = {
     },
     numberComments: '{{numberComments}} comments',
     seeDetailImage: 'Watch image',
+    share: {
+        title: 'Share',
+    },
 };
 
 // MESS ROUTE

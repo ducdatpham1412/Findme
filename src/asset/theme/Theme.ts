@@ -12,6 +12,9 @@ const Theme = {
         blueInput: '#3E7BAC',
         blueInputHolder: '#A5C4CE',
         joinGroupChat: '#90BEE9',
+        gray: '#99989B',
+        grayLight: '#E5E5EA',
+        background: '#F4F4F4',
     },
     darkTheme: {
         backgroundColor: '#081019',

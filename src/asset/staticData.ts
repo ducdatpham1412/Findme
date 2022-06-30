@@ -1,3 +1,6 @@
+import {scale} from 'react-native-size-matters';
+import Images from './img/images';
+
 export const listBubbles = [
     {
         idHobby: 1,
@@ -28,5 +31,28 @@ export const responseApple = {
     state: null,
     user: '000310.3bceb39016454892808727fe96c5a7c1.0914',
 };
+export const activityShare = [
+    {
+        id: 0,
+        url: Images.icons.facebookLink,
+        width: scale(50),
+        height: scale(50),
+        title: 'Facebook',
+    },
+    {
+        id: 1,
+        url: Images.icons.messageLink,
+        width: scale(50),
+        height: scale(50),
+        title: 'Message',
+    },
+    {
+        id: 2,
+        url: Images.icons.zaloLink,
+        width: scale(50),
+        height: scale(50),
+        title: 'Zalo',
+    },
+];
 
 // <uses-permission android:name="android.permission.RECORD_AUDIO" />
