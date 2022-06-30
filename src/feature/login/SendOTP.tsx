@@ -169,13 +169,15 @@ const SendOTP = ({route}: any) => {
 
     const onSendAgain = async () => {
         try {
-            code.length && setCode('');
+            if (code.length) {
+                setCode('');
+            }
             if (itemSignUp) {
                 resetCountdown();
                 await apiRequestOTP(paramsOTP);
             } else if (isResetPassword && username) {
                 await apiRequestOTP({
-                    username: username,
+                    username,
                     typeOTP: TYPE_OTP.resetPassword,
                 });
             }
@@ -218,7 +220,6 @@ const SendOTP = ({route}: any) => {
                 containerStyle: {
                     marginTop: insets?.top || 0,
                     backgroundColor: 'transparent',
-                    borderBottomWidth: 0,
                 },
                 iconStyle: {color: Theme.common.white},
                 titleStyle: {color: Theme.common.white},
@@ -264,7 +265,7 @@ const SendOTP = ({route}: any) => {
                 onPress={onSendAgain}>
                 <StyleText
                     i18Text={TextSendAgain}
-                    i18Params={{countdown: countdown}}
+                    i18Params={{countdown}}
                     customStyle={[styles.titleSendAgain]}
                 />
             </StyleTouchable>

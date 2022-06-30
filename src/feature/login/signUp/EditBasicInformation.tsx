@@ -193,6 +193,7 @@ const EditBasicInformation = ({route}: Props) => {
                                 containerStyle={{marginTop: verticalScale(30)}}
                                 i18Placeholder="profile.edit.name"
                                 onSubmitEditing={onPressButton}
+                                selectionColor={Theme.darkTheme.textHightLight}
                             />
                         </View>
 

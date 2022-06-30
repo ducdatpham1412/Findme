@@ -133,7 +133,7 @@ const LoginScreen = () => {
 
     const InputUsernamePassword = () => {
         return (
-            <View style={styles.inputView}>
+            <>
                 <InputBox
                     i18Placeholder="login.loginScreen.username"
                     value={user}
@@ -154,15 +154,7 @@ const LoginScreen = () => {
                     secureTextEntry
                     selectionColor={Theme.darkTheme.textHightLight}
                 />
-
-                {userRef && !user && (
-                    <ListSaveAcc
-                        listAcc={listSaveAcc}
-                        selectAcc={selectSaveAcc}
-                        deleteAcc={deleteSaveAcc}
-                    />
-                )}
-            </View>
+            </>
         );
     };
 
@@ -229,8 +221,17 @@ const LoginScreen = () => {
     return (
         <View style={styles.container}>
             <StyleContainer containerStyle={styles.body}>
-                {InputUsernamePassword()}
-                {RememberPassword()}
+                <View style={styles.inputView}>
+                    {InputUsernamePassword()}
+                    {RememberPassword()}
+                    {userRef && !user && (
+                        <ListSaveAcc
+                            listAcc={listSaveAcc}
+                            selectAcc={selectSaveAcc}
+                            deleteAcc={deleteSaveAcc}
+                        />
+                    )}
+                </View>
                 <StyleButton
                     title="login.loginScreen.signIn"
                     containerStyle={styles.loginButton}
@@ -253,6 +254,7 @@ const styles = ScaledSheet.create({
     },
     // input
     inputView: {
+        width: '100%',
         marginTop: '50@vs',
     },
     inputForm: {
