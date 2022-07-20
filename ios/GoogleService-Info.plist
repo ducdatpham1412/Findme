@@ -3,11 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>647052846803-8gagoaetpkqlbbqd0lavnicsqs81hbfm.apps.googleusercontent.com</string>
+	<string>647052846803-h70u9j1rjgsqbfibhhm1d2h7etsgffih.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.647052846803-8gagoaetpkqlbbqd0lavnicsqs81hbfm</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>647052846803-1r323mb0pkagavjamh6uo3ci3iu81plc.apps.googleusercontent.com</string>
+	<string>com.googleusercontent.apps.647052846803-h70u9j1rjgsqbfibhhm1d2h7etsgffih</string>
 	<key>API_KEY</key>
 	<string>AIzaSyAuIMpHS-y63A5zEGg3HaDWFHY_79jvRkQ</string>
 	<key>GCM_SENDER_ID</key>
@@ -15,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.doffy.ios.development</string>
+	<string>com.doffy.ios.production</string>
 	<key>PROJECT_ID</key>
 	<string>doffy-development</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:647052846803:ios:efe87d59a7b194caa15626</string>
+	<string>1:647052846803:ios:810a3c0cb33a44f8a15626</string>
 </dict>
 </plist>

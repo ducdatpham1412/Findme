@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
     TypeChatTagResponse,

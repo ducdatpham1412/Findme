@@ -23,6 +23,7 @@ import SplashScreen from 'react-native-splash-screen';
 import {isIOS, logger, selectBgCardStyle} from 'utility/assistant';
 import {selectIsHaveActiveUser} from 'utility/login/selectScreen';
 import AppStack from './AppStack';
+import DynamicLink from './DynamicLink';
 import LoginRoute from './LoginRoute';
 import WebViewScreen from './WebViewScreen';
 
@@ -171,6 +172,8 @@ const RootScreen = () => {
 
                 {/* For loading all app */}
                 {isLoading && <LoadingScreen />}
+
+                <DynamicLink />
             </TabBarProvider>
         </NavigationContainer>
     );
