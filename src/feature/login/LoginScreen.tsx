@@ -33,6 +33,54 @@ const loginForm = __DEV__
       }
     : {username: '', password: ''};
 
+const signInWithGoogle = async () => {
+    try {
+        Redux.setIsLoading(true);
+        await GoogleSignin.hasPlayServices({
+            showPlayServicesUpdateDialog: true,
+        });
+        const userInfo = await GoogleSignin.signIn();
+        const {idToken} = userInfo;
+        AuthenticateService.requestLoginSocial({
+            tokenSocial: idToken,
+            typeSocial: TYPE_SOCIAL_LOGIN.google,
+        });
+    } catch (error: any) {
+        if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+            // user cancelled the login flow
+        } else if (error.code === statusCodes.IN_PROGRESS) {
+            // operation (e.g. sign in) is in progress already
+        } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+            // play services not available or outdated
+        } else {
+            // some other error happened
+        }
+    } finally {
+        Redux.setIsLoading(false);
+    }
+};
+
+const onSignInWithApple = async () => {
+    try {
+        Redux.setIsLoading(true);
+        const res = await appleAuth.performRequest({
+            requestedOperation: appleAuth.Operation.LOGIN,
+            requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+        });
+
+        const tokenSocial = res.identityToken;
+        // console.log('token haha: ', res);
+        AuthenticateService.requestLoginSocial({
+            tokenSocial,
+            typeSocial: TYPE_SOCIAL_LOGIN.apple,
+        });
+    } catch (err) {
+        appAlert(err);
+    } finally {
+        Redux.setIsLoading(false);
+    }
+};
+
 const LoginScreen = () => {
     const [userRef, setUserRef] = useState(false);
     const isFocused = useIsFocused();
@@ -49,7 +97,9 @@ const LoginScreen = () => {
     };
 
     useEffect(() => {
-        getListAcc();
+        if (isFocused) {
+            getListAcc();
+        }
     }, [isFocused]);
 
     /**
@@ -75,56 +125,6 @@ const LoginScreen = () => {
             password: pass.trim(),
             isKeepSign,
         });
-    };
-
-    const signInWithGoogle = async () => {
-        try {
-            Redux.setIsLoading(true);
-            await GoogleSignin.hasPlayServices({
-                showPlayServicesUpdateDialog: true,
-            });
-            const userInfo = await GoogleSignin.signIn();
-            const {idToken} = userInfo;
-            AuthenticateService.requestLoginSocial({
-                tokenSocial: idToken,
-                typeSocial: TYPE_SOCIAL_LOGIN.google,
-            });
-        } catch (error: any) {
-            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-                // user cancelled the login flow
-            } else if (error.code === statusCodes.IN_PROGRESS) {
-                // operation (e.g. sign in) is in progress already
-            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-                // play services not available or outdated
-            } else {
-                // some other error happened
-            }
-        } finally {
-            Redux.setIsLoading(false);
-        }
-    };
-
-    const onSignInWithApple = async () => {
-        try {
-            Redux.setIsLoading(true);
-            const res = await appleAuth.performRequest({
-                requestedOperation: appleAuth.Operation.LOGIN,
-                requestedScopes: [
-                    appleAuth.Scope.EMAIL,
-                    appleAuth.Scope.FULL_NAME,
-                ],
-            });
-
-            const tokenSocial = res.identityToken;
-            AuthenticateService.requestLoginSocial({
-                tokenSocial,
-                typeSocial: TYPE_SOCIAL_LOGIN.apple,
-            });
-        } catch (err) {
-            appAlert(err);
-        } finally {
-            Redux.setIsLoading(false);
-        }
     };
 
     /**
