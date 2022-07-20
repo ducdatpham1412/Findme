@@ -7,14 +7,9 @@ import {
     apiGetListBubbleActive,
     apiGetListBubbleActiveOfUserEnjoy,
 } from 'api/module';
-import Images from 'asset/img/images';
+import FindmeStore from 'app-redux/store';
 import {Metrics} from 'asset/metrics';
-import {activityShare} from 'asset/staticData';
-import Theme from 'asset/theme/Theme';
-import {StyleImage} from 'components/base';
 import StyleList from 'components/base/StyleList';
-import StyleText from 'components/base/StyleText';
-import StyleTouchable from 'components/base/StyleTouchable';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import LoadingScreen from 'components/LoadingScreen';
 import usePaging from 'hook/usePaging';
@@ -28,10 +23,10 @@ import {
 } from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {View} from 'react-native';
-import {Modalize} from 'react-native-modalize';
-import {ScaledSheet, verticalScale} from 'react-native-size-matters';
+import Share from 'react-native-share';
+import {ScaledSheet} from 'react-native-size-matters';
 import {interactBubble, onGoToSignUp} from 'utility/assistant';
-import Bubble, {bubbleHeight} from './components/Bubble';
+import Bubble from './components/Bubble';
 
 export interface TypeShowMoreOptions {
     idUser: number;
@@ -43,14 +38,37 @@ let idUserReport = 0;
 let imageSeeDetail = '';
 let allowSaveImage = false;
 
+const onGoToSignUpFromAlert = () => {
+    goBack();
+    onGoToSignUp();
+};
+
+const onGoToProfile = (item: TypeBubblePalace) => {
+    const myId = FindmeStore.getState().accountSlice.passport.profile.id;
+    if (item.hadKnowEachOther) {
+        if (item.creatorId === myId) {
+            navigate(PROFILE_ROUTE.myProfile);
+        } else {
+            navigate(ROOT_SCREEN.otherProfile, {
+                id: item.creatorId,
+            });
+        }
+    }
+};
+
+const onSeeDetailImage = (url: string, allowSave: boolean) => {
+    showSwipeImages({
+        listImages: [{url}],
+        allowSaveImage: allowSave,
+    });
+};
+
 const ListBubbleCouple = () => {
     const optionsRef = useRef<any>(null);
-    const modalizeRef = useRef<Modalize>(null);
 
     const theme = Redux.getTheme();
     const token = Redux.getToken();
     const isModeExp = Redux.getModeExp();
-    const myId = Redux.getPassport().profile.id;
 
     const hadLogan = token && !isModeExp;
 
@@ -63,7 +81,6 @@ const ListBubbleCouple = () => {
     const displayComment = Redux.getDisplayComment();
     const bubbleFocusing = Redux.getBubbleFocusing();
     const [preNumberComment, setPreNumberComment] = useState(0);
-    const [itemBubble, setItemBubble] = useState({creatorId: undefined});
 
     const {list, setList, onLoadMore, refreshing, onRefresh} = usePaging({
         request: selectedApi,
@@ -94,11 +111,9 @@ const ListBubbleCouple = () => {
         }
     }, [bubbleFocusing, preNumberComment, displayComment]);
 
-    const onGoToSignUpFromAlert = () => {
-        goBack();
-        onGoToSignUp();
-    };
-
+    /**
+     * Functions
+     */
     const onShowModalComment = (post: TypeBubblePalace) => {
         if (!hadLogan) {
             appAlert('discovery.bubble.goToSignUp', {
@@ -151,33 +166,32 @@ const ListBubbleCouple = () => {
         }
     };
 
-    const onGoToProfile = (item: TypeBubblePalace) => {
-        if (item.hadKnowEachOther) {
-            if (item.creatorId === myId) {
-                navigate(PROFILE_ROUTE.myProfile);
-            } else {
-                navigate(ROOT_SCREEN.otherProfile, {
-                    id: item.creatorId,
-                });
-            }
-        }
-    };
-
-    const onSeeDetailImage = (url: string, allowSave: boolean) => {
-        showSwipeImages({
-            listImages: [{url}],
-            allowSaveImage: allowSave,
+    const onShowModalShare = (item: TypeBubblePalace) => {
+        // let imagePath: any = null;
+        // RNFetchBlob.config({
+        //     fileCache: true,
+        // })
+        //     .fetch('GET', item.images[0])
+        //     .then(resp => {
+        //         imagePath = resp.path();
+        //         return resp.readFile('base64');
+        //     })
+        //     .then(async base64Data => {
+        //         const temp = `data:image/png;base64,${base64Data}`;
+        //         await Share.open({
+        //             message: item.content,
+        //             url: temp,
+        //         });
+        //         return RNFetchBlob.fs.unlink(imagePath);
+        //     });
+        Share.open({
+            message: item.images[0],
         });
     };
+
     /**
-     * Render view
+     * Render views
      */
-
-    const onShowModalShare = (item: any) => {
-        modalizeRef.current?.open();
-        setItemBubble(item);
-    };
-
     const RenderItemBubble = useCallback((item: TypeBubblePalace) => {
         return (
             <Bubble
@@ -200,7 +214,7 @@ const ListBubbleCouple = () => {
                 renderItem={({item}) => RenderItemBubble(item)}
                 keyExtractor={(_, index) => String(index)}
                 // snapToInterval={bubbleHeight}
-                snapToOffsets={list.map((_, index) => index * bubbleHeight)}
+                // snapToOffsets={list.map((_, index) => index * bubbleHeight)}
                 // scrollEventThrottle={16}
                 decelerationRate="fast"
                 refreshing={refreshing}
@@ -208,80 +222,7 @@ const ListBubbleCouple = () => {
                 onLoadMore={onLoadMore}
                 ListEmptyComponent={LoadingScreen}
                 // removeClippedSubviews={true}
-                // onEndReached={undefined}
-                // onScroll={e => {
-                //     const indexToLast = Math.round(
-                //         (e.nativeEvent.contentSize.height -
-                //             e.nativeEvent.contentOffset.y) /
-                //             bubbleHeight,
-                //     );
-                //     Redux.setBubbleFocusing(list[indexToLast].id);
-                // }}]
             />
-        );
-    };
-
-    const RenderModalShare = () => {
-        return (
-            <View style={styles.wrapViewModalShare}>
-                <View style={styles.wrapViewHeaderModal}>
-                    <StyleText
-                        i18Text={'discovery.share.title'}
-                        customStyle={styles.wrapTextTitleModal}
-                    />
-
-                    <StyleTouchable
-                        onPress={() => {
-                            modalizeRef.current?.close();
-                        }}
-                        customStyle={styles.wrapTouchCloseModal}>
-                        <StyleImage
-                            source={Images.icons.close}
-                            customStyle={styles.wrapIconClose}
-                        />
-                    </StyleTouchable>
-                </View>
-                <View style={styles.wrapViewBodyModal}>
-                    <StyleTouchable onPress={() => null}>
-                        <StyleImage
-                            source={Images.icons.copyLink}
-                            customStyle={styles.wrapIconActivityShare}
-                        />
-                    </StyleTouchable>
-                </View>
-                <View style={styles.wrapViewBodyModal}>
-                    {activityShare.map((item: any) => {
-                        return (
-                            <StyleTouchable
-                                style={styles.wrapViewShare}
-                                onPress={() => null}>
-                                <StyleImage
-                                    source={item.url}
-                                    customStyle={styles.wrapIconLink}
-                                />
-                                <StyleText
-                                    i18Text={item.title}
-                                    customStyle={styles.wrapTextTitleShare}
-                                />
-                            </StyleTouchable>
-                        );
-                    })}
-                </View>
-                <View style={styles.wrapViewBodyModalLink}>
-                    <StyleTouchable
-                        style={styles.wrapViewShare}
-                        onPress={() =>
-                            navigate(ROOT_SCREEN.reportUser, {
-                                idUser: itemBubble.creatorId,
-                            })
-                        }>
-                        <StyleImage
-                            source={Images.icons.reportLink}
-                            customStyle={styles.wrapIconActivityShare}
-                        />
-                    </StyleTouchable>
-                </View>
-            </View>
         );
     };
 
@@ -319,13 +260,6 @@ const ListBubbleCouple = () => {
                     },
                 ]}
             />
-            <Modalize
-                ref={modalizeRef}
-                modalHeight={verticalScale(340)}
-                withHandle={false}
-                rootStyle={[styles.wrapModal]}>
-                {RenderModalShare()}
-            </Modalize>
         </View>
     );
 };
@@ -338,73 +272,6 @@ const styles = ScaledSheet.create({
     wrapModal: {
         borderTopRightRadius: 15,
         borderTopLeftRadius: 15,
-    },
-    wrapViewModalShare: {
-        height: '100%',
-    },
-    wrapViewHeaderModal: {
-        flexDirection: 'row',
-        padding: '16@vs',
-        alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: Theme.common.textMe,
-    },
-    wrapViewIconShare: {
-        width: '41@vs',
-        height: '41@vs',
-        backgroundColor: Theme.common.blueInput,
-        borderRadius: 5,
-        marginRight: '8@ms',
-    },
-    wrapTextTitleModal: {
-        fontWeight: '700',
-        fontSize: '18@ms0.3',
-        color: Theme.common.black,
-    },
-    wrapTextContentModal: {
-        fontWeight: '400',
-        fontSize: '13@ms0.3',
-        color: Theme.common.gray,
-    },
-    wrapTouchCloseModal: {
-        position: 'absolute',
-        top: '10@vs',
-        right: '10@ms',
-    },
-    wrapIconClose: {
-        width: '28@vs',
-        height: '28@vs',
-    },
-    wrapViewBodyModal: {
-        flexDirection: 'row',
-        paddingVertical: '19@vs',
-        paddingHorizontal: '18@ms',
-        borderBottomWidth: 1,
-        borderBottomColor: Theme.common.textMe,
-    },
-    wrapViewBodyModalLink: {
-        flexDirection: 'row',
-        padding: '16@vs',
-        alignItems: 'center',
-    },
-    wrapIconActivityShare: {
-        width: '50@ms',
-        height: '50@ms',
-        marginRight: '29@s',
-    },
-    wrapViewShare: {
-        marginRight: '39@ms',
-        alignItems: 'center',
-    },
-    wrapTextTitleShare: {
-        fontSize: '14@ms0.3',
-        fontWeight: '500',
-        color: Theme.common.black,
-        marginTop: '5@vs',
-    },
-    wrapIconLink: {
-        width: '50@ms',
-        height: '50@ms',
     },
 });
 

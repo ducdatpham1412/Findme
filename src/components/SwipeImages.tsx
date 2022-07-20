@@ -2,16 +2,16 @@ import CameraRoll from '@react-native-community/cameraroll';
 import {Metrics} from 'asset/metrics';
 import Redux from 'hook/useRedux';
 import {appAlert, goBack, TypeSwipeImages} from 'navigation/NavigationService';
-import React, {useRef, useState} from 'react';
+import React, {useRef} from 'react';
 import {View} from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import {ScaledSheet} from 'react-native-size-matters';
-import {StyleImage, StyleTouchable} from './base';
-import StyleActionSheet from './common/StyleActionSheet';
+import Feather from 'react-native-vector-icons/Feather';
 import RNFetchBlob from 'rn-fetch-blob';
 import {isIOS} from 'utility/assistant';
 import {checkSaveImage} from 'utility/permission/permission';
-import Feather from 'react-native-vector-icons/Feather';
+import {StyleImage, StyleTouchable} from './base';
+import StyleActionSheet from './common/StyleActionSheet';
 
 interface Props {
     route: {

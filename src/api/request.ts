@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-destructuring */
 import FindmeStore from 'app-redux/store';
 import {ERROR_KEY_ENUM} from 'asset/error';
 import axios from 'axios';
@@ -10,7 +12,8 @@ import AuthenticateService from 'utility/login/loginService';
 const AUTH_URL_REFRESH_TOKEN = `${Config.API_URL}/auth/refresh-token`;
 
 const request = axios.create({
-    baseURL: Config.API_URL,
+    // baseURL: Config.API_URL,
+    baseURL: 'http://10.254.181.93:8000/',
     timeout: 5000,
     headers: {
         Accept: '*/*',
