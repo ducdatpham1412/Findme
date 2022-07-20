@@ -17,6 +17,10 @@ export const push = (name: string, params?: {}) => {
     navigationRef.current.dispatch(StackActions.push(name, params));
 };
 
+export const getCurrentRoute = () => {
+    return navigationRef.current.getCurrentRoute();
+};
+
 interface TypeMoreChoiceAlert {
     actionClickOk?: Function;
     moreNotice?: string;

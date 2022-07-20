@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 export const standValue = {
     USERNAME_MIN_LENGTH: 7,
     USERNAME_MAX_LENGTH: 20,
@@ -68,3 +69,5 @@ export const REPORT_REASONS = [
 ];
 
 export const DELAY_LONG_PRESS = 150;
+
+export const DYNAMIC_LINK_SHARE = 'https://doffy.page.link';

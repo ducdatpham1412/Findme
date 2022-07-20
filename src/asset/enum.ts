@@ -159,3 +159,8 @@ export enum TYPE_OS_LOGIN_SOCIAL {
     android = 0,
     ios = 1,
 }
+
+export enum TYPE_DYNAMIC_LINK {
+    post = 0,
+    profile = 1,
+}
