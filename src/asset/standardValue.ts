@@ -73,3 +73,6 @@ export const DELAY_LONG_PRESS = 150;
 export const DYNAMIC_LINK_SHARE = 'https://doffy.page.link';
 export const DYNAMIC_LINK_IOS = 'com.doffy.ios.production';
 export const DYNAMIC_LINK_ANDORID = 'com.doffy.android.production';
+
+export const ANDROID_APP_LINK =
+    'https://play.google.com/store/apps/details?id=com.doffy.android.production';
