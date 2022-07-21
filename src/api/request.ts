@@ -13,7 +13,7 @@ const AUTH_URL_REFRESH_TOKEN = `${Config.API_URL}/auth/refresh-token`;
 
 const request = axios.create({
     // baseURL: Config.API_URL,
-    baseURL: 'http://10.254.181.93:8000/',
+    baseURL: 'http://10.0.0.166:8000/',
     timeout: 5000,
     headers: {
         Accept: '*/*',

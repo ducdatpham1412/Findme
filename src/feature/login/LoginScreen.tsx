@@ -40,9 +40,8 @@ const signInWithGoogle = async () => {
             showPlayServicesUpdateDialog: true,
         });
         const userInfo = await GoogleSignin.signIn();
-        const {idToken} = userInfo;
         AuthenticateService.requestLoginSocial({
-            tokenSocial: idToken,
+            tokenSocial: userInfo.idToken,
             typeSocial: TYPE_SOCIAL_LOGIN.google,
         });
     } catch (error: any) {
@@ -68,7 +67,7 @@ const onSignInWithApple = async () => {
             requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
         });
 
-        const tokenSocial = res.identityToken;
+        const tokenSocial = res.authorizationCode;
         // console.log('token haha: ', res);
         AuthenticateService.requestLoginSocial({
             tokenSocial,

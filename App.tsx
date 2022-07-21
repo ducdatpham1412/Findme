@@ -1,7 +1,6 @@
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import FindmeStore from 'app-redux/store';
 import {SocketProvider} from 'hook/useSocketIO';
-import DynamicLink from 'navigation/screen/DynamicLink';
 import RootScreen from 'navigation/screen/RootScreen';
 import React from 'react';
 import {I18nextProvider} from 'react-i18next';
@@ -25,7 +24,6 @@ const App = () => {
         <I18nextProvider i18n={I18Next}>
             <Provider store={FindmeStore}>
                 <SocketProvider>
-                    <DynamicLink />
                     <RootScreen />
                 </SocketProvider>
             </Provider>

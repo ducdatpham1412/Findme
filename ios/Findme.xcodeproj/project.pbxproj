@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* FindmeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* FindmeTests.m */; };
-		09AA356F28658669006F6566 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 09AA356E28658669006F6566 /* GoogleService-Info.plist */; };
-		09AA357028658669006F6566 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 09AA356E28658669006F6566 /* GoogleService-Info.plist */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
@@ -20,6 +18,8 @@
 		B7E424CF6AC8CF7FDDDD169A /* libPods-Findme.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F06E9410E771B3FF4D8A898E /* libPods-Findme.a */; };
 		CE8EFD9C2759FACC00D9549E /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = CE8EFD9B2759FACC00D9549E /* Config.xcconfig */; };
 		CE8EFD9D2759FACC00D9549E /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = CE8EFD9B2759FACC00D9549E /* Config.xcconfig */; };
+		CEE0445228886C3B00F547AF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEE0445128886C3B00F547AF /* GoogleService-Info.plist */; };
+		CEE0445328886C3B00F547AF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEE0445128886C3B00F547AF /* GoogleService-Info.plist */; };
 		E1EDA080285E236800AC739E /* chim_cu_gay.wav in Resources */ = {isa = PBXBuildFile; fileRef = E1EDA07F285E236800AC739E /* chim_cu_gay.wav */; };
 		E1EDA081285E236800AC739E /* chim_cu_gay.wav in Resources */ = {isa = PBXBuildFile; fileRef = E1EDA07F285E236800AC739E /* chim_cu_gay.wav */; };
 /* End PBXBuildFile section */
@@ -38,7 +38,6 @@
 		00E356EE1AD99517003FC87E /* FindmeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FindmeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* FindmeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FindmeTests.m; sourceTree = "<group>"; };
-		09AA356E28658669006F6566 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* Findme.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Findme.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Findme/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Findme/AppDelegate.m; sourceTree = "<group>"; };
@@ -67,6 +66,7 @@
 		CEB7AE98260DE15500487276 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		CEB7AE99260DE15500487276 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
 		CECD88E327BF495800761A26 /* Findme.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Findme.entitlements; path = Findme/Findme.entitlements; sourceTree = "<group>"; };
+		CEE0445128886C3B00F547AF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D889B8366844D5BBBE2112E6 /* libPods-Findme-FindmeTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Findme-FindmeTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1EDA07F285E236800AC739E /* chim_cu_gay.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = chim_cu_gay.wav; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -160,7 +160,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				09AA356E28658669006F6566 /* GoogleService-Info.plist */,
+				CEE0445128886C3B00F547AF /* GoogleService-Info.plist */,
 				E1EDA07F285E236800AC739E /* chim_cu_gay.wav */,
 				CE8EFD9B2759FACC00D9549E /* Config.xcconfig */,
 				13B07FAE1A68108700A75B9A /* Findme */,
@@ -306,7 +306,7 @@
 			files = (
 				E1EDA081285E236800AC739E /* chim_cu_gay.wav in Resources */,
 				CE8EFD9D2759FACC00D9549E /* Config.xcconfig in Resources */,
-				09AA357028658669006F6566 /* GoogleService-Info.plist in Resources */,
+				CEE0445328886C3B00F547AF /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -317,9 +317,9 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				6CF061F3285D814000B1A44B /* GoogleService-Info.plist in Resources */,
 				CE8EFD9C2759FACC00D9549E /* Config.xcconfig in Resources */,
-				09AA356F28658669006F6566 /* GoogleService-Info.plist in Resources */,
 				E1EDA080285E236800AC739E /* chim_cu_gay.wav in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				CEE0445228886C3B00F547AF /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -605,7 +605,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.doffy.ios.development;
+				PRODUCT_BUNDLE_IDENTIFIER = com.doffy.ios.production;
 				PRODUCT_NAME = Findme;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -636,7 +636,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.doffy.ios.development;
+				PRODUCT_BUNDLE_IDENTIFIER = com.doffy.ios.production;
 				PRODUCT_NAME = Findme;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;

@@ -231,8 +231,6 @@ const DetailBubble = ({route}: Props) => {
     };
 
     const RenderTool = () => {
-        const backgroundColor = theme.backgroundColor;
-
         const RenderStartChat = () => {
             return (
                 <StyleTouchable
@@ -241,7 +239,7 @@ const DetailBubble = ({route}: Props) => {
                         {
                             width: moderateScale(55),
                             height: moderateScale(55),
-                            backgroundColor,
+                            backgroundColor: theme.backgroundColor,
                         },
                     ]}
                     disable>
@@ -258,7 +256,10 @@ const DetailBubble = ({route}: Props) => {
             return (
                 <View>
                     <StyleTouchable
-                        customStyle={[styles.buttonTouch, {backgroundColor}]}
+                        customStyle={[
+                            styles.buttonTouch,
+                            {backgroundColor: theme.backgroundColor},
+                        ]}
                         onPress={onLikeUnLike}
                         hitSlop={15}>
                         {isLiked ? (
@@ -298,7 +299,10 @@ const DetailBubble = ({route}: Props) => {
             return (
                 <View>
                     <StyleTouchable
-                        customStyle={[styles.buttonTouch, {backgroundColor}]}
+                        customStyle={[
+                            styles.buttonTouch,
+                            {backgroundColor: theme.backgroundColor},
+                        ]}
                         onPress={onShowModalComment}
                         hitSlop={15}>
                         <StyleImage
@@ -325,7 +329,10 @@ const DetailBubble = ({route}: Props) => {
         const RenderReload = () => {
             return (
                 <StyleTouchable
-                    customStyle={[styles.buttonTouch, {backgroundColor}]}
+                    customStyle={[
+                        styles.buttonTouch,
+                        {backgroundColor: theme.backgroundColor},
+                    ]}
                     onPress={onRefreshItem}
                     hitSlop={{left: 10, top: 10, right: 10, bottom: 10}}>
                     <StyleImage

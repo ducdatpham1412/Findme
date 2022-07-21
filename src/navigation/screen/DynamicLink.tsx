@@ -1,15 +1,42 @@
-import dynamicLink from '@react-native-firebase/dynamic-links';
+import dynamicLink, {
+    FirebaseDynamicLinksTypes,
+} from '@react-native-firebase/dynamic-links';
+import FindmeStore from 'app-redux/store';
+import {TYPE_DYNAMIC_LINK} from 'asset/enum';
+import ROOT_SCREEN, {LOGIN_ROUTE} from 'navigation/config/routes';
+import {navigate} from 'navigation/NavigationService';
 import {useEffect} from 'react';
 
 const DynamicLink = () => {
+    const handleDynamicLink = (link: FirebaseDynamicLinksTypes.DynamicLink) => {
+        const arrayParams = link.url.split('?')[1].split('&');
+        const type = Number(arrayParams[0].split('=')[1]);
+        const action = arrayParams[1].split('=')[1];
+
+        if (type === TYPE_DYNAMIC_LINK.post) {
+            const isModeExp = FindmeStore.getState().accountSlice.modeExp;
+            const {token} = FindmeStore.getState().logicSlice;
+            const isInApp = isModeExp || token;
+            if (isInApp) {
+                navigate(ROOT_SCREEN.detailBubble, {
+                    bubbleId: action,
+                });
+            } else {
+                navigate(LOGIN_ROUTE.loginScreen);
+            }
+        }
+    };
+
     useEffect(() => {
-        const subscribe = dynamicLink().onLink(() => null);
+        const unSubscribe = dynamicLink().onLink(handleDynamicLink);
         dynamicLink()
             .getInitialLink()
-            .then((link: any) => {
-                console.log('link is: ', link);
+            .then((link: FirebaseDynamicLinksTypes.DynamicLink | null) => {
+                if (link) {
+                    handleDynamicLink(link);
+                }
             });
-        return () => subscribe();
+        return () => unSubscribe();
     }, []);
 
     return null;
