@@ -1,5 +1,6 @@
 /* eslint-disable no-shadow */
 /* eslint-disable react/jsx-key */
+import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeBubblePalace} from 'api/interface';
 import {
     apiGetDetailBubble,
@@ -8,7 +9,14 @@ import {
     apiGetListBubbleActiveOfUserEnjoy,
 } from 'api/module';
 import FindmeStore from 'app-redux/store';
+import {TYPE_DYNAMIC_LINK} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
+import {
+    ANDROID_APP_LINK,
+    DYNAMIC_LINK_ANDORID,
+    DYNAMIC_LINK_IOS,
+    DYNAMIC_LINK_SHARE,
+} from 'asset/standardValue';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import LoadingScreen from 'components/LoadingScreen';
@@ -26,13 +34,6 @@ import {View} from 'react-native';
 import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
 import {interactBubble, onGoToSignUp} from 'utility/assistant';
-import dynamicLinks from '@react-native-firebase/dynamic-links';
-import {
-    DYNAMIC_LINK_ANDORID,
-    DYNAMIC_LINK_IOS,
-    DYNAMIC_LINK_SHARE,
-} from 'asset/standardValue';
-import {TYPE_DYNAMIC_LINK} from 'asset/enum';
 import Bubble from './components/Bubble';
 
 export interface TypeShowMoreOptions {
@@ -176,19 +177,21 @@ const ListBubbleCouple = () => {
     const onShowModalShare = async (item: TypeBubblePalace) => {
         try {
             const link = await dynamicLinks().buildShortLink({
-                link: `${DYNAMIC_LINK_SHARE}?type=${TYPE_DYNAMIC_LINK.post}&post_id=${item.id}`,
+                link: `${item.images[0]}?type=${TYPE_DYNAMIC_LINK.post}&post_id=${item.id}`,
                 domainUriPrefix: DYNAMIC_LINK_SHARE,
                 ios: {
                     bundleId: DYNAMIC_LINK_IOS,
+                    appStoreId: '570060128',
                 },
                 android: {
                     packageName: DYNAMIC_LINK_ANDORID,
+                    fallbackUrl: ANDROID_APP_LINK,
                 },
                 analytics: {
                     campaign: 'banner',
                 },
             });
-            console.log('link is: ', link);
+
             // let imagePath: any = null;
             // RNFetchBlob.config({
             //     fileCache: true,
@@ -199,15 +202,18 @@ const ListBubbleCouple = () => {
             //         return resp.readFile('base64');
             //     })
             //     .then(async base64Data => {
-            //         const temp = `data:image/png;base64,${base64Data}`;
+            //         const base64Image = `data:image/png;base64,${base64Data}`;
             //         await Share.open({
-            //             message: item.content,
-            //             url: temp,
+            //             title: 'Title',
+            //             url: base64Image,
+            //             message: link,
+            //             subject: 'Subject',
             //         });
             //         return RNFetchBlob.fs.unlink(imagePath);
             //     });
+
             Share.open({
-                message: 'Hello world',
+                message: 'Doffy share',
                 url: link,
             });
         } catch (err) {
@@ -300,5 +306,4 @@ const styles = ScaledSheet.create({
         borderTopLeftRadius: 15,
     },
 });
-
 export default ListBubbleCouple;
