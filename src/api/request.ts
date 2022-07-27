@@ -9,11 +9,13 @@ import {logger} from 'utility/assistant';
 import FindmeAsyncStorage from 'utility/FindmeAsyncStorage';
 import AuthenticateService from 'utility/login/loginService';
 
-const AUTH_URL_REFRESH_TOKEN = `${Config.API_URL}/auth/refresh-token`;
+const baseURL = Config.API_URL;
+// const baseURL = 'http://10.254.181.93:8000';
+
+const AUTH_URL_REFRESH_TOKEN = `${baseURL}/auth/refresh-token`;
 
 const request = axios.create({
-    baseURL: Config.API_URL,
-    // baseURL: 'http://10.254.181.93:8000/',
+    baseURL,
     timeout: 5000,
     headers: {
         Accept: '*/*',
@@ -108,6 +110,7 @@ request.interceptors.response.use(
             } catch (err) {
                 // handle when refreshing token, refresh is blacked list
                 const temp: any = err;
+                console.log('temp is: ', temp);
                 const _error = temp.response.data;
                 if (_error.errorKey === ERROR_KEY_ENUM.token_blacklisted) {
                     AuthenticateService.logOut({hadRefreshTokenBlacked: true});

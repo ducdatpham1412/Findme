@@ -1,62 +1,100 @@
 {
-    "project_info": {
-        "project_number": "647052846803",
-        "project_id": "doffy-development",
-        "storage_bucket": "doffy-development.appspot.com"
-    },
-    "client": [
-        {
-            "client_info": {
-                "mobilesdk_app_id": "1:647052846803:android:15d16ac7c6345ef3a15626",
-                "android_client_info": {
-                    "package_name": "com.doffy.android.production"
-                }
-            },
-            "oauth_client": [
-                {
-                    "client_id": "647052846803-1r323mb0pkagavjamh6uo3ci3iu81plc.apps.googleusercontent.com",
-                    "client_type": 1,
-                    "android_info": {
-                        "package_name": "com.doffy.android.production",
-                        "certificate_hash": "27036953dd2020a98f2bc269d90e0f4cd2da3a60"
-                    }
-                },
-                {
-                    "client_id": "647052846803-404488utle5hjc0rh6afso8tjes9t7jj.apps.googleusercontent.com",
-                    "client_type": 1,
-                    "android_info": {
-                        "package_name": "com.doffy.android.production",
-                        "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
-                    }
-                },
-                {
-                    "client_id": "647052846803-fbvc9ru0jg933rfs14lpu8f7nv5ek6hl.apps.googleusercontent.com",
-                    "client_type": 3
-                }
-            ],
-            "api_key": [
-                {
-                    "current_key": "AIzaSyAq1NPglZf0j-EzuW6Qc4O6cMcUflUYlaw"
-                }
-            ],
-            "services": {
-                "appinvite_service": {
-                    "other_platform_oauth_client": [
-                        {
-                            "client_id": "647052846803-fbvc9ru0jg933rfs14lpu8f7nv5ek6hl.apps.googleusercontent.com",
-                            "client_type": 3
-                        },
-                        {
-                            "client_id": "647052846803-8gagoaetpkqlbbqd0lavnicsqs81hbfm.apps.googleusercontent.com",
-                            "client_type": 2,
-                            "ios_info": {
-                                "bundle_id": "com.doffy.ios.development"
-                            }
-                        }
-                    ]
-                }
-            }
+  "project_info": {
+    "project_number": "647052846803",
+    "project_id": "doffy-development",
+    "storage_bucket": "doffy-development.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:647052846803:android:5873bebb3d4d7226a15626",
+        "android_client_info": {
+          "package_name": "com.doffy.android.production"
         }
-    ],
-    "configuration_version": "1"
+      },
+      "oauth_client": [
+        {
+          "client_id": "647052846803-s4loc7qivqjprs0q50jjhm446b14snut.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.doffy.android.production",
+            "certificate_hash": "babfd43fd5352262e1a49d8cf85c40d75883f2b0"
+          }
+        },
+        {
+          "client_id": "647052846803-g1chkddda04ce6ppmtrciig1h08b43at.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAq1NPglZf0j-EzuW6Qc4O6cMcUflUYlaw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "647052846803-g1chkddda04ce6ppmtrciig1h08b43at.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "647052846803-f9madd8vhekunhmtv5ns2cv6icjpnm4u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.doffy.ios.production",
+                "app_store_id": "570060128"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:647052846803:android:7052e4f3e097b7c2a15626",
+        "android_client_info": {
+          "package_name": "com.findme"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "647052846803-547dhkplavtde7rs6p7qu85ar6ndoeem.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.findme",
+            "certificate_hash": "babfd43fd5352262e1a49d8cf85c40d75883f2b0"
+          }
+        },
+        {
+          "client_id": "647052846803-g1chkddda04ce6ppmtrciig1h08b43at.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAq1NPglZf0j-EzuW6Qc4O6cMcUflUYlaw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "647052846803-g1chkddda04ce6ppmtrciig1h08b43at.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "647052846803-f9madd8vhekunhmtv5ns2cv6icjpnm4u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.doffy.ios.production",
+                "app_store_id": "570060128"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
 }

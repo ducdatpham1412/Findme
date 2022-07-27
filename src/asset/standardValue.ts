@@ -1,4 +1,6 @@
 /* eslint-disable no-shadow */
+import Config from 'react-native-config';
+
 export const standValue = {
     USERNAME_MIN_LENGTH: 7,
     USERNAME_MAX_LENGTH: 20,
@@ -44,7 +46,7 @@ export const TERMS_URL = 'https://www.doffy.xyz/about-us/terms';
 export const FEEDBACK_URL =
     'https://docs.google.com/forms/d/1Yb-OzSMJbJxG_RZYtPwkKZGjw4AZOsC2IvJlac-1ydI/edit?usp=sharing';
 export const GUIDELINE_URL = 'https://www.doffy.xyz/about-us/guideline';
-
+export const LANDING_PAGE_URL = 'https://www.doffy.xyz/';
 export const REPORT_REASONS = [
     {
         id: 0,
@@ -71,8 +73,8 @@ export const REPORT_REASONS = [
 export const DELAY_LONG_PRESS = 150;
 
 export const DYNAMIC_LINK_SHARE = 'https://doffy.page.link';
-export const DYNAMIC_LINK_IOS = 'com.doffy.ios.production';
-export const DYNAMIC_LINK_ANDORID = 'com.doffy.android.production';
+export const DYNAMIC_LINK_IOS = Config.IOS_APP_ID;
+export const DYNAMIC_LINK_ANDROID = Config.ANDROID_APP_ID;
 
 export const ANDROID_APP_LINK =
     'https://play.google.com/store/apps/details?id=com.doffy.android.production';
