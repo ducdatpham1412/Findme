@@ -6,6 +6,7 @@ import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import React, {memo, useMemo, useRef, useState} from 'react';
+import isEqual from 'react-fast-compare';
 import {Animated, Keyboard, Text, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {
@@ -16,19 +17,19 @@ import {
 } from 'react-native-size-matters';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {checkIsSingleEmoji} from 'utility/validate';
+import {TypeSeeDetailImage} from '../ChatDetail';
 import DatetimeMessage from './DatetimeMessage';
 import MessageImage from './MessageImage';
-import isEqual from 'react-fast-compare';
 
 interface Props {
     itemMessage: TypeChatMessageResponse;
     isSameMessageAfter: boolean;
     displayPartnerAvatar: boolean;
-    displayMeAvatar: boolean;
+    displaySeenAvatar: boolean;
     chatColor: Array<string>;
     onDeleteMessage(idMessage: string): Promise<void>;
-    listMessagesLength: number;
-    onSeeDetailImage(listImages: Array<any>, index: number): void;
+    // listMessagesLength: number;
+    onSeeDetailImage(params: TypeSeeDetailImage): void;
 }
 
 const ItemMessage = (props: Props) => {
@@ -36,7 +37,7 @@ const ItemMessage = (props: Props) => {
         itemMessage,
         isSameMessageAfter,
         displayPartnerAvatar,
-        displayMeAvatar,
+        displaySeenAvatar,
         onDeleteMessage,
         chatColor,
         onSeeDetailImage,
@@ -44,44 +45,30 @@ const ItemMessage = (props: Props) => {
     const theme = Redux.getTheme();
     let x: any;
 
-    const initValue = useMemo(() => {
-        const isMyMessage = itemMessage.relationship === RELATIONSHIP.self;
-        const displayAvatar = isMyMessage
-            ? displayMeAvatar
-            : displayPartnerAvatar;
-        const isText = itemMessage.type === MESSAGE_TYPE.text;
+    const isMyMessage = itemMessage.relationship === RELATIONSHIP.self;
+    const displayAvatar = isMyMessage
+        ? displaySeenAvatar
+        : displayPartnerAvatar;
+    const isText = itemMessage.type === MESSAGE_TYPE.text;
 
-        let isEmoji = false;
-        if (isText) {
-            isEmoji =
-                !!itemMessage.content &&
-                checkIsSingleEmoji(itemMessage.content);
-        }
-        const isMessageText = isText && !isEmoji;
-        const isMessageEmoji = isText && isEmoji;
-        const isMessageImage =
-            itemMessage.type === MESSAGE_TYPE.image &&
-            !!itemMessage.content.length;
+    let isEmoji = false;
+    if (isText) {
+        isEmoji =
+            !!itemMessage.content &&
+            typeof itemMessage.content === 'string' &&
+            checkIsSingleEmoji(itemMessage.content);
+    }
+    const isMessageText = isText && !isEmoji;
+    const isMessageEmoji = isText && isEmoji;
+    const isMessageImage =
+        itemMessage.type === MESSAGE_TYPE.image && !!itemMessage.content.length;
 
-        const backgroundColor = isMyMessage
-            ? 'transparent'
-            : theme.backgroundButtonColor;
-        const textColor = isMyMessage ? Theme.common.textMe : theme.textColor;
-        const paddingLeft = isMyMessage ? scale(17) : scale(10);
-        const paddingRight = isMyMessage ? scale(10) : scale(17);
-
-        return {
-            isMyMessage,
-            displayAvatar,
-            isMessageText,
-            isMessageEmoji,
-            isMessageImage,
-            backgroundColor,
-            paddingLeft,
-            paddingRight,
-            textColor,
-        };
-    }, [itemMessage.relationship, itemMessage.content, theme, props]);
+    const backgroundColor = isMyMessage
+        ? 'transparent'
+        : theme.backgroundButtonColor;
+    const textColor = isMyMessage ? Theme.common.textMe : theme.textColor;
+    const paddingLeft = isMyMessage ? scale(17) : scale(10);
+    const paddingRight = isMyMessage ? scale(10) : scale(17);
 
     /**
      * For animation message
@@ -94,19 +81,19 @@ const ItemMessage = (props: Props) => {
     const onPressMessage = (index = 0) => {
         if (!isDisplayingOption) {
             // message image
-            if (initValue.isMessageImage) {
-                const listImages = itemMessage.content.map(item => ({
-                    url: item,
-                }));
-                onSeeDetailImage(listImages, index);
+            if (isMessageImage) {
+                if (typeof itemMessage.content === 'object') {
+                    const listImages = itemMessage.content.map?.(item => ({
+                        url: item,
+                    }));
+                    onSeeDetailImage({listImages, index});
+                }
             }
             // message text
-            else {
-                if (!isDisplayDatetime) {
-                    setIsDisplayDatetime(true);
-                } else {
-                    setMostHeightDateTime(!mostHeightDateTime);
-                }
+            else if (!isDisplayDatetime) {
+                setIsDisplayDatetime(true);
+            } else {
+                setMostHeightDateTime(!mostHeightDateTime);
             }
         } else {
             clearTimeout(x);
@@ -121,7 +108,7 @@ const ItemMessage = (props: Props) => {
         clearTimeout(x);
         setIsDisplayingOption(true);
         Animated.spring(pan, {
-            toValue: initValue.isMyMessage ? -scale(40) : scale(40),
+            toValue: isMyMessage ? -scale(40) : scale(40),
             useNativeDriver: true,
         }).start(() => {
             x = setTimeout(() => {
@@ -134,108 +121,11 @@ const ItemMessage = (props: Props) => {
         return () => clearTimeout(x);
     };
 
-    // const oldPan: any = useRef(new Animated.Value(0)).current;
-    // const panResponse = useRef(
-    //     PanResponder.create({
-    //         onMoveShouldSetPanResponder: () => true,
-    //         onPanResponderGrant: () => {
-    //             setDisplayOption(true);
-    //         },
-    //         onPanResponderMove: (evt, gesture) => {
-    //             clearTimeout(x);
-    //             const dx = gesture.dx;
-    //             const newPan = oldPan._value + dx;
-    //             if (initValue.isMyMessage) {
-    //                 if (newPan < -scale(70) || newPan > 0) {
-    //                     return;
-    //                 }
-    //             } else {
-    //                 if (newPan < 0 || newPan > scale(70)) {
-    //                     return;
-    //                 }
-    //             }
-    //             pan.setValue(newPan);
-    //         },
-    //     }),
-    // ).current;
-
-    // const onResponderRelease = () => {
-    //     if (initValue.isMyMessage) {
-    //         // come back to start position
-    //         if (pan._value > oldPan._value) {
-    //             Animated.spring(pan, {
-    //                 toValue: 0,
-    //                 useNativeDriver: true,
-    //             }).start(() => oldPan.setValue(0));
-    //         }
-    //         // auto come to -70 when move < - 30
-    //         else if (pan._value < -30) {
-    //             Animated.spring(pan, {
-    //                 toValue: -scale(70),
-    //                 useNativeDriver: true,
-    //             }).start(() => oldPan.setValue(-scale(70)));
-    //         }
-    //         // if move > -30, auto comeback to 0
-    //         else {
-    //             Animated.spring(pan, {
-    //                 toValue: 0,
-    //                 useNativeDriver: true,
-    //             }).start(() => oldPan.setValue(0));
-    //         }
-
-    //         // auto comeback 0 after 2 seconds
-    //         x = setTimeout(() => {
-    //             Animated.spring(pan, {
-    //                 toValue: 0,
-    //                 useNativeDriver: true,
-    //             }).start(() => oldPan.setValue(0));
-    //         }, 2000);
-    //     } else {
-    //         // come back to start position
-    //         if (pan._value < oldPan._value) {
-    //             Animated.spring(pan, {
-    //                 toValue: 0,
-    //                 useNativeDriver: true,
-    //             }).start(() => oldPan.setValue(0));
-    //         }
-    //         // auto come to -70 when move < - 30
-    //         else if (pan._value > 30) {
-    //             Animated.spring(pan, {
-    //                 toValue: scale(70),
-    //                 useNativeDriver: true,
-    //             }).start(() => oldPan.setValue(scale(70)));
-    //         }
-    //         // if move > -30, auto comeback to 0
-    //         else {
-    //             Animated.spring(pan, {
-    //                 toValue: 0,
-    //                 useNativeDriver: true,
-    //             }).start(() => oldPan.setValue(0));
-    //         }
-
-    //         // auto comeback 0 after 2 seconds
-    //         x = setTimeout(() => {
-    //             Animated.spring(pan, {
-    //                 toValue: 0,
-    //                 useNativeDriver: true,
-    //             }).start(() => oldPan.setValue(0));
-    //         }, 2000);
-    //     }
-    // };
-
-    // const onComeBackToInitPosition = () => {
-    //     clearTimeout(x);
-    //     Animated.spring(pan, {
-    //         toValue: 0,
-    //         useNativeDriver: true,
-    //     }).start(() => oldPan.setValue(0));
-    // };
-
     /**
      * Render view
      */
     const RenderLinearGradient = useMemo(() => {
-        if (!initValue.isMyMessage) {
+        if (!isMyMessage) {
             return null;
         }
         return (
@@ -250,20 +140,20 @@ const ItemMessage = (props: Props) => {
                 end={{x: 1, y: 1}}
             />
         );
-    }, [initValue.isMyMessage, chatColor]);
+    }, [isMyMessage, chatColor]);
 
     const avatarSize = useMemo(() => {
-        return initValue.isMyMessage ? moderateScale(20) : moderateScale(27);
-    }, [initValue.isMyMessage]);
+        return isMyMessage ? moderateScale(20) : moderateScale(27);
+    }, [isMyMessage]);
 
     return (
         <>
             {isDisplayDatetime && (
                 <DatetimeMessage
-                    datetime={itemMessage.createdTime}
-                    isMyMessage={initValue.isMyMessage}
+                    datetime={itemMessage.created}
+                    isMyMessage={isMyMessage}
                     mostHeightDateTime={mostHeightDateTime}
-                    senderName={itemMessage.senderName}
+                    senderName={itemMessage.creatorName}
                 />
             )}
 
@@ -271,9 +161,7 @@ const ItemMessage = (props: Props) => {
                 style={[
                     styles.container,
                     {
-                        flexDirection: initValue.isMyMessage
-                            ? 'row-reverse'
-                            : 'row',
+                        flexDirection: isMyMessage ? 'row-reverse' : 'row',
                         marginTop: isSameMessageAfter ? 0 : verticalScale(30),
                         opacity: itemMessage?.tag ? 0.4 : 1,
                     },
@@ -283,9 +171,9 @@ const ItemMessage = (props: Props) => {
                         styles.avatarView,
                         {width: avatarSize, height: avatarSize},
                     ]}>
-                    {initValue.displayAvatar && (
+                    {displayAvatar && (
                         <StyleImage
-                            source={{uri: itemMessage.senderAvatar}}
+                            source={{uri: itemMessage.creatorAvatar}}
                             customStyle={[
                                 styles.avatarView,
                                 {width: avatarSize, height: avatarSize},
@@ -297,7 +185,7 @@ const ItemMessage = (props: Props) => {
                 <View style={styles.spaceView} />
 
                 {/* option delete message */}
-                {initValue.isMyMessage && isDisplayingOption && (
+                {isMyMessage && isDisplayingOption && (
                     <View style={styles.optionsBox}>
                         <StyleTouchable
                             onPress={() => onDeleteMessage(itemMessage.id)}>
@@ -316,29 +204,30 @@ const ItemMessage = (props: Props) => {
                     style={[
                         styles.contentView,
                         {
-                            flexDirection: initValue.isMyMessage
-                                ? 'row-reverse'
-                                : 'row',
+                            flexDirection: isMyMessage ? 'row-reverse' : 'row',
                             transform: [{translateX: pan}],
                         },
                     ]}
                     // {...panResponse.panHandlers}
                     // onResponderRelease={onResponderRelease}
                 >
-                    {initValue.isMessageImage && (
+                    {isMessageImage && (
                         <View style={styles.imageBox}>
-                            {itemMessage.content.map((item, index) => (
-                                <MessageImage
-                                    imageUrl={item}
-                                    total={itemMessage.content.length}
-                                    onPress={() => onPressMessage(index)}
-                                    onLongPress={onLongPressMessage}
-                                />
-                            ))}
+                            {itemMessage.content?.map(
+                                (item: string, index: number) => (
+                                    <MessageImage
+                                        key={index}
+                                        imageUrl={item}
+                                        total={itemMessage.content.length}
+                                        onPress={() => onPressMessage(index)}
+                                        onLongPress={onLongPressMessage}
+                                    />
+                                ),
+                            )}
                         </View>
                     )}
 
-                    {initValue.isMessageEmoji && (
+                    {isMessageEmoji && (
                         <StyleTouchable
                             activeOpacity={1}
                             normalOpacity={
@@ -361,12 +250,12 @@ const ItemMessage = (props: Props) => {
                         </StyleTouchable>
                     )}
 
-                    {initValue.isMessageText && (
+                    {isMessageText && (
                         <StyleTouchable
                             customStyle={[
                                 styles.messageBox,
                                 {
-                                    backgroundColor: initValue.backgroundColor,
+                                    backgroundColor,
                                 },
                             ]}
                             activeOpacity={1}
@@ -385,9 +274,9 @@ const ItemMessage = (props: Props) => {
                                 customStyle={[
                                     styles.messageText,
                                     {
-                                        color: initValue.textColor,
-                                        marginLeft: initValue.paddingLeft,
-                                        marginRight: initValue.paddingRight,
+                                        color: textColor,
+                                        marginLeft: paddingLeft,
+                                        marginRight: paddingRight,
                                     },
                                 ]}
                             />
@@ -464,18 +353,115 @@ export default memo(ItemMessage, (prevProps: Props, nextProps: Props) => {
     if (
         !isEqual(prevProps.itemMessage, nextProps.itemMessage) ||
         prevProps.isSameMessageAfter !== nextProps.isSameMessageAfter ||
-        prevProps.displayMeAvatar !== nextProps.displayMeAvatar ||
+        prevProps.displaySeenAvatar !== nextProps.displaySeenAvatar ||
         prevProps.displayPartnerAvatar !== nextProps.displayPartnerAvatar ||
         prevProps.chatColor !== nextProps.chatColor
     ) {
         return false;
     }
 
-    if (nextProps.listMessagesLength < prevProps.listMessagesLength) {
-        return false;
-    }
+    // if (nextProps.listMessagesLength < prevProps.listMessagesLength) {
+    //     return false;
+    // }
     // if (prevProps.onDeleteMessage !== nextProps.onDeleteMessage) {
     //     return false;
     // }
     return true;
 });
+
+// const oldPan: any = useRef(new Animated.Value(0)).current;
+// const panResponse = useRef(
+//     PanResponder.create({
+//         onMoveShouldSetPanResponder: () => true,
+//         onPanResponderGrant: () => {
+//             setDisplayOption(true);
+//         },
+//         onPanResponderMove: (evt, gesture) => {
+//             clearTimeout(x);
+//             const dx = gesture.dx;
+//             const newPan = oldPan._value + dx;
+//             if (isMyMessage) {
+//                 if (newPan < -scale(70) || newPan > 0) {
+//                     return;
+//                 }
+//             } else {
+//                 if (newPan < 0 || newPan > scale(70)) {
+//                     return;
+//                 }
+//             }
+//             pan.setValue(newPan);
+//         },
+//     }),
+// ).current;
+
+// const onResponderRelease = () => {
+//     if (isMyMessage) {
+//         // come back to start position
+//         if (pan._value > oldPan._value) {
+//             Animated.spring(pan, {
+//                 toValue: 0,
+//                 useNativeDriver: true,
+//             }).start(() => oldPan.setValue(0));
+//         }
+//         // auto come to -70 when move < - 30
+//         else if (pan._value < -30) {
+//             Animated.spring(pan, {
+//                 toValue: -scale(70),
+//                 useNativeDriver: true,
+//             }).start(() => oldPan.setValue(-scale(70)));
+//         }
+//         // if move > -30, auto comeback to 0
+//         else {
+//             Animated.spring(pan, {
+//                 toValue: 0,
+//                 useNativeDriver: true,
+//             }).start(() => oldPan.setValue(0));
+//         }
+
+//         // auto comeback 0 after 2 seconds
+//         x = setTimeout(() => {
+//             Animated.spring(pan, {
+//                 toValue: 0,
+//                 useNativeDriver: true,
+//             }).start(() => oldPan.setValue(0));
+//         }, 2000);
+//     } else {
+//         // come back to start position
+//         if (pan._value < oldPan._value) {
+//             Animated.spring(pan, {
+//                 toValue: 0,
+//                 useNativeDriver: true,
+//             }).start(() => oldPan.setValue(0));
+//         }
+//         // auto come to -70 when move < - 30
+//         else if (pan._value > 30) {
+//             Animated.spring(pan, {
+//                 toValue: scale(70),
+//                 useNativeDriver: true,
+//             }).start(() => oldPan.setValue(scale(70)));
+//         }
+//         // if move > -30, auto comeback to 0
+//         else {
+//             Animated.spring(pan, {
+//                 toValue: 0,
+//                 useNativeDriver: true,
+//             }).start(() => oldPan.setValue(0));
+//         }
+
+//         // auto comeback 0 after 2 seconds
+//         x = setTimeout(() => {
+//             Animated.spring(pan, {
+//                 toValue: 0,
+//                 useNativeDriver: true,
+//             }).start(() => oldPan.setValue(0));
+//         }, 2000);
+//     }
+// };
+
+// const onComeBackToInitPosition = () => {
+//     clearTimeout(x);
+//     Animated.spring(pan, {
+//         toValue: 0,
+//         useNativeDriver: true,
+//     }).start(() => oldPan.setValue(0));
+// };

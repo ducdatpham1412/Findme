@@ -98,7 +98,7 @@ export enum SOCKET_EVENT {
     requestPublicChat = '2.2',
     agreePublicChat = '2.3',
     allAgreePublicChat = '2.4',
-    changeGroupName = '2.5',
+    changeChatName = '2.5',
     changeChatColor = '2.6',
     // message
     message = '3.0',
@@ -163,4 +163,9 @@ export enum TYPE_OS_LOGIN_SOCIAL {
 export enum TYPE_DYNAMIC_LINK {
     post = 0,
     profile = 1,
+}
+
+export enum CONVERSATION_STATUS {
+    active = 1,
+    stop = 0,
 }

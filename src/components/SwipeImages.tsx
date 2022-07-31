@@ -25,7 +25,7 @@ const SwipeImages = ({route}: Props) => {
     const {
         listImages,
         initIndex = 0,
-        allowSaveImage = false,
+        allowSaveImage = true,
         textSaveImage = 'common.canNotSave',
     } = route.params;
     const theme = Redux.getTheme();

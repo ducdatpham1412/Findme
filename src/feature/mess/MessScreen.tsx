@@ -1,5 +1,5 @@
 import {TypeChatTagResponse} from 'api/interface';
-import {apiGetDetailChatTag} from 'api/module';
+import {apiGetDetailConversation} from 'api/module';
 import {CHAT_TAG} from 'asset/enum';
 import StyleList from 'components/base/StyleList';
 import Redux from 'hook/useRedux';
@@ -7,14 +7,15 @@ import {useSocketChatTagBubble} from 'hook/useSocketIO';
 import Header from 'navigation/components/Header';
 import {MESS_ROUTE, PROFILE_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
-import React, {memo, useCallback, useEffect} from 'react';
+import React, {memo, useEffect} from 'react';
 import {View} from 'react-native';
 import {scale, ScaledSheet} from 'react-native-size-matters';
+import {isTimeBefore} from 'utility/format';
 import ChatTag from './components/ChatTag';
 
 const RenderMessages = () => {
     const chatTagFromNotification = Redux.getChatTagFromNotification();
-    const {id} = Redux.getPassport().profile;
+    const myId = Redux.getPassport().profile.id;
 
     const {
         listChatTags,
@@ -29,7 +30,9 @@ const RenderMessages = () => {
         if (chatTagFromNotification) {
             try {
                 Redux.setChatTagFocusing(chatTagFromNotification);
-                const res = await apiGetDetailChatTag(chatTagFromNotification);
+                const res = await apiGetDetailConversation(
+                    chatTagFromNotification,
+                );
                 seenMessage(chatTagFromNotification);
 
                 if (res.data.type === CHAT_TAG.group) {
@@ -63,31 +66,24 @@ const RenderMessages = () => {
         goToChatDetailFromNotification();
     }, [chatTagFromNotification]);
 
-    const onGoToChat = useCallback(async (chatTag: TypeChatTagResponse) => {
+    const onGoToChat = async (conversation: TypeChatTagResponse) => {
         try {
-            if (
-                !chatTag.userSeenMessage[String(id)].isLatest &&
-                !chatTag.isBlock &&
-                !chatTag.isStop
-            ) {
-                seenMessage(chatTag.id);
+            const havingUpdate = isTimeBefore(
+                conversation.userData[String(myId)].modified,
+                conversation.modified,
+            );
+            if (havingUpdate) {
+                seenMessage(conversation.id);
             }
-            Redux.setChatTagFocusing(chatTag.id);
-            if (chatTag.type === CHAT_TAG.group) {
-                navigate(MESS_ROUTE.chatDetailGroup, {
-                    itemChatTag: chatTag,
-                    setListChatTags,
-                });
-            } else {
-                navigate(MESS_ROUTE.chatDetail, {
-                    itemChatTag: chatTag,
-                    setListChatTags,
-                });
-            }
+            Redux.setChatTagFocusing(conversation.id);
+            navigate(MESS_ROUTE.chatDetail, {
+                itemChatTag: conversation,
+                setListChatTags,
+            });
         } catch (err) {
             appAlert(err);
         }
-    }, []);
+    };
 
     /**
      * Render view

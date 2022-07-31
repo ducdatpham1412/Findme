@@ -11,7 +11,6 @@ import {
     TypeCreateGroupResponse,
     TypeCreatePostRequest,
     TypeCreatePostResponse,
-    TypeDeleteMessageRequest,
     TypeEditProfileRequest,
     TypeEditProfileResponse,
     TypeGetListBlockedResponse,
@@ -188,7 +187,7 @@ export const apiGetListComments = (
 /**
  *  DISCOVERY and CHAT
  */
-export const apiGetListChatTags = ({
+export const apiGetListConversations = ({
     params,
 }: TypeParamsPaging): Promise<{
     success: boolean;
@@ -197,7 +196,7 @@ export const apiGetListChatTags = ({
     totalPages: number;
     data: Array<TypeChatTagResponse>;
 }> => {
-    return request.get('/chat/get-list-chat-tag', {
+    return request.get('/chat/list-conversations', {
         params,
     });
 };
@@ -208,17 +207,17 @@ export const apiGetListMessages = ({
     success: boolean;
     data: Array<TypeChatMessageResponse>;
 }> => {
-    return request.get(`/chat/get-list-messages/${params.chatTagId}`, {
+    return request.get(`/chat/list-messages/${params.chatTagId}`, {
         params,
     });
 };
 
-export const apiDeleteMessage = (params: TypeDeleteMessageRequest) => {
-    return request.put('/chat/delete-message', params);
+export const apiDeleteMessage = (messageId: string) => {
+    return request.put(`/chat/delete-message/${messageId}`);
 };
 
-export const apiGetDetailChatTag = (chatTagId: string) => {
-    return request.get(`/chat/get-detail-chat-tag/${chatTagId}`);
+export const apiGetDetailConversation = (conversationId: string) => {
+    return request.get(`/chat/detail-conversation/${conversationId}`);
 };
 
 /**
