@@ -17,25 +17,20 @@ import {
 } from 'api/interface';
 import {
     apiDeleteMessage,
-    apiGetDetailChatTag,
-    apiGetListChatTags,
     apiGetListComments,
+    apiGetListConversations,
     apiGetListMessages,
     apiGetListNotifications,
 } from 'api/module';
 import FindmeStore from 'app-redux/store';
 import {MESSAGE_TYPE, RELATIONSHIP, SOCKET_EVENT} from 'asset/enum';
-import {MESS_ROUTE} from 'navigation/config/routes';
-import {appAlert, navigate} from 'navigation/NavigationService';
-import React, {useCallback, useEffect, useState} from 'react';
+import {appAlert} from 'navigation/NavigationService';
+import React, {useEffect, useState} from 'react';
 import {AppState, AppStateStatus} from 'react-native';
 import Config from 'react-native-config';
 import {io, Socket} from 'socket.io-client';
-import {
-    countDownToCancelRequestPublic,
-    isIOS,
-    reorderListChatTag,
-} from 'utility/assistant';
+import {isIOS, reorderListChatTag} from 'utility/assistant';
+import {isTimeBefore} from 'utility/format';
 import ImageUploader from 'utility/ImageUploader';
 import usePaging from './usePaging';
 import Redux from './useRedux';
@@ -108,20 +103,17 @@ export const SocketProvider = ({children}: any) => {
  */
 export const useSocketChatTagBubble = () => {
     const listChatTags = Redux.getListChatTag();
-    const chatTagFocusing = Redux.getChatTagFocusing();
     const myId = Redux.getPassport().profile.id;
     const token = Redux.getToken();
 
     const {list, setList, refreshing, onRefresh, onLoadMore} = usePaging({
-        request: apiGetListChatTags,
+        request: apiGetListConversations,
         params: {
             take: 20,
         },
     });
 
-    let countdownRequestPublic: any;
-
-    const hearingOtherSocket = useCallback(() => {
+    const hearingOtherSocket = () => {
         socket?.off(SOCKET_EVENT.createChatTag);
         socket?.on(SOCKET_EVENT.createChatTag, (data: TypeChatTagResponse) => {
             setList((previousChatTags: Array<TypeChatTagResponse>) => {
@@ -134,13 +126,13 @@ export const useSocketChatTagBubble = () => {
         socket.on(SOCKET_EVENT.seenMessage, (data: TypeSeenMessageResponse) => {
             setList((previousChatTags: Array<TypeChatTagResponse>) => {
                 return previousChatTags.map(item => {
-                    if (item.id !== data.chatTagId) {
+                    if (item.id !== data.conversationId) {
                         return item;
                     }
                     return {
                         ...item,
-                        userSeenMessage: {
-                            ...item.userSeenMessage,
+                        userData: {
+                            ...item.userData,
                             ...data.data,
                         },
                     };
@@ -148,20 +140,20 @@ export const useSocketChatTagBubble = () => {
             });
         });
 
-        socket?.off(SOCKET_EVENT.changeGroupName);
+        socket?.off(SOCKET_EVENT.changeChatName);
         socket.on(
-            SOCKET_EVENT.changeGroupName,
+            SOCKET_EVENT.changeChatName,
             (data: TypeChangeGroupNameResponse) => {
                 let indexNeedToReorder = -1;
                 setList((previousChatTags: Array<TypeChatTagResponse>) => {
                     const temp = previousChatTags.map((item, index) => {
-                        if (item.id !== data.chatTagId) {
+                        if (item.id !== data.conversationId) {
                             return item;
                         }
                         indexNeedToReorder = index;
                         return {
                             ...item,
-                            groupName: data.newName,
+                            conversationName: data.name,
                         };
                     });
 
@@ -191,13 +183,13 @@ export const useSocketChatTagBubble = () => {
             let indexNeedToReorder = -1;
             setList((previousChatTags: Array<TypeChatTagResponse>) => {
                 const temp = previousChatTags.map((item, index) => {
-                    if (item.id !== data.chatTagId) {
+                    if (item.id !== data.conversationId) {
                         return item;
                     }
                     indexNeedToReorder = index;
                     return {
                         ...item,
-                        color: data.newColor,
+                        color: data.color,
                     };
                 });
 
@@ -220,100 +212,6 @@ export const useSocketChatTagBubble = () => {
                 }
             }
         });
-
-        socket?.off(SOCKET_EVENT.joinCommunity);
-        socket.on(SOCKET_EVENT.joinCommunity, (chatTagId: string) => {
-            Redux.setChatTagFromNotification(chatTagId);
-        });
-
-        socket?.off(SOCKET_EVENT.hadNewUserJoinCommunity);
-        socket.on(
-            SOCKET_EVENT.hadNewUserJoinCommunity,
-            async (chatTagId: string) => {
-                const res = await apiGetDetailChatTag(chatTagId);
-                setList((previousChatTags: Array<TypeChatTagResponse>) => {
-                    const check = previousChatTags.find(
-                        item => item.id === chatTagId,
-                    );
-                    if (check) {
-                        let indexNeedToReorder = 0;
-                        const temp = previousChatTags.map((item, index) => {
-                            if (item.id !== chatTagId) {
-                                return item;
-                            }
-                            indexNeedToReorder = index;
-                            return res.data;
-                        });
-                        if (indexNeedToReorder > 0) {
-                            return reorderListChatTag(temp, indexNeedToReorder);
-                        }
-                        return temp;
-                    }
-                    return [res.data].concat(previousChatTags);
-                });
-            },
-        );
-
-        // request public chat
-        socket?.off(SOCKET_EVENT.requestPublicChat);
-        socket.on(SOCKET_EVENT.requestPublicChat, (chatTagId: string) => {
-            let indexNeedToReorder = -1;
-            setList((previousChatTag: Array<TypeChatTagResponse>) => {
-                const temp = previousChatTag.map((item, index) => {
-                    if (item.id !== chatTagId) {
-                        return item;
-                    }
-                    indexNeedToReorder = index;
-                    return {
-                        ...item,
-                        isRequestingPublic: true,
-                    };
-                });
-
-                if (indexNeedToReorder > 0) {
-                    const updateList = reorderListChatTag(
-                        temp,
-                        indexNeedToReorder,
-                    );
-                    return updateList;
-                }
-                return temp;
-            });
-
-            // if not found chat tag in list, call api get that
-            if (indexNeedToReorder === -1) {
-                try {
-                    // call api get chat tag with id
-                } catch (err) {
-                    appAlert(err);
-                }
-            }
-
-            clearTimeout(countdownRequestPublic);
-            countdownRequestPublic = countDownToCancelRequestPublic({
-                chatTagId,
-                setList,
-            });
-        });
-
-        socket?.off(SOCKET_EVENT.allAgreePublicChat);
-        socket.on(
-            SOCKET_EVENT.allAgreePublicChat,
-            (data: TypeChatTagResponse) => {
-                setList((previousChatTags: Array<TypeChatTagResponse>) => {
-                    const temp = previousChatTags.map(item => {
-                        if (item.id !== data.id) {
-                            return item;
-                        }
-                        return data;
-                    });
-                    return temp;
-                });
-                navigate(MESS_ROUTE.publicChatting, {
-                    publicChatTag: data,
-                });
-            },
-        );
 
         // block, stop chat
         socket?.off(SOCKET_EVENT.isBlocked);
@@ -379,7 +277,7 @@ export const useSocketChatTagBubble = () => {
         socket.on(SOCKET_EVENT.typing, (data: TypingResponse) => {
             setList((previousChatTags: Array<TypeChatTagResponse>) => {
                 return previousChatTags.map(item => {
-                    if (item.id !== data.chatTagId) {
+                    if (item.id !== data.conversationId) {
                         return item;
                     }
                     let userTyping: Array<number> = [];
@@ -408,7 +306,7 @@ export const useSocketChatTagBubble = () => {
         socket.on(SOCKET_EVENT.unTyping, (data: TypingResponse) => {
             setList((previousChatTags: Array<TypeChatTagResponse>) => {
                 return previousChatTags.map(item => {
-                    if (item.id !== data.chatTagId || !item.userTyping) {
+                    if (item.id !== data.conversationId || !item.userTyping) {
                         return item;
                     }
                     const userTyping = item.userTyping.filter(
@@ -429,23 +327,18 @@ export const useSocketChatTagBubble = () => {
                 let indexNeedToReorder = 0;
 
                 const temp = previousChatTag.map((item, index) => {
-                    if (item.id !== data.chatTag) {
+                    if (item.id !== data.conversationId) {
                         return item;
                     }
-                    const updateItem = {
-                        ...item,
-                        userSeenMessage: {
-                            ...item.userSeenMessage,
-                            [String(myId)]: {
-                                ...item.userSeenMessage[String(myId)],
-                                isLatest: false,
-                            },
-                        },
-                    };
+                    const latestMessage =
+                        typeof data.content === 'string'
+                            ? data.content
+                            : 'Image';
                     indexNeedToReorder = index;
                     return {
-                        ...updateItem,
-                        updateTime: new Date(),
+                        ...item,
+                        modified: data.created,
+                        latestMessage,
                     };
                 });
 
@@ -459,14 +352,16 @@ export const useSocketChatTagBubble = () => {
                 return temp;
             });
         });
-    }, [myId]);
+    };
 
     const checkDisplayNotification = () => {
         let newNumber = 0;
         for (let i = 0; i < listChatTags.length; i++) {
             if (
-                !listChatTags[i].userSeenMessage[String(myId)]?.isLatest &&
-                listChatTags[i].id !== chatTagFocusing
+                isTimeBefore(
+                    listChatTags[i].userData[String(myId)].modified,
+                    listChatTags[i].modified,
+                )
             ) {
                 newNumber += 1;
             }
@@ -478,7 +373,7 @@ export const useSocketChatTagBubble = () => {
         if (token && socket) {
             hearingOtherSocket();
         }
-    }, [myId, token, socket]);
+    }, [token, socket]);
 
     useEffect(() => {
         Redux.updateListChatTag(list);
@@ -488,8 +383,8 @@ export const useSocketChatTagBubble = () => {
         checkDisplayNotification();
     }, [listChatTags, myId]);
 
-    const seenMessage = (chatTagId: string) => {
-        socket.emit(SOCKET_EVENT.seenMessage, {myId, chatTagId});
+    const seenMessage = (conversationId: string) => {
+        socket.emit(SOCKET_EVENT.seenMessage, {myId, conversationId});
     };
 
     return {
@@ -500,6 +395,17 @@ export const useSocketChatTagBubble = () => {
         setListChatTags: setList,
         seenMessage,
     };
+};
+
+/**
+ * Chat detail
+ */
+const deleteMessage = async (idMessage: string) => {
+    try {
+        await apiDeleteMessage(idMessage);
+    } catch (err) {
+        appAlert(err);
+    }
 };
 
 export const useSocketChatDetail = (params: {
@@ -520,10 +426,10 @@ export const useSocketChatDetail = (params: {
     const hearingSocket = () => {
         socket?.off(SOCKET_EVENT.message);
         socket.on(SOCKET_EVENT.message, (data: TypeChatMessageResponse) => {
-            if (data.chatTag === chatTagFocusing) {
+            if (data.conversationId === chatTagFocusing) {
                 // if senderId is me
                 // only need remove the tag of message local before
-                if (data.senderId === myId) {
+                if (data.creator === myId) {
                     setList(
                         (previousMessages: Array<TypeChatMessageResponse>) => {
                             const temp = previousMessages.map(item => {
@@ -539,16 +445,20 @@ export const useSocketChatDetail = (params: {
                             return temp;
                         },
                     );
-                    if (params.isMyChatTag) {
-                        socket.emit(SOCKET_EVENT.seenMessage, {
-                            myId,
-                            chatTagId: data.chatTag,
-                        });
-                    }
+                    socket.emit(SOCKET_EVENT.seenMessage, {
+                        myId,
+                        conversationId: data.conversationId,
+                    });
+                    // if (params.isMyChatTag) {
+                    //     socket.emit(SOCKET_EVENT.seenMessage, {
+                    //         myId,
+                    //         conversationId: data.conversationId,
+                    //     });
+                    // }
                 }
 
                 // if senderId not me, set messages
-                else if (data.senderId !== myId) {
+                else if (data.creator !== myId) {
                     setList(
                         (previousMessages: Array<TypeChatMessageResponse>) => {
                             const temp: TypeChatMessageResponse = {
@@ -561,7 +471,7 @@ export const useSocketChatDetail = (params: {
                     );
                     socket.emit(SOCKET_EVENT.seenMessage, {
                         myId,
-                        chatTagId: data.chatTag,
+                        conversationId: data.conversationId,
                     });
                 }
             }
@@ -571,28 +481,24 @@ export const useSocketChatDetail = (params: {
                 (previousChatTags: Array<TypeChatTagResponse>) => {
                     let indexNeedToReorder = 0;
                     const temp = previousChatTags.map((item, index) => {
-                        if (item.id !== data.chatTag) {
+                        if (item.id !== data.conversationId) {
                             return item;
                         }
-                        let updateItem = item;
-                        // if message received, you're not in it's chat tag
-                        // set your status isLatest = false
-                        if (item.id !== chatTagFocusing) {
-                            updateItem = {
-                                ...item,
-                                userSeenMessage: {
-                                    ...item.userSeenMessage,
-                                    [String(myId)]: {
-                                        ...item.userSeenMessage[String(myId)],
-                                        isLatest: false,
-                                    },
-                                },
-                            };
-                        }
+                        const latestMessage =
+                            typeof data.content === 'string'
+                                ? data.content
+                                : 'Image';
                         indexNeedToReorder = index;
                         return {
-                            ...updateItem,
-                            updateTime: new Date(),
+                            ...item,
+                            modified: data.created,
+                            latestMessage,
+                            userData: {
+                                ...item.userData,
+                                [String(myId)]: {
+                                    modified: data.created,
+                                },
+                            },
                         };
                     });
 
@@ -608,7 +514,7 @@ export const useSocketChatDetail = (params: {
         socket.on(
             SOCKET_EVENT.deleteMessage,
             (data: TypeDeleteMessageResponse) => {
-                if (data.chatTagId === chatTagFocusing) {
+                if (data.conversationId === chatTagFocusing) {
                     setList(
                         (previousMessages: Array<TypeChatMessageResponse>) => {
                             return previousMessages.filter(
@@ -626,15 +532,15 @@ export const useSocketChatDetail = (params: {
     }, [chatTagFocusing, myId]);
 
     const sendMessage = async (_params: TypeChatMessageSend) => {
-        const newMessage: any = {
+        const newMessage: TypeChatMessageResponse = {
             id: _params.tag,
-            chatTag: _params.chatTag,
+            conversationId: _params.conversationId,
             type: _params.type,
             content: _params.content,
-            senderId: _params.senderId,
-            senderName: _params.senderName,
-            senderAvatar: _params.senderAvatar,
-            createdTime: _params.tag,
+            creator: _params.creator,
+            creatorName: _params.creatorName,
+            creatorAvatar: _params.creatorAvatar,
+            created: String(new Date()),
             tag: _params.tag,
             relationship: RELATIONSHIP.self,
         };
@@ -656,24 +562,6 @@ export const useSocketChatDetail = (params: {
             }
         } else {
             socket.emit(SOCKET_EVENT.message, _params);
-        }
-    };
-
-    const deleteMessage = async (idMessage: string) => {
-        try {
-            await apiDeleteMessage({
-                chatTagId: chatTagFocusing,
-                messageId: idMessage,
-            });
-            setList((previousMessage: Array<TypeChatMessageResponse>) => {
-                return previousMessage.filter(item => item.id !== idMessage);
-            });
-            socket.emit(SOCKET_EVENT.deleteMessage, {
-                chatTagId: chatTagFocusing,
-                messageId: idMessage,
-            });
-        } catch (err) {
-            appAlert(err);
         }
     };
 
@@ -817,54 +705,6 @@ export const startChatTag = (params: {
     socket.emit(SOCKET_EVENT.createChatTag, params);
 };
 
-export const requestPublicChat = (chatTagId: string) => {
-    socket.emit(SOCKET_EVENT.requestPublicChat, chatTagId);
-};
-export const agreePublicChat = (chatTagId: string) => {
-    const reduxToken = FindmeStore.getState().logicSlice.token;
-    socket.emit(SOCKET_EVENT.agreePublicChat, {token: reduxToken, chatTagId});
-};
-
-export const blockAllChatTag = (params: {
-    listUserId: Array<number>;
-    listChatTagId: Array<string>;
-}) => {
-    socket.emit(SOCKET_EVENT.isBlocked, params);
-};
-export const unBlockAllChatTag = (params: {
-    listUserId: Array<number>;
-    listChatTagId: Array<string>;
-}) => {
-    socket.emit(SOCKET_EVENT.unBlocked, params);
-};
-
-export const stopChatTag = (chatTagId: string) => {
-    socket.emit(SOCKET_EVENT.stopConversation, chatTagId);
-};
-export const openChatTag = (chatTagId: string) => {
-    socket.emit(SOCKET_EVENT.openConversation, chatTagId);
-};
-
-export const changeGroupName = (params: {
-    chatTagId: string;
-    newName: string;
-}) => {
-    socket.emit(SOCKET_EVENT.changeGroupName, {
-        token: FindmeStore.getState().logicSlice.token,
-        ...params,
-    });
-};
-
-export const changeChatTheme = (params: {
-    newColor: number;
-    chatTagId: string;
-}) => {
-    socket.emit(SOCKET_EVENT.changeChatColor, {
-        token: FindmeStore.getState().logicSlice.token,
-        ...params,
-    });
-};
-
 export const socketTyping = (params: TypingResponse) => {
     socket.emit(SOCKET_EVENT.typing, params);
 };
@@ -874,13 +714,6 @@ export const socketUnTyping = (params: TypingResponse) => {
 
 export const socketAddComment = (params: TypeAddCommentRequest) => {
     socket.emit(SOCKET_EVENT.addComment, params);
-};
-
-export const socketJoinCommunity = (params: TypeJoinCommunityRequest) => {
-    socket.emit(SOCKET_EVENT.joinCommunity, {
-        token: FindmeStore.getState().logicSlice.token,
-        profilePostGroupId: params.profilePostGroupId,
-    });
 };
 
 export const socketJoinRoom = (roomId: string) => {
@@ -893,4 +726,44 @@ export const socketLeaveRoom = (roomId: string) => {
 
 export const closeSocket = () => {
     SocketClass.close();
+};
+
+// socket?.off(SOCKET_EVENT.joinCommunity);
+// socket.on(SOCKET_EVENT.joinCommunity, (chatTagId: string) => {
+//     Redux.setChatTagFromNotification(chatTagId);
+// });
+
+// socket?.off(SOCKET_EVENT.hadNewUserJoinCommunity);
+// socket.on(
+//     SOCKET_EVENT.hadNewUserJoinCommunity,
+//     async (chatTagId: string) => {
+//         const res = await apiGetDetailChatTag(chatTagId);
+//         setList((previousChatTags: Array<TypeChatTagResponse>) => {
+//             const check = previousChatTags.find(
+//                 item => item.id === chatTagId,
+//             );
+//             if (check) {
+//                 let indexNeedToReorder = 0;
+//                 const temp = previousChatTags.map((item, index) => {
+//                     if (item.id !== chatTagId) {
+//                         return item;
+//                     }
+//                     indexNeedToReorder = index;
+//                     return res.data;
+//                 });
+//                 if (indexNeedToReorder > 0) {
+//                     return reorderListChatTag(temp, indexNeedToReorder);
+//                 }
+//                 return temp;
+//             }
+//             return [res.data].concat(previousChatTags);
+//         });
+//     },
+// );
+
+export const socketJoinCommunity = (params: TypeJoinCommunityRequest) => {
+    socket.emit(SOCKET_EVENT.joinCommunity, {
+        token: FindmeStore.getState().logicSlice.token,
+        profilePostGroupId: params.profilePostGroupId,
+    });
 };

@@ -57,3 +57,26 @@ export const formatDateMessage = (date: string | Date) => {
     }
     return dayjs(date).locale('en').format('MMM DD, HH:mm');
 };
+
+export const isTimeBefore = (day1: Date | string, day2: Date | string) => {
+    return dayjs(day1).isBefore(day2);
+};
+
+export const isTimeAfter = (day1: Date | string, day2: Date | string) => {
+    return dayjs(day1).isAfter(day2);
+};
+
+export const isTimeEqual = (day1: Date | string, day2: Date | string) => {
+    return dayjs(day1).isSame(day2);
+};
+
+export const formDateMessage = (date: Date | string) => {
+    if (dayjs(date).isToday()) {
+        return dayjs(date).locale('en').format('HH:mm');
+    }
+    const now = dayjs();
+    if (now.isSame(date, 'week')) {
+        return dayjs(date).format('ddd');
+    }
+    return dayjs(date).format('DD MMM');
+};

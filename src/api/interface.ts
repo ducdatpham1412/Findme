@@ -316,81 +316,66 @@ export interface TypeMemberInListChatTag {
     gender: number;
 }
 export interface TypeChatTagResponse {
-    id: any;
+    id: string;
     listUser: Array<TypeMemberInListChatTag>;
-    groupName: string;
-    image?: string;
-    isPrivate: boolean;
-    isStop: boolean;
-    isBlock: boolean;
-    userSeenMessage: {
+    conversationName: string;
+    conversationImage: string;
+    userData: {
         [key: string]: {
-            latestMessage: string;
-            isLatest: boolean;
+            created: string;
+            modified: string;
         };
     };
-    type: number;
-    updateTime: Date;
     color: number;
-    // append in front-end
-    isRequestingPublic?: boolean;
-    hadRequestedPublic?: boolean;
+    modified: string;
+    status: number;
+    isBlocked: number;
+    latestMessage: string;
+    // in front-end
     userTyping?: Array<number>;
 }
 
-export interface TypeChatTagEnjoyResponse {
-    newChatTag: TypeChatTagResponse;
-    newMessage: TypeChatMessageResponse;
-}
-
 export interface TypeChatMessageSend {
-    chatTag: number;
-    groupName: string;
+    conversationId: string;
     type: number;
     content: string | Array<string>;
-    senderId: number;
-    senderName: string;
-    senderAvatar: string;
-    listUser: Array<number>;
-    tag: string; // to check message comeback sender after set local message, string Date
+    creator: number;
+    creatorName: string;
+    creatorAvatar: string;
+    tag: string;
+    // tag to check message comeback sender after set local message, string Date
 }
 
 export interface TypeChatMessageResponse {
     id: string;
-    chatTag: any;
+    conversationId: string;
     type: number;
-    content: string & Array<string>;
-    senderId: number;
-    senderAvatar: string;
-    senderName: string;
-    createdTime: string;
+    content: string | Array<string>;
+    creator: number;
+    creatorName: string;
+    creatorAvatar: string;
+    created: string;
     tag?: string | undefined; // to check message comeback sender after set local message
     // in front-end
     relationship: number;
 }
 
 export interface TypeChangeGroupNameResponse {
-    chatTagId: string;
-    newName: string;
+    conversationId: string;
+    name: string;
 }
 
 export interface TypeChangeChatColor {
-    chatTagId: string;
-    newColor: number;
-}
-
-export interface TypeDeleteMessageRequest {
-    chatTagId: string;
-    messageId: string;
+    conversationId: string;
+    color: number;
 }
 
 // seen message
 export interface TypeSeenMessageResponse {
-    chatTagId: string;
+    conversationId: string;
     data: {
         [key: string]: {
-            latestMessage: string;
-            isLatest: boolean;
+            modified: string;
         };
     };
 }
@@ -427,12 +412,12 @@ export interface TypeReportUserRequest {
 }
 
 export interface TypeDeleteMessageResponse {
-    chatTagId: string;
+    conversationId: string;
     messageId: string;
 }
 
 export interface TypingResponse {
-    chatTagId: string;
+    conversationId: string;
     userId: number;
 }
 

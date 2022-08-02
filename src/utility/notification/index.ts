@@ -17,12 +17,14 @@ const deleteTagMember = () => {
 const onMoveNavigation = (data: any) => {
     switch (data.type) {
         case TYPE_NOTIFICATION.newChatTag:
-            // navigate(MAIN_SCREEN.profileRoute);
-            Redux.setChatTagFromNotification(data.chatTagId);
+            if (data.conversationId) {
+                Redux.setChatTagFromNotification(data.conversationId);
+            }
             break;
         case TYPE_NOTIFICATION.message:
-            // navigate(MESS_ROUTE.messScreen);
-            Redux.setChatTagFromNotification(data.chatTagId);
+            if (data.conversationId) {
+                Redux.setChatTagFromNotification(data.conversationId);
+            }
             break;
         case TYPE_NOTIFICATION.likePost:
             navigate(ROOT_SCREEN.detailBubble, {

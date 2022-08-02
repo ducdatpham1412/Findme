@@ -1,40 +1,24 @@
 import {useIsFocused} from '@react-navigation/native';
 import {TypeChatMessageResponse, TypeChatTagResponse} from 'api/interface';
-import {MESSAGE_TYPE} from 'asset/enum';
+import {CONVERSATION_STATUS, MESSAGE_TYPE} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
-import {
-    StyleIcon,
-    StyleImage,
-    StyleText,
-    StyleTouchable,
-} from 'components/base';
+import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import StyleKeyboardAwareView from 'components/StyleKeyboardAwareView';
 import ModalPickImage from 'feature/mess/components/ModalPickImage';
 import Redux from 'hook/useRedux';
-import {
-    agreePublicChat,
-    requestPublicChat,
-    socketUnTyping,
-    useSocketChatDetail,
-} from 'hook/useSocketIO';
+import {socketUnTyping, useSocketChatDetail} from 'hook/useSocketIO';
 import Header from 'navigation/components/Header';
 import {MESS_ROUTE} from 'navigation/config/routes';
-import {
-    appAlertYesNo,
-    goBack,
-    navigate,
-    showSwipeImages,
-} from 'navigation/NavigationService';
+import {goBack, navigate, showSwipeImages} from 'navigation/NavigationService';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {FlatList, Keyboard, TextInput, View} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
 import {chooseColorGradient, isIOS} from 'utility/assistant';
-import HeaderRequestPublic from './components/HeaderRequestPublic';
 import ItemMessage from './components/ItemMessage';
 import Typing from './components/Typing';
 import UserInput from './components/UserInput';
@@ -47,12 +31,74 @@ interface ChatDetailProps {
         };
     };
 }
+
+export interface TypeSeeDetailImage {
+    listImages: Array<any>;
+    index: number;
+    inputRef?: any;
+}
+
 const initHeightModal = ((Metrics.width - 6) * 2) / 3;
+
+const onGoBack = () => {
+    Redux.setChatTagFocusing('');
+    goBack();
+};
+
+const onSeeDetailImage = (params: TypeSeeDetailImage) => {
+    const {listImages, index, inputRef} = params;
+    if (inputRef.current?.isFocused() && !isIOS) {
+        Keyboard.dismiss();
+        const x = setTimeout(() => {
+            showSwipeImages({
+                listImages,
+                initIndex: index,
+            });
+        }, 100);
+        return () => clearTimeout(x);
+    }
+
+    showSwipeImages({
+        listImages,
+        initIndex: index,
+    });
+    return () => null;
+};
+
+const RenderItemMessage = (params: {
+    item: TypeChatMessageResponse;
+    index: number;
+    messages: Array<TypeChatMessageResponse>;
+    deleteMessage(idMessage: string): Promise<void>;
+    chatColor: Array<string>;
+    inputRef: any;
+}) => {
+    const {item, index, messages, deleteMessage, chatColor, inputRef} = params;
+    const isSameMessageAfter =
+        messages?.[index + 1]?.relationship === item.relationship;
+    const displayPartnerAvatar =
+        messages[index - 1]?.relationship !== item.relationship;
+    const displaySeenAvatar = true;
+
+    return (
+        <ItemMessage
+            itemMessage={item}
+            isSameMessageAfter={isSameMessageAfter}
+            displayPartnerAvatar={displayPartnerAvatar}
+            displaySeenAvatar={displaySeenAvatar}
+            onDeleteMessage={deleteMessage}
+            // listMessagesLength={messages.length}
+            chatColor={chatColor}
+            onSeeDetailImage={(paramsDetail: any) =>
+                onSeeDetailImage({...paramsDetail, inputRef})
+            }
+        />
+    );
+};
 
 const ChatDetail = ({route}: ChatDetailProps) => {
     const {profile} = Redux.getPassport();
     const theme = Redux.getTheme();
-    const isModeExp = Redux.getModeExp();
     const listChatTag = Redux.getListChatTag();
     const numberNewMessages = Redux.getNumberNewMessages();
     const {gradient} = Redux.getResource();
@@ -62,7 +108,6 @@ const ChatDetail = ({route}: ChatDetailProps) => {
     const inputRef = useRef<TextInput>(null);
     const isFocused = useIsFocused();
 
-    const [shouldNotiShh, setShouldNotiShh] = useState(false);
     const [displayPickImg, setDisplayPickImg] = useState(false);
     const [modalPickImgHeight, setModalPickImgHeight] =
         useState(initHeightModal);
@@ -114,71 +159,21 @@ const ChatDetail = ({route}: ChatDetailProps) => {
     }, [itemChatTag.color]);
 
     /**
-     * Agree, refuse request public
-     */
-    const onAgreeRequestPublic = () => {
-        goBack();
-        agreePublicChat(itemChatTag.id);
-        setItemChatTag({
-            ...itemChatTag,
-            isRequestingPublic: true,
-            hadRequestedPublic: true,
-        });
-    };
-
-    const onRefuseRequestPublic = () => {
-        const temp = listChatTag.map(item => {
-            if (item.id !== itemChatTag.id) {
-                return item;
-            }
-            return {
-                ...item,
-                isRequestingPublic: false,
-            };
-        });
-        route.params.setListChatTags(temp);
-        goBack();
-    };
-
-    /**
      * Effect
      */
     useEffect(() => {
         for (let i = 0; i < listChatTag.length; i++) {
             const temp = listChatTag[i];
             if (temp.id === itemChatTag.id) {
-                if (temp.isRequestingPublic) {
-                    setItemChatTag(temp);
-                    setShouldNotiShh(true);
-                } else {
-                    setItemChatTag(temp);
-                    setShouldNotiShh(false);
-                }
-                break;
+                setItemChatTag(temp);
             }
         }
     }, [listChatTag]);
 
-    // when having socket request public
-    useEffect(() => {
-        if (shouldNotiShh) {
-            appAlertYesNo({
-                i18Title: 'mess.messScreen.requestPublic',
-                agreeChange: onAgreeRequestPublic,
-                refuseChange: onRefuseRequestPublic,
-                headerNode: <HeaderRequestPublic itemChatTag={itemChatTag} />,
-                touchOutBack: false,
-            });
-        }
-        // else {
-        //     setItemChatTag({...itemChatTag, isRequestingPublic: false});
-        // }
-    }, [shouldNotiShh]);
-
     useEffect(() => {
         if (!isFocused) {
             socketUnTyping({
-                chatTagId: itemChatTag.id,
+                conversationId: itemChatTag.id,
                 userId: profile.id,
             });
         }
@@ -188,72 +183,35 @@ const ChatDetail = ({route}: ChatDetailProps) => {
      * Send message
      */
     const onSend = async () => {
-        const senderName = itemChatTag.isPrivate
-            ? profile.anonymousName
-            : profile.name;
-        if (profile?.id) {
-            // send images
-            if (images.length) {
-                setImages([]);
-                await sendMessage({
-                    chatTag: itemChatTag.id,
-                    groupName: itemChatTag.groupName,
-                    type: MESSAGE_TYPE.image,
-                    content: images,
-                    senderId: profile.id,
-                    senderName,
-                    senderAvatar: myAvatar,
-                    listUser: itemChatTag.listUser.map(item => item.id),
-                    tag: String(Date.now()),
-                });
-            }
+        // send text
+        if (content) {
+            setContent('');
+            await sendMessage({
+                conversationId: itemChatTag.id,
+                type: MESSAGE_TYPE.text,
+                content: content.trimEnd(),
+                creator: profile.id,
+                creatorName: profile.name,
+                creatorAvatar: myAvatar,
+                tag: String(Date.now()),
+            });
+        }
 
-            // send text
-            if (content) {
-                setContent('');
-                await sendMessage({
-                    chatTag: itemChatTag.id,
-                    groupName: itemChatTag.groupName,
-                    type: MESSAGE_TYPE.text,
-                    content: content.trimEnd(),
-                    senderId: profile.id,
-                    senderName,
-                    senderAvatar: myAvatar,
-                    listUser: itemChatTag.listUser.map(item => item.id),
-                    tag: String(Date.now()),
-                });
-            }
+        // send images
+        if (images.length) {
+            setImages([]);
+            await sendMessage({
+                conversationId: itemChatTag.id,
+                type: MESSAGE_TYPE.image,
+                content: images,
+                creator: profile.id,
+                creatorName: profile.name,
+                creatorAvatar: myAvatar,
+                tag: String(Date.now()),
+            });
         }
 
         listRef.current?.scrollToOffset({offset: 0});
-    };
-
-    /**
-     * Request public Shh
-     */
-    const onRequestPublic = () => {
-        if (
-            !isModeExp &&
-            itemChatTag.isPrivate &&
-            !itemChatTag.isStop &&
-            !itemChatTag.isBlock
-        ) {
-            if (!itemChatTag.isRequestingPublic) {
-                requestPublicChat(itemChatTag.id);
-            } else {
-                appAlertYesNo({
-                    i18Title: itemChatTag?.hadRequestedPublic
-                        ? 'mess.messScreen.waitingOther'
-                        : 'mess.messScreen.requestPublic',
-                    agreeChange: onAgreeRequestPublic,
-                    refuseChange: onRefuseRequestPublic,
-                    headerNode: (
-                        <HeaderRequestPublic itemChatTag={itemChatTag} />
-                    ),
-                    displayButton: !itemChatTag?.hadRequestedPublic,
-                });
-            }
-        }
     };
 
     /**
@@ -271,36 +229,18 @@ const ChatDetail = ({route}: ChatDetailProps) => {
         setImages(temp);
     };
 
-    const onGoBack = () => {
-        Redux.setChatTagFocusing('');
-        goBack();
-    };
-
-    const onSeeDetailImage = (listImages: Array<any>, index: number) => {
-        if (inputRef.current?.isFocused() && !isIOS) {
-            Keyboard.dismiss();
-            const x = setTimeout(() => {
-                showSwipeImages({
-                    listImages,
-                    initIndex: index,
-                    allowSaveImage: !itemChatTag.isPrivate,
-                });
-            }, 100);
-            return () => clearTimeout(x);
-        }
-
-        showSwipeImages({
-            listImages,
-            initIndex: index,
-            allowSaveImage: !itemChatTag.isPrivate,
-        });
-        return () => null;
-    };
-
     /**
      * Render view
      */
     const RenderHeader = () => {
+        let name = itemChatTag.conversationName;
+        if (!name) {
+            const partnerInfo = itemChatTag.listUser.find(
+                userInfo => userInfo.id !== profile.id,
+            );
+            name = partnerInfo?.name || '';
+        }
+
         const headerLeft = () => {
             return (
                 <View style={styles.headerLeftBox}>
@@ -327,32 +267,6 @@ const ChatDetail = ({route}: ChatDetailProps) => {
             );
         };
 
-        const headerShh = () => {
-            if (!itemChatTag.isPrivate) {
-                // return (
-                //     <AntDesign
-                //         name="team"
-                //         style={{
-                //             fontSize: moderateScale(17),
-                //             color: borderMessRoute,
-                //         }}
-                //     />
-                // );
-                return null;
-            }
-            return (
-                <StyleIcon
-                    source={Images.icons.shh}
-                    size={30}
-                    customStyle={{
-                        tintColor: itemChatTag?.isRequestingPublic
-                            ? theme.highlightColor
-                            : borderMessRoute,
-                    }}
-                />
-            );
-        };
-
         const headerOption = () => {
             return (
                 <AntDesign
@@ -362,22 +276,12 @@ const ChatDetail = ({route}: ChatDetailProps) => {
             );
         };
 
-        // const HeaderBoxCloud = useMemo(() => {
-        //     return (
-        //         <Feather
-        //             name="cloud-snow"
-        //             style={[styles.iconCloud, {color: theme.textColor}]}
-        //         />
-        //     );
-        // }, []);
-
         return (
             <Header
-                headerTitle={itemChatTag.groupName}
+                headerTitle={name}
+                headerTitleMission={onNavigateToMessSetting}
                 headerLeft={headerLeft()}
                 headerLeftMission={onGoBack}
-                headerRight2={headerShh()}
-                headerRight2Mission={onRequestPublic}
                 headerRight3={headerOption()}
                 headerRight3Mission={onNavigateToMessSetting}
                 containerStyle={{
@@ -387,33 +291,6 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                 headerTitleStyle={{
                     color: borderMessRoute,
                 }}
-            />
-        );
-    };
-
-    const RenderItemMessage = (params: {
-        item: TypeChatMessageResponse;
-        index: number;
-    }) => {
-        const {item, index} = params;
-        const isSameMessageAfter =
-            messages?.[index + 1]?.relationship === item.relationship;
-        const displayPartnerAvatar =
-            messages[index - 1]?.relationship !== item.relationship;
-        const displayMeAvatar =
-            item.id ===
-            itemChatTag.userSeenMessage[String(partnerId)].latestMessage;
-
-        return (
-            <ItemMessage
-                itemMessage={item}
-                isSameMessageAfter={isSameMessageAfter}
-                displayPartnerAvatar={displayPartnerAvatar}
-                displayMeAvatar={displayMeAvatar}
-                onDeleteMessage={deleteMessage}
-                listMessagesLength={messages.length}
-                chatColor={chatColor}
-                onSeeDetailImage={onSeeDetailImage}
             />
         );
     };
@@ -453,7 +330,16 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                 <StyleList
                     ref={listRef}
                     data={messages}
-                    renderItem={RenderItemMessage}
+                    renderItem={({item, index}: any) =>
+                        RenderItemMessage({
+                            item,
+                            index,
+                            inputRef,
+                            messages,
+                            deleteMessage,
+                            chatColor,
+                        })
+                    }
                     contentContainerStyle={styles.contentContainer}
                     inverted
                     keyExtractor={item => item.id}
@@ -466,7 +352,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
         );
     };
 
-    const RenderImagePreview = useMemo(() => {
+    const RenderImagePreview = () => {
         if (images.length) {
             return (
                 <View style={styles.twoImageInput}>
@@ -502,10 +388,11 @@ const ChatDetail = ({route}: ChatDetailProps) => {
             );
         }
         return null;
-    }, [images]);
+    };
 
-    const RenderStopOrBlock = useMemo(() => {
-        if (itemChatTag.isStop || itemChatTag.isBlock) {
+    const RenderInput = () => {
+        const isStopped = itemChatTag.status === CONVERSATION_STATUS.stop;
+        if (isStopped || itemChatTag.isBlocked) {
             return (
                 <View style={styles.blockView}>
                     <StyleImage
@@ -515,10 +402,22 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                 </View>
             );
         }
-        return null;
-    }, [itemChatTag.isStop, itemChatTag.isBlock]);
 
-    const RenderPickImage = useMemo(() => {
+        return (
+            <UserInput
+                ref={inputRef}
+                text={content}
+                setText={(text: string) => setContent(text)}
+                onSendMessage={onSend}
+                images={images}
+                setImages={setImages}
+                displayPickImg={displayPickImg}
+                setDisplayPickImg={setDisplayPickImg}
+            />
+        );
+    };
+
+    const RenderPickImage = () => {
         if (displayPickImg) {
             return (
                 <ModalPickImage
@@ -532,7 +431,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
             );
         }
         return null;
-    }, [displayPickImg, images, modalPickImgHeight]);
+    };
 
     return (
         <>
@@ -543,23 +442,11 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                 }>
                 {RenderHeader()}
                 {RenderListMessage()}
-                {RenderImagePreview}
-                {RenderStopOrBlock}
-                {!(itemChatTag.isStop || itemChatTag.isBlock) && (
-                    <UserInput
-                        ref={inputRef}
-                        text={content}
-                        setText={(text: string) => setContent(text)}
-                        onSendMessage={onSend}
-                        images={images}
-                        setImages={setImages}
-                        displayPickImg={displayPickImg}
-                        setDisplayPickImg={setDisplayPickImg}
-                    />
-                )}
+                {RenderImagePreview()}
+                {RenderInput()}
             </StyleKeyboardAwareView>
 
-            {RenderPickImage}
+            {RenderPickImage()}
         </>
     );
 };

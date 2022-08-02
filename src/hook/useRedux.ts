@@ -1,8 +1,5 @@
-import {
-    TypeBubblePalace,
-    TypeBubblePalaceAction,
-    TypeChatTagResponse,
-} from 'api/interface';
+/* eslint-disable react-hooks/rules-of-hooks */
+import {TypeBubblePalaceAction, TypeChatTagResponse} from 'api/interface';
 import {
     accountSliceAction,
     initialAccountState,
@@ -209,8 +206,7 @@ export const Redux = {
     },
 
     getThemeKeyboard: () => {
-        const theme =
-            FindmeStore.getState().accountSlice.passport.setting.theme;
+        const {theme} = FindmeStore.getState().accountSlice.passport.setting;
         return theme === THEME_TYPE.darkTheme ? 'dark' : 'light';
     },
 
@@ -257,7 +253,7 @@ export const Redux = {
     },
 
     logOut: () => {
-        const passport = initialAccountState.passport;
+        const {passport} = initialAccountState;
 
         // Set modeExp can not set here, cuz it make row choose socket
         // of MessScreen render again while it's unmounting -> CRASH APP

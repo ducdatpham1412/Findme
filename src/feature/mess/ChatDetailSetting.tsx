@@ -15,14 +15,6 @@ import {
 } from 'components/base';
 import FlyButton from 'components/common/FlyButton';
 import Redux from 'hook/useRedux';
-import {
-    blockAllChatTag,
-    changeChatTheme,
-    changeGroupName,
-    openChatTag,
-    stopChatTag,
-    unBlockAllChatTag,
-} from 'hook/useSocketIO';
 import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
 import ROOT_SCREEN, {MAIN_SCREEN} from 'navigation/config/routes';
 import {
@@ -53,7 +45,6 @@ const ChatDetailSetting = ({route}: Props) => {
 
     const shouldRenderOtherProfile = Redux.getShouldRenderOtherProfile();
     const borderMessRoute = Redux.getBorderMessRoute();
-    const chatTagFocusing = Redux.getChatTagFocusing();
     const theme = Redux.getTheme();
     const {id} = Redux.getPassport().profile;
 
@@ -78,42 +69,11 @@ const ChatDetailSetting = ({route}: Props) => {
      * Function
      */
     const onPressIconEditName = () => {
-        const agreeChangeName = async () => {
-            try {
-                changeGroupName({
-                    chatTagId: itemChatTag.id,
-                    newName: groupName,
-                });
-                goBack();
-                goBack();
-            } catch (err) {
-                appAlert(err);
-            }
-        };
-        const refuseChangeName = () => {
-            setGroupName(itemChatTag.groupName);
-            goBack();
-        };
-
-        if (!inputGroupNameRef.current?.isFocused() && !canChangeName) {
-            inputGroupNameRef.current?.focus();
-        } else if (!canChangeName) {
-            return;
-        } else {
-            inputGroupNameRef.current?.blur();
-            appAlertYesNo({
-                i18Title: 'alert.wantToChange',
-                agreeChange: agreeChangeName,
-                refuseChange: refuseChangeName,
-            });
-        }
+        // go to new screen edit name
     };
 
     const onChangeChatTheme = (newColor: number) => {
-        changeChatTheme({
-            newColor,
-            chatTagId: chatTagFocusing,
-        });
+        // call api change chat theme
         setItemChatTag((preValue: TypeChatTagResponse) => ({
             ...preValue,
             color: newColor,
@@ -134,13 +94,7 @@ const ChatDetailSetting = ({route}: Props) => {
         const agreeBlock = async () => {
             try {
                 goBack();
-                const listChatTagsBlock = await apiBlockUser(
-                    listMembers[0]?.id,
-                );
-                blockAllChatTag({
-                    listUserId: listMembers.map(item => item.id),
-                    listChatTagId: listChatTagsBlock.data,
-                });
+                await apiBlockUser(listMembers[0]?.id);
                 Redux.setShouldRenderOtherProfile(!shouldRenderOtherProfile);
                 setItemChatTag({
                     ...itemChatTag,
@@ -153,13 +107,7 @@ const ChatDetailSetting = ({route}: Props) => {
 
         try {
             if (itemChatTag.isBlock) {
-                const listChatTagsOpen = await apiUnBlockUser(
-                    listMembers[0].id,
-                );
-                unBlockAllChatTag({
-                    listUserId: listMembers.map(item => item.id),
-                    listChatTagId: listChatTagsOpen.data,
-                });
+                await apiUnBlockUser(listMembers[0].id);
                 Redux.setShouldRenderOtherProfile(!shouldRenderOtherProfile);
                 setItemChatTag({
                     ...itemChatTag,
@@ -181,14 +129,14 @@ const ChatDetailSetting = ({route}: Props) => {
         try {
             if (itemChatTag.isStop) {
                 await apiOpenConversation(itemChatTag.id);
-                openChatTag(itemChatTag.id);
+                // openChatTag(itemChatTag.id);  // remove this
                 setItemChatTag({
                     ...itemChatTag,
                     isStop: false,
                 });
             } else {
                 await apiStopConversation(itemChatTag.id);
-                stopChatTag(itemChatTag.id);
+                // stopChatTag(itemChatTag.id); // remove this
                 setItemChatTag({
                     ...itemChatTag,
                     isStop: true,
@@ -212,9 +160,9 @@ const ChatDetailSetting = ({route}: Props) => {
                 goBack();
             }, 100);
             return () => clearTimeout(x);
-        } else {
-            goBack();
         }
+        goBack();
+        return () => null;
     };
 
     /**
@@ -329,6 +277,7 @@ const ChatDetailSetting = ({route}: Props) => {
                             : theme.borderColor;
                     return (
                         <StyleTouchable
+                            key={String(item.id)}
                             customStyle={styles.memberBox}
                             onPress={() => onGoToProfile(item.id)}
                             disable={itemChatTag.isPrivate}

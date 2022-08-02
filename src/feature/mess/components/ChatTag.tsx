@@ -1,17 +1,11 @@
 import {TypeChatTagResponse} from 'api/interface';
-import {CHAT_TAG} from 'asset/enum';
-import Images from 'asset/img/images';
-import {
-    StyleIcon,
-    StyleImage,
-    StyleText,
-    StyleTouchable,
-} from 'components/base';
+import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import React, {memo} from 'react';
-import {Platform, View} from 'react-native';
-import {scale, ScaledSheet} from 'react-native-size-matters';
 import isEqual from 'react-fast-compare';
+import {Platform, View} from 'react-native';
+import {ScaledSheet} from 'react-native-size-matters';
+import {formDateMessage, isTimeBefore} from 'utility/format';
 
 interface Props {
     item: TypeChatTagResponse;
@@ -23,87 +17,111 @@ const ChatTag = (props: Props) => {
     const theme = Redux.getTheme();
     const myId = Redux.getPassport().profile?.id;
 
-    const isRequest = !!item?.isRequestingPublic;
-    const haveSeenLatestMessage = item.userSeenMessage[String(myId)]?.isLatest;
+    const hadNew = isTimeBefore(
+        item.userData?.[String(myId)].modified,
+        item.modified,
+    );
 
-    const RenderImageChatTag = () => {
+    const RenderImage = () => {
         const chooseLink = () => {
-            if (item.type !== CHAT_TAG.group) {
-                let temp = item.listUser[0].avatar;
-                for (let i = 0; i < item.listUser.length; i++) {
-                    if (item.listUser[i].id !== myId) {
-                        temp = item.listUser[i].avatar;
-                        break;
-                    }
-                }
-                return temp;
+            if (item.conversationImage) {
+                return item.conversationImage;
             }
-
-            return item?.image;
+            const partnerInfo = item.listUser.find(
+                userInfo => userInfo.id !== myId,
+            );
+            if (partnerInfo?.avatar) {
+                return partnerInfo.avatar;
+            }
+            const myInfo = item.listUser.find(userInfo => userInfo.id === myId);
+            return myInfo?.avatar || '';
         };
 
         return (
             <StyleImage
                 source={{uri: chooseLink()}}
-                customStyle={[
-                    styles.avatar,
-                    {
-                        borderColor: theme.highlightColor,
-                        borderWidth: haveSeenLatestMessage ? 0 : scale(3.5),
-                    },
-                ]}
+                customStyle={styles.avatar}
             />
         );
     };
 
     const RenderNameChatTag = () => {
-        let color = theme.textColor;
-        if (item.isRequestingPublic || !haveSeenLatestMessage) {
-            color = theme.highlightColor;
+        let name = item.conversationName;
+        if (!name) {
+            const partnerInfo = item.listUser.find(
+                userInfo => userInfo.id !== myId,
+            );
+            name = partnerInfo?.name || '';
         }
+
+        const color = hadNew ? theme.textHightLight : theme.textColor;
+        const fontWeight = hadNew ? 'bold' : 'normal';
+
         return (
             <View style={styles.nameBox}>
                 <StyleText
-                    originValue={item.groupName}
+                    originValue={name}
                     customStyle={[
                         styles.nameText,
                         {
                             color,
-                            fontWeight: haveSeenLatestMessage
-                                ? 'normal'
-                                : 'bold',
+                            fontWeight,
                         },
                     ]}
                     numberOfLines={1}
                 />
+
+                <View style={styles.latestMessageBox}>
+                    {!!item.latestMessage && (
+                        <StyleText
+                            originValue={item.latestMessage}
+                            customStyle={[
+                                styles.latestMessageText,
+                                {
+                                    color: theme.borderColor,
+                                },
+                            ]}
+                            numberOfLines={1}
+                        />
+                    )}
+                    <StyleText
+                        originValue={`・${formDateMessage(item.modified)}`}
+                        customStyle={[
+                            styles.textTime,
+                            {
+                                color: theme.borderColor,
+                            },
+                        ]}
+                        numberOfLines={1}
+                    />
+                </View>
             </View>
         );
     };
 
     const RenderStatus = () => {
-        if (item.userTyping && item.userTyping.length) {
+        if (hadNew) {
             return (
-                <StyleText
-                    i18Text="mess.typing"
-                    customStyle={[
-                        styles.textTyping,
-                        {color: theme.holderColor},
+                <View
+                    style={[
+                        styles.hadNewDot,
+                        {backgroundColor: theme.highlightColor},
                     ]}
                 />
             );
         }
 
-        if (item.isPrivate) {
+        if (item?.userTyping && item.userTyping.length) {
             return (
-                <StyleIcon
-                    source={Images.icons.shh}
-                    size={30}
-                    customStyle={{
-                        tintColor: isRequest
-                            ? theme.highlightColor
-                            : theme.borderColor,
-                    }}
-                />
+                <View style={styles.statusBox}>
+                    <StyleText
+                        i18Text="mess.typing"
+                        customStyle={[
+                            styles.textTyping,
+                            {color: theme.holderColor},
+                        ]}
+                    />
+                </View>
             );
         }
         return null;
@@ -118,11 +136,11 @@ const ChatTag = (props: Props) => {
                 },
             ]}
             onPress={() => onGoToChat(item)}>
-            {RenderImageChatTag()}
+            {RenderImage()}
 
             <View style={styles.contentPart}>
                 {RenderNameChatTag()}
-                <View style={styles.statusBox}>{RenderStatus()}</View>
+                {RenderStatus()}
             </View>
         </StyleTouchable>
     );
@@ -152,6 +170,7 @@ const styles = ScaledSheet.create({
         flex: 1,
         paddingHorizontal: '10@s',
         flexDirection: 'row',
+        alignItems: 'center',
     },
     nameBox: {
         flex: 1,
@@ -161,6 +180,20 @@ const styles = ScaledSheet.create({
     },
     nameText: {
         fontSize: '17@ms',
+    },
+    latestMessageBox: {
+        width: '100%',
+        marginTop: '4@vs',
+        flexDirection: 'row',
+        overflow: 'hidden',
+        alignItems: 'center',
+    },
+    latestMessageText: {
+        fontSize: '12.5@ms',
+        maxWidth: '70%',
+    },
+    textTime: {
+        fontSize: '11@ms',
     },
     statusBox: {
         width: '40@s',
@@ -174,6 +207,11 @@ const styles = ScaledSheet.create({
     },
     textTyping: {
         fontSize: '13@ms',
+    },
+    hadNewDot: {
+        width: '8@ms',
+        height: '8@ms',
+        borderRadius: '4@ms',
     },
 });
 
