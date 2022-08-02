@@ -143,19 +143,19 @@ export const apiGetListBubbleActiveOfUserEnjoy = ({
     });
 };
 
-export const apiGetListBubbleGroup = ({params}: TypeParamsPaging) => {
-    return request.get('/common/get-list-bubble-group', {
-        params,
-    });
-};
+// export const apiGetListBubbleGroup = ({params}: TypeParamsPaging) => {
+//     return request.get('/common/get-list-bubble-group', {
+//         params,
+//     });
+// };
 
-export const apiGetListBubbleGroupOfUserEnjoy = ({
-    params,
-}: TypeParamsPaging) => {
-    return request.get('/common/get-list-bubble-group-enjoy', {
-        params,
-    });
-};
+// export const apiGetListBubbleGroupOfUserEnjoy = ({
+//     params,
+// }: TypeParamsPaging) => {
+//     return request.get('/common/get-list-bubble-group-enjoy', {
+//         params,
+//     });
+// };
 
 export const apiGetDetailBubble = (
     idBubble: string,
@@ -322,12 +322,12 @@ export const apiCreateGroup = (
     return request.post('/profile/create-group', params);
 };
 
-export const apiGetListMyGroups = (): Promise<{
-    success: boolean;
-    data: Array<TypeCreateGroupResponse>;
-}> => {
-    return request.get('/profile/list-my-groups');
-};
+// export const apiGetListMyGroups = (): Promise<{
+//     success: boolean;
+//     data: Array<TypeCreateGroupResponse>;
+// }> => {
+//     return request.get('/profile/list-my-groups');
+// };
 
 export const apiDeletePost = (idPost: string) => {
     return request.put(`/profile/delete-post/${idPost}`);

@@ -56,7 +56,7 @@ const UserInput = (props: UserInputProps, inputRef: any) => {
 
     const stretchInput = useCallback(
         (isFocusing: boolean, effectWhenHaveText = false) => {
-            let temptFocus = effectWhenHaveText
+            const temptFocus = effectWhenHaveText
                 ? isFocusing
                 : isFocusing || text;
 
@@ -247,13 +247,13 @@ const UserInput = (props: UserInputProps, inputRef: any) => {
                     accessible
                     onFocus={() =>
                         socketTyping({
-                            chatTagId: chatTagFocusing,
+                            conversationId: chatTagFocusing,
                             userId: myId,
                         })
                     }
                     onBlur={() =>
                         socketUnTyping({
-                            chatTagId: chatTagFocusing,
+                            conversationId: chatTagFocusing,
                             userId: myId,
                         })
                     }

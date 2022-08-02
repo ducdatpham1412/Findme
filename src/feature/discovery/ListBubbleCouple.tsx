@@ -10,7 +10,6 @@ import {
 } from 'api/module';
 import FindmeStore from 'app-redux/store';
 import {TYPE_DYNAMIC_LINK} from 'asset/enum';
-import {Metrics} from 'asset/metrics';
 import {
     ANDROID_APP_LINK,
     DYNAMIC_LINK_ANDORID,
@@ -35,6 +34,7 @@ import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
 import {interactBubble, onGoToSignUp} from 'utility/assistant';
 import Bubble from './components/Bubble';
+import HeaderDoffy, {headerDoffyHeight} from './components/HeaderDoffy';
 
 export interface TypeShowMoreOptions {
     idUser: number;
@@ -45,6 +45,8 @@ export interface TypeShowMoreOptions {
 let idUserReport = 0;
 let imageSeeDetail = '';
 let allowSaveImage = false;
+
+let oldOffset = 0;
 
 const onGoToSignUpFromAlert = () => {
     goBack();
@@ -89,6 +91,8 @@ const ListBubbleCouple = () => {
     const displayComment = Redux.getDisplayComment();
     const bubbleFocusing = Redux.getBubbleFocusing();
     const [preNumberComment, setPreNumberComment] = useState(0);
+
+    const [isShowHeader, setIsShowHeader] = useState(true);
 
     const {list, setList, onLoadMore, refreshing, onRefresh} = usePaging({
         request: selectedApi,
@@ -239,8 +243,12 @@ const ListBubbleCouple = () => {
         );
     }, []);
 
-    const RenderBubblePlaceStatic = () => {
-        return (
+    return (
+        <View
+            style={[
+                styles.container,
+                {backgroundColor: theme.backgroundColor},
+            ]}>
             <StyleList
                 data={list}
                 renderItem={({item}) => RenderItemBubble(item)}
@@ -253,18 +261,25 @@ const ListBubbleCouple = () => {
                 onRefresh={onRefresh}
                 onLoadMore={onLoadMore}
                 ListEmptyComponent={LoadingScreen}
+                ListHeaderComponent={
+                    <View style={{height: headerDoffyHeight}} />
+                }
+                maxToRenderPerBatch={20}
+                onScroll={e => {
+                    const currentOffset = e.nativeEvent.contentOffset.y;
+                    const distance = currentOffset - oldOffset;
+                    if (distance > 75) {
+                        setIsShowHeader(false);
+                        oldOffset = currentOffset;
+                    } else if (distance < -75) {
+                        setIsShowHeader(true);
+                        oldOffset = currentOffset;
+                    }
+                }}
                 // removeClippedSubviews={true}
             />
-        );
-    };
 
-    return (
-        <View
-            style={[
-                styles.container,
-                {backgroundColor: theme.backgroundColor},
-            ]}>
-            {RenderBubblePlaceStatic()}
+            <HeaderDoffy isShowHeader={isShowHeader} />
 
             <StyleActionSheet
                 ref={optionsRef}
@@ -299,11 +314,6 @@ const ListBubbleCouple = () => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
-        paddingTop: Metrics.tabBarUp,
-    },
-    wrapModal: {
-        borderTopRightRadius: 15,
-        borderTopLeftRadius: 15,
     },
 });
 export default ListBubbleCouple;

@@ -17,32 +17,20 @@ const Images = {
         boy: require('./ic_boy.png'),
         girl: require('./ic_girl.png'),
         lgbt: require('./ic_lgbt.png'),
-        // mess
-        mess: require('./ic_mess.png'),
-        send: require('./ic_send.png'),
-        shh: require('./ic_shh.png'),
         // alert
         alert: require('./ic_alert.png'),
         // tabBar
-        push: require('./ic_push.png'),
         zoomPhoto: require('./ic_zoom_photo.png'),
-        plus: require('./ic_plus.png'),
         home: require('./ic_home.png'),
         chat: require('./ic_chat.png'),
         createGroup: require('./ic_create_group.png'),
         notification: require('./ic_notification.png'),
-        // profile
-        follower: require('./ic_follower.png'),
-        following: require('./ic_following.png'),
         // discovery
         chatNow: require('./ic_chat_now.png'),
         comment: require('./ic_comment.png'),
         more: require('./ic_more.png'),
         reload: require('./ic_reload.png'),
-        personal: require('./ic_personal.png'),
-        community: require('./ic_community.png'),
         share: require('./ic_share.png'),
-        close: require('./ic_close.png'),
     },
     images: {
         logo: require('./img_logo.png'),
