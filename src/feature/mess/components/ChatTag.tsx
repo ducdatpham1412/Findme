@@ -5,7 +5,7 @@ import React, {memo} from 'react';
 import isEqual from 'react-fast-compare';
 import {Platform, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import {formDateMessage, isTimeBefore} from 'utility/format';
+import {formatDateChatTag, isTimeBefore} from 'utility/format';
 
 interface Props {
     item: TypeChatTagResponse;
@@ -15,10 +15,10 @@ interface Props {
 const ChatTag = (props: Props) => {
     const {item, onGoToChat} = props;
     const theme = Redux.getTheme();
-    const myId = Redux.getPassport().profile?.id;
+    const {profile} = Redux.getPassport();
 
     const hadNew = isTimeBefore(
-        item.userData?.[String(myId)].modified,
+        item.userData?.[String(profile.id)].modified,
         item.modified,
     );
 
@@ -28,12 +28,14 @@ const ChatTag = (props: Props) => {
                 return item.conversationImage;
             }
             const partnerInfo = item.listUser.find(
-                userInfo => userInfo.id !== myId,
+                userInfo => userInfo.id !== profile.id,
             );
             if (partnerInfo?.avatar) {
                 return partnerInfo.avatar;
             }
-            const myInfo = item.listUser.find(userInfo => userInfo.id === myId);
+            const myInfo = item.listUser.find(
+                userInfo => userInfo.id === profile.id,
+            );
             return myInfo?.avatar || '';
         };
 
@@ -49,9 +51,13 @@ const ChatTag = (props: Props) => {
         let name = item.conversationName;
         if (!name) {
             const partnerInfo = item.listUser.find(
-                userInfo => userInfo.id !== myId,
+                userInfo => userInfo.id !== profile.id,
             );
-            name = partnerInfo?.name || '';
+            if (partnerInfo) {
+                name = partnerInfo.name || '';
+            } else {
+                name = profile.name; // chat to yourself
+            }
         }
 
         const color = hadNew ? theme.textHightLight : theme.textColor;
@@ -85,7 +91,7 @@ const ChatTag = (props: Props) => {
                         />
                     )}
                     <StyleText
-                        originValue={`・${formDateMessage(item.modified)}`}
+                        originValue={`・${formatDateChatTag(item.modified)}`}
                         customStyle={[
                             styles.textTime,
                             {

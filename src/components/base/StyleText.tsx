@@ -2,9 +2,10 @@ import React, {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleProp, Text, TextProps, TextStyle} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
+import {I18Normalize} from 'utility/I18Next';
 
 interface StyleTextProps extends TextProps {
-    i18Text?: string;
+    i18Text?: I18Normalize;
     i18Params?: object;
     originValue?: any;
     customStyle?: StyleProp<TextStyle>;

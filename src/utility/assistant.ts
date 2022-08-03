@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-    TypeChatTagResponse,
     TypeCreateGroupResponse,
     TypeCreatePostResponse,
     TypeGradient,
@@ -93,27 +92,6 @@ export const chooseIconHobby = (idHobby: number) => {
     const temp =
         listHobbies.find(item => item.id === idHobby) || listHobbies[0];
     return temp?.icon || '';
-};
-
-export const countDownToCancelRequestPublic = (params: {
-    chatTagId: string;
-    setList: any;
-}) => {
-    return setTimeout(() => {
-        let focusChatTag: TypeChatTagResponse;
-        const {listChatTag} = FindmeStore.getState().logicSlice;
-        const temp = listChatTag.map(item => {
-            if (item.id !== params.chatTagId) {
-                return item;
-            }
-            focusChatTag = {
-                ...item,
-                isRequestingPublic: false,
-            };
-            return focusChatTag;
-        });
-        params.setList(temp);
-    }, 9000);
 };
 
 /**

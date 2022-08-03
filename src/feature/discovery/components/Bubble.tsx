@@ -15,25 +15,18 @@ import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
-import {appAlert, goBack, navigate} from 'navigation/NavigationService';
-import React, {memo, useEffect, useRef, useState} from 'react';
+import {appAlert, goBack} from 'navigation/NavigationService';
+import React, {memo, useEffect, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import {View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {
-    moderateScale,
-    scale,
-    ScaledSheet,
-    verticalScale,
-} from 'react-native-size-matters';
+import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import {
     chooseColorGradient,
     choosePrivateAvatar,
     logger,
     onGoToSignUp,
 } from 'utility/assistant';
-import {Modalize} from 'react-native-modalize';
-import ROOT_SCREEN from 'navigation/config/routes';
 import {TypeShowMoreOptions} from '../ListBubbleCouple';
 import IconHobby from './IconHobby';
 

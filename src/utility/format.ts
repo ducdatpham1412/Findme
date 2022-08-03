@@ -70,7 +70,7 @@ export const isTimeEqual = (day1: Date | string, day2: Date | string) => {
     return dayjs(day1).isSame(day2);
 };
 
-export const formDateMessage = (date: Date | string) => {
+export const formatDateChatTag = (date: Date | string) => {
     if (dayjs(date).isToday()) {
         return dayjs(date).locale('en').format('HH:mm');
     }

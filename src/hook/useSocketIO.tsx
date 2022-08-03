@@ -23,7 +23,12 @@ import {
     apiGetListNotifications,
 } from 'api/module';
 import FindmeStore from 'app-redux/store';
-import {MESSAGE_TYPE, RELATIONSHIP, SOCKET_EVENT} from 'asset/enum';
+import {
+    CONVERSATION_STATUS,
+    MESSAGE_TYPE,
+    RELATIONSHIP,
+    SOCKET_EVENT,
+} from 'asset/enum';
 import {appAlert} from 'navigation/NavigationService';
 import React, {useEffect, useState} from 'react';
 import {AppState, AppStateStatus} from 'react-native';
@@ -113,7 +118,7 @@ export const useSocketChatTagBubble = () => {
         },
     });
 
-    const hearingOtherSocket = () => {
+    const hearingSocket = () => {
         socket?.off(SOCKET_EVENT.createChatTag);
         socket?.on(SOCKET_EVENT.createChatTag, (data: TypeChatTagResponse) => {
             setList((previousChatTags: Array<TypeChatTagResponse>) => {
@@ -223,7 +228,7 @@ export const useSocketChatTagBubble = () => {
                     }
                     return {
                         ...item,
-                        isBlock: true,
+                        isBlocked: true,
                     };
                 });
             });
@@ -237,7 +242,7 @@ export const useSocketChatTagBubble = () => {
                     }
                     return {
                         ...item,
-                        isBlock: false,
+                        isBlocked: false,
                     };
                 });
             });
@@ -252,7 +257,7 @@ export const useSocketChatTagBubble = () => {
                     }
                     return {
                         ...item,
-                        isStop: true,
+                        status: CONVERSATION_STATUS.stop,
                     };
                 });
             });
@@ -267,7 +272,7 @@ export const useSocketChatTagBubble = () => {
                     }
                     return {
                         ...item,
-                        isStop: false,
+                        status: CONVERSATION_STATUS.active,
                     };
                 });
             });
@@ -371,7 +376,7 @@ export const useSocketChatTagBubble = () => {
 
     useEffect(() => {
         if (token && socket) {
-            hearingOtherSocket();
+            hearingSocket();
         }
     }, [token, socket]);
 
@@ -408,6 +413,12 @@ const deleteMessage = async (idMessage: string) => {
     }
 };
 
+const listMessageEvents = [
+    MESSAGE_TYPE.changeColor,
+    MESSAGE_TYPE.changeName,
+    MESSAGE_TYPE.joinCommunity,
+];
+
 export const useSocketChatDetail = (params: {
     isMyChatTag: boolean;
     setListChatTags: any;
@@ -426,13 +437,21 @@ export const useSocketChatDetail = (params: {
     const hearingSocket = () => {
         socket?.off(SOCKET_EVENT.message);
         socket.on(SOCKET_EVENT.message, (data: TypeChatMessageResponse) => {
-            if (data.conversationId === chatTagFocusing) {
-                // if senderId is me
-                // only need remove the tag of message local before
+            const isFocusingThisChatTag =
+                data.conversationId === chatTagFocusing;
+            if (isFocusingThisChatTag) {
                 if (data.creator === myId) {
                     setList(
                         (previousMessages: Array<TypeChatMessageResponse>) => {
-                            const temp = previousMessages.map(item => {
+                            if (listMessageEvents.includes(data.type)) {
+                                const temp: TypeChatMessageResponse = {
+                                    ...data,
+                                    tag: undefined,
+                                    relationship: RELATIONSHIP.self,
+                                };
+                                return [temp].concat(previousMessages);
+                            }
+                            return previousMessages.map(item => {
                                 if (item?.tag !== data?.tag) {
                                     return item;
                                 }
@@ -442,13 +461,11 @@ export const useSocketChatDetail = (params: {
                                     relationship: RELATIONSHIP.self,
                                 };
                             });
-                            return temp;
                         },
                     );
-                    socket.emit(SOCKET_EVENT.seenMessage, {
-                        myId,
-                        conversationId: data.conversationId,
-                    });
+                    // We'll take after this problem
+                    // Because if sender is me, not need to send socket "seenMessage" any more, only need set userData in local
+
                     // if (params.isMyChatTag) {
                     //     socket.emit(SOCKET_EVENT.seenMessage, {
                     //         myId,
@@ -469,10 +486,6 @@ export const useSocketChatDetail = (params: {
                             return [temp].concat(previousMessages);
                         },
                     );
-                    socket.emit(SOCKET_EVENT.seenMessage, {
-                        myId,
-                        conversationId: data.conversationId,
-                    });
                 }
             }
 
@@ -493,12 +506,6 @@ export const useSocketChatDetail = (params: {
                             ...item,
                             modified: data.created,
                             latestMessage,
-                            userData: {
-                                ...item.userData,
-                                [String(myId)]: {
-                                    modified: data.created,
-                                },
-                            },
                         };
                     });
 
@@ -508,6 +515,13 @@ export const useSocketChatDetail = (params: {
                     return temp;
                 },
             );
+
+            if (isFocusingThisChatTag) {
+                socket.emit(SOCKET_EVENT.seenMessage, {
+                    myId,
+                    conversationId: data.conversationId,
+                });
+            }
         });
 
         socket?.off(SOCKET_EVENT.deleteMessage);
@@ -540,7 +554,7 @@ export const useSocketChatDetail = (params: {
             creator: _params.creator,
             creatorName: _params.creatorName,
             creatorAvatar: _params.creatorAvatar,
-            created: String(new Date()),
+            created: undefined,
             tag: _params.tag,
             relationship: RELATIONSHIP.self,
         };

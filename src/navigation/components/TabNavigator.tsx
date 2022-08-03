@@ -336,6 +336,7 @@ const styles = ScaledSheet.create({
         borderRadius: '10@ms',
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: 'red',
     },
     textNewMessages: {
         fontSize: '8@ms',

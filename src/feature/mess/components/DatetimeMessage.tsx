@@ -2,7 +2,11 @@ import {StyleText} from 'components/base';
 import Redux from 'hook/useRedux';
 import React, {useEffect, useRef, useState} from 'react';
 import {Animated} from 'react-native';
-import {ScaledSheet, verticalScale} from 'react-native-size-matters';
+import {
+    moderateScale,
+    ScaledSheet,
+    verticalScale,
+} from 'react-native-size-matters';
 import {formatDateMessage} from 'utility/format';
 
 interface Props {
@@ -39,7 +43,14 @@ const DatetimeMessage = ({
         <Animated.View
             style={[
                 styles.container,
-                {flexDirection: isMyMessage ? 'row-reverse' : 'row', height},
+                {
+                    flexDirection: isMyMessage ? 'row-reverse' : 'row',
+                    height,
+                    alignSelf: isMyMessage ? 'flex-end' : 'flex-start',
+                    paddingLeft: isMyMessage
+                        ? verticalScale(7)
+                        : moderateScale(52),
+                },
             ]}>
             {mostHeightDateTime && (
                 <StyleText
@@ -57,10 +68,7 @@ const DatetimeMessage = ({
 };
 
 const styles = ScaledSheet.create({
-    container: {
-        width: '100%',
-        paddingHorizontal: '50@s',
-    },
+    container: {},
     textDatetime: {
         fontSize: '10@ms',
         marginTop: '5@vs',

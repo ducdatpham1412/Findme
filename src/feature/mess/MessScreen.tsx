@@ -1,15 +1,14 @@
 import {TypeChatTagResponse} from 'api/interface';
 import {apiGetDetailConversation} from 'api/module';
-import {CHAT_TAG} from 'asset/enum';
+import {StyleText} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import Redux from 'hook/useRedux';
 import {useSocketChatTagBubble} from 'hook/useSocketIO';
-import Header from 'navigation/components/Header';
-import {MESS_ROUTE, PROFILE_ROUTE} from 'navigation/config/routes';
+import {MESS_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {memo, useEffect} from 'react';
-import {View} from 'react-native';
-import {scale, ScaledSheet} from 'react-native-size-matters';
+import {Platform, View} from 'react-native';
+import {ScaledSheet} from 'react-native-size-matters';
 import {isTimeBefore} from 'utility/format';
 import ChatTag from './components/ChatTag';
 
@@ -35,17 +34,11 @@ const RenderMessages = () => {
                 );
                 seenMessage(chatTagFromNotification);
 
-                if (res.data.type === CHAT_TAG.group) {
-                    navigate(MESS_ROUTE.chatDetailGroup, {
-                        itemChatTag: res.data,
-                        setListChatTags,
-                    });
-                } else {
-                    navigate(MESS_ROUTE.chatDetail, {
-                        itemChatTag: res.data,
-                        setListChatTags,
-                    });
-                }
+                navigate(MESS_ROUTE.chatDetail, {
+                    itemChatTag: res.data,
+                    setListChatTags,
+                });
+
                 Redux.setChatTagFromNotification(undefined);
                 setListChatTags((preValue: Array<TypeChatTagResponse>) => {
                     const check = preValue.find(
@@ -123,16 +116,16 @@ const MessScreen = () => {
                 styles.container,
                 {backgroundColor: theme.backgroundColor},
             ]}>
-            {/* Header */}
-            <Header
-                headerLeftMission={() => navigate(PROFILE_ROUTE.myProfile)}
-                headerTitle={'mess.messScreen.headerTitle'}
-                headerTitleStyle={{
-                    color: borderMessRoute,
-                    left: scale(30),
-                }}
-                containerStyle={styles.headerView}
-            />
+            <View
+                style={[
+                    styles.headerView,
+                    {borderBottomColor: theme.borderColor},
+                ]}>
+                <StyleText
+                    i18Text="mess.messScreen.headerTitle"
+                    customStyle={[styles.textTitle, {color: borderMessRoute}]}
+                />
+            </View>
 
             {/* List chat tags */}
             {!isModeExp && token && <RenderMessages />}
@@ -146,8 +139,16 @@ const styles = ScaledSheet.create({
         backgroundColor: 'transparent',
     },
     headerView: {
-        height: '50@ms',
-        paddingHorizontal: '20@s',
+        paddingHorizontal: '30@s',
+        paddingVertical: '10@vs',
+        borderBottomWidth: Platform.select({
+            ios: '0.25@ms',
+            android: '0.5@ms',
+        }),
+    },
+    textTitle: {
+        fontSize: '18@ms',
+        fontWeight: 'bold',
     },
     contentList: {
         paddingBottom: '50@vs',

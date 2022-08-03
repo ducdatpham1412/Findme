@@ -3,22 +3,21 @@ import {TypeChatMessageResponse, TypeChatTagResponse} from 'api/interface';
 import {CONVERSATION_STATUS, MESSAGE_TYPE} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
-import Theme from 'asset/theme/Theme';
-import {StyleImage, StyleText, StyleTouchable} from 'components/base';
+import {StyleImage, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import StyleKeyboardAwareView from 'components/StyleKeyboardAwareView';
 import ModalPickImage from 'feature/mess/components/ModalPickImage';
 import Redux from 'hook/useRedux';
 import {socketUnTyping, useSocketChatDetail} from 'hook/useSocketIO';
-import Header from 'navigation/components/Header';
 import {MESS_ROUTE} from 'navigation/config/routes';
-import {goBack, navigate, showSwipeImages} from 'navigation/NavigationService';
+import {navigate, showSwipeImages} from 'navigation/NavigationService';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {FlatList, Keyboard, TextInput, View} from 'react-native';
-import {ScaledSheet, verticalScale} from 'react-native-size-matters';
-import AntDesign from 'react-native-vector-icons/AntDesign';
+import {ScaledSheet} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 import {chooseColorGradient, isIOS} from 'utility/assistant';
+import {isTimeBefore, isTimeEqual} from 'utility/format';
+import HeaderChat from './components/HeaderChat';
 import ItemMessage from './components/ItemMessage';
 import Typing from './components/Typing';
 import UserInput from './components/UserInput';
@@ -39,11 +38,6 @@ export interface TypeSeeDetailImage {
 }
 
 const initHeightModal = ((Metrics.width - 6) * 2) / 3;
-
-const onGoBack = () => {
-    Redux.setChatTagFocusing('');
-    goBack();
-};
 
 const onSeeDetailImage = (params: TypeSeeDetailImage) => {
     const {listImages, index, inputRef} = params;
@@ -71,14 +65,25 @@ const RenderItemMessage = (params: {
     messages: Array<TypeChatMessageResponse>;
     deleteMessage(idMessage: string): Promise<void>;
     chatColor: Array<string>;
+    partnerAvatar: string;
+    messageIdSeen: string;
     inputRef: any;
 }) => {
-    const {item, index, messages, deleteMessage, chatColor, inputRef} = params;
+    const {
+        item,
+        index,
+        messages,
+        deleteMessage,
+        chatColor,
+        inputRef,
+        messageIdSeen,
+        partnerAvatar,
+    } = params;
     const isSameMessageAfter =
         messages?.[index + 1]?.relationship === item.relationship;
     const displayPartnerAvatar =
         messages[index - 1]?.relationship !== item.relationship;
-    const displaySeenAvatar = true;
+    const displaySeenAvatar = item.id === messageIdSeen;
 
     return (
         <ItemMessage
@@ -92,6 +97,7 @@ const RenderItemMessage = (params: {
             onSeeDetailImage={(paramsDetail: any) =>
                 onSeeDetailImage({...paramsDetail, inputRef})
             }
+            partnerAvatar={partnerAvatar}
         />
     );
 };
@@ -111,18 +117,27 @@ const ChatDetail = ({route}: ChatDetailProps) => {
     const [displayPickImg, setDisplayPickImg] = useState(false);
     const [modalPickImgHeight, setModalPickImgHeight] =
         useState(initHeightModal);
+    const [messageIdSeen, setMessageIdSeen] = useState('');
 
     const [itemChatTag, setItemChatTag] = useState(route.params.itemChatTag);
 
-    const partnerId = useMemo(() => {
+    const partnerInfo = useMemo(() => {
         const result = itemChatTag.listUser.find(
             item => item.id !== profile.id,
         );
-        return result?.id || profile.id;
-    }, [itemChatTag.listUser]);
+        return result || profile;
+    }, []);
+
+    const conversationName = useMemo(() => {
+        let name = itemChatTag.conversationName;
+        if (!name) {
+            name = partnerInfo.name;
+        }
+        return name;
+    }, [itemChatTag.conversationName]);
 
     const isMyChatTag = useMemo(() => {
-        return partnerId === profile.id;
+        return partnerInfo.id === profile.id;
     }, []);
 
     const {
@@ -179,6 +194,36 @@ const ChatDetail = ({route}: ChatDetailProps) => {
         }
     }, [isFocused]);
 
+    useEffect(() => {
+        if (
+            messages[0]?.created !== undefined &&
+            messages[0]?.creator === profile.id
+        ) {
+            messages.every((item, index) => {
+                if (
+                    (isTimeBefore(
+                        item.created,
+                        itemChatTag.userData[String(partnerInfo.id)].modified,
+                    ) ||
+                        isTimeEqual(
+                            item.created,
+                            itemChatTag.userData[String(partnerInfo.id)]
+                                .modified,
+                        )) &&
+                    item.creator === profile.id
+                ) {
+                    setMessageIdSeen(messages[index].id);
+                    return false;
+                }
+                return true;
+            });
+        }
+    }, [
+        itemChatTag.userData[String(partnerInfo.id)].modified,
+        messages,
+        profile.id,
+    ]);
+
     /**
      * Send message
      */
@@ -232,69 +277,6 @@ const ChatDetail = ({route}: ChatDetailProps) => {
     /**
      * Render view
      */
-    const RenderHeader = () => {
-        let name = itemChatTag.conversationName;
-        if (!name) {
-            const partnerInfo = itemChatTag.listUser.find(
-                userInfo => userInfo.id !== profile.id,
-            );
-            name = partnerInfo?.name || '';
-        }
-
-        const headerLeft = () => {
-            return (
-                <View style={styles.headerLeftBox}>
-                    <AntDesign
-                        name="left"
-                        style={[styles.iconLeft, {color: borderMessRoute}]}
-                    />
-                    {!!numberNewMessages && (
-                        <View
-                            style={[
-                                styles.numberNewMessagesBox,
-                                {backgroundColor: borderMessRoute},
-                            ]}>
-                            <StyleText
-                                originValue={numberNewMessages}
-                                customStyle={[
-                                    styles.textNewMessages,
-                                    {color: Theme.common.textMe},
-                                ]}
-                            />
-                        </View>
-                    )}
-                </View>
-            );
-        };
-
-        const headerOption = () => {
-            return (
-                <AntDesign
-                    name="infocirlceo"
-                    style={[styles.iconCloud, {color: borderMessRoute}]}
-                />
-            );
-        };
-
-        return (
-            <Header
-                headerTitle={name}
-                headerTitleMission={onNavigateToMessSetting}
-                headerLeft={headerLeft()}
-                headerLeftMission={onGoBack}
-                headerRight3={headerOption()}
-                headerRight3Mission={onNavigateToMessSetting}
-                containerStyle={{
-                    borderBottomColor: borderMessRoute,
-                    height: verticalScale(45),
-                }}
-                headerTitleStyle={{
-                    color: borderMessRoute,
-                }}
-            />
-        );
-    };
-
     const RenderTyping = useMemo(() => {
         if (!itemChatTag?.userTyping || !itemChatTag?.userTyping.length) {
             return null;
@@ -311,7 +293,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
             }
         } else {
             userIdDisplay = itemChatTag.userTyping.find(
-                item => item === partnerId,
+                item => item === partnerInfo.id,
             );
             if (!userIdDisplay) {
                 return null;
@@ -338,6 +320,8 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                             messages,
                             deleteMessage,
                             chatColor,
+                            partnerAvatar: partnerInfo.avatar,
+                            messageIdSeen,
                         })
                     }
                     contentContainerStyle={styles.contentContainer}
@@ -440,7 +424,15 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                 onGetKeyBoardHeight={(value: number) =>
                     setModalPickImgHeight(value - Metrics.safeBottomPadding)
                 }>
-                {RenderHeader()}
+                <HeaderChat
+                    borderMessRoute={borderMessRoute}
+                    numberNewMessages={numberNewMessages}
+                    avatar={partnerInfo.avatar}
+                    onPressAvatar={() => null}
+                    name={conversationName}
+                    onPressName={onNavigateToMessSetting}
+                    onGoToSetting={onNavigateToMessSetting}
+                />
                 {RenderListMessage()}
                 {RenderImagePreview()}
                 {RenderInput()}
@@ -461,24 +453,6 @@ const styles = ScaledSheet.create({
     },
     iconCloud: {
         fontSize: '17@ms',
-    },
-    headerLeftBox: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    iconLeft: {
-        fontSize: '20@ms',
-    },
-    numberNewMessagesBox: {
-        width: '13@s',
-        height: '15@s',
-        borderRadius: '10@s',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    textNewMessages: {
-        fontSize: '11@ms',
     },
     // two image when choose send image
     twoImageInput: {

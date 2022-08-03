@@ -7,7 +7,6 @@ import DetailBubble from 'feature/discovery/DetailBubble';
 import InteractBubble from 'feature/discovery/InteractBubble';
 import ReportUser from 'feature/discovery/ReportUser';
 import ChatDetail from 'feature/mess/ChatDetail';
-import ChatDetailGroup from 'feature/mess/ChatDetailGroup';
 import ChatDetailSetting from 'feature/mess/ChatDetailSetting';
 import PublicChatting from 'feature/mess/PublicChatting';
 import CreateGroup from 'feature/profile/CreateGroup';
@@ -128,13 +127,13 @@ const AppStack = () => {
                         gestureEnabled: isIOS,
                     }}
                 />
-                <Stack.Screen
+                {/* <Stack.Screen
                     name={MESS_ROUTE.chatDetailGroup}
                     component={ChatDetailGroup}
                     options={{
                         gestureEnabled: isIOS,
                     }}
-                />
+                /> */}
                 <Stack.Screen
                     name={MESS_ROUTE.chatDetailSetting}
                     component={ChatDetailSetting}
