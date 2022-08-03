@@ -51,6 +51,7 @@ const ListMyGroups = (props: Props) => {
                 <View style={styles.body}>
                     {listGroups.map(item => (
                         <BubbleGroup
+                            key={String(item.id)}
                             item={item}
                             onDeleteAGroupFromList={onDeleteAGroupFromList}
                         />

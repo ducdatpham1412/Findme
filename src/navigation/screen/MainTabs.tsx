@@ -14,6 +14,10 @@ import ProfileRoute from './tabs/ProfileRoute';
 
 const BottomTab = createBottomTabNavigator();
 
+const NullTab = () => {
+    return null;
+};
+
 const MainTabs: React.FunctionComponent = () => {
     const bubbleFocusing = Redux.getBubbleFocusing();
     const displayComment = Redux.getDisplayComment();
@@ -45,8 +49,8 @@ const MainTabs: React.FunctionComponent = () => {
                 />
 
                 <BottomTab.Screen
-                    name={MAIN_SCREEN.profileRoute}
-                    component={ProfileRoute}
+                    name={'null'}
+                    component={NullTab}
                     options={{
                         lazy: false,
                     }}
@@ -55,6 +59,14 @@ const MainTabs: React.FunctionComponent = () => {
                 <BottomTab.Screen
                     name={MAIN_SCREEN.notificationRoute}
                     component={NotificationScreen}
+                />
+
+                <BottomTab.Screen
+                    name={MAIN_SCREEN.profileRoute}
+                    component={ProfileRoute}
+                    options={{
+                        lazy: false,
+                    }}
                 />
             </BottomTab.Navigator>
 

@@ -126,6 +126,7 @@ const StylePicker = ({route}: Props) => {
                                 : '60deg';
                             return (
                                 <Animated.View
+                                    key={index}
                                     style={{
                                         opacity: isCurrent ? 1 : 0.3,
                                         transform: [

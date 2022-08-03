@@ -1,5 +1,4 @@
 import Images from 'asset/img/images';
-import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
@@ -10,6 +9,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {Animated, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
+import Feather from 'react-native-vector-icons/Feather';
 
 // const AnimatedLinear = Animated.createAnimatedComponent(LinearGradient);
 
@@ -33,7 +33,7 @@ const TabNavigator = (props: any) => {
     const tabIndexFocus = props.state.index;
     const [indicatorWidth, setIndicatorWidth] = useState(0);
     const indicatorTranslateX = useRef(new Animated.Value(0)).current;
-    const indicatorTranslateY = useRef(new Animated.Value(0)).current;
+    const scale = useRef(new Animated.Value(1)).current;
 
     // for add more view
     // const addMoreWidth = useRef(new Animated.Value(0)).current;
@@ -59,29 +59,20 @@ const TabNavigator = (props: any) => {
     }, [showTabBar]);
 
     useEffect(() => {
-        if (tabIndexFocus === 0 || tabIndexFocus === 1) {
-            // Animated.timing(addMoreWidth, {
-            //     toValue: 0,
-            //     useNativeDriver: false,
-            //     duration: 600,
-            // }).start();
-            Animated.spring(indicatorTranslateX, {
-                toValue: indicatorWidth * tabIndexFocus,
-                useNativeDriver: true,
-            }).start();
-            Animated.spring(indicatorTranslateY, {
-                toValue: 0,
+        Animated.spring(indicatorTranslateX, {
+            toValue: indicatorWidth * tabIndexFocus,
+            useNativeDriver: true,
+        }).start();
+        if (tabIndexFocus === 4) {
+            Animated.spring(scale, {
+                toValue: 0.3,
                 useNativeDriver: true,
             }).start();
         } else {
-            Animated.spring(indicatorTranslateY, {
-                toValue: moderateScale(-50),
+            Animated.spring(scale, {
+                toValue: 1,
                 useNativeDriver: true,
             }).start();
-            // Animated.spring(addMoreWidth, {
-            //     toValue: Metrics.width,
-            //     useNativeDriver: false,
-            // }).start();
         }
     }, [tabIndexFocus]);
 
@@ -89,14 +80,10 @@ const TabNavigator = (props: any) => {
         navigate(PROFILE_ROUTE.createPostPreview);
     };
 
-    const onGoToCreateGroup = () => {
-        navigate(PROFILE_ROUTE.createGroup);
-    };
-
     /**
      * Render view
      */
-    const RenderDiscoveryButton = () => {
+    const DiscoveryButton = () => {
         const tintColor =
             tabIndexFocus === 0 ? Theme.common.white : theme.tabBarIconColor;
         return (
@@ -118,7 +105,7 @@ const TabNavigator = (props: any) => {
         );
     };
 
-    const RenderMessageButton = () => {
+    const MessageButton = () => {
         let tintColor = theme.tabBarIconColor;
         if (tabIndexFocus === 1) {
             tintColor = Theme.common.white;
@@ -147,39 +134,24 @@ const TabNavigator = (props: any) => {
         );
     };
 
-    const RenderCreatePostButton = () => {
+    const CreatePostButton = () => {
         return (
             <StyleTouchable
                 customStyle={styles.buttonView}
                 onPress={onGoToCreatePost}>
-                <StyleImage
-                    source={Images.icons.plus}
-                    customStyle={[
-                        styles.iconTabBar,
-                        {tintColor: theme.tabBarIconColor},
+                <LinearGradient
+                    colors={[
+                        Theme.common.gradientTabBar1,
+                        Theme.common.gradientTabBar2,
                     ]}
-                />
+                    style={styles.createBox}>
+                    <Feather name="plus" style={styles.iconCreate} />
+                </LinearGradient>
             </StyleTouchable>
         );
     };
 
-    const RenderCreateGroupButton = () => {
-        return (
-            <StyleTouchable
-                customStyle={styles.buttonView}
-                onPress={onGoToCreateGroup}>
-                <StyleImage
-                    source={Images.icons.createGroup}
-                    customStyle={[
-                        styles.iconTabBar,
-                        {tintColor: theme.tabBarIconColor},
-                    ]}
-                />
-            </StyleTouchable>
-        );
-    };
-
-    const RenderProfileButton = () => {
+    const ProfileButton = () => {
         return (
             <StyleTouchable
                 onPress={() => {
@@ -189,7 +161,7 @@ const TabNavigator = (props: any) => {
                         navigate(PROFILE_ROUTE.myProfile);
                     }
                 }}
-                customStyle={styles.profileView}>
+                customStyle={styles.buttonView}>
                 <StyleImage
                     source={{uri: avatar}}
                     customStyle={styles.profile}
@@ -198,31 +170,36 @@ const TabNavigator = (props: any) => {
         );
     };
 
-    const RenderNotificationButton = () => {
+    const NotificationButton = () => {
+        const tintColor =
+            tabIndexFocus === 3 ? Theme.common.white : theme.tabBarIconColor;
         return (
             <StyleTouchable
-                customStyle={styles.notificationView}
+                customStyle={styles.buttonView}
                 onPress={() => navigate(MAIN_SCREEN.notificationRoute)}>
-                <StyleImage
-                    source={Images.icons.notification}
-                    customStyle={[
-                        styles.iconTabBar,
-                        {tintColor: theme.tabBarIconColor},
-                    ]}
-                />
-                {numberNewNotifications > 0 && (
-                    <View style={styles.newNotificationBox}>
-                        <StyleText
-                            originValue={numberNewNotifications}
-                            customStyle={styles.textNewMessages}
-                        />
-                    </View>
-                )}
+                <View
+                    style={{
+                        height: '100%',
+                        justifyContent: 'center',
+                    }}>
+                    <StyleImage
+                        source={Images.icons.notification}
+                        customStyle={[styles.iconTabBar, {tintColor}]}
+                    />
+                    {numberNewNotifications > 0 && (
+                        <View style={styles.newNotificationBox}>
+                            <StyleText
+                                originValue={numberNewNotifications}
+                                customStyle={styles.textNewMessages}
+                            />
+                        </View>
+                    )}
+                </View>
             </StyleTouchable>
         );
     };
 
-    const RenderTabBarIndicator = () => {
+    const TabBarIndicator = () => {
         return (
             <Animated.View
                 style={[
@@ -235,7 +212,7 @@ const TabNavigator = (props: any) => {
                                 translateX: indicatorTranslateX,
                             },
                             {
-                                translateY: indicatorTranslateY,
+                                scale,
                             },
                         ],
                     },
@@ -251,13 +228,14 @@ const TabNavigator = (props: any) => {
         );
     };
 
-    const RenderAddMore = () => {
+    const AddMore = () => {
         return (
             <View
                 style={[
                     styles.addMoreView,
                     {
                         backgroundColor: theme.backgroundColor,
+                        borderTopColor: theme.borderColor,
                     },
                 ]}>
                 {/* <AnimatedLinear
@@ -278,10 +256,7 @@ const TabNavigator = (props: any) => {
 
     return (
         <>
-            {RenderProfileButton()}
-            {RenderNotificationButton()}
-
-            {RenderAddMore()}
+            {AddMore()}
             <Animated.View
                 style={[
                     styles.tabBarDown,
@@ -290,60 +265,39 @@ const TabNavigator = (props: any) => {
                         backgroundColor: theme.backgroundColor,
                     },
                 ]}>
-                {RenderTabBarIndicator()}
-                {RenderDiscoveryButton()}
-                {RenderMessageButton()}
-                {RenderCreatePostButton()}
-                {RenderCreateGroupButton()}
+                {TabBarIndicator()}
+                {DiscoveryButton()}
+                {MessageButton()}
+                {CreatePostButton()}
+                {NotificationButton()}
+                {ProfileButton()}
             </Animated.View>
         </>
     );
 };
 
 const styles = ScaledSheet.create({
-    // Tab bar up
-    tabBarUp: {
-        position: 'absolute',
-        width: '100%',
-        height: '45@ms',
-        marginTop: Metrics.safeTopPadding,
-        paddingHorizontal: '20@s',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    notificationView: {
-        flexDirection: 'row',
-        height: '35@ms',
-        position: 'absolute',
-        alignItems: 'center',
-        top: moderateScale(5),
-        right: '20@s',
-    },
     newNotificationBox: {
-        right: '7@ms',
-        top: '-7@ms',
+        position: 'absolute',
         width: '15@ms',
         height: '15@ms',
-        backgroundColor: 'red',
         borderRadius: '10@ms',
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    profileView: {
-        position: 'absolute',
-        top: moderateScale(5),
-        left: '20@s',
+        backgroundColor: 'red',
+        top: '9@ms',
+        right: '-2@ms',
     },
     profile: {
-        width: '35@ms',
-        height: '35@ms',
+        width: '30@ms',
+        height: '30@ms',
         borderRadius: '20@ms',
     },
     addMoreView: {
         width: '100%',
-        height: '10@ms',
+        height: '5@ms',
         alignItems: 'center',
+        borderTopWidth: '0.25@ms',
     },
     addMoreGradient: {
         height: '100%',
@@ -352,8 +306,8 @@ const styles = ScaledSheet.create({
     tabBarDown: {
         width: '100%',
         flexDirection: 'row',
-        paddingHorizontal: '20@s',
         overflow: 'hidden',
+        paddingHorizontal: '5@s',
     },
     buttonView: {
         flex: 1,
@@ -364,11 +318,19 @@ const styles = ScaledSheet.create({
         width: '25@ms',
         height: '25@ms',
     },
+    createBox: {
+        paddingHorizontal: '8@ms',
+        paddingVertical: '2@ms',
+        borderRadius: '7@ms',
+    },
+    iconCreate: {
+        fontSize: '20@ms',
+        color: Theme.common.white,
+    },
     newMessagesBox: {
         position: 'absolute',
         width: '18@ms',
         height: '18@ms',
-        backgroundColor: 'red',
         right: '-7@ms',
         top: '-3@ms',
         borderRadius: '10@ms',
@@ -376,7 +338,7 @@ const styles = ScaledSheet.create({
         justifyContent: 'center',
     },
     textNewMessages: {
-        fontSize: '10@ms',
+        fontSize: '8@ms',
         color: 'white',
     },
     zoomPhoto: {
@@ -387,14 +349,15 @@ const styles = ScaledSheet.create({
     // tabBar indicator
     indicatorView: {
         position: 'absolute',
-        left: '20@s',
         height: '100%',
         alignItems: 'center',
+        justifyContent: 'center',
         alignSelf: 'center',
+        left: '5@s',
     },
     gradientBox: {
-        width: '70%',
-        height: '100%',
+        width: '75%',
+        height: '90%',
         borderRadius: '20@ms',
     },
 });
