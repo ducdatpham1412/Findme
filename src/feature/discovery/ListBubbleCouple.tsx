@@ -141,10 +141,17 @@ const ListBubbleCouple = () => {
 
     const onInteractBubble = (itemBubble: TypeBubblePalace) => {
         if (hadLogan) {
-            interactBubble({
-                itemBubble,
-                isBubble: !itemBubble.hadKnowEachOther,
-            });
+            if (
+                itemBubble.creatorAvatar &&
+                itemBubble.creatorId &&
+                itemBubble.creatorName
+            ) {
+                interactBubble({
+                    userId: itemBubble.creatorId,
+                    name: itemBubble.creatorName,
+                    avatar: itemBubble.creatorAvatar,
+                });
+            }
         } else {
             appAlert('discovery.bubble.goToSignUp', {
                 moreNotice: 'common.letGo',

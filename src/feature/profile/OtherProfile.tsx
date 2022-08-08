@@ -1,8 +1,4 @@
-import {
-    TypeCreatePostResponse,
-    TypeGetProfileResponse,
-    TypeSendMessageFromProfile,
-} from 'api/interface';
+import {TypeCreatePostResponse, TypeGetProfileResponse} from 'api/interface';
 import {
     apiBlockUser,
     apiFollowUser,
@@ -107,15 +103,10 @@ const OtherProfile = ({route}: Props) => {
     // on send message
     const onSendMessage = () => {
         if (profile?.name && profile.id && profile.avatar) {
-            const itemBubble: TypeSendMessageFromProfile = {
-                name: profile?.name,
-                creatorId: profile?.id,
-                creatorAvatar: profile?.avatar,
-            };
             interactBubble({
-                itemBubble,
-                isBubble: false,
-                isEffectTabBar: false,
+                userId: profile.id,
+                name: profile.name,
+                avatar: profile.avatar,
             });
         }
     };

@@ -1,8 +1,5 @@
-import {TypeBubblePalace, TypeChatTagRequest} from 'api/interface';
-import FindmeStore from 'app-redux/store';
-import {CHAT_TAG} from 'asset/enum';
+import {TypeInteractBubble} from 'api/interface';
 import {Metrics} from 'asset/metrics';
-import Theme from 'asset/theme/Theme';
 import {
     StyleImage,
     StyleInput,
@@ -14,27 +11,19 @@ import {startChatTag} from 'hook/useSocketIO';
 import {goBack} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Animated, Platform, Text, View} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import {ScaledSheet} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
-import {chooseColorGradient, choosePrivateAvatar} from 'utility/assistant';
 
 interface Props {
     route: {
-        params: {
-            item: TypeBubblePalace;
-            isBubble: boolean;
-            isEffectTabBar?: boolean;
-        };
+        params: TypeInteractBubble;
     };
 }
 
 const InteractBubble = ({route}: Props) => {
-    const {item, isBubble, isEffectTabBar = true} = route.params;
+    const {userId, name, avatar} = route.params;
 
-    const token = Redux.getToken();
     const theme = Redux.getTheme();
-    const {id} = Redux.getPassport().profile;
 
     const translateY = useRef(new Animated.Value(-300)).current;
     const aim = useRef(new Animated.Value(0)).current;
@@ -46,14 +35,7 @@ const InteractBubble = ({route}: Props) => {
     const inputRef = useRef<any>();
     const [message, setMessage] = useState('');
 
-    const colorGradient = useMemo(() => {
-        return chooseColorGradient({
-            listGradients: FindmeStore.getState().logicSlice.resource.gradient,
-            colorChoose: item.color,
-        });
-    }, []);
-
-    const startMoving = useCallback(() => {
+    const startMoving = () => {
         Animated.timing(translateY, {
             toValue: 0,
             useNativeDriver: true,
@@ -65,7 +47,7 @@ const InteractBubble = ({route}: Props) => {
                 speed: 0.1,
             }).start();
         });
-    }, []);
+    };
 
     useEffect(() => {
         inputRef.current.focus();
@@ -84,20 +66,9 @@ const InteractBubble = ({route}: Props) => {
     }, []);
 
     const onSendInteract = () => {
-        const newChatTag: TypeChatTagRequest = {
-            type: isBubble ? CHAT_TAG.newFromBubble : CHAT_TAG.newFromProfile,
-            content: message,
-            listUser: [id, item.creatorId].sort(),
-            color: item.color,
-            senderId: id,
-            idBubble: item.id,
-        };
-        if (isBubble) {
-            newChatTag.nameBubble = item.name;
-        }
         startChatTag({
-            token,
-            newChatTag,
+            content: message,
+            userId,
         });
         goBack();
     };
@@ -105,36 +76,33 @@ const InteractBubble = ({route}: Props) => {
     /**
      * Render view
      */
-    const RenderNameAndAvatar = useMemo(() => {
+    const RenderNameAndAvatar = () => {
         return (
             <View
                 style={[
                     styles.avatarAndNameBox,
-                    {borderBottomColor: colorGradient[2]},
+                    {borderBottomColor: theme.borderColor},
                 ]}>
                 <StyleImage
-                    source={{uri: choosePrivateAvatar(item.gender)}}
+                    source={{uri: avatar}}
                     customStyle={[
                         styles.avatar,
                         {borderColor: theme.highlightColor},
                     ]}
                 />
                 <StyleText
-                    originValue={item.name}
-                    customStyle={[
-                        styles.nameText,
-                        {color: Theme.common.textMe},
-                    ]}
+                    originValue={name}
+                    customStyle={[styles.nameText, {color: theme.textColor}]}
                 />
             </View>
         );
-    }, [item]);
+    };
 
     const RenderIconSend = useMemo(() => {
         return (
             <Feather
                 name="send"
-                style={[styles.iconSend, {color: Theme.common.white}]}
+                style={[styles.iconSend, {color: theme.highlightColor}]}
             />
         );
     }, []);
@@ -152,21 +120,18 @@ const InteractBubble = ({route}: Props) => {
                 <View
                     style={[
                         styles.cordBox,
-                        {backgroundColor: colorGradient[2]},
+                        {backgroundColor: theme.backgroundButtonColor},
                     ]}
                 />
 
-                <LinearGradient
+                <View
                     style={[
                         styles.inputMessageBox,
                         {
                             backgroundColor: theme.backgroundButtonColor,
                         },
-                    ]}
-                    colors={colorGradient}
-                    start={{x: 0, y: 0}}
-                    end={{x: 1, y: 1}}>
-                    {RenderNameAndAvatar}
+                    ]}>
+                    {RenderNameAndAvatar()}
                     {/* Input Message */}
                     <View style={styles.inputAndSendView}>
                         <StyleInput
@@ -174,16 +139,14 @@ const InteractBubble = ({route}: Props) => {
                             value={message}
                             onChangeText={text => setMessage(text)}
                             containerStyle={styles.inputContainer}
-                            inputStyle={{color: Theme.common.textMe}}
+                            inputStyle={{color: theme.textHightLight}}
                             multiline
                             i18Placeholder="Hello"
-                            placeholderTextColor={
-                                Theme.lightTheme.holderColorLighter
-                            }
+                            placeholderTextColor={theme.holderColorLighter}
                             keyboardAppearance={Redux.getThemeKeyboard()}
                             hasErrorBox={false}
                             hasUnderLine={false}
-                            isEffectTabBar={isEffectTabBar}
+                            isEffectTabBar
                         />
                         <StyleTouchable
                             onPress={onSendInteract}
@@ -191,7 +154,7 @@ const InteractBubble = ({route}: Props) => {
                             {RenderIconSend}
                         </StyleTouchable>
                     </View>
-                </LinearGradient>
+                </View>
             </Animated.View>
         </View>
     );
@@ -243,7 +206,7 @@ const styles = ScaledSheet.create({
     // input
     inputMessageBox: {
         width: '80%',
-        borderRadius: '50@vs',
+        borderRadius: '15@vs',
         paddingHorizontal: '10@s',
         paddingVertical: '20@vs',
     },

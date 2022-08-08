@@ -68,11 +68,11 @@ export enum TYPE_OTP {
     requestOpenAccount = 3,
 }
 
-export enum CHAT_TAG {
-    newFromBubble = 0,
-    newFromProfile = 1,
-    group = 2,
-}
+// export enum CHAT_TAG {
+//     newFromBubble = 0,
+//     newFromProfile = 1,
+//     group = 2,
+// }
 export enum MESSAGE_TYPE {
     text = 0,
     image = 1,
@@ -96,12 +96,9 @@ export enum SOCKET_EVENT {
     // chat tag
     createChatTag = '2.0',
     joinRoom = '2.1',
-    leaveRoom = '2.1.1',
-    requestPublicChat = '2.2',
-    agreePublicChat = '2.3',
-    allAgreePublicChat = '2.4',
-    changeChatName = '2.5',
-    changeChatColor = '2.6',
+    leaveRoom = '2.2',
+    changeChatName = '2.3',
+    changeChatColor = '2.4',
     // message
     message = '3.0',
     messageEnjoy = '3.1',
