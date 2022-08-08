@@ -4,6 +4,7 @@ import {
     TypeCreateGroupResponse,
     TypeCreatePostResponse,
     TypeGradient,
+    TypeInteractBubble,
     TypeMemberInListChatTag,
 } from 'api/interface';
 import FindmeStore from 'app-redux/store';
@@ -19,7 +20,6 @@ import {Metrics} from 'asset/metrics';
 import {PRIVATE_AVATAR} from 'asset/standardValue';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {
-    DISCOVERY_ROUTE,
     LOGIN_ROUTE,
     PROFILE_ROUTE,
     SETTING_ROUTE,
@@ -42,32 +42,8 @@ export const selectBgCardStyle = (opacity?: number) => {
         : `rgba(255, 255, 255, ${valueOpacity})`;
 };
 
-/**
- * DISCOVERY PALACE
- */
-export const openHeartBox = (setShowTabBar: any) => {
-    const modeExp = Redux.getModeExp();
-    if (modeExp) {
-        appAlert('alert.clickHeartModeExp', {
-            moreNotice: 'alert.moreButtonContent',
-            moreAction: () => navigate(LOGIN_ROUTE.signUpType),
-        });
-    } else {
-        navigate(DISCOVERY_ROUTE.heartScreen);
-        setShowTabBar(false);
-    }
-};
-
-export const interactBubble = (params: {
-    itemBubble: any;
-    isBubble: boolean;
-    isEffectTabBar?: boolean;
-}) => {
-    navigate(ROOT_SCREEN.interactBubble, {
-        item: params.itemBubble,
-        isBubble: params.isBubble,
-        isEffectTabBar: params.isEffectTabBar,
-    });
+export const interactBubble = (params: TypeInteractBubble) => {
+    navigate(ROOT_SCREEN.interactBubble, params);
 };
 
 export const choosePrivateAvatar = (_gender?: number) => {

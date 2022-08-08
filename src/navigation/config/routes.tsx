@@ -52,8 +52,6 @@ const MAIN_SCREEN = {
  */
 const DISCOVERY_ROUTE = {
     discoveryScreen: '@DISCOVERY_ROUTE/discoveryScreen',
-    heartScreen: '@DISCOVERY_ROUTE/heartScreen',
-    plusScreen: '@DISCOVERY_ROUTE/plusScreen',
     listBubbleCouple: '@DISCOVERY_ROUTE/listBubbleCouple',
     listBubbleGroup: '@DISCOVERY_ROUTE/listBubbleGroup',
 };

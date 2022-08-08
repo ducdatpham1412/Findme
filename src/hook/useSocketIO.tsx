@@ -5,9 +5,9 @@ import {
     TypeChangeGroupNameResponse,
     TypeChatMessageResponse,
     TypeChatMessageSend,
-    TypeChatTagRequest,
     TypeChatTagResponse,
     TypeCommentResponse,
+    TypeConversationRequest,
     TypeCreatePostResponse,
     TypeDeleteMessageResponse,
     TypeJoinCommunityRequest,
@@ -712,11 +712,12 @@ export const useSocketNotification = () => {
  * HELPER FUNCTION
  * -----------------------------------
  */
-export const startChatTag = (params: {
-    token: any;
-    newChatTag: TypeChatTagRequest;
-}) => {
-    socket.emit(SOCKET_EVENT.createChatTag, params);
+export const startChatTag = (conversation: TypeConversationRequest) => {
+    const {token} = FindmeStore.getState().logicSlice;
+    socket.emit(SOCKET_EVENT.createChatTag, {
+        token,
+        conversation,
+    });
 };
 
 export const socketTyping = (params: TypingResponse) => {

@@ -22,7 +22,11 @@ import {ScaledSheet} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Octicons from 'react-native-vector-icons/Octicons';
-import {chooseColorGradient, renderIconGender} from 'utility/assistant';
+import {
+    chooseColorGradient,
+    renderIconGender,
+    selectBgCardStyle,
+} from 'utility/assistant';
 import ItemSetting from './components/ItemSetting';
 import ItemSettingSwitch from './components/ItemSettingSwitch';
 
@@ -290,6 +294,9 @@ const ChatDetailSetting = ({route}: Props) => {
                 onOpened={() => inputConversationNameRef.current?.focus()}
                 scrollViewProps={{
                     keyboardShouldPersistTaps: 'always',
+                }}
+                overlayStyle={{
+                    backgroundColor: selectBgCardStyle(0.8),
                 }}>
                 <View
                     style={[

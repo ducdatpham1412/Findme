@@ -204,12 +204,6 @@ export interface TypeEditProfileResponse {
     data: any;
 }
 
-export interface TypeSendMessageFromProfile {
-    name: string;
-    creatorId: number;
-    creatorAvatar: string;
-}
-
 export interface TypeCreatePostRequest {
     content?: string;
     images?: Array<string>;
@@ -291,18 +285,18 @@ export interface TypeUpdateMyBubblesRequest {
     }>;
 }
 
+export interface TypeInteractBubble {
+    userId: number;
+    name: string;
+    avatar: string;
+}
+
 /**
  * MESSENGER
  */
-export interface TypeChatTagRequest {
-    type: number; // CHAT_TAG.new
+export interface TypeConversationRequest {
     content: string;
-    listUser: Array<number>; // [1, 2]
-    color: number;
-    senderId: number;
-    // two below only for send from bubble palace
-    nameBubble?: string;
-    idBubble?: string;
+    userId: number;
 }
 
 export interface TypeMemberInListChatTag {
