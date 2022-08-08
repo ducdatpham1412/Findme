@@ -154,7 +154,7 @@ const discovery = {
 const mess = {
     component: {},
     messScreen: {
-        headerTitle: 'Messages',
+        headerTitle: 'Chats',
         requestPublic:
             'Do you agree to unlock anonymous of this conversation?\n\nAfter unlocking, you and this friend can know and follow each other!',
         waitingOther: 'Waiting response from\nyour friend...',
@@ -163,17 +163,21 @@ const mess = {
             'Congratulation! :D\nNow you can connect and make friend to each other',
     },
     detailSetting: {
-        profile: 'profile',
+        title: 'Chat details',
+        profile: "{{name}}'s profile",
+        conversationName: 'Conversation name',
+        theme: 'Theme',
         stopConversation: 'Stop chat',
         openConversation: 'Open chat',
         block: 'Block',
-        unBlock: 'Unblock',
-        sureBlock:
-            'Are you sure block this person?\n\nNote: Any chats with this person (both of anonymous or not) will be blocked',
         report: 'Report',
     },
     typing: 'typing',
     hadJoinGroup: 'had joined group',
+    changeColorOfChat: ' had changed color of chat',
+    changeNameOfChat: ' had changed name of chat',
+    editConversationName: 'Conversation name',
+    oneNameForBoth: 'Use one name for both of you',
 };
 
 // PROFILE ROUTE

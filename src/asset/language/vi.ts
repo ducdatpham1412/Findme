@@ -215,17 +215,21 @@ const mess = {
             'Wowww! :D\nGiờ đây các bạn có thể chia sẻ và kết bạn với nhau rồi',
     },
     detailSetting: {
-        profile: 'profile',
+        title: 'Chi tiết trò chuyện',
+        profile: 'Trang cá nhân của {{name}}',
+        theme: 'Màu sắc',
+        conversationName: 'Tên cuộc trò chuyện',
         stopConversation: 'Dừng chat',
         openConversation: 'Mở chat',
         block: 'Chặn',
-        unBlock: 'Huỷ chặn',
-        sureBlock:
-            'Bạn chắc chắn muốn chặn người này chứ?\n\nLưu ý: Mọi cuộc trò chuyện với người này (kể cả ẩn danh hay không) đều sẽ bị chặn',
         report: 'Tố cáo',
     },
     typing: 'typing',
     hadJoinGroup: 'vừa tham gia nhóm',
+    changeColorOfChat: '{{name}} đã thay đổi màu sắc cuộc trò chuyện',
+    changeNameOfChat: '{{name}} đã thay đổi tên cuộc trò chuyện',
+    editConversationName: 'Tên cuộc trò chuyện',
+    oneNameForBoth: 'Sử dụng một tên cho cả hai bạn',
 };
 
 // SETTING ROUTE

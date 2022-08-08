@@ -1,5 +1,7 @@
 import {
     TypeBubblePalace,
+    TypeChangeChatColor,
+    TypeChangeChatName,
     TypeChangeInformationRequest,
     TypeChangeInformationResponse,
     TypeChangePasswordRequest,
@@ -220,6 +222,18 @@ export const apiGetDetailConversation = (conversationId: string) => {
     return request.get(`/chat/detail-conversation/${conversationId}`);
 };
 
+export const apiChangeChatColor = (params: TypeChangeChatColor) => {
+    return request.put(`/chat/change-chat-color/${params.conversationId}`, {
+        color: params.color,
+    });
+};
+
+export const apiChangeChatName = (params: TypeChangeChatName) => {
+    return request.put(`/chat/change-chat-name/${params.conversationId}`, {
+        name: params.name,
+    });
+};
+
 /**
  *  SETTING
  */
@@ -244,10 +258,10 @@ export const apiChangePassword = (params: TypeChangePasswordRequest) => {
 };
 
 export const apiBlockUser = (id: number) => {
-    return request.post(`/setting/block/enable/${id}`);
+    return request.post(`/setting/block/${id}`);
 };
 export const apiUnBlockUser = (id: number) => {
-    return request.post(`/setting/block/disable/${id}`);
+    return request.post(`/setting/unblock/${id}`);
 };
 export const apiGetListBlocked = (): Promise<TypeGetListBlockedResponse> => {
     return request.get('/setting/block/get-list');

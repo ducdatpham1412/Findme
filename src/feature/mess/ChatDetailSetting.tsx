@@ -1,36 +1,30 @@
 import {TypeChatTagResponse} from 'api/interface';
 import {
     apiBlockUser,
+    apiChangeChatColor,
+    apiChangeChatName,
     apiOpenConversation,
     apiStopConversation,
     apiUnBlockUser,
 } from 'api/module';
-import {CHAT_TAG} from 'asset/enum';
-import {
-    StyleContainer,
-    StyleImage,
-    StyleInput,
-    StyleText,
-    StyleTouchable,
-} from 'components/base';
-import FlyButton from 'components/common/FlyButton';
+import {CONVERSATION_STATUS, TYPE_COLOR} from 'asset/enum';
+import {Metrics} from 'asset/metrics';
+import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
-import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
-import ROOT_SCREEN, {MAIN_SCREEN} from 'navigation/config/routes';
-import {
-    appAlert,
-    appAlertYesNo,
-    goBack,
-    navigate,
-} from 'navigation/NavigationService';
+import StyleHeader from 'navigation/components/StyleHeader';
+import ROOT_SCREEN from 'navigation/config/routes';
+import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {useMemo, useRef, useState} from 'react';
-import {TextInput, View} from 'react-native';
+import {Platform, ScrollView, TextInput, View} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import {Modalize} from 'react-native-modalize';
 import {ScaledSheet} from 'react-native-size-matters';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Octicons from 'react-native-vector-icons/Octicons';
-import {moveMeToEndOfListMember} from 'utility/assistant';
-import ButtonChangeTheme from './components/ButtonChangeTheme';
+import {chooseColorGradient, renderIconGender} from 'utility/assistant';
+import ItemSetting from './components/ItemSetting';
+import ItemSettingSwitch from './components/ItemSettingSwitch';
 
 interface Props {
     route: {
@@ -40,84 +34,94 @@ interface Props {
     };
 }
 
-const ChatDetailSetting = ({route}: Props) => {
-    const routeItemChatTag = route.params.itemChatTag;
+/**
+ * Functions
+ */
+const onGoToProfile = (userId: number) => {
+    navigate(ROOT_SCREEN.otherProfile, {
+        id: userId,
+    });
+};
 
+const onReportUser = (userId: number) => {
+    navigate(ROOT_SCREEN.reportUser, {
+        idUser: userId,
+    });
+};
+
+const ChatDetailSetting = ({route}: Props) => {
     const shouldRenderOtherProfile = Redux.getShouldRenderOtherProfile();
     const borderMessRoute = Redux.getBorderMessRoute();
     const theme = Redux.getTheme();
-    const {id} = Redux.getPassport().profile;
+    const {profile, information} = Redux.getPassport();
+    const {gradient} = Redux.getResource();
+    const gradientAny: any = gradient;
 
-    const listMembers = useMemo(() => {
-        return moveMeToEndOfListMember(routeItemChatTag.listUser);
-    }, [routeItemChatTag.listUser]);
+    const modalizeThemeRef = useRef<Modalize>(null);
+    const modalizeNameRef = useRef<Modalize>(null);
+    const inputConversationNameRef = useRef<TextInput>(null);
 
-    const isChatTagOfMe = useMemo(() => {
-        if (routeItemChatTag.type === CHAT_TAG.group) {
-            return false;
-        }
-        return listMembers[0]?.id === listMembers[1]?.id;
+    const [itemChatTag, setItemChatTag] = useState(route.params.itemChatTag);
+
+    const [conversationName, setConversationName] = useState(
+        itemChatTag.conversationName,
+    );
+
+    const partnerInfo = useMemo(() => {
+        const result = itemChatTag.listUser.find(
+            item => item.id !== profile.id,
+        );
+        return (
+            result || {
+                id: profile.id,
+                name: profile.name,
+                avatar: profile.avatar,
+                gender: information.gender,
+            }
+        );
     }, []);
 
-    const inputGroupNameRef = useRef<TextInput>(null);
-
-    const [itemChatTag, setItemChatTag] = useState(routeItemChatTag);
-    const [groupName, setGroupName] = useState(itemChatTag.groupName);
-    const canChangeName = groupName !== itemChatTag.groupName;
+    const isChatTagOfMe = useMemo(() => {
+        return itemChatTag.listUser[0]?.id === itemChatTag.listUser[1]?.id;
+    }, []);
 
     /**
      * Function
      */
-    const onPressIconEditName = () => {
-        // go to new screen edit name
-    };
-
-    const onChangeChatTheme = (newColor: number) => {
-        // call api change chat theme
-        setItemChatTag((preValue: TypeChatTagResponse) => ({
-            ...preValue,
-            color: newColor,
-        }));
-    };
-
-    // go to partner profile
-    const onGoToProfile = (userId: number) => {
-        navigate(ROOT_SCREEN.otherProfile, {
-            id: userId,
-            onGoBack: () => {
-                navigate(MAIN_SCREEN.messRoute);
-            },
-        });
-    };
-
-    const onBlockOrUnBlock = async () => {
-        const agreeBlock = async () => {
-            try {
-                goBack();
-                await apiBlockUser(listMembers[0]?.id);
-                Redux.setShouldRenderOtherProfile(!shouldRenderOtherProfile);
-                setItemChatTag({
-                    ...itemChatTag,
-                    isBlock: true,
-                });
-            } catch (err) {
-                appAlert(err);
-            }
-        };
-
+    const onChangeTheme = async (key: string) => {
+        const typeColor: any = TYPE_COLOR;
         try {
-            if (itemChatTag.isBlock) {
-                await apiUnBlockUser(listMembers[0].id);
+            if (typeColor[key] !== undefined) {
+                await apiChangeChatColor({
+                    conversationId: itemChatTag.id,
+                    color: typeColor[key],
+                });
+                setItemChatTag({
+                    ...itemChatTag,
+                    color: typeColor[key],
+                });
+                modalizeThemeRef.current?.close();
+            }
+        } catch (err) {
+            appAlert(err);
+        }
+    };
+
+    const onHandleBlock = async () => {
+        try {
+            if (itemChatTag.isBlocked) {
+                await apiUnBlockUser(partnerInfo.id);
                 Redux.setShouldRenderOtherProfile(!shouldRenderOtherProfile);
                 setItemChatTag({
                     ...itemChatTag,
-                    isBlock: false,
+                    isBlocked: false,
                 });
             } else {
-                appAlertYesNo({
-                    i18Title: 'mess.detailSetting.sureBlock',
-                    agreeChange: agreeBlock,
-                    refuseChange: goBack,
+                await apiBlockUser(partnerInfo.id);
+                Redux.setShouldRenderOtherProfile(!shouldRenderOtherProfile);
+                setItemChatTag({
+                    ...itemChatTag,
+                    isBlocked: true,
                 });
             }
         } catch (err) {
@@ -125,263 +129,240 @@ const ChatDetailSetting = ({route}: Props) => {
         }
     };
 
-    const onStopOrOpenConversation = async () => {
+    const onHandleStopConversation = async () => {
         try {
-            if (itemChatTag.isStop) {
+            if (itemChatTag.status === CONVERSATION_STATUS.stop) {
                 await apiOpenConversation(itemChatTag.id);
-                // openChatTag(itemChatTag.id);  // remove this
                 setItemChatTag({
                     ...itemChatTag,
-                    isStop: false,
+                    status: CONVERSATION_STATUS.active,
                 });
             } else {
                 await apiStopConversation(itemChatTag.id);
-                // stopChatTag(itemChatTag.id); // remove this
                 setItemChatTag({
                     ...itemChatTag,
-                    isStop: true,
+                    status: CONVERSATION_STATUS.stop,
                 });
             }
         } catch (err) {
             appAlert(err);
         }
-    };
-
-    const onReportUser = () => {
-        navigate(ROOT_SCREEN.reportUser, {
-            idUser: listMembers[0].id,
-        });
-    };
-
-    const onGoBack = () => {
-        if (inputGroupNameRef.current?.isFocused) {
-            inputGroupNameRef.current.blur();
-            const x = setTimeout(() => {
-                goBack();
-            }, 100);
-            return () => clearTimeout(x);
-        }
-        goBack();
-        return () => null;
     };
 
     /**
      * Render view
      */
-    const RenderBlockOrUnBlock = useMemo(() => {
-        if (itemChatTag.isBlock) {
-            return {
-                color: theme.highlightColor,
-                icon: (
-                    <AntDesign
-                        name="unlock"
-                        style={[styles.stopIcon, {color: theme.highlightColor}]}
-                    />
-                ),
-                text: 'mess.detailSetting.unBlock',
-            };
-        }
-
-        return {
-            color: theme.borderColor,
-            icon: (
-                <Entypo
-                    name="block"
-                    style={[styles.stopIcon, {color: theme.borderColor}]}
-                />
-            ),
-            text: 'mess.detailSetting.block',
-        };
-    }, [itemChatTag.isBlock]);
-
-    const RenderStopOrOpen = useMemo(() => {
-        if (itemChatTag.isStop) {
-            return {
-                color: theme.highlightColor,
-                icon: (
-                    <Octicons
-                        name="stop"
-                        style={[styles.stopIcon, {color: theme.highlightColor}]}
-                    />
-                ),
-                text: 'mess.detailSetting.openConversation',
-            };
-        }
-
-        return {
-            color: theme.borderColor,
-            icon: (
-                <Octicons
-                    name="stop"
-                    style={[styles.stopIcon, {color: theme.borderColor}]}
-                />
-            ),
-            text: 'mess.detailSetting.stopConversation',
-        };
-    }, [itemChatTag.isStop]);
-
-    const RenderBtnBackAndChatTagName = () => {
+    const IconPartnerGender = () => {
         return (
-            <View style={styles.headerView}>
-                <HeaderLeftIcon
-                    style={styles.iconBackView}
-                    onPress={onGoBack}
-                    iconStyle={{color: borderMessRoute}}
-                />
-
-                <View style={styles.groupNameView}>
-                    <StyleInput
-                        ref={inputGroupNameRef}
-                        value={groupName}
-                        onChangeText={text => setGroupName(text)}
-                        containerStyle={[
-                            styles.containerInputView,
-                            {borderColor: borderMessRoute},
-                        ]}
-                        inputStyle={[styles.inputBox, {color: borderMessRoute}]}
-                        hasErrorBox={false}
-                        multiline
-                        isEffectTabBar={false}
-                    />
-                    <StyleTouchable onPress={onPressIconEditName}>
-                        {canChangeName ? (
-                            <AntDesign
-                                name="check"
-                                style={[
-                                    styles.iconEdit,
-                                    {color: borderMessRoute},
-                                ]}
-                            />
-                        ) : (
-                            <AntDesign
-                                name="edit"
-                                style={[
-                                    styles.iconEdit,
-                                    {color: borderMessRoute},
-                                ]}
-                            />
-                        )}
-                    </StyleTouchable>
-                </View>
-            </View>
-        );
-    };
-
-    const RenderListMember = () => {
-        return (
-            <View style={styles.listMemberView}>
-                {listMembers.map(item => {
-                    const color =
-                        item.id === id
-                            ? theme.highlightColor
-                            : theme.borderColor;
-                    return (
-                        <StyleTouchable
-                            key={String(item.id)}
-                            customStyle={styles.memberBox}
-                            onPress={() => onGoToProfile(item.id)}
-                            disable={itemChatTag.isPrivate}
-                            disableOpacity={0.7}>
-                            <StyleImage
-                                source={{uri: item.avatar}}
-                                customStyle={[
-                                    styles.imgAvatar,
-                                    {
-                                        borderColor: color,
-                                    },
-                                ]}
-                            />
-                            <View style={styles.nameTouch}>
-                                <StyleText
-                                    originValue={item.name}
-                                    customStyle={[
-                                        styles.nameText,
-                                        {color: theme.textColor},
-                                    ]}
-                                    numberOfLines={1}
-                                />
-                            </View>
-                        </StyleTouchable>
-                    );
-                })}
-            </View>
-        );
-    };
-
-    const RenderChangeTheme = () => {
-        return (
-            <ButtonChangeTheme
-                colorNow={itemChatTag.color}
-                onChangeChatTheme={onChangeChatTheme}
+            <StyleImage
+                source={renderIconGender(partnerInfo.gender)}
+                customStyle={styles.iconGender}
             />
         );
     };
 
-    const RenderButtonFunction = () => {
-        if (isChatTagOfMe || itemChatTag.type === CHAT_TAG.group) {
-            return null;
-        }
+    const IconConversationName = () => {
         return (
-            <View style={styles.twoButtonView}>
-                {/* Stop or open conversation */}
-                <FlyButton
-                    containerStyle={[
-                        styles.buttonStop,
-                        {
-                            borderColor: RenderStopOrOpen.color,
-                        },
-                    ]}
-                    onPress={onStopOrOpenConversation}>
-                    {RenderStopOrOpen.icon}
+            <Ionicons
+                name="text"
+                style={[
+                    styles.textConversationName,
+                    {color: theme.textHightLight},
+                ]}
+            />
+        );
+    };
+
+    const IconTheme = () => {
+        return (
+            <LinearGradient
+                colors={chooseColorGradient({
+                    listGradients: gradient,
+                    colorChoose: itemChatTag.color,
+                })}
+                style={styles.iconAvatar}
+            />
+        );
+    };
+
+    const IconStopChat = () => {
+        return (
+            <Octicons
+                name="stop"
+                style={[
+                    styles.textConversationName,
+                    {color: theme.textHightLight},
+                ]}
+            />
+        );
+    };
+
+    const IconBlock = () => {
+        return (
+            <Entypo
+                name="block"
+                style={[
+                    styles.textConversationName,
+                    {color: theme.highlightColor},
+                ]}
+            />
+        );
+    };
+
+    const IconReport = () => {
+        return (
+            <Octicons
+                name="report"
+                style={[
+                    styles.textConversationName,
+                    {color: theme.highlightColor},
+                ]}
+            />
+        );
+    };
+
+    const ModalChangeTheme = () => {
+        return (
+            <Modalize
+                ref={modalizeThemeRef}
+                modalHeight={Metrics.height / 2}
+                modalStyle={{
+                    backgroundColor: theme.backgroundButtonColor,
+                }}>
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.contentModalScroll}>
+                    {Object.keys(gradientAny).map((key, index) => {
+                        const name = key[0].toUpperCase() + key.slice(1);
+                        return (
+                            <StyleTouchable
+                                key={index}
+                                customStyle={styles.chooseGradientBox}
+                                onPress={() => onChangeTheme(key)}>
+                                <LinearGradient
+                                    colors={gradientAny[key]}
+                                    style={styles.itemGradient}
+                                />
+                                <StyleText
+                                    originValue={name}
+                                    customStyle={[
+                                        styles.textNameGradient,
+                                        {color: theme.textColor},
+                                    ]}
+                                />
+                            </StyleTouchable>
+                        );
+                    })}
+                </ScrollView>
+            </Modalize>
+        );
+    };
+
+    const ModalEditConversationName = () => {
+        const onCancel = () => {
+            setConversationName(itemChatTag.conversationName);
+            modalizeNameRef.current?.close();
+        };
+
+        const onSave = async () => {
+            try {
+                await apiChangeChatName({
+                    conversationId: itemChatTag.id,
+                    name: conversationName,
+                });
+                setItemChatTag({
+                    ...itemChatTag,
+                    conversationName,
+                });
+                modalizeNameRef.current?.close();
+            } catch (err) {
+                appAlert(err);
+            }
+        };
+
+        return (
+            <Modalize
+                ref={modalizeNameRef}
+                modalStyle={{
+                    backgroundColor: 'transparent',
+                }}
+                withHandle={false}
+                onOpened={() => inputConversationNameRef.current?.focus()}
+                scrollViewProps={{
+                    keyboardShouldPersistTaps: 'always',
+                }}>
+                <View
+                    style={[
+                        styles.inputEditNameView,
+                        {backgroundColor: theme.backgroundButtonColor},
+                    ]}>
                     <StyleText
-                        i18Text={RenderStopOrOpen.text}
+                        i18Text="mess.editConversationName"
                         customStyle={[
-                            styles.stopText,
-                            {color: RenderStopOrOpen.color},
+                            styles.titleConversationName,
+                            {color: theme.textHightLight},
                         ]}
                     />
-                </FlyButton>
-
-                {/* Report */}
-                <FlyButton
-                    containerStyle={[
-                        styles.buttonStop,
-                        {borderColor: RenderBlockOrUnBlock.color},
-                    ]}
-                    onPress={onReportUser}>
-                    <Octicons
-                        name="report"
+                    <StyleText
+                        i18Text="mess.oneNameForBoth"
+                        customStyle={[
+                            styles.contentConversationName,
+                            {color: theme.textColor},
+                        ]}
+                    />
+                    <TextInput
+                        ref={inputConversationNameRef}
                         style={[
-                            styles.stopIcon,
-                            {color: RenderBlockOrUnBlock.color},
+                            styles.inputConversationName,
+                            {
+                                color: theme.textHightLight,
+                                borderColor: theme.borderColor,
+                            },
                         ]}
+                        defaultValue={conversationName}
+                        placeholder="Aa"
+                        placeholderTextColor={theme.holderColorLighter}
+                        onChangeText={text => setConversationName(text)}
                     />
-                    <StyleText
-                        i18Text="mess.detailSetting.report"
-                        customStyle={[
-                            styles.stopText,
-                            {color: RenderBlockOrUnBlock.color},
-                        ]}
-                    />
-                </FlyButton>
-
-                {/* Block user */}
-                <FlyButton
-                    containerStyle={[
-                        styles.buttonStop,
-                        {borderColor: RenderBlockOrUnBlock.color},
-                    ]}
-                    onPress={onBlockOrUnBlock}>
-                    {RenderBlockOrUnBlock.icon}
-                    <StyleText
-                        i18Text={RenderBlockOrUnBlock.text}
-                        customStyle={[
-                            styles.stopText,
-                            {color: RenderBlockOrUnBlock.color},
-                        ]}
-                    />
-                </FlyButton>
-            </View>
+                    <View
+                        style={[
+                            styles.buttonView,
+                            {borderTopColor: theme.borderColor},
+                        ]}>
+                        <StyleTouchable
+                            customStyle={[
+                                styles.buttonBox,
+                                {
+                                    borderRightWidth: 0.5,
+                                    borderRightColor: theme.borderColor,
+                                },
+                            ]}
+                            onPress={onCancel}>
+                            <StyleText
+                                i18Text="common.cancel"
+                                customStyle={[
+                                    styles.textButton,
+                                    {color: theme.highlightColor},
+                                ]}
+                            />
+                        </StyleTouchable>
+                        <StyleTouchable
+                            customStyle={styles.buttonBox}
+                            onPress={onSave}>
+                            <StyleText
+                                i18Text="common.save"
+                                customStyle={[
+                                    styles.textButton,
+                                    {
+                                        color: theme.highlightColor,
+                                        fontWeight: 'bold',
+                                    },
+                                ]}
+                            />
+                        </StyleTouchable>
+                    </View>
+                </View>
+            </Modalize>
         );
     };
 
@@ -391,13 +372,86 @@ const ChatDetailSetting = ({route}: Props) => {
                 styles.container,
                 {backgroundColor: theme.backgroundColor},
             ]}>
-            {RenderBtnBackAndChatTagName()}
+            <StyleHeader
+                title={
+                    itemChatTag.conversationName || 'mess.detailSetting.title'
+                }
+                titleStyle={{width: '60%'}}
+            />
 
-            <StyleContainer scrollEnabled nestedScrollEnabled>
-                {RenderListMember()}
-                {RenderChangeTheme()}
-                {RenderButtonFunction()}
-            </StyleContainer>
+            <View style={styles.avatarNameView}>
+                <StyleImage
+                    source={{uri: partnerInfo.avatar}}
+                    customStyle={styles.avatar}
+                />
+                <StyleText
+                    originValue={partnerInfo.name}
+                    customStyle={[styles.nameText, {color: borderMessRoute}]}
+                />
+            </View>
+
+            <ScrollView style={styles.body}>
+                <View
+                    style={[
+                        styles.customActionsView,
+                        {backgroundColor: theme.backgroundTextInput},
+                    ]}>
+                    <ItemSetting
+                        iconLeft={IconPartnerGender()}
+                        title="mess.detailSetting.profile"
+                        titleParams={{name: partnerInfo.name}}
+                        hadIconRight
+                        onPress={() => onGoToProfile(partnerInfo.id)}
+                    />
+                    <ItemSetting
+                        iconLeft={IconConversationName()}
+                        title="mess.detailSetting.conversationName"
+                        titleParams={{name: partnerInfo.name}}
+                        onPress={() => {
+                            modalizeNameRef.current?.open();
+                        }}
+                    />
+                    <ItemSetting
+                        iconLeft={IconTheme()}
+                        title="mess.detailSetting.theme"
+                        titleParams={{name: partnerInfo.name}}
+                        onPress={() => modalizeThemeRef.current?.open()}
+                    />
+                </View>
+
+                {!isChatTagOfMe && (
+                    <View
+                        style={[
+                            styles.customActionsView,
+                            {backgroundColor: theme.backgroundTextInput},
+                        ]}>
+                        <ItemSettingSwitch
+                            iconLeft={IconStopChat()}
+                            title="mess.detailSetting.stopConversation"
+                            value={
+                                itemChatTag.status === CONVERSATION_STATUS.stop
+                            }
+                            onToggleSwitch={onHandleStopConversation}
+                        />
+                        <ItemSettingSwitch
+                            iconLeft={IconBlock()}
+                            title="mess.detailSetting.block"
+                            titleStyle={{color: theme.highlightColor}}
+                            value={itemChatTag.isBlocked}
+                            onToggleSwitch={onHandleBlock}
+                        />
+                        <ItemSetting
+                            iconLeft={IconReport()}
+                            title="mess.detailSetting.report"
+                            titleStyle={{color: theme.highlightColor}}
+                            onPress={() => onReportUser(partnerInfo.id)}
+                        />
+                    </View>
+                )}
+            </ScrollView>
+
+            {ModalChangeTheme()}
+            {ModalEditConversationName()}
         </View>
     );
 };
@@ -406,77 +460,110 @@ const styles = ScaledSheet.create({
     container: {
         flex: 1,
     },
-    // headerView
-    headerView: {
-        width: '100%',
-        justifyContent: 'center',
-        flexDirection: 'row',
-        paddingHorizontal: '20@s',
+    avatarNameView: {
+        alignSelf: 'center',
         marginTop: '20@vs',
+        alignItems: 'center',
     },
-    iconBackView: {},
-    // group name view
-    groupNameView: {
-        width: '100%',
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        justifyContent: 'center',
+    avatar: {
+        width: '100@s',
+        height: '100@s',
+        borderRadius: '50@s',
     },
-    containerInputView: {
-        width: '60%',
-        borderBottomWidth: 1,
-        paddingBottom: '5@vs',
-    },
-    inputBox: {
-        fontSize: '17@ms',
-    },
-    iconEdit: {
-        fontSize: '25@ms',
-        marginLeft: '5@s',
-    },
-    // list members
-    listMemberView: {
-        width: '100%',
+    nameText: {
+        fontWeight: 'bold',
         marginTop: '10@vs',
     },
-    memberBox: {
+    body: {
+        width: '85%',
+        alignSelf: 'center',
+        marginTop: '15@vs',
+    },
+    customActionsView: {
+        width: '100%',
+        paddingVertical: '10@vs',
+        paddingHorizontal: '15@s',
+        borderRadius: '8@s',
+        marginBottom: '15@vs',
+    },
+    iconGender: {
         width: '80%',
+        height: '80%',
+    },
+    textConversationName: {
+        fontSize: '20@ms',
+    },
+    iconAvatar: {
+        width: '70%',
+        height: '70%',
+        borderRadius: '70@s',
+    },
+    contentModalScroll: {
+        paddingBottom: '50@vs',
+        paddingTop: '20@vs',
+    },
+    chooseGradientBox: {
+        width: '60%',
         flexDirection: 'row',
-        marginTop: '20@vs',
+        alignItems: 'center',
+        marginVertical: '10@vs',
         alignSelf: 'center',
     },
-    imgAvatar: {
+    itemGradient: {
         width: '40@s',
         height: '40@s',
         borderRadius: '25@s',
-        borderWidth: '2@s',
-        marginHorizontal: '5@s',
     },
-    nameTouch: {
-        flex: 1,
-        justifyContent: 'center',
-        paddingLeft: '10@s',
+    textNameGradient: {
+        fontSize: '16@ms',
+        marginLeft: '10@s',
+        fontWeight: 'bold',
     },
-    nameText: {
-        fontSize: '17@ms',
+    inputEditNameView: {
+        width: '75%',
+        alignSelf: 'center',
+        borderRadius: '15@ms',
+        marginTop: Metrics.height / 5,
+        alignItems: 'center',
     },
-    // button view
-    buttonStop: {
-        width: '50@s',
-        height: '50@s',
+    titleConversationName: {
+        fontSize: '15@ms',
+        fontWeight: 'bold',
+        marginTop: '13@vs',
     },
-    stopIcon: {
-        fontSize: '17@ms',
+    contentConversationName: {
+        fontSize: '12@ms',
+        marginTop: '7@vs',
     },
-    stopText: {
-        fontSize: '7@ms',
-        marginTop: '6@vs',
+    inputConversationName: {
+        width: '85%',
+        marginTop: '15@vs',
+        marginBottom: 0,
+        borderWidth: Platform.select({
+            ios: '0.25@ms',
+            android: '0.5@ms',
+        }),
+        paddingVertical: '6@vs',
+        paddingHorizontal: '5@s',
+        borderRadius: '5@ms',
     },
-    twoButtonView: {
+    buttonView: {
         width: '100%',
+        borderTopWidth: Platform.select({
+            ios: '0.25@ms',
+            android: '0.5@ms',
+        }),
+        marginTop: '15@vs',
         flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginTop: '80@vs',
+        paddingVertical: '13@vs',
+    },
+    buttonBox: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    textButton: {
+        fontSize: '15@ms',
     },
 });
 

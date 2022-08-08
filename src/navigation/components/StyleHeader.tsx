@@ -5,10 +5,11 @@ import React from 'react';
 import {StyleProp, TextStyle, View, ViewStyle} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {isIOS} from 'utility/assistant';
+import {I18Normalize} from 'utility/I18Next';
 import HeaderLeftIcon from './HeaderLeftIcon';
 
 export interface StyleHeaderProps {
-    title: string;
+    title: I18Normalize | string;
     onGoBack?(): void;
     containerStyle?: StyleProp<ViewStyle>;
     titleStyle?: StyleProp<TextStyle>;

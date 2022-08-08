@@ -304,10 +304,6 @@ export interface TypeChatTagRequest {
     nameBubble?: string;
     idBubble?: string;
 }
-// export interface TypeChatTagEnjoyRequest {
-//     myId: number;
-//     newChatTag: TypeChatTagRequest;
-// }
 
 export interface TypeMemberInListChatTag {
     id: number;
@@ -329,7 +325,7 @@ export interface TypeChatTagResponse {
     color: number;
     modified: string;
     status: number;
-    isBlocked: number;
+    isBlocked: boolean;
     latestMessage: string;
     // in front-end
     userTyping?: Array<number>;
@@ -354,7 +350,7 @@ export interface TypeChatMessageResponse {
     creator: number;
     creatorName: string;
     creatorAvatar: string;
-    created: string;
+    created: string | undefined;
     tag?: string | undefined; // to check message comeback sender after set local message
     // in front-end
     relationship: number;
@@ -368,6 +364,11 @@ export interface TypeChangeGroupNameResponse {
 export interface TypeChangeChatColor {
     conversationId: string;
     color: number;
+}
+
+export interface TypeChangeChatName {
+    conversationId: string;
+    name: string;
 }
 
 // seen message

@@ -115,7 +115,8 @@ const ListFollows = ({route}: Props) => {
     const initRoute = useMemo(() => {
         if (type === TYPE_FOLLOW.follower) {
             return 'Follower';
-        } else if (type === TYPE_FOLLOW.following) {
+        }
+        if (type === TYPE_FOLLOW.following) {
             return 'Following';
         }
         return '';

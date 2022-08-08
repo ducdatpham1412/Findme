@@ -5,17 +5,13 @@ import {DELAY_LONG_PRESS} from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
-import React, {memo, useMemo, useRef, useState} from 'react';
+import React, {memo, useRef, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import {Animated, Keyboard, Text, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {
-    moderateScale,
-    scale,
-    ScaledSheet,
-    verticalScale,
-} from 'react-native-size-matters';
+import {moderateScale, scale, ScaledSheet} from 'react-native-size-matters';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {formatDateMessage} from 'utility/format';
 import {checkIsSingleEmoji} from 'utility/validate';
 import {TypeSeeDetailImage} from '../ChatDetail';
 import DatetimeMessage from './DatetimeMessage';
@@ -27,6 +23,7 @@ interface Props {
     displayPartnerAvatar: boolean;
     displaySeenAvatar: boolean;
     chatColor: Array<string>;
+    partnerAvatar: string;
     onDeleteMessage(idMessage: string): Promise<void>;
     // listMessagesLength: number;
     onSeeDetailImage(params: TypeSeeDetailImage): void;
@@ -41,6 +38,7 @@ const ItemMessage = (props: Props) => {
         onDeleteMessage,
         chatColor,
         onSeeDetailImage,
+        partnerAvatar,
     } = props;
     const theme = Redux.getTheme();
     let x: any;
@@ -49,19 +47,16 @@ const ItemMessage = (props: Props) => {
     const displayAvatar = isMyMessage
         ? displaySeenAvatar
         : displayPartnerAvatar;
-    const isText = itemMessage.type === MESSAGE_TYPE.text;
 
-    let isEmoji = false;
-    if (isText) {
-        isEmoji =
-            !!itemMessage.content &&
-            typeof itemMessage.content === 'string' &&
-            checkIsSingleEmoji(itemMessage.content);
-    }
+    const isText = itemMessage.type === MESSAGE_TYPE.text;
+    const isEmoji = isText && checkIsSingleEmoji(String(itemMessage.content));
+
     const isMessageText = isText && !isEmoji;
     const isMessageEmoji = isText && isEmoji;
     const isMessageImage =
         itemMessage.type === MESSAGE_TYPE.image && !!itemMessage.content.length;
+    const isMessageChangeColor = itemMessage.type === MESSAGE_TYPE.changeColor;
+    const isMessageChangeName = itemMessage.type === MESSAGE_TYPE.changeName;
 
     const backgroundColor = isMyMessage
         ? 'transparent'
@@ -69,6 +64,7 @@ const ItemMessage = (props: Props) => {
     const textColor = isMyMessage ? Theme.common.textMe : theme.textColor;
     const paddingLeft = isMyMessage ? scale(17) : scale(10);
     const paddingRight = isMyMessage ? scale(10) : scale(17);
+    const avatarSize = isMyMessage ? moderateScale(20) : moderateScale(27);
 
     /**
      * For animation message
@@ -124,7 +120,7 @@ const ItemMessage = (props: Props) => {
     /**
      * Render view
      */
-    const RenderLinearGradient = useMemo(() => {
+    const RenderLinearGradient = () => {
         if (!isMyMessage) {
             return null;
         }
@@ -140,15 +136,44 @@ const ItemMessage = (props: Props) => {
                 end={{x: 1, y: 1}}
             />
         );
-    }, [isMyMessage, chatColor]);
+    };
 
-    const avatarSize = useMemo(() => {
-        return isMyMessage ? moderateScale(20) : moderateScale(27);
-    }, [isMyMessage]);
+    const PartnerAvatar = () => {
+        if (isMyMessage) {
+            return null;
+        }
+        if (!displayAvatar) {
+            return <View style={styles.avatarPartnerWithoutAvatar} />;
+        }
+        return (
+            <View style={styles.avatarPartnerView}>
+                <StyleImage
+                    source={{uri: partnerAvatar}}
+                    customStyle={styles.avatarPartnerView}
+                />
+            </View>
+        );
+    };
+
+    const SeenAvatar = () => {
+        if (!isMyMessage || !displayAvatar) {
+            return null;
+        }
+        return (
+            <View style={styles.seenAvatarView}>
+                <StyleImage
+                    source={{uri: partnerAvatar}}
+                    customStyle={styles.seenAvatar}
+                />
+            </View>
+        );
+    };
 
     return (
         <>
-            {isDisplayDatetime && (
+            {SeenAvatar()}
+
+            {isDisplayDatetime && !!itemMessage.created && (
                 <DatetimeMessage
                     datetime={itemMessage.created}
                     isMyMessage={isMyMessage}
@@ -162,25 +187,10 @@ const ItemMessage = (props: Props) => {
                     styles.container,
                     {
                         flexDirection: isMyMessage ? 'row-reverse' : 'row',
-                        marginTop: isSameMessageAfter ? 0 : verticalScale(30),
                         opacity: itemMessage?.tag ? 0.4 : 1,
                     },
                 ]}>
-                <View
-                    style={[
-                        styles.avatarView,
-                        {width: avatarSize, height: avatarSize},
-                    ]}>
-                    {displayAvatar && (
-                        <StyleImage
-                            source={{uri: itemMessage.creatorAvatar}}
-                            customStyle={[
-                                styles.avatarView,
-                                {width: avatarSize, height: avatarSize},
-                            ]}
-                        />
-                    )}
-                </View>
+                {PartnerAvatar()}
 
                 <View style={styles.spaceView} />
 
@@ -267,7 +277,7 @@ const ItemMessage = (props: Props) => {
                             onPress={onPressMessage}
                             onLongPress={onLongPressMessage}
                             delayLongPress={DELAY_LONG_PRESS}>
-                            {RenderLinearGradient}
+                            {RenderLinearGradient()}
 
                             <StyleText
                                 originValue={itemMessage.content}
@@ -283,6 +293,62 @@ const ItemMessage = (props: Props) => {
                         </StyleTouchable>
                     )}
 
+                    {isMessageChangeColor && (
+                        <View style={styles.notificationMessageView}>
+                            <StyleText
+                                originValue={`@${itemMessage.creatorName}`}
+                                customStyle={[
+                                    styles.textNotification,
+                                    {
+                                        color: theme.textColor,
+                                        fontWeight: 'bold',
+                                        marginLeft: isMyMessage
+                                            ? avatarSize + scale(7)
+                                            : -(avatarSize + scale(7)),
+                                    },
+                                ]}>
+                                <StyleText
+                                    i18Text="mess.changeColorOfChat"
+                                    customStyle={[
+                                        styles.textNotification,
+                                        {
+                                            color: theme.textColor,
+                                            fontWeight: 'normal',
+                                        },
+                                    ]}
+                                />
+                            </StyleText>
+                        </View>
+                    )}
+
+                    {isMessageChangeName && (
+                        <View style={styles.notificationMessageView}>
+                            <StyleText
+                                originValue={`@${itemMessage.creatorName}`}
+                                customStyle={[
+                                    styles.textNotification,
+                                    {
+                                        color: theme.textColor,
+                                        fontWeight: 'bold',
+                                        marginLeft: isMyMessage
+                                            ? avatarSize + scale(7)
+                                            : -(avatarSize + scale(7)),
+                                    },
+                                ]}>
+                                <StyleText
+                                    i18Text="mess.changeNameOfChat"
+                                    customStyle={[
+                                        styles.textNotification,
+                                        {
+                                            color: theme.textColor,
+                                            fontWeight: 'normal',
+                                        },
+                                    ]}
+                                />
+                            </StyleText>
+                        </View>
+                    )}
+
                     {/* only message text have this
                     because message image when press will show detail */}
 
@@ -292,6 +358,21 @@ const ItemMessage = (props: Props) => {
                     />
                 </Animated.View>
             </View>
+
+            {!!itemMessage.created &&
+                (!isSameMessageAfter ||
+                    isMessageChangeName ||
+                    isMessageChangeColor) && (
+                    <StyleText
+                        originValue={formatDateMessage(itemMessage.created)}
+                        customStyle={[
+                            styles.dateText,
+                            {
+                                color: theme.borderColor,
+                            },
+                        ]}
+                    />
+                )}
         </>
     );
 };
@@ -299,15 +380,27 @@ const ItemMessage = (props: Props) => {
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
-        alignItems: 'flex-end',
+        alignItems: 'flex-start',
         marginBottom: '2@vs',
     },
     // avatar
-    avatarView: {
-        width: '24@ms',
-        height: '24@ms',
+    avatarPartnerWithoutAvatar: {
+        width: '40@ms',
+        height: '100%',
+    },
+    avatarPartnerView: {
+        width: '40@ms',
+        height: '40@ms',
+        borderRadius: '20@ms',
+    },
+    seenAvatarView: {
+        alignSelf: 'flex-end',
+        marginRight: '10@s',
+    },
+    seenAvatar: {
+        width: '30@ms',
+        height: '30@ms',
         borderRadius: '15@ms',
-        marginBottom: '4@vs',
     },
     // space between
     spaceView: {
@@ -319,13 +412,19 @@ const styles = ScaledSheet.create({
         flex: 1,
     },
     messageBox: {
-        borderRadius: '20@vs',
+        borderRadius: '25@ms',
         maxWidth: '70%',
         minWidth: '20%',
     },
     messageText: {
-        fontSize: '16@ms',
-        marginVertical: '7@vs',
+        fontSize: '13.5@ms',
+        marginVertical: '10@ms',
+    },
+    dateText: {
+        alignSelf: 'center',
+        fontSize: '10@ms',
+        marginTop: '20@vs',
+        marginBottom: '10@vs',
     },
     imageBox: {
         maxWidth: Metrics.width * 0.7,
@@ -336,12 +435,21 @@ const styles = ScaledSheet.create({
         position: 'absolute',
         width: '40@s',
         height: '100%',
-        left: '21@s',
+        left: '7@s',
         alignItems: 'center',
         justifyContent: 'center',
     },
     iconDelete: {
         fontSize: '25@ms',
+    },
+    notificationMessageView: {
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    textNotification: {
+        fontSize: '10@ms',
+        marginBottom: '10@vs',
     },
     // come back touch
     comeBackButtonBox: {
