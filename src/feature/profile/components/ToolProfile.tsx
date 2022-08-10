@@ -27,7 +27,7 @@ const ToolProfile = () => {
                 ]}
                 hitSlop={15}>
                 <StyleImage
-                    source={Images.icons.plus}
+                    source={Images.icons.createGroup}
                     customStyle={[
                         styles.iconCamera,
                         {tintColor: theme.textHightLight},
@@ -43,7 +43,7 @@ const ToolProfile = () => {
             />
 
             <StyleTouchable
-                onPress={() => navigate(PROFILE_ROUTE.createGroup)}
+                onPress={() => null}
                 customStyle={[
                     styles.touchIconCamera,
                     {borderColor: theme.textColor},

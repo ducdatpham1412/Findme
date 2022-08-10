@@ -6,12 +6,13 @@ import {goBack} from 'navigation/NavigationService';
 import React, {ReactNode, useEffect, useRef} from 'react';
 import {Animated, TouchableOpacity, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
+import {I18Normalize} from 'utility/I18Next';
 import {StyleIcon} from './base';
 
 interface AlertConfirmChangeProps {
     route: {
         params: {
-            i18Title: string;
+            i18Title: I18Normalize;
             i18Params?: object;
             agreeChange(): void;
             refuseChange(): void;
@@ -32,7 +33,7 @@ const ButtonYesOrNo = (props: any) => {
             <TouchableOpacity
                 style={[
                     styles.buttonElement,
-                    {backgroundColor: theme.borderColor},
+                    {backgroundColor: theme.borderColor, opacity: 0.6},
                 ]}
                 onPress={agreeChange}>
                 <StyleText
@@ -84,8 +85,6 @@ const AlertYesNo = ({route}: AlertConfirmChangeProps) => {
     const onGoBack = () => {
         if (touchOutBack) {
             goBack();
-        } else {
-            return;
         }
     };
 
@@ -106,9 +105,7 @@ const AlertYesNo = ({route}: AlertConfirmChangeProps) => {
                         styles.headerView,
                         {borderBottomColor: theme.borderColor},
                     ]}>
-                    {headerNode ? (
-                        headerNode
-                    ) : (
+                    {!!headerNode || (
                         <>
                             <StyleIcon
                                 source={Images.icons.alert}

@@ -1,6 +1,5 @@
 import {TypeBubblePalace} from 'api/interface';
 import {apiGetDetailBubble, apiLikePost, apiUnLikePost} from 'api/module';
-import {RELATIONSHIP} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
@@ -12,11 +11,9 @@ import IconNotLiked from 'components/common/IconNotLiked';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
-import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
 import ROOT_SCREEN from 'navigation/config/routes';
 import {
     appAlert,
-    goBack,
     navigate,
     showSwipeImages,
 } from 'navigation/NavigationService';
@@ -24,21 +21,13 @@ import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
-import {
-    bubbleProfileHeight,
-    bubbleProfileWidth,
-    chooseColorGradient,
-    choosePrivateAvatar,
-    logger,
-} from 'utility/assistant';
-import IconHobby from './components/IconHobby';
+import {bubbleProfileHeight, bubbleProfileWidth} from 'utility/assistant';
 import ModalComment from './components/ModalComment';
 
 interface Props {
     route: {
         params: {
-            bubbleId?: string;
-            itemBubble?: TypeBubblePalace;
+            bubbleId: string;
             displayComment?: boolean;
         };
     };
@@ -46,39 +35,23 @@ interface Props {
 
 const DetailBubble = ({route}: Props) => {
     const bubbleId = route.params?.bubbleId;
-    const itemBubble = route.params?.itemBubble;
     const routeDisplayComment = !!route.params?.displayComment;
 
     const theme = Redux.getTheme();
-    const {gradient} = Redux.getResource();
+    const myId = Redux.getPassport().profile.id;
 
     const optionsRef = useRef<any>(null);
 
     const [bubble, setBubble] = useState<TypeBubblePalace>();
     const [displayComment, setDisplayComment] = useState(routeDisplayComment);
 
-    const isLiked = bubble?.isLiked;
-    const totalLikes = bubble?.totalLikes;
-    const avatar =
-        bubble?.creatorAvatar ||
-        (bubble?.gender ? choosePrivateAvatar(bubble.gender) : '');
-
-    const color = chooseColorGradient({
-        listGradients: gradient,
-        colorChoose: bubble?.color || 0,
-    });
-
-    const imageChoose = bubble?.images[0] ? bubble?.images[0] : avatar;
-    const isMyBubble = bubble?.relationship === RELATIONSHIP.self;
+    const imageChoose = bubble?.images[0] || bubble?.creatorAvatar || '';
+    const isMyPost = bubble?.creator === myId;
 
     const getData = async () => {
         try {
-            if (bubbleId) {
-                const res = await apiGetDetailBubble(bubbleId);
-                setBubble(res.data);
-            } else if (bubble) {
-                setBubble(itemBubble);
-            }
+            const res = await apiGetDetailBubble(bubbleId);
+            setBubble(res.data);
         } catch (err) {
             appAlert(err);
         }
@@ -89,9 +62,9 @@ const DetailBubble = ({route}: Props) => {
     }, []);
 
     const onGoToProfile = () => {
-        if (bubble?.hadKnowEachOther) {
+        if (bubble?.creator) {
             navigate(ROOT_SCREEN.otherProfile, {
-                id: bubble.creatorId,
+                id: bubble.creator,
             });
         }
     };
@@ -111,20 +84,22 @@ const DetailBubble = ({route}: Props) => {
         }
     };
 
-    const onLikeUnLike = async () => {
-        if (bubble && totalLikes !== undefined && isLiked !== undefined) {
-            const currentLike = isLiked;
-            const currentTotalLikes = totalLikes;
+    const onHandleLike = async () => {
+        if (bubble) {
+            const currentLike = bubble.isLiked;
+            const currentTotalLikes = bubble.totalLikes;
 
             try {
                 setBubble({
                     ...bubble,
                     isLiked: !currentLike,
-                    totalLikes: currentTotalLikes + (isLiked ? -1 : 1),
+                    totalLikes: currentTotalLikes + (currentLike ? -1 : 1),
                 });
-                await (currentLike
-                    ? apiUnLikePost(bubble.id)
-                    : apiLikePost(bubble.id));
+                if (currentLike) {
+                    await apiUnLikePost(bubble.id);
+                } else {
+                    apiLikePost(bubble.id);
+                }
             } catch (err) {
                 setBubble({
                     ...bubble,
@@ -146,20 +121,15 @@ const DetailBubble = ({route}: Props) => {
     const RenderImage = () => {
         const opacity = bubble?.images[0] ? 1 : 0.3;
 
-        const onShowNameBubble = () => {
-            logger(bubble?.name);
-        };
-
         return (
             <StyleTouchHaveDouble
                 customStyle={styles.imageView}
                 onDoubleClick={() => {
-                    if (!isLiked) {
-                        onLikeUnLike();
+                    if (!bubble?.isLiked) {
+                        onHandleLike();
                     } else {
                         showSwipeImages({
                             listImages: [{url: imageChoose}],
-                            allowSaveImage: isMyBubble,
                         });
                     }
                 }}>
@@ -178,21 +148,16 @@ const DetailBubble = ({route}: Props) => {
                         resizeMode="contain"
                     />
                 </StyleTouchable>
-
-                {bubble?.color && (
-                    <IconHobby
-                        bubbleId={bubble?.id}
-                        color={bubble.color}
-                        containerStyle={styles.iconHobby}
-                        onTouchStart={onShowNameBubble}
-                    />
-                )}
             </StyleTouchHaveDouble>
         );
     };
 
     const RenderContentName = () => {
-        const textColor = isMyBubble
+        if (!bubble) {
+            return null;
+        }
+
+        const textColor = isMyPost
             ? theme.highlightColor
             : Theme.darkTheme.textHightLight;
         return (
@@ -204,7 +169,7 @@ const DetailBubble = ({route}: Props) => {
                 <View style={styles.avatarNameContentView}>
                     <StyleTouchable onPress={onGoToProfile}>
                         <StyleImage
-                            source={{uri: avatar}}
+                            source={{uri: bubble.creatorAvatar}}
                             customStyle={styles.avatar}
                         />
                     </StyleTouchable>
@@ -231,7 +196,7 @@ const DetailBubble = ({route}: Props) => {
     };
 
     const RenderTool = () => {
-        const RenderStartChat = () => {
+        const StartChat = () => {
             return (
                 <StyleTouchable
                     customStyle={[
@@ -251,8 +216,7 @@ const DetailBubble = ({route}: Props) => {
             );
         };
 
-        const RenderIconLikeUnLike = () => {
-            const iconColor = isLiked ? theme.likeHeart : theme.unLikeHeart;
+        const IconLike = () => {
             return (
                 <View>
                     <StyleTouchable
@@ -260,30 +224,30 @@ const DetailBubble = ({route}: Props) => {
                             styles.buttonTouch,
                             {backgroundColor: theme.backgroundColor},
                         ]}
-                        onPress={onLikeUnLike}
+                        onPress={onHandleLike}
                         hitSlop={15}>
-                        {isLiked ? (
+                        {bubble?.isLiked ? (
                             <IconLiked
-                                onPress={onLikeUnLike}
+                                onPress={onHandleLike}
                                 customStyle={[
                                     styles.iconLike,
-                                    {color: iconColor},
+                                    {color: theme.likeHeart},
                                 ]}
                             />
                         ) : (
                             <IconNotLiked
-                                onPress={onLikeUnLike}
+                                onPress={onHandleLike}
                                 customStyle={[
                                     styles.iconUnLike,
-                                    {color: iconColor},
+                                    {color: theme.unLikeHeart},
                                 ]}
                             />
                         )}
                     </StyleTouchable>
                     <View style={styles.textLikeCommentBox}>
-                        {!!totalLikes && (
+                        {!!bubble?.totalLikes && (
                             <StyleText
-                                originValue={totalLikes}
+                                originValue={bubble.totalLikes}
                                 customStyle={[
                                     styles.textLikeComment,
                                     {color: theme.unLikeHeart},
@@ -295,7 +259,7 @@ const DetailBubble = ({route}: Props) => {
             );
         };
 
-        const RenderComment = () => {
+        const Comment = () => {
             return (
                 <View>
                     <StyleTouchable
@@ -326,7 +290,7 @@ const DetailBubble = ({route}: Props) => {
             );
         };
 
-        const RenderReload = () => {
+        const Reload = () => {
             return (
                 <StyleTouchable
                     customStyle={[
@@ -345,21 +309,53 @@ const DetailBubble = ({route}: Props) => {
 
         return (
             <View style={styles.toolView}>
-                {RenderStartChat()}
-                {RenderIconLikeUnLike()}
-                {RenderComment()}
-                {RenderReload()}
+                {StartChat()}
+                {IconLike()}
+                {Comment()}
+                {Reload()}
             </View>
         );
     };
 
+    const ModalOptions = () => {
+        if (!isMyPost) {
+            return (
+                <StyleActionSheet
+                    ref={optionsRef}
+                    listTextAndAction={[
+                        {
+                            text: 'discovery.report.title',
+                            action: () => {
+                                if (bubble?.creator) {
+                                    navigate(ROOT_SCREEN.reportUser, {
+                                        idUser: bubble.creator,
+                                    });
+                                }
+                            },
+                        },
+                        {
+                            text: 'discovery.seeDetailImage',
+                            action: () => {
+                                showSwipeImages({
+                                    listImages: [{url: imageChoose}],
+                                });
+                            },
+                        },
+                        {
+                            text: 'common.cancel',
+                            action: () => null,
+                        },
+                    ]}
+                />
+            );
+        }
+
+        return null; // Tomorrow check here
+    };
+
     return (
         <>
-            <LinearGradient
-                style={styles.container}
-                colors={color}
-                start={{x: 0, y: 0}}
-                end={{x: 1, y: 1}}>
+            <View style={styles.container}>
                 <View
                     style={[
                         styles.body,
@@ -369,9 +365,7 @@ const DetailBubble = ({route}: Props) => {
                     {RenderContentName()}
                     {RenderTool()}
                 </View>
-            </LinearGradient>
-
-            <HeaderLeftIcon onPress={goBack} style={styles.backIcon} />
+            </View>
 
             {!!bubble && displayComment && (
                 <ModalComment
@@ -383,34 +377,7 @@ const DetailBubble = ({route}: Props) => {
                 />
             )}
 
-            <StyleActionSheet
-                ref={optionsRef}
-                listTextAndAction={[
-                    {
-                        text: 'discovery.report.title',
-                        action: () => {
-                            if (bubble?.creatorId) {
-                                navigate(ROOT_SCREEN.reportUser, {
-                                    idUser: bubble?.creatorId,
-                                });
-                            }
-                        },
-                    },
-                    {
-                        text: 'discovery.seeDetailImage',
-                        action: () => {
-                            showSwipeImages({
-                                listImages: [{url: imageChoose}],
-                                allowSaveImage: isMyBubble,
-                            });
-                        },
-                    },
-                    {
-                        text: 'common.cancel',
-                        action: () => null,
-                    },
-                ]}
-            />
+            {ModalOptions()}
         </>
     );
 };
@@ -425,12 +392,6 @@ const styles = ScaledSheet.create({
     body: {
         flex: 1,
         borderRadius: '15@ms',
-    },
-    backIcon: {
-        position: 'absolute',
-        top: '100@vs',
-        backgroundColor: `rgba(8, 16, 25, ${0.4})`,
-        borderRadius: '20@vs',
     },
     // avatar, name and content
     avatarNameContentView: {
@@ -477,12 +438,6 @@ const styles = ScaledSheet.create({
     iconMore: {
         width: '25@ms',
         height: '8@ms',
-    },
-    iconHobby: {
-        position: 'absolute',
-        marginTop: 0,
-        top: '10@ms',
-        left: '10@ms',
     },
     // tool
     toolView: {

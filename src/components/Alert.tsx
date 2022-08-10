@@ -5,14 +5,15 @@ import {goBack} from 'navigation/NavigationService';
 import React, {useEffect, useRef} from 'react';
 import {Animated, TouchableOpacity, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
+import {I18Normalize} from 'utility/I18Next';
 import {StyleIcon, StyleText} from './base';
 
 interface Props {
     route: {
         params: {
-            notice: string;
+            notice: I18Normalize;
             actionClickOk?(): void;
-            moreNotice?: string;
+            moreNotice?: I18Normalize;
             moreAction?(): void;
         };
     };
@@ -71,11 +72,10 @@ const Alert = ({route}: Props) => {
 
                 {/* Button ok and more */}
                 <View style={styles.buttonBox}>
-                    {/* BUTTON OK */}
                     <TouchableOpacity
                         style={[
                             styles.buttonElement,
-                            {backgroundColor: theme.borderColor},
+                            {backgroundColor: theme.borderColor, opacity: 0.6},
                         ]}
                         onPress={actionClickOk || goBack}>
                         <StyleText
@@ -84,7 +84,6 @@ const Alert = ({route}: Props) => {
                         />
                     </TouchableOpacity>
 
-                    {/* Button more */}
                     {!!moreNotice && (
                         <TouchableOpacity
                             style={[
@@ -148,8 +147,8 @@ const styles = ScaledSheet.create({
         paddingVertical: '5@vs',
         paddingHorizontal: '20@s',
         borderRadius: '15@s',
-        alignItems: 'center',
-        justifyContent: 'center',
+        // alignItems: 'center',
+        // justifyContent: 'center',
     },
     textButtonElement: {
         fontSize: '18@ms',

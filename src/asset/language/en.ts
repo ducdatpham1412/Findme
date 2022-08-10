@@ -218,7 +218,7 @@ const profile = {
         post: 'Post',
         edit: 'Edit',
         editPost: 'Edit post',
-        delete: 'Delete',
+        delete: 'Delete post',
         sureDeletePost: 'Are you sure delete this post?',
         enterTopic: 'Enter topic yourself',
     },

@@ -32,7 +32,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {View} from 'react-native';
 import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
-import {interactBubble, onGoToSignUp} from 'utility/assistant';
+import {onGoToSignUp} from 'utility/assistant';
 import Bubble from './components/Bubble';
 import HeaderDoffy, {headerDoffyHeight} from './components/HeaderDoffy';
 
@@ -55,14 +55,12 @@ const onGoToSignUpFromAlert = () => {
 
 const onGoToProfile = (item: TypeBubblePalace) => {
     const myId = FindmeStore.getState().accountSlice.passport.profile.id;
-    if (item.hadKnowEachOther) {
-        if (item.creatorId === myId) {
-            navigate(PROFILE_ROUTE.myProfile);
-        } else {
-            navigate(ROOT_SCREEN.otherProfile, {
-                id: item.creatorId,
-            });
-        }
+    if (item.creator === myId) {
+        navigate(PROFILE_ROUTE.myProfile);
+    } else {
+        navigate(ROOT_SCREEN.otherProfile, {
+            id: item.creator,
+        });
     }
 };
 
@@ -136,27 +134,6 @@ const ListBubbleCouple = () => {
             Redux.updateBubbleFocusing(post);
             Redux.setDisplayComment(true);
             setPreNumberComment(post.totalComments);
-        }
-    };
-
-    const onInteractBubble = (itemBubble: TypeBubblePalace) => {
-        if (hadLogan) {
-            if (
-                itemBubble.creatorAvatar &&
-                itemBubble.creatorId &&
-                itemBubble.creatorName
-            ) {
-                interactBubble({
-                    userId: itemBubble.creatorId,
-                    name: itemBubble.creatorName,
-                    avatar: itemBubble.creatorAvatar,
-                });
-            }
-        } else {
-            appAlert('discovery.bubble.goToSignUp', {
-                moreNotice: 'common.letGo',
-                moreAction: onGoToSignUpFromAlert,
-            });
         }
     };
 
@@ -239,7 +216,7 @@ const ListBubbleCouple = () => {
         return (
             <Bubble
                 item={item}
-                onInteractBubble={onInteractBubble}
+                onInteractBubble={() => null}
                 onShowMoreOption={onShowOptions}
                 onRefreshItem={onRefreshItem}
                 onGoToProfile={onGoToProfile}

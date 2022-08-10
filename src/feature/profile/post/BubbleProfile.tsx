@@ -9,25 +9,18 @@ import StyleTouchHaveDouble from 'components/base/StyleTouchHaveDouble';
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import StyleMoreText from 'components/StyleMoreText';
-import IconHobby from 'feature/discovery/components/IconHobby';
-import {TypeShowMoreOptions} from 'feature/discovery/ListBubbleCouple';
 import Redux from 'hook/useRedux';
 import React, {memo, useEffect, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import {View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
-import {
-    bubbleProfileHeight,
-    bubbleProfileWidth,
-    chooseColorGradient,
-    logger,
-} from 'utility/assistant';
+import {bubbleProfileHeight, bubbleProfileWidth} from 'utility/assistant';
 import {TypeLikeUnlikeParams} from './ListDetailPost';
 
 interface Props {
     item: TypeCreatePostResponse;
-    onShowOptions(params: TypeShowMoreOptions): void;
+    onShowOptions(params: TypeCreatePostResponse): void;
     onRefreshItem(idBubble: string): Promise<void>;
     onShowModalComment(bubble: TypeCreatePostResponse): void;
     onLikeOrUnLike(params: TypeLikeUnlikeParams): Promise<void>;
@@ -45,15 +38,9 @@ const BubbleProfile = (props: Props) => {
     } = props;
 
     const theme = Redux.getTheme();
-    const {gradient} = Redux.getResource();
 
     const [isLiked, setIsLiked] = useState(item.isLiked);
     const [totalLikes, setTotalLikes] = useState(item.totalLikes);
-
-    const color = chooseColorGradient({
-        listGradients: gradient,
-        colorChoose: item.color,
-    });
 
     const avatar = item.creatorAvatar;
 
@@ -79,10 +66,6 @@ const BubbleProfile = (props: Props) => {
         const imageChoose = item.images[0] ? item.images[0] : avatar;
         const opacity = item.images[0] ? 1 : 0.3;
 
-        const onShowNameBubble = () => {
-            logger(item.name);
-        };
-
         return (
             <StyleTouchHaveDouble
                 customStyle={styles.imageView}
@@ -100,12 +83,7 @@ const BubbleProfile = (props: Props) => {
 
                 <StyleTouchable
                     customStyle={styles.moreTouch}
-                    onPress={() =>
-                        onShowOptions({
-                            idUser: item.creatorId,
-                            imageWantToSee: imageChoose,
-                        })
-                    }
+                    onPress={() => onShowOptions(item)}
                     hitSlop={15}>
                     <StyleImage
                         source={Images.icons.more}
@@ -113,13 +91,6 @@ const BubbleProfile = (props: Props) => {
                         resizeMode="contain"
                     />
                 </StyleTouchable>
-
-                <IconHobby
-                    bubbleId={item.id}
-                    color={item.color}
-                    containerStyle={styles.iconHobby}
-                    onTouchStart={onShowNameBubble}
-                />
             </StyleTouchHaveDouble>
         );
     };
@@ -164,8 +135,6 @@ const BubbleProfile = (props: Props) => {
     };
 
     const RenderTool = () => {
-        const backgroundColor = theme.backgroundColor;
-
         const RenderStartChat = () => {
             return (
                 <StyleTouchable
@@ -174,7 +143,7 @@ const BubbleProfile = (props: Props) => {
                         {
                             width: moderateScale(55),
                             height: moderateScale(55),
-                            backgroundColor,
+                            backgroundColor: theme.backgroundColor,
                         },
                     ]}
                     disable>
@@ -191,7 +160,10 @@ const BubbleProfile = (props: Props) => {
             return (
                 <View>
                     <StyleTouchable
-                        customStyle={[styles.buttonTouch, {backgroundColor}]}
+                        customStyle={[
+                            styles.buttonTouch,
+                            {backgroundColor: theme.backgroundColor},
+                        ]}
                         onPress={onLikeUnLike}
                         hitSlop={15}>
                         {isLiked ? (
@@ -231,7 +203,10 @@ const BubbleProfile = (props: Props) => {
             return (
                 <View>
                     <StyleTouchable
-                        customStyle={[styles.buttonTouch, {backgroundColor}]}
+                        customStyle={[
+                            styles.buttonTouch,
+                            {backgroundColor: theme.backgroundColor},
+                        ]}
                         onPress={() => onShowModalComment(item)}
                         hitSlop={15}>
                         <StyleImage
@@ -258,7 +233,10 @@ const BubbleProfile = (props: Props) => {
         const RenderReload = () => {
             return (
                 <StyleTouchable
-                    customStyle={[styles.buttonTouch, {backgroundColor}]}
+                    customStyle={[
+                        styles.buttonTouch,
+                        {backgroundColor: theme.backgroundColor},
+                    ]}
                     onPress={() => onRefreshItem(item.id)}
                     hitSlop={{left: 10, top: 10, right: 10, bottom: 10}}>
                     <StyleImage
@@ -280,18 +258,14 @@ const BubbleProfile = (props: Props) => {
     };
 
     return (
-        <LinearGradient
-            style={styles.container}
-            colors={color}
-            start={{x: 0, y: 0}}
-            end={{x: 1, y: 1}}>
+        <View style={styles.container}>
             <View
                 style={[styles.body, {backgroundColor: theme.backgroundColor}]}>
                 {RenderImage()}
                 {RenderContentName()}
                 {RenderTool()}
             </View>
-        </LinearGradient>
+        </View>
     );
 };
 
@@ -351,12 +325,6 @@ const styles = ScaledSheet.create({
     iconMore: {
         width: '20@ms',
         height: '10@ms',
-    },
-    iconHobby: {
-        position: 'absolute',
-        marginTop: 0,
-        top: '10@ms',
-        left: '10@ms',
     },
     // tool
     toolView: {

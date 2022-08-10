@@ -129,25 +129,31 @@ export interface TypeGradient {
 export interface TypeCommentResponse {
     id: string;
     content: string;
+    images: Array<string>;
     numberLikes: number;
-    isLiked: boolean;
-    creatorId: number;
+    isLiked: number;
+    creator: number;
     creatorName: string;
     creatorAvatar: string;
-    createdTime: string;
+    created: string;
     listCommentsReply?: Array<TypeCommentResponse>;
-    replyOf?: string; // this is for socket
 }
 
-export interface TypeAddCommentRequest {
+export interface TypeSocketCommentRequest {
     token: string;
-    bubbleId: string;
-    content: string;
-    commentReplied: string;
+    comment: {
+        postId: string;
+        commentReplied: string | null;
+        content: string;
+        images: Array<string>;
+        creatorName: string;
+        creatorAvatar: string;
+    };
 }
 
-export interface TypeJoinCommunityRequest {
-    profilePostGroupId: string;
+export interface TypeSocketCommentResponse {
+    commentReplied: string | null;
+    data: TypeCommentResponse;
 }
 
 /**
@@ -205,24 +211,38 @@ export interface TypeEditProfileResponse {
 }
 
 export interface TypeCreatePostRequest {
+    content: string;
+    images: Array<string>;
+    stars: number;
+    topic?: number | null;
+    feeling?: number | null;
+    location?: string | null;
+    link?: string | null;
+}
+export interface TypeEditPostRequest {
     content?: string;
     images?: Array<string>;
-    color?: number;
-    name?: string;
+    stars?: number;
+    topic?: number | null;
+    feeling?: number | null;
+    location?: string | null;
+    link?: string | null;
 }
 
 export interface TypeCreatePostResponse {
     id: string;
+    topic: number | null;
+    feeling: number | null;
+    location: string | null;
     content: string;
     images: Array<string>;
+    stars: number;
     totalLikes: number;
     totalComments: number;
-    creatorId: number;
+    creator: number;
     creatorName: string;
     creatorAvatar: string;
-    createdTime: string;
-    color: number;
-    name: string;
+    created: string;
     isLiked: boolean;
     relationship: number;
 }
@@ -257,18 +277,19 @@ export interface TypeFollowResponse {
  */
 export interface TypeBubblePalace {
     id: string;
+    topic: number | null;
+    feeling: number | null;
+    location: string | null;
     content: string;
     images: Array<string>;
+    stars: number;
+    link: string | null;
     totalLikes: number;
-    hadKnowEachOther: boolean;
-    creatorId: number;
-    creatorName: string;
-    creatorAvatar: string | null;
-    gender: number;
-    createdTime: string;
     totalComments: number;
-    color: number;
-    name: string;
+    creator: number;
+    creatorName: string;
+    creatorAvatar: string;
+    created: string;
     isLiked: boolean;
     relationship: number;
 }

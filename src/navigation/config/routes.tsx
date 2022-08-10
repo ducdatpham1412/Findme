@@ -61,14 +61,12 @@ const MESS_ROUTE = {
     chatDetail: '@MESS_ROUTE/chatDetail',
     chatDetailGroup: '@MESS_ROUTE/chatDetailGroup',
     chatDetailSetting: '@MESS_ROUTE/chatDetailSetting',
-    publicChatting: '@MESS_ROUTE/publicChatting',
 };
 
 const PROFILE_ROUTE = {
     myProfile: '@PROFILE_ROUTE/myProfile',
     editProfile: '@PROFILE_ROUTE/editProfile',
     settingRoute: '@PROFILE_ROUTE/settingRoute',
-    createGroup: '@PROFILE_ROUTE/createGroup',
     createPostPreview: '@PROFILE_ROUTE/createPostPreview',
 };
 /**

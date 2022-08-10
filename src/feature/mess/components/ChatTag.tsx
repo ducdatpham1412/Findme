@@ -60,7 +60,6 @@ const ChatTag = (props: Props) => {
             }
         }
 
-        const color = hadNew ? theme.textHightLight : theme.textColor;
         const fontWeight = hadNew ? 'bold' : 'normal';
 
         return (
@@ -70,7 +69,7 @@ const ChatTag = (props: Props) => {
                     customStyle={[
                         styles.nameText,
                         {
-                            color,
+                            color: theme.textHightLight,
                             fontWeight,
                         },
                     ]}
@@ -195,7 +194,7 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
     },
     latestMessageText: {
-        fontSize: '12.5@ms',
+        fontSize: '12@ms',
         maxWidth: '70%',
     },
     textTime: {

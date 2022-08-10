@@ -2,7 +2,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
     TypeCreateGroupResponse,
-    TypeCreatePostResponse,
     TypeGradient,
     TypeInteractBubble,
     TypeMemberInListChatTag,
@@ -177,26 +176,6 @@ export const chooseLanguageFromId = (id: number) => {
         tempLanguage = 'vi';
     }
     return tempLanguage;
-};
-
-export const modalizeOptionPost = (params: {
-    itemPostFromEdit: TypeCreatePostResponse;
-    deleteAPostInList: any;
-}) => {
-    return [
-        {
-            text: 'profile.post.editPost',
-            action: () => navigate(PROFILE_ROUTE.createPostPreview, params),
-        },
-        {
-            text: 'profile.post.delete',
-            action: params.deleteAPostInList,
-        },
-        {
-            text: 'common.cancel',
-            action: () => null,
-        },
-    ];
 };
 
 export const modalizeGoToChatTagFromGroup = (params: {chatTagId: string}) => {

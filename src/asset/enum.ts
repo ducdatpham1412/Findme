@@ -91,8 +91,7 @@ export enum SOCKET_EVENT {
     appBackground = '0.4',
     // bubble
     addComment = '1.0',
-    joinCommunity = '1.1',
-    hadNewUserJoinCommunity = '1.2',
+    deleteComment = '1.0.1',
     // chat tag
     createChatTag = '2.0',
     joinRoom = '2.1',
@@ -144,8 +143,6 @@ export enum TYPE_BUBBLE_PALACE_ACTION {
     disableBubble = 0,
     createNewPostFromProfile = 1,
     editPostFromProfile = 2,
-    createNewGroupFromProfile = 3,
-    editGroupFromProfile = 4,
 }
 
 export enum TYPE_SOCIAL_LOGIN {
@@ -167,4 +164,9 @@ export enum TYPE_DYNAMIC_LINK {
 export enum CONVERSATION_STATUS {
     active = 1,
     stop = 0,
+}
+
+export enum TOPIC {
+    travel = 0,
+    culinary = 1,
 }

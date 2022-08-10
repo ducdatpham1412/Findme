@@ -45,6 +45,7 @@ const ModalComment = (props: Props) => {
 
     const theme = Redux.getTheme();
     const token = Redux.getToken();
+    const {profile} = Redux.getPassport();
 
     const inputRef = useRef<TextInput>(null);
     const translateY = useRef(new Animated.Value(Metrics.height)).current;
@@ -53,7 +54,10 @@ const ModalComment = (props: Props) => {
     const [personReplied, setPersonReplied] = useState('');
     const [commentReplied, setCommentReplied] = useState(''); // if "", it not reply any comment
 
-    const {list, loading, onRefresh} = useSocketComment(bubbleFocusing);
+    const {list, loading, onRefresh} = useSocketComment({
+        bubbleFocusing,
+        scrollToEnd: () => listCommentRef.current?.scrollToEnd(),
+    });
 
     useEffect(() => {
         Animated.timing(translateY, {
@@ -72,9 +76,14 @@ const ModalComment = (props: Props) => {
     const onSendComment = async () => {
         socketAddComment({
             token: String(token),
-            bubbleId: bubbleFocusing.id,
-            content: textComment.trimEnd(),
-            commentReplied,
+            comment: {
+                postId: bubbleFocusing.id,
+                commentReplied: commentReplied || null,
+                content: textComment,
+                images: [],
+                creatorName: profile.name,
+                creatorAvatar: profile.avatar,
+            },
         });
         setBubbleFocusing?.(
             (preValue: TypeBubblePalace | TypeCreatePostResponse) => ({
@@ -84,7 +93,6 @@ const ModalComment = (props: Props) => {
         );
         setCommentReplied('');
         setTextComment('');
-        listCommentRef.current?.scrollToEnd();
     };
 
     const onFocusingTypingComment = () => {
