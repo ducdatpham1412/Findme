@@ -82,7 +82,7 @@ const TabNavigator = (props: any) => {
     }, [tabIndexFocus]);
 
     const onGoToCreatePost = () => {
-        navigate(PROFILE_ROUTE.createPostPreview);
+        navigate(PROFILE_ROUTE.createPostPickImg);
     };
 
     /**

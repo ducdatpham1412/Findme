@@ -1,374 +1,430 @@
-import {TypeBubblePalace, TypeEditPostRequest} from 'api/interface';
+import {
+    TypeCreatePostRequest,
+    TypeCreatePostResponse,
+    TypeEditPostRequest,
+} from 'api/interface';
 import {apiCreatePost, apiEditPost} from 'api/module';
-import {RELATIONSHIP, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
+import {TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
+import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
-import {
-    StyleImage,
-    StyleInput,
-    StyleText,
-    StyleTouchable,
-} from 'components/base';
-import StyleTouchHaveDouble from 'components/base/StyleTouchHaveDouble';
-import ButtonBack from 'components/common/ButtonBack';
-import StyleMoreText from 'components/StyleMoreText';
-import {bubbleHeight} from 'feature/discovery/components/Bubble';
+import {LIST_FEELINGS, LIST_TOPICS, NUMBER_STARS} from 'asset/standardValue';
+import Theme from 'asset/theme/Theme';
+import {StyleImage, StyleText, StyleTouchable} from 'components/base';
+import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
 import Redux from 'hook/useRedux';
-import {appAlert, goBack, popUpPicker} from 'navigation/NavigationService';
-import React, {useCallback, useRef, useState} from 'react';
-import {useTranslation} from 'react-i18next';
-import {Animated, ScrollView, TextInput, Vibration, View} from 'react-native';
-import ActionSheet from 'react-native-actionsheet';
-import {ScaledSheet, verticalScale} from 'react-native-size-matters';
-import Entypo from 'react-native-vector-icons/Entypo';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import ROOT_SCREEN from 'navigation/config/routes';
 import {
-    chooseImageFromCamera,
-    chooseImageFromLibrary,
-    logger,
-    optionsImagePicker,
-} from 'utility/assistant';
+    appAlert,
+    appAlertYesNo,
+    goBack,
+    navigate,
+} from 'navigation/NavigationService';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {
+    Animated,
+    Keyboard,
+    KeyboardEvent,
+    Platform,
+    ScrollView,
+    TextInput,
+    Vibration,
+    View,
+} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import {Modalize} from 'react-native-modalize';
+import {ScaledSheet, verticalScale} from 'react-native-size-matters';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {onGoToSignUp} from 'utility/assistant';
 import ImageUploader from 'utility/ImageUploader';
+import ItemToolCreatePost from './components/ItemToolCreatePost';
+import ModalAddLink from './post/ModalAddLink';
+import ModalCheckIn from './post/ModalCheckIn';
+import ModalFeeling from './post/ModalFeeling';
+import ModalPickStars from './post/ModalPickStars';
+import ModalTopic from './post/ModalTopic';
 
 interface Props {
     route: {
         params: {
-            itemPostFromEdit?: TypeBubblePalace;
+            itemNew?: {
+                images: Array<string>;
+            };
+            itemEdit?: TypeCreatePostResponse;
+            itemError?: TypeCreatePostRequest;
         };
     };
 }
 
-const CreatePostPreview = ({route}: Props) => {
-    const itemPostFromEdit = route.params?.itemPostFromEdit;
+const AnimatedStars = Animated.createAnimatedComponent(LinearGradient);
 
+const IconStar = () => (
+    <AntDesign
+        name="star"
+        style={[styles.starTool, {color: Theme.common.orange}]}
+    />
+);
+
+const IconLink = () => (
+    <FontAwesome5
+        name="link"
+        style={[styles.starTool, {color: Theme.common.gradientTabBar1}]}
+    />
+);
+
+const IconEmotion = () => (
+    <MaterialCommunityIcons
+        name="emoticon-lol-outline"
+        style={[styles.starTool, {color: Theme.common.darkPink}]}
+    />
+);
+const IconTag = () => (
+    <AntDesign
+        name="tag"
+        style={[styles.starTool, {color: Theme.common.gradientTabBar2}]}
+    />
+);
+const IconCheckIn = () => (
+    <Ionicons
+        name="ios-location-sharp"
+        style={[styles.starTool, {color: Theme.common.commentGreen}]}
+    />
+);
+
+const screenWidth = Metrics.width;
+let shouldShowToolHorizontal = false;
+
+const CreatePostPreview = ({route}: Props) => {
+    const itemNew = route.params?.itemNew;
+    const itemEdit = route.params?.itemEdit;
+    const itemError = route.params?.itemError;
     const {t} = useTranslation();
 
     const theme = Redux.getTheme();
-    const {profile} = Redux.getPassport();
     const isModeExp = Redux.getModeExp();
-    const {listHobbies} = Redux.getResource();
+    const token = Redux.getToken();
+    const translateXTool = useRef(new Animated.Value(0)).current;
+    const scaleStars = useRef(new Animated.Value(1)).current;
+    const translateXStars = useRef(new Animated.Value(0)).current;
+    const [keyboardHeight, setKeyboardHeight] = useState(0);
 
-    const actionSheetRef = useRef<any>(null);
-    const scaleIconColor = useRef(new Animated.Value(1)).current;
-    const scrollContentRef = useRef<ScrollView>(null);
-    const inputContentRef = useRef<TextInput>(null);
+    const starRef = useRef<Modalize>(null);
+    const linkRef = useRef<Modalize>(null);
+    const checkInRef = useRef<Modalize>(null);
+    const feelingRef = useRef<Modalize>(null);
+    const topicRef = useRef<Modalize>(null);
 
-    const [content, setContent] = useState(itemPostFromEdit?.content);
-    const [images, setImages] = useState(itemPostFromEdit?.images);
-    const [stars, setStars] = useState(itemPostFromEdit?.stars);
-    const [topic, setTopic] = useState(itemPostFromEdit?.topic);
-    const [feeling, setFeeling] = useState(itemPostFromEdit?.feeling);
-    const [location, setLocation] = useState(itemPostFromEdit?.location);
-    const [link, setLink] = useState(itemPostFromEdit?.link);
+    const initValue = useMemo(() => {
+        return {
+            content: itemEdit?.content || itemError?.content || '',
+            images:
+                itemEdit?.images || itemError?.images || itemNew?.images || [],
+            starts: itemEdit?.stars || itemError?.stars || 0,
+            topic: itemEdit?.topic || itemError?.topic,
+            feeling: itemEdit?.feeling || itemError?.feeling,
+            location: itemEdit?.location || itemError?.location,
+            link: itemEdit?.link || itemError?.link,
+        };
+    }, []);
 
-    const [displayLayer, setDisplayLayer] = useState(false);
-    const [displayLayerContent, setDisplayLayerContent] = useState(false);
+    const [content, setContent] = useState(initValue.content);
+    const [images] = useState(initValue.images);
+    const [stars, setStars] = useState(initValue.starts);
 
-    const optionsImgPicker = optionsImagePicker.map(text => t(text));
+    const [topic, setTopic] = useState(initValue.topic);
+    const [feeling, setFeeling] = useState(initValue.feeling);
+    const [location, setLocation] = useState(initValue.location);
+    const [link, setLink] = useState(initValue.link);
 
-    const onConfirmPost = async () => {
-        if (topic === undefined) {
-            Vibration.vibrate();
-            Animated.spring(scaleIconColor, {
-                toValue: 2.3,
+    const onKeyBoardDidShow = (e: KeyboardEvent) => {
+        setKeyboardHeight(e.endCoordinates.height);
+        if (shouldShowToolHorizontal) {
+            Animated.timing(translateXTool, {
+                toValue: -screenWidth,
                 useNativeDriver: true,
-                speed: 20,
-            }).start(() => {
-                Animated.spring(scaleIconColor, {
-                    toValue: 1,
-                    useNativeDriver: true,
-                    speed: 20,
-                }).start();
-            });
-            return;
-        }
-
-        logger(setStars, setTopic, setFeeling, setLocation, setLink);
-
-        /**
-         * Edit post
-         */
-        if (itemPostFromEdit) {
-            Redux.setIsLoading(true);
-            const updateData: TypeEditPostRequest = {};
-            if (content !== itemPostFromEdit.content) {
-                updateData.content = content;
-            }
-            // Not let user edit images
-            // if (images !== itemPostFromEdit.images && images?.length) {
-            //     updateData.images = await ImageUploader.upLoadManyImg(
-            //         images,
-            //         1000,
-            //     );
-            // }
-            if (stars !== itemPostFromEdit.stars) {
-                updateData.stars = stars;
-            }
-            if (topic !== itemPostFromEdit.topic) {
-                updateData.topic = topic;
-            }
-            if (feeling !== itemPostFromEdit.feeling) {
-                updateData.feeling = feeling;
-            }
-            if (location !== itemPostFromEdit.location) {
-                updateData.location = location;
-            }
-            if (link !== itemPostFromEdit.link) {
-                updateData.link = link;
-            }
-
-            try {
-                if (!isModeExp) {
-                    await apiEditPost({
-                        idPost: itemPostFromEdit.id,
-                        data: updateData,
-                    });
-                }
-                updateData.images = images;
-                Redux.setBubblePalaceAction({
-                    action: TYPE_BUBBLE_PALACE_ACTION.editPostFromProfile,
-                    payload: {
-                        id: itemPostFromEdit.id,
-                        ...updateData,
-                    },
-                });
-                goBack();
-            } catch (err) {
-                appAlert(err);
-            } finally {
-                Redux.setIsLoading(false);
-            }
-            return;
-        }
-
-        /**
-         * Create post
-         */
-        if (content && images?.length && stars) {
-            try {
-                Redux.setIsLoading(true);
-                if (!isModeExp) {
-                    const uploadImages = await ImageUploader.upLoadManyImg(
-                        images,
-                        1000,
-                    );
-
-                    const res = await apiCreatePost({
-                        content,
-                        images: uploadImages,
-                        stars,
-                        topic,
-                        feeling,
-                        location,
-                        link,
-                    });
-                    Redux.setBubblePalaceAction({
-                        action: TYPE_BUBBLE_PALACE_ACTION.createNewPostFromProfile,
-                        payload: res.data,
-                    });
-                } else {
-                    const newPost: TypeBubblePalace = {
-                        id: String(Math.random()),
-                        content,
-                        images,
-                        topic,
-                        feeling: feeling || 0,
-                        stars,
-                        location: location || '',
-                        link: link || '',
-                        totalLikes: 100,
-                        totalComments: 100,
-                        creator: profile.id,
-                        creatorName: profile.name,
-                        creatorAvatar: profile.avatar,
-                        created: String(new Date()),
-                        isLiked: true,
-                        relationship: RELATIONSHIP.self,
-                    };
-                    Redux.setBubblePalaceAction({
-                        action: TYPE_BUBBLE_PALACE_ACTION.createNewPostFromProfile,
-                        payload: newPost,
-                    });
-                }
-
-                goBack();
-            } catch (err) {
-                appAlert(err);
-            } finally {
-                Redux.setIsLoading(false);
-            }
+                duration: 100,
+            }).start();
         }
     };
 
-    const onChooseAction = useCallback(async (index: number) => {
-        if (index === 0) {
-            await chooseImageFromCamera(setImages, {
-                freeStyleCrop: true,
-                maxWidth: Metrics.width,
-                maxHeight: bubbleHeight,
-                multiple: false,
-                maxFiles: 10,
-            });
-        } else if (index === 1) {
-            await chooseImageFromLibrary(setImages, {
-                freeStyleCrop: true,
-                maxWidth: Metrics.width,
-                maxHeight: bubbleHeight,
-                multiple: false,
-                maxFiles: 10,
-            });
-        }
+    const onKeyboardDidHide = () => {
+        Animated.timing(translateXTool, {
+            toValue: 0,
+            useNativeDriver: true,
+            duration: 100,
+        }).start();
+    };
+
+    useEffect(() => {
+        Keyboard.addListener('keyboardDidShow', onKeyBoardDidShow);
+        Keyboard.addListener('keyboardDidHide', onKeyboardDidHide);
+        return () => {
+            Keyboard.removeListener('keyboardDidShow', onKeyBoardDidShow);
+            Keyboard.removeListener('keyboadDidHide', onKeyboardDidHide);
+        };
     }, []);
 
     /**
-     * Render view
+     * Functions
      */
-    const RenderImage = () => {
-        if (!images?.length) {
-            return null;
-        }
-        return (
-            <StyleTouchHaveDouble
-                customStyle={styles.imageView}
-                onLongPress={() => setDisplayLayer(true)}
-                onPressOut={() => setDisplayLayer(false)}>
-                <StyleImage
-                    source={{uri: images[0]}}
-                    customStyle={styles.image}
-                />
-            </StyleTouchHaveDouble>
-        );
+    const onChooseStar = () => {
+        starRef.current?.open();
     };
 
-    const RenderLayer = () => {
-        if (!displayLayer) {
-            return null;
+    const onAddLink = () => {
+        shouldShowToolHorizontal = false;
+        linkRef.current?.open();
+    };
+
+    const onFeeling = () => {
+        feelingRef.current?.open();
+    };
+
+    const onTopic = () => {
+        topicRef.current?.open();
+    };
+
+    const onCheckIn = () => {
+        shouldShowToolHorizontal = false;
+        checkInRef.current?.open();
+    };
+
+    const onGoBack = () => {
+        if (
+            content !== initValue.content ||
+            stars !== initValue.starts ||
+            link !== initValue.link ||
+            feeling !== initValue.feeling ||
+            topic !== initValue.topic ||
+            location !== initValue.location
+        ) {
+            appAlertYesNo({
+                i18Title: 'common.wantToDiscard',
+                agreeText: 'common.discard',
+                refuseText: 'common.stay',
+                agreeChange: () => {
+                    goBack();
+                    goBack();
+                },
+                refuseChange: goBack,
+            });
+        } else {
+            goBack();
         }
+    };
+
+    const onConfirmPost = async (isDraft: boolean) => {
+        if (stars === 0) {
+            Vibration.vibrate();
+            Animated.timing(scaleStars, {
+                toValue: 1.5,
+                useNativeDriver: true,
+                duration: 100,
+            }).start(() => {
+                Animated.sequence([
+                    Animated.timing(translateXStars, {
+                        toValue: 10,
+                        duration: 60,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(translateXStars, {
+                        toValue: -10,
+                        duration: 60,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(translateXStars, {
+                        toValue: 10,
+                        duration: 60,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(translateXStars, {
+                        toValue: 0,
+                        duration: 60,
+                        useNativeDriver: true,
+                    }),
+                ]).start(() => {
+                    Animated.timing(scaleStars, {
+                        toValue: 1,
+                        useNativeDriver: true,
+                        duration: 100,
+                    }).start();
+                });
+            });
+            return;
+        }
+        if (images.length === 0) {
+            return;
+        }
+
+        if (!isModeExp && token) {
+            const newPost: TypeCreatePostRequest = {
+                content,
+                images,
+                stars,
+                feeling,
+                topic,
+                location,
+                link,
+                isDraft,
+            };
+            try {
+                Redux.setPostCreatedHandling({
+                    status: 'loading',
+                    data: newPost,
+                });
+                navigate(ROOT_SCREEN.mainScreen);
+                const listNameImages = await ImageUploader.upLoadManyImg(
+                    newPost.images,
+                    1000,
+                );
+                const res = await apiCreatePost({
+                    content,
+                    images: listNameImages,
+                    stars,
+                    feeling,
+                    topic,
+                    location,
+                    link,
+                    isDraft,
+                });
+                Redux.setBubblePalaceAction({
+                    action: TYPE_BUBBLE_PALACE_ACTION.createNewPost,
+                    payload: res.data,
+                });
+                Redux.setPostCreatedHandling({
+                    status: 'success',
+                    data: newPost,
+                });
+            } catch (err) {
+                Redux.setPostCreatedHandling({
+                    status: 'error',
+                    data: newPost,
+                });
+                appAlert(err);
+            }
+        } else {
+            appAlert('discovery.bubble.goToSignUp', {
+                moreNotice: 'common.letGo',
+                moreAction: () => {
+                    goBack();
+                    onGoToSignUp();
+                },
+            });
+        }
+    };
+
+    const onEditPost = async () => {
+        const updateObject: TypeEditPostRequest = {};
+        if (content !== initValue.content) {
+            updateObject.content = content;
+        }
+        if (stars !== initValue.starts) {
+            updateObject.stars = stars;
+        }
+        if (topic !== initValue.topic) {
+            updateObject.topic = topic;
+        }
+        if (feeling !== initValue.feeling) {
+            updateObject.feeling = feeling;
+        }
+        if (location !== initValue.location) {
+            updateObject.location = location;
+        }
+        if (link !== initValue.link) {
+            updateObject.link = link;
+        }
+
+        try {
+            Redux.setIsLoading(true);
+            if (itemEdit?.id) {
+                await apiEditPost({
+                    idPost: itemEdit.id,
+                    data: updateObject,
+                });
+                Redux.setBubblePalaceAction({
+                    action: TYPE_BUBBLE_PALACE_ACTION.editPostFromProfile,
+                    payload: {
+                        id: itemEdit.id,
+                        ...updateObject,
+                    },
+                });
+                goBack();
+            }
+        } catch (err) {
+            appAlert(err);
+        } finally {
+            Redux.setIsLoading(false);
+        }
+    };
+
+    /**
+     * Render views
+     */
+    const Header = () => {
         return (
             <View
                 style={[
-                    styles.layerView,
-                    {backgroundColor: theme.backgroundColor},
-                ]}
-            />
-        );
-    };
-
-    const RenderLayerContent = () => {
-        if (!displayLayerContent) {
-            return null;
-        }
-        return (
-            <View
-                style={[
-                    styles.layerView,
-                    {backgroundColor: theme.backgroundColor},
-                ]}
-                onTouchEnd={() => setDisplayLayerContent(false)}
-            />
-        );
-    };
-
-    const RenderButtonComeback = () => {
-        return (
-            <ButtonBack
-                containerStyle={styles.buttonBackView}
-                onPress={goBack}
-            />
-        );
-    };
-
-    const RenderName = () => {
-        const textColor = theme.textHightLight;
-        return (
-            <View style={styles.nameView}>
-                <View style={styles.avatarNameBox}>
-                    <StyleText
-                        originValue={`@${profile.name}`}
-                        customStyle={[styles.textName, {color: textColor}]}
+                    styles.headerView,
+                    {borderBottomColor: theme.borderColor},
+                ]}>
+                <StyleTouchable
+                    customStyle={styles.iconCloseView}
+                    onPress={onGoBack}>
+                    <Ionicons
+                        name="chevron-back"
+                        style={[styles.iconClose, {color: theme.textColor}]}
                     />
-                </View>
-            </View>
-        );
-    };
+                </StyleTouchable>
 
-    const showEditCaption = useCallback(() => {
-        setDisplayLayerContent(true);
-        setTimeout(() => {
-            inputContentRef.current?.focus();
-        }, 100);
-    }, []);
-
-    const RenderContent = () => {
-        return (
-            <Animated.View style={styles.contentView}>
-                {!displayLayerContent ? (
-                    <StyleMoreText
-                        value={content}
-                        textStyle={[
-                            styles.textContent,
-                            {color: theme.textHightLight},
-                        ]}
-                        onPress={showEditCaption}
-                    />
-                ) : (
-                    <ScrollView
-                        ref={scrollContentRef}
-                        style={{height: verticalScale(200)}}
-                        onContentSizeChange={() =>
-                            scrollContentRef.current?.scrollToEnd()
-                        }
-                        onTouchEnd={() => setDisplayLayerContent(false)}>
-                        <StyleInput
-                            ref={inputContentRef}
-                            editable={displayLayerContent}
-                            value={content}
-                            onChangeText={text => setContent(text)}
-                            hasErrorBox={false}
-                            hasUnderLine={false}
-                            placeholder="Aa"
-                            containerStyle={{width: '100%'}}
-                            inputStyle={[
-                                styles.textContent,
-                                {color: theme.textHightLight},
-                            ]}
-                            onPressOut={() => null}
-                            multiline
-                            isEffectTabBar={false}
-                        />
-                    </ScrollView>
-                )}
-            </Animated.View>
-        );
-    };
-
-    const RenderToolUp = () => {
-        return (
-            <View style={styles.toolUpView}>
-                <StyleTouchHaveDouble
-                    customStyle={[
-                        styles.iconToolUpBox,
-                        {backgroundColor: theme.backgroundButtonColor},
-                    ]}
-                    onPressOut={showEditCaption}>
-                    <StyleText
-                        originValue="Aa"
-                        customStyle={{color: theme.textHightLight}}
-                    />
-                </StyleTouchHaveDouble>
-
-                {(!itemPostFromEdit || !itemPostFromEdit.images[0]) && (
+                {(!!itemNew || !!itemError) && (
                     <StyleTouchable
-                        style={[
-                            styles.iconToolUpBox,
-                            {backgroundColor: theme.backgroundButtonColor},
+                        customStyle={[
+                            styles.postBox,
+                            {borderColor: theme.highlightColor},
                         ]}
-                        onPress={() => actionSheetRef.current?.show()}
-                        activeOpacity={0.9}>
-                        <Entypo
-                            name="images"
-                            style={[
-                                styles.iconImage,
-                                {color: theme.textHightLight},
+                        onPress={() => onConfirmPost(false)}>
+                        <StyleText
+                            i18Text="profile.post.post"
+                            customStyle={[
+                                styles.textPost,
+                                {color: theme.highlightColor},
+                            ]}
+                        />
+                    </StyleTouchable>
+                )}
+
+                {(!!itemNew || !!itemError) && (
+                    <StyleTouchable
+                        customStyle={[
+                            styles.draftBox,
+                            {borderColor: theme.borderColor},
+                        ]}
+                        onPress={() => onConfirmPost(true)}>
+                        <StyleText
+                            i18Text="profile.post.draft"
+                            customStyle={[
+                                styles.textDraft,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                    </StyleTouchable>
+                )}
+
+                {!!itemEdit && (
+                    <StyleTouchable
+                        customStyle={[
+                            styles.postBox,
+                            {borderColor: theme.highlightColor},
+                        ]}
+                        onPress={onEditPost}>
+                        <StyleText
+                            i18Text="profile.post.edit"
+                            customStyle={[
+                                styles.textPost,
+                                {color: theme.highlightColor},
                             ]}
                         />
                     </StyleTouchable>
@@ -377,106 +433,237 @@ const CreatePostPreview = ({route}: Props) => {
         );
     };
 
-    const onNavigatePicker = () => {
-        popUpPicker({
-            data: listHobbies,
-            renderItem: (item: any) => {
-                if (item.id === 8) {
-                    return (
-                        <View style={styles.elementPicker}>
+    const FeelingTopicLocation = () => {
+        const chooseFeeling = LIST_FEELINGS.find(item => item.id === feeling);
+        const chooseTopic = LIST_TOPICS.find(item => item.id === topic);
+        return (
+            <View style={styles.feelingTopicLocationView}>
+                {(!!chooseFeeling || !!chooseTopic) && (
+                    <View style={styles.locationBox}>
+                        {!!chooseFeeling && (
                             <StyleImage
-                                source={{uri: item.icon}}
-                                customStyle={styles.iconPicker}
+                                source={chooseFeeling.icon}
+                                customStyle={styles.iconFeeling}
                             />
-                            <StyleInput
-                                defaultValue={''}
-                                onChangeText={() => null}
-                                containerStyle={styles.inputContainer}
-                                inputStyle={[
-                                    styles.inputOther,
-                                    {color: theme.textHightLight},
+                        )}
+                        {!!chooseFeeling && !!chooseTopic && (
+                            <StyleText
+                                originValue="・"
+                                customStyle={[
+                                    styles.textTopic,
+                                    {color: theme.textColor},
                                 ]}
-                                hasErrorBox={false}
-                                hasUnderLine={false}
-                                maxLength={50}
-                                i18Placeholder="profile.post.enterTopic"
-                                placeholderTextColor={theme.holderColorLighter}
-                                isEffectTabBar={false}
                             />
-                        </View>
-                    );
-                }
-                return (
-                    <View style={styles.elementPicker}>
-                        <StyleImage
-                            source={{uri: item.icon}}
-                            customStyle={styles.iconPicker}
+                        )}
+                        {!!chooseTopic && (
+                            <StyleText
+                                i18Text={chooseTopic.text}
+                                customStyle={[
+                                    styles.textTopic,
+                                    {color: theme.textColor},
+                                ]}
+                            />
+                        )}
+                    </View>
+                )}
+                {!!location && (
+                    <View style={styles.locationBox}>
+                        <Ionicons
+                            name="ios-location-sharp"
+                            style={[
+                                styles.iconLocationCaption,
+                                {color: Theme.common.commentGreen},
+                            ]}
                         />
                         <StyleText
-                            originValue={item.name}
+                            originValue={location}
                             customStyle={[
-                                styles.textPicker,
-                                {color: theme.textHightLight},
+                                styles.textLocation,
+                                {color: theme.textColor},
                             ]}
                         />
                     </View>
-                );
-            },
-            itemHeight: verticalScale(70),
-            onSetItemSelected: (hobby: any) => {
-                logger(hobby);
-            },
-            initIndex: listHobbies.findIndex(item => item.id === topic),
-            onCancel: goBack,
-        });
-    };
-
-    const RenderTollRight = () => {
-        return (
-            <View style={styles.toolView}>
-                <Animated.View
-                    style={[
-                        styles.iconThemeBox,
-                        {
-                            backgroundColor: theme.backgroundButtonColor,
-                            transform: [{scale: scaleIconColor}],
-                        },
-                    ]}>
-                    <Ionicons
-                        name="ios-color-palette-outline"
-                        style={[
-                            styles.iconTheme,
-                            {color: theme.highlightColor},
-                        ]}
-                        onPress={onNavigatePicker}
-                    />
-                </Animated.View>
+                )}
             </View>
         );
     };
 
-    const RenderButtonPost = () => {
-        const titleButton = itemPostFromEdit
-            ? 'profile.post.edit'
-            : 'profile.post.post';
+    const StarLink = () => {
         return (
-            <StyleTouchable
-                customStyle={[
-                    styles.buttonPostView,
-                    {
-                        backgroundColor: theme.backgroundButtonColor,
-                        borderColor: theme.borderColor,
-                    },
-                ]}
-                onPress={onConfirmPost}>
-                <StyleText
-                    i18Text={titleButton}
-                    customStyle={[
-                        styles.textPost,
-                        {color: theme.textHightLight},
+            <View style={styles.starLinkView}>
+                <AnimatedStars
+                    colors={[
+                        Theme.common.gradientTabBar1,
+                        Theme.common.gradientTabBar2,
                     ]}
+                    style={[
+                        styles.starBox,
+                        {
+                            transform: [
+                                {scale: scaleStars},
+                                {translateX: translateXStars},
+                            ],
+                        },
+                    ]}>
+                    <StyleTouchable
+                        onPress={onChooseStar}
+                        customStyle={styles.starTouch}>
+                        {NUMBER_STARS.map((_, index) => {
+                            if (index < (stars || 0)) {
+                                return (
+                                    <AntDesign
+                                        key={index}
+                                        name="star"
+                                        style={[
+                                            styles.star,
+                                            {color: Theme.common.orange},
+                                        ]}
+                                    />
+                                );
+                            }
+                            return (
+                                <AntDesign
+                                    key={index}
+                                    name="staro"
+                                    style={[
+                                        styles.star,
+                                        {color: Theme.common.white},
+                                    ]}
+                                />
+                            );
+                        })}
+                        <StyleText
+                            originValue={stars}
+                            customStyle={styles.textNumberStar}
+                        />
+                    </StyleTouchable>
+                </AnimatedStars>
+
+                {link ? (
+                    <StyleTouchable
+                        customStyle={styles.linkBox}
+                        onPress={onAddLink}>
+                        <LinearGradient
+                            colors={[
+                                Theme.common.gradientTabBar1,
+                                Theme.common.gradientTabBar2,
+                            ]}
+                            style={styles.linkTouch}>
+                            <View style={styles.iconHouseTouch}>
+                                <StyleImage
+                                    source={Images.icons.house}
+                                    customStyle={styles.iconHouse}
+                                />
+                            </View>
+                            <StyleText
+                                originValue={'See now'}
+                                customStyle={styles.textNumberStar}
+                            />
+                        </LinearGradient>
+                    </StyleTouchable>
+                ) : (
+                    <StyleTouchable
+                        customStyle={[
+                            styles.addLinkBox,
+                            {borderColor: theme.textColor},
+                        ]}
+                        onPress={onAddLink}>
+                        <AntDesign
+                            name="plus"
+                            style={[
+                                styles.textAddLink,
+                                {color: theme.textColor},
+                            ]}
+                        />
+                        <StyleText
+                            i18Text="profile.post.addLink"
+                            customStyle={[
+                                styles.textAddLink,
+                                {color: theme.textColor, marginLeft: 10},
+                            ]}
+                        />
+                    </StyleTouchable>
+                )}
+            </View>
+        );
+    };
+
+    const ToolHorizontal = () => {
+        return (
+            <Animated.View
+                style={[
+                    styles.toolHorizontalView,
+                    {
+                        bottom: keyboardHeight,
+                        right: -screenWidth,
+                        transform: [{translateX: translateXTool}],
+                        backgroundColor: theme.backgroundColor,
+                    },
+                ]}>
+                <View style={{flex: 1}} />
+                <View style={styles.buttonToolBox}>
+                    <StyleTouchable
+                        customStyle={styles.buttonStarTool}
+                        onPress={onChooseStar}>
+                        {IconStar}
+                    </StyleTouchable>
+                    <StyleTouchable
+                        customStyle={styles.buttonStarTool}
+                        onPress={onAddLink}>
+                        {IconLink}
+                    </StyleTouchable>
+                    <View
+                        style={[
+                            styles.divider,
+                            {backgroundColor: theme.textColor},
+                        ]}
+                    />
+                    <StyleTouchable
+                        customStyle={styles.buttonStarTool}
+                        onPress={onFeeling}>
+                        {IconEmotion}
+                    </StyleTouchable>
+                    <StyleTouchable
+                        customStyle={styles.buttonStarTool}
+                        onPress={onTopic}>
+                        {IconTag}
+                    </StyleTouchable>
+                    <StyleTouchable
+                        customStyle={styles.buttonStarTool}
+                        onPress={onCheckIn}>
+                        {IconCheckIn}
+                    </StyleTouchable>
+                </View>
+            </Animated.View>
+        );
+    };
+
+    const ModalVertical = () => {
+        return (
+            <View
+                style={[
+                    styles.modalVerticalView,
+                    {
+                        backgroundColor: theme.backgroundColor,
+                        shadowColor: theme.textColor,
+                    },
+                ]}>
+                <ItemToolCreatePost
+                    icon={IconEmotion()}
+                    title="profile.post.feeling"
+                    onPress={onFeeling}
                 />
-            </StyleTouchable>
+                <ItemToolCreatePost
+                    icon={IconTag()}
+                    title="profile.post.topic"
+                    onPress={onTopic}
+                />
+                <ItemToolCreatePost
+                    icon={IconCheckIn()}
+                    title="profile.post.checkIn"
+                    onPress={onCheckIn}
+                />
+            </View>
         );
     };
 
@@ -486,28 +673,63 @@ const CreatePostPreview = ({route}: Props) => {
                 styles.container,
                 {backgroundColor: theme.backgroundColor},
             ]}>
-            {RenderImage()}
-            {RenderButtonComeback()}
+            {Header()}
 
-            <ButtonBack
-                containerStyle={styles.buttonBackView}
-                onPress={goBack}
+            <ScrollView>
+                {FeelingTopicLocation()}
+                <View style={styles.captionView}>
+                    <TextInput
+                        style={[
+                            styles.captionInputBox,
+                            {color: theme.textHightLight},
+                        ]}
+                        multiline
+                        placeholder={t('common.writeSomething')}
+                        placeholderTextColor={theme.holderColorLighter}
+                        defaultValue={initValue.content}
+                        onChangeText={text => setContent(text)}
+                        onFocus={() => {
+                            shouldShowToolHorizontal = true;
+                        }}
+                    />
+                </View>
+
+                <ScrollSyncSizeImage
+                    images={images}
+                    syncWidth={Metrics.width}
+                    scrollViewProps={{
+                        keyboardShouldPersistTaps: 'handled',
+                    }}
+                />
+                {StarLink()}
+                {ModalVertical()}
+            </ScrollView>
+
+            {ToolHorizontal()}
+
+            {/* Modalize */}
+            <ModalPickStars
+                ref={starRef}
+                numberStars={stars}
+                onChangeNumberStars={value => setStars(value)}
             />
-
-            {RenderToolUp()}
-            {RenderLayer()}
-            {RenderName()}
-            {RenderButtonPost()}
-            {RenderTollRight()}
-
-            {RenderLayerContent()}
-            {RenderContent()}
-
-            <ActionSheet
-                ref={actionSheetRef}
-                options={optionsImgPicker}
-                cancelButtonIndex={2}
-                onPress={onChooseAction}
+            <ModalAddLink
+                ref={linkRef}
+                link={link || ''}
+                onChangeLink={value => setLink(value)}
+            />
+            <ModalCheckIn
+                ref={checkInRef}
+                location={location || ''}
+                onChangeLocation={value => setLocation(value)}
+            />
+            <ModalFeeling
+                ref={feelingRef}
+                onChangeFeeling={value => setFeeling(value)}
+            />
+            <ModalTopic
+                ref={topicRef}
+                onChangeTopic={value => setTopic(value)}
             />
         </View>
     );
@@ -515,151 +737,188 @@ const CreatePostPreview = ({route}: Props) => {
 
 const styles = ScaledSheet.create({
     container: {
-        flex: 1,
+        flexGrow: 1,
     },
-    buttonBackView: {
-        top: '10@s',
-        left: '10@s',
-        padding: '10@ms',
-    },
-    // image
-    imageView: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    image: {
+    // feelingTopicLocation
+    feelingTopicLocationView: {
         width: '100%',
-        height: '100%',
-        resizeMode: 'contain',
     },
-    // layer
-    layerView: {
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        opacity: 0.6,
-    },
-    // name and avatar and content
-    nameView: {
-        position: 'absolute',
-        top: '70@ms',
-        left: '10@s',
-        width: '70%',
-        height: '70@ms',
-    },
-    avatarNameBox: {
-        width: '100%',
+    locationBox: {
         flexDirection: 'row',
         alignItems: 'center',
+        marginTop: '10@vs',
+        paddingHorizontal: '10@s',
     },
-    textName: {
-        fontSize: '20@ms',
+    iconFeeling: {
+        width: '30@ms',
+        height: '30@ms',
+    },
+    textTopic: {
+        fontSize: '13.5@ms',
         fontWeight: 'bold',
     },
-    // content view
-    contentView: {
-        position: 'absolute',
-        left: '10@s',
-        top: '140@ms',
-        width: '70%',
-    },
-    textContent: {
+    iconLocationCaption: {
         fontSize: '17@ms',
-        paddingHorizontal: 0,
     },
-    // tool up
-    toolUpView: {
-        position: 'absolute',
-        top: '10@vs',
-        right: '20@s',
-        width: '150@ms',
-        height: '50@ms',
-        flexDirection: 'row',
+    textLocation: {
+        fontSize: '13.5@ms',
+        fontWeight: 'bold',
+        marginLeft: '2@s',
+    },
+    // write caption
+    captionView: {
+        width: '100%',
+        maxHeight: '130@vs',
+        marginVertical: '10@vs',
+    },
+    captionInputBox: {
+        width: '100%',
+        fontSize: '13.5@ms',
+        paddingHorizontal: '15@s',
+    },
+    // header
+    headerView: {
+        width: '100%',
+        paddingVertical: '5@vs',
+        paddingHorizontal: '15@s',
+        flexDirection: 'row-reverse',
         alignItems: 'center',
-        justifyContent: 'space-around',
+        justifyContent: 'flex-start',
+        borderBottomWidth: Platform.select({
+            ios: '0.25@ms',
+            android: '0.5@ms',
+        }),
     },
-    iconToolUpBox: {
-        borderRadius: '30@ms',
-        width: '50@ms',
-        height: '50@ms',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    iconImage: {
-        fontSize: '23@ms',
-    },
-    // button post
-    buttonPostView: {
+    iconCloseView: {
         position: 'absolute',
-        bottom: '20@s',
-        right: '20@s',
-        paddingHorizontal: '40@s',
-        paddingVertical: '7@vs',
-        borderRadius: '20@s',
-        borderWidth: '1@ms',
+        right: '10@s',
+    },
+    iconClose: {
+        fontSize: '25@ms',
+    },
+    postBox: {
+        borderWidth: Platform.select({
+            ios: '0.5@ms',
+            android: '1@ms',
+        }),
+        paddingHorizontal: '15@s',
+        paddingVertical: '3@vs',
+        borderRadius: '5@ms',
     },
     textPost: {
+        fontSize: '14@ms',
         fontWeight: 'bold',
     },
-    // tool view
-    toolView: {
-        position: 'absolute',
-        width: '100@s',
-        paddingVertical: '10@vs',
-        bottom: '230@s',
-        right: 0,
-        alignItems: 'center',
+    draftBox: {
+        borderWidth: Platform.select({
+            ios: '0.5@ms',
+            android: '1@ms',
+        }),
+        paddingHorizontal: '10@s',
+        paddingVertical: '3@vs',
+        borderRadius: '5@ms',
+        marginRight: '7@s',
     },
-    avatar: {
-        width: '50@ms',
-        height: '50@ms',
-        borderRadius: '30@ms',
+    textDraft: {
+        fontSize: '14@ms',
     },
-    iconLike: {
-        fontSize: '60@ms',
-        marginTop: '30@vs',
+    // start
+    starLinkView: {
+        width: '100%',
+        marginVertical: '10@vs',
+        paddingHorizontal: '10@s',
+        flexDirection: 'row',
     },
-    iconThemeBox: {
-        marginTop: '50@vs',
-        padding: '8@ms',
-        borderRadius: '30@ms',
+    starBox: {
+        borderRadius: '5@ms',
     },
-    iconTheme: {
-        fontSize: '40@ms',
-    },
-    elementPicker: {
-        width: '70%',
-        height: '70@vs',
+    starTouch: {
+        height: '30@ms',
+        paddingHorizontal: '10@s',
         flexDirection: 'row',
         alignItems: 'center',
     },
-    iconPicker: {
-        width: '40@vs',
-        height: '40@vs',
-        marginRight: '20@s',
+    star: {
+        fontSize: '14@ms',
+        marginHorizontal: '3@s',
     },
-    textPicker: {
+    textNumberStar: {
+        fontSize: '10@ms',
         fontWeight: 'bold',
+        color: Theme.common.white,
+        marginLeft: '7@s',
     },
-    inputContainer: {
-        flex: 1,
+    linkBox: {
+        marginLeft: '10@s',
     },
-    inputOther: {
-        width: '100%',
-        paddingHorizontal: 0,
-    },
-    // extension tool
-    reportView: {
-        position: 'absolute',
-        width: '50@ms',
-        top: Metrics.safeTopPadding + verticalScale(10),
-        right: '10@s',
+    linkTouch: {
+        height: '30@ms',
+        flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: '30@ms',
+        borderRadius: '5@ms',
+        paddingHorizontal: '10@s',
     },
-    iconMoon: {
-        fontSize: '35@ms',
+    iconHouseTouch: {
+        width: '20@ms',
+        height: '20@ms',
+        backgroundColor: Theme.common.white,
+        borderRadius: '15@ms',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    iconHouse: {
+        width: '10@ms',
+        height: '10@ms',
+    },
+    addLinkBox: {
+        marginLeft: '10@s',
+        borderWidth: '1@ms',
+        borderRadius: '5@ms',
+        paddingHorizontal: '10@s',
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: '30@ms',
+    },
+    textAddLink: {
+        fontSize: '12@ms',
+    },
+    // tool horizontal
+    toolHorizontalView: {
+        position: 'absolute',
+        width: screenWidth,
+        paddingVertical: '7@vs',
+        right: -screenWidth,
+        borderTopLeftRadius: '5@ms',
+        borderTopRightRadius: '5@ms',
+        flexDirection: 'row',
+    },
+    divider: {
+        height: '100%',
+        width: Platform.select({
+            ios: '0.5@ms',
+            android: '1@ms',
+        }),
+        marginHorizontal: '5@s',
+    },
+    buttonToolBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    buttonStarTool: {
+        paddingHorizontal: '5@s',
+        marginHorizontal: '7@s',
+    },
+    starTool: {
+        fontSize: '23@ms',
+    },
+    // modal vertical
+    modalVerticalView: {
+        paddingBottom: Metrics.safeBottomPadding,
+        shadowOffset: {
+            width: 0,
+            height: -verticalScale(3),
+        },
+        shadowOpacity: 0.1,
     },
 });
 

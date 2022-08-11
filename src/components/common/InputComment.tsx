@@ -103,7 +103,6 @@ const InputComment = (props: Props, inputRef: any) => {
                 styles.container,
                 {
                     backgroundColor: theme.backgroundColor,
-                    borderTopColor: theme.borderColor,
                 },
             ]}>
             {RenderReply()}
@@ -118,8 +117,11 @@ const InputComment = (props: Props, inputRef: any) => {
                 editable={editable}
                 i18Placeholder="Comment..."
                 placeholderTextColor={theme.holderColorLighter}
-                containerStyle={styles.containerInput}
-                inputStyle={styles.input}
+                containerStyle={[
+                    styles.containerInput,
+                    {backgroundColor: theme.backgroundColorSecond},
+                ]}
+                inputStyle={[styles.input, {color: theme.textColor}]}
                 value={text}
                 onChangeText={onChangeText}
                 isEffectTabBar={false}
@@ -139,15 +141,12 @@ const InputComment = (props: Props, inputRef: any) => {
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
+        maxHeight: '120@vs',
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: '12@s',
-        paddingTop: '7@ms',
+        paddingTop: '10@ms',
         paddingBottom: verticalScale(7) + Metrics.safeBottomPadding,
-        borderTopWidth: Platform.select({
-            ios: '0.25@ms',
-            android: '0.5@ms',
-        }),
     },
     replyView: {
         position: 'absolute',
@@ -171,9 +170,12 @@ const styles = ScaledSheet.create({
         width: '30@ms',
         height: '30@ms',
         borderRadius: '15@ms',
+        marginRight: '5@s',
     },
     containerInput: {
         flex: 1,
+        paddingVertical: '5@vs',
+        borderRadius: '5@ms',
     },
     input: {
         fontSize: '15@ms',
@@ -181,8 +183,7 @@ const styles = ScaledSheet.create({
     emojiView: {
         alignItems: 'center',
         justifyContent: 'center',
-        paddingLeft: '10@s',
-        paddingRight: '5@s',
+        paddingLeft: '5@s',
     },
     sendIcon: {
         fontSize: '20@ms',

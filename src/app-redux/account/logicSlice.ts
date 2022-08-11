@@ -3,10 +3,16 @@ import {
     TypeBubblePalace,
     TypeBubblePalaceAction,
     TypeChatTagResponse,
+    TypeCreatePostRequest,
     TypeGradient,
 } from 'api/interface';
 import {DEFAULT_IMAGE_BACKGROUND} from 'asset/standardValue';
 import {HobbyType} from 'hook/useRedux';
+
+export type ReduxPostCreatedHandle = {
+    status: 'loading' | 'success' | 'error' | 'done';
+    data: TypeCreatePostRequest | undefined;
+};
 
 export const initialLogicState = {
     isLoading: false,
@@ -29,6 +35,10 @@ export const initialLogicState = {
 
     // is use when user block other and OtherProfile should re-render
     shouldRenderOtherProfile: true,
+
+    postCreatedHandling: <ReduxPostCreatedHandle>{
+        status: 'done',
+    },
 
     resource: {
         listHobbies: <Array<HobbyType>>[],
@@ -79,6 +89,9 @@ const logicSlice = createSlice({
         },
         setNumberNewNotification: (state, action) => {
             state.numberNewNotifications = action.payload;
+        },
+        setPostCreatedHandling: (state, action) => {
+            state.postCreatedHandling = action.payload;
         },
     },
 });

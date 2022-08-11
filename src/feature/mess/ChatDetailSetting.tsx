@@ -53,6 +53,8 @@ const onReportUser = (userId: number) => {
     });
 };
 
+let timeOut: any;
+
 const ChatDetailSetting = ({route}: Props) => {
     const shouldRenderOtherProfile = Redux.getShouldRenderOtherProfile();
     const borderMessRoute = Redux.getBorderMessRoute();
@@ -225,7 +227,7 @@ const ChatDetailSetting = ({route}: Props) => {
         );
     };
 
-    const ModalChangeTheme = () => {
+    const ModalChangeTheme = useMemo(() => {
         return (
             <Modalize
                 ref={modalizeThemeRef}
@@ -260,7 +262,7 @@ const ChatDetailSetting = ({route}: Props) => {
                 </ScrollView>
             </Modalize>
         );
-    };
+    }, []);
 
     const ModalEditConversationName = () => {
         const onCancel = () => {
@@ -291,7 +293,6 @@ const ChatDetailSetting = ({route}: Props) => {
                     backgroundColor: 'transparent',
                 }}
                 withHandle={false}
-                onOpened={() => inputConversationNameRef.current?.focus()}
                 scrollViewProps={{
                     keyboardShouldPersistTaps: 'always',
                 }}
@@ -416,6 +417,10 @@ const ChatDetailSetting = ({route}: Props) => {
                         titleParams={{name: partnerInfo.name}}
                         onPress={() => {
                             modalizeNameRef.current?.open();
+                            timeOut = setTimeout(() => {
+                                inputConversationNameRef.current?.focus();
+                            }, 100);
+                            return () => clearTimeout(timeOut);
                         }}
                     />
                     <ItemSetting
@@ -457,7 +462,7 @@ const ChatDetailSetting = ({route}: Props) => {
                 )}
             </ScrollView>
 
-            {ModalChangeTheme()}
+            {ModalChangeTheme}
             {ModalEditConversationName()}
         </View>
     );

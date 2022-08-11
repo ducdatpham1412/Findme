@@ -218,10 +218,10 @@ export interface TypeCreatePostRequest {
     feeling?: number | null;
     location?: string | null;
     link?: string | null;
+    isDraft: boolean;
 }
 export interface TypeEditPostRequest {
     content?: string;
-    images?: Array<string>;
     stars?: number;
     topic?: number | null;
     feeling?: number | null;
@@ -231,12 +231,13 @@ export interface TypeEditPostRequest {
 
 export interface TypeCreatePostResponse {
     id: string;
-    topic: number | null;
-    feeling: number | null;
-    location: string | null;
     content: string;
     images: Array<string>;
     stars: number;
+    topic: number | null;
+    feeling: number | null;
+    location: string | null;
+    link: string | null;
     totalLikes: number;
     totalComments: number;
     creator: number;
@@ -280,10 +281,10 @@ export interface TypeBubblePalace {
     topic: number | null;
     feeling: number | null;
     location: string | null;
+    link: string | null;
     content: string;
     images: Array<string>;
     stars: number;
-    link: string | null;
     totalLikes: number;
     totalComments: number;
     creator: number;

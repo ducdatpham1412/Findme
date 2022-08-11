@@ -20,6 +20,10 @@ const common = {
     continue: 'Continue',
     reply: 'Reply',
     anonymous: '@Anonymous',
+    writeSomething: 'Write something',
+    discard: 'Discard',
+    stay: 'Stay',
+    wantToDiscard: 'You want to discard the changes?',
 };
 
 const login = {
@@ -216,11 +220,30 @@ const profile = {
         title: 'Post your image',
         caption: 'Write caption',
         post: 'Post',
+        draft: 'Draft',
         edit: 'Edit',
         editPost: 'Edit post',
         delete: 'Delete post',
         sureDeletePost: 'Are you sure delete this post?',
         enterTopic: 'Enter topic yourself',
+        pickImage: 'Pick images',
+        addLink: 'Add link',
+        feeling: 'Feeling',
+        checkIn: 'Check in',
+        topic: 'Topic',
+        rating: 'Rating',
+        pasteLink: 'Paste link here',
+        whereAreYouNow: "Where're you now?",
+        willDebutSearchOnGoogleMap:
+            "Doffy're developing searching on Google map\nLet's wait for us ^^",
+        nice: 'Nice',
+        omg: 'Omg',
+        wondering: 'Wondering',
+        cry: 'Cry',
+        angry: 'Angry',
+        travel: 'Travel',
+        cuisine: 'Cuisine',
+        shopping: 'Shopping',
     },
     follow: {
         follower: 'Followers',
@@ -322,6 +345,7 @@ const alert = {
 
     // PROFILE
     successUpdatePro: 'Update profile successful !',
+    invalidLink: 'Invalid link',
 
     // PERMISSION
     permissionCamera: 'Access camera',

@@ -68,6 +68,7 @@ const PROFILE_ROUTE = {
     editProfile: '@PROFILE_ROUTE/editProfile',
     settingRoute: '@PROFILE_ROUTE/settingRoute',
     createPostPreview: '@PROFILE_ROUTE/createPostPreview',
+    createPostPickImg: '@PROFILE_ROUTE/createPostPickImg',
 };
 /**
  * ||

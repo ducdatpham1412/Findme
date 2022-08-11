@@ -9,10 +9,12 @@ import ReportUser from 'feature/discovery/ReportUser';
 import ChatDetail from 'feature/mess/ChatDetail';
 import ChatDetailSetting from 'feature/mess/ChatDetailSetting';
 import CreatePostPreview from 'feature/profile/CreatePostPreview';
+import CreatPostPickImage from 'feature/profile/CreatPostPickImage';
 import ListFollows from 'feature/profile/ListFollows';
 import OtherProfile from 'feature/profile/OtherProfile';
 import ListDetailPost from 'feature/profile/post/ListDetailPost';
 import Redux from 'hook/useRedux';
+import StatusPostCreated from 'navigation/components/StatusPostCreated';
 import ROOT_SCREEN, {MESS_ROUTE, PROFILE_ROUTE} from 'navigation/config/routes';
 import React from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -29,7 +31,6 @@ const AppStack = () => {
     const cardStyle = {
         backgroundColor: theme.backgroundColor,
     };
-
     return (
         <SafeAreaView
             style={[styles.container, {backgroundColor: theme.backgroundColor}]}
@@ -115,6 +116,10 @@ const AppStack = () => {
                     component={CreatePostPreview}
                 />
                 <Stack.Screen
+                    name={PROFILE_ROUTE.createPostPickImg}
+                    component={CreatPostPickImage}
+                />
+                <Stack.Screen
                     name={MESS_ROUTE.chatDetail}
                     component={ChatDetail}
                     options={{
@@ -133,6 +138,8 @@ const AppStack = () => {
                     component={ChatDetailSetting}
                 />
             </Stack.Navigator>
+
+            <StatusPostCreated />
         </SafeAreaView>
     );
 };

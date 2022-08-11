@@ -1,29 +1,77 @@
+/* eslint-disable no-underscore-dangle */
 import {Metrics} from 'asset/metrics';
 import {StyleImage, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import Redux from 'hook/useRedux';
-import React, {useCallback, useEffect, useState} from 'react';
-import {StyleProp, View, ViewStyle} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Platform, StyleProp, View, ViewStyle} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import ImageUploader from 'utility/ImageUploader';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {isIOS} from 'utility/assistant';
+import ImageUploader from 'utility/ImageUploader';
 
 interface Props {
     images: Array<string>;
-    setImages: any;
+    onChooseImage(image: string): void;
     containerStyle?: StyleProp<ViewStyle>;
+    numberColumns?: number;
+    initIndexImage?: number;
 }
 interface StatusLibrary {
     endCursor: string | undefined;
     hasNext: boolean;
 }
 
+interface RenderImageParams {
+    item: any;
+    images: Array<string>;
+    onChooseImage(image: string): void;
+    theme: any;
+    numberColumns: number;
+}
+
+const RenderImage = (params: RenderImageParams) => {
+    const {item, images, onChooseImage, theme, numberColumns} = params;
+    const isChosen = images.includes(item);
+    const size = Metrics.width / numberColumns;
+
+    return (
+        <StyleTouchable
+            onPress={() => onChooseImage(item)}
+            customStyle={[styles.imageBox, {width: size, height: size}]}>
+            <StyleImage source={{uri: item}} style={styles.image} />
+
+            {isChosen && (
+                <View
+                    style={[
+                        styles.layoutChosen,
+                        {backgroundColor: theme.backgroundColor},
+                    ]}
+                />
+            )}
+
+            {isChosen && (
+                <AntDesign
+                    name="check"
+                    style={[styles.checkIcon, {color: theme.highlightColor}]}
+                />
+            )}
+        </StyleTouchable>
+    );
+};
+
 const ModalPickImage = (props: Props) => {
     const theme = Redux.getTheme();
-    const {images, setImages, containerStyle} = props;
+    const {
+        images,
+        onChooseImage,
+        containerStyle,
+        numberColumns = 4,
+        initIndexImage,
+    } = props;
 
     const [libraryImages, setLibraryImages] = useState<Array<any>>([]);
+    const [hadSetIndexImage, setHadSetIndexImage] = useState(false);
 
     const [pageIndex, setPageIndex] = useState(1);
     const [statusLibrary, setStatusLibrary] = useState<StatusLibrary>({
@@ -56,7 +104,12 @@ const ModalPickImage = (props: Props) => {
             }
             return item.node.image.uri;
         });
-        setLibraryImages(libraryImages.concat(moreImages));
+        const temp = libraryImages.concat(moreImages);
+        if (!hadSetIndexImage && initIndexImage !== undefined) {
+            onChooseImage(temp[initIndexImage]);
+            setHadSetIndexImage(true);
+        }
+        setLibraryImages(temp);
         setFirstLoad(80);
     };
 
@@ -72,64 +125,20 @@ const ModalPickImage = (props: Props) => {
         }
     };
 
-    // render_view
-    const renderImage = useCallback(
-        ({item, index}: any) => {
-            const isChosen = images.includes(item);
-
-            const onChooseImage = () => {
-                if (!isChosen) {
-                    if (images.length < 2) {
-                        setImages(images.concat(item));
-                    } else {
-                        const temp = [item].concat(images[0]);
-                        setImages(temp);
-                    }
-                } else {
-                    const temp = [...images];
-                    const _index = temp.indexOf(item);
-                    temp.splice(_index, 1);
-                    setImages(temp);
-                }
-            };
-
-            return (
-                <StyleTouchable
-                    key={index}
-                    onPress={onChooseImage}
-                    customStyle={styles.imageBox}>
-                    <StyleImage source={{uri: item}} style={styles.image} />
-
-                    {isChosen && (
-                        <View
-                            style={[
-                                styles.layoutChosen,
-                                {backgroundColor: theme.backgroundColor},
-                            ]}
-                        />
-                    )}
-
-                    {isChosen && (
-                        <AntDesign
-                            name="check"
-                            style={[
-                                styles.checkIcon,
-                                {color: theme.highlightColor},
-                            ]}
-                        />
-                    )}
-                </StyleTouchable>
-            );
-        },
-        [images],
-    );
-
     return (
         <View style={[styles.container, containerStyle]}>
             <StyleList
                 data={libraryImages}
-                renderItem={renderImage}
-                numColumns={3}
+                renderItem={({item}: any) =>
+                    RenderImage({
+                        item,
+                        images,
+                        onChooseImage,
+                        theme,
+                        numberColumns,
+                    })
+                }
+                numColumns={numberColumns}
                 onLoadMore={onLoadMoreImage}
                 contentContainerStyle={styles.contentContainer}
             />
@@ -145,11 +154,14 @@ const styles = ScaledSheet.create({
     imageBox: {
         alignItems: 'center',
         justifyContent: 'center',
+        padding: Platform.select({
+            ios: '0.25@ms',
+            android: '0.25@ms',
+        }),
     },
     image: {
-        width: (Metrics.width - 6) / 3,
-        height: (Metrics.width - 6) / 3,
-        marginHorizontal: 1,
+        width: '100%',
+        height: '100%',
     },
     layoutChosen: {
         position: 'absolute',

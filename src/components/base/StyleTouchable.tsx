@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component, ReactNode} from 'react';
 import {Pressable, PressableProps, StyleProp, ViewStyle} from 'react-native';
 
 export interface StyleTouchableProps extends PressableProps {
@@ -11,40 +11,38 @@ export interface StyleTouchableProps extends PressableProps {
     normalOpacity?: number;
 }
 
-const StyleTouchable: React.FunctionComponent<StyleTouchableProps> = (
-    props: StyleTouchableProps,
-) => {
-    const {
-        customStyle,
-        disable = false,
-        onPress,
-        onLongPress,
-        children,
-        disableOpacity = 0.4,
-        activeOpacity = 0.6,
-        normalOpacity = 1,
-    } = props;
+export default class StyleTouchable extends Component<StyleTouchableProps> {
+    render(): ReactNode {
+        const {
+            customStyle,
+            disable = false,
+            onPress,
+            onLongPress,
+            children,
+            disableOpacity = 0.4,
+            activeOpacity = 0.6,
+            normalOpacity = 1,
+        } = this.props;
 
-    return (
-        <Pressable
-            style={({pressed}) => [
-                customStyle,
-                {
-                    opacity: disable
-                        ? disableOpacity
-                        : pressed
-                        ? activeOpacity
-                        : normalOpacity,
-                    overflow: 'hidden',
-                },
-            ]}
-            disabled={disable}
-            {...props}
-            onPress={onPress}
-            onLongPress={onLongPress}>
-            {children}
-        </Pressable>
-    );
-};
-
-export default StyleTouchable;
+        return (
+            <Pressable
+                style={({pressed}) => [
+                    customStyle,
+                    {
+                        opacity: disable
+                            ? disableOpacity
+                            : pressed
+                            ? activeOpacity
+                            : normalOpacity,
+                        overflow: 'hidden',
+                    },
+                ]}
+                disabled={disable}
+                {...this.props}
+                onPress={onPress}
+                onLongPress={onLongPress}>
+                {children}
+            </Pressable>
+        );
+    }
+}

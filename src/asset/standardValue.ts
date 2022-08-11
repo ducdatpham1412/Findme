@@ -1,5 +1,8 @@
 /* eslint-disable no-shadow */
 import Config from 'react-native-config';
+import {I18Normalize} from 'utility/I18Next';
+import {FEELING, TOPIC} from './enum';
+import Images from './img/images';
 
 export const standValue = {
     USERNAME_MIN_LENGTH: 7,
@@ -78,3 +81,61 @@ export const DYNAMIC_LINK_ANDROID = Config.ANDROID_APP_ID;
 
 export const ANDROID_APP_LINK =
     'https://play.google.com/store/apps/details?id=com.doffy.android.production';
+
+export const MAX_NUMBER_IMAGES_POST = 10;
+
+export const NUMBER_STARS = [0, 1, 2, 3, 4];
+
+export const LIST_FEELINGS: Array<{
+    id: number;
+    text: I18Normalize;
+    icon: any;
+}> = [
+    {
+        id: FEELING.nice,
+        text: 'profile.post.nice',
+        icon: Images.icons.girl,
+    },
+    {
+        id: FEELING.omg,
+        text: 'profile.post.omg',
+        icon: Images.icons.apple,
+    },
+    {
+        id: FEELING.wondering,
+        text: 'profile.post.wondering',
+        icon: Images.icons.boy,
+    },
+    {
+        id: FEELING.cry,
+        text: 'profile.post.cry',
+        icon: Images.icons.house,
+    },
+    {
+        id: FEELING.angry,
+        text: 'profile.post.angry',
+        icon: Images.icons.facebook,
+    },
+];
+
+export const LIST_TOPICS: Array<{
+    id: number;
+    text: I18Normalize;
+    icon: any;
+}> = [
+    {
+        id: TOPIC.travel,
+        text: 'profile.post.travel',
+        icon: Images.icons.boy,
+    },
+    {
+        id: TOPIC.cuisine,
+        text: 'profile.post.cuisine',
+        icon: Images.icons.girl,
+    },
+    {
+        id: TOPIC.shopping,
+        text: 'profile.post.shopping',
+        icon: Images.icons.lgbt,
+    },
+];

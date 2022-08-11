@@ -2,6 +2,7 @@ import {StackActions} from '@react-navigation/native';
 import {StylePickerProps} from 'components/base/picker/StylePicker';
 import ROOT_SCREEN from 'navigation/config/routes';
 import React, {ReactNode, RefObject} from 'react';
+import {I18Normalize} from 'utility/I18Next';
 
 export const navigationRef: RefObject<any> = React.createRef();
 
@@ -28,10 +29,12 @@ interface TypeMoreChoiceAlert {
 }
 
 interface TypeAlertYesOrNo {
-    i18Title: string;
+    i18Title: I18Normalize;
+    agreeText?: I18Normalize;
+    refuseText?: I18Normalize;
     i18Params?: object;
-    agreeChange(): any;
-    refuseChange(): any;
+    agreeChange(): void;
+    refuseChange(): void;
     headerNode?: ReactNode;
     displayButton?: boolean;
     touchOutBack?: boolean;
