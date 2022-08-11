@@ -18,7 +18,14 @@ import {
 import ROOT_SCREEN from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Animated, FlatList, Keyboard, TextInput, View} from 'react-native';
+import {
+    Animated,
+    FlatList,
+    Keyboard,
+    Platform,
+    TextInput,
+    View,
+} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 import ItemComment from './ItemComment';
@@ -225,10 +232,13 @@ const styles = ScaledSheet.create({
         flex: 1,
     },
     commentBox: {
-        flex: 1.5,
-        borderWidth: '1@ms',
-        borderTopLeftRadius: '20@ms',
-        borderTopRightRadius: '20@ms',
+        flex: 2,
+        borderWidth: Platform.select({
+            ios: '0.25@ms',
+            android: '0.5@ms',
+        }),
+        borderTopLeftRadius: '13@ms',
+        borderTopRightRadius: '13@ms',
         borderBottomWidth: 0,
     },
     headerTouch: {

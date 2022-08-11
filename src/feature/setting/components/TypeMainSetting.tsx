@@ -3,10 +3,11 @@ import Redux from 'hook/useRedux';
 import React from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
+import {I18Normalize} from 'utility/I18Next';
 
 interface TypeMainSettingProps {
     icon: any;
-    title: string;
+    title: I18Normalize;
     onPress(): void;
 }
 
@@ -79,7 +80,7 @@ const styles = ScaledSheet.create({
         marginRight: '10@s',
     },
     text: {
-        fontSize: '20@ms',
+        fontSize: '15@ms',
     },
 });
 

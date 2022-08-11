@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import {yupResolver} from '@hookform/resolvers/yup';
 import ChangePersonalInfo from 'api/actions/setting/ChangePersonalInfo';
 import {INFO_TYPE} from 'asset/enum';
@@ -114,7 +115,9 @@ const PersonalInformation = () => {
     const [birthdayShow, setBirthdayShow] = useState(false);
     const onChangeDateTimePicker = (selectedDate: Date) => {
         const currentDate = selectedDate || temptBirthday;
-        !isIOS && setBirthdayShow(!birthdayShow);
+        if (!isIOS) {
+            setBirthdayShow(!birthdayShow);
+        }
         setTemptBirthday(currentDate);
         setValue(INFO_TYPE.birthday, convertToFormatDate(currentDate));
     };
@@ -125,32 +128,32 @@ const PersonalInformation = () => {
      */
     const [typeChange, setTypeChange] = useState('facebook');
 
-    const agreeChange = async (_typeChange: string) => {
+    const agreeChange = async (typeChange_: string) => {
         let newInfo: any;
-        if (_typeChange === INFO_TYPE.birthday) {
+        if (typeChange_ === INFO_TYPE.birthday) {
             newInfo = temptBirthday;
             setBirthdayShow(false);
-        } else if (_typeChange === INFO_TYPE.gender) {
+        } else if (typeChange_ === INFO_TYPE.gender) {
             newInfo = idGender;
         } else {
-            newInfo = getValues(_typeChange);
+            newInfo = getValues(typeChange_);
         }
 
         // change email or phone
         if (
-            _typeChange === INFO_TYPE.email ||
-            _typeChange === INFO_TYPE.phone
+            typeChange_ === INFO_TYPE.email ||
+            typeChange_ === INFO_TYPE.phone
         ) {
             navigate(SETTING_ROUTE.enterPassword, {
                 newInfo,
-                typeChange: _typeChange,
+                typeChange: typeChange_,
             });
         }
         // change facebook, gender, birthday
         else {
             try {
                 Redux.setIsLoading(true);
-                await ChangePersonalInfo.changeInfo(newInfo, _typeChange);
+                await ChangePersonalInfo.changeInfo(newInfo, typeChange_);
                 goBack();
             } catch (err) {
                 appAlert(err);
@@ -165,10 +168,10 @@ const PersonalInformation = () => {
         goBack();
     };
 
-    const openConfirmChange = async (_typeChange: string) => {
-        setTypeChange(_typeChange);
+    const openConfirmChange = async (typeChange_: string) => {
+        setTypeChange(typeChange_);
         const tempInfo = () => {
-            switch (_typeChange) {
+            switch (typeChange_) {
                 case INFO_TYPE.facebook:
                     return information.facebook;
                 case INFO_TYPE.email:
@@ -184,17 +187,17 @@ const PersonalInformation = () => {
             }
         };
 
-        if (getValues(_typeChange) === tempInfo()) {
+        if (getValues(typeChange_) === tempInfo()) {
             return;
         }
 
-        if (errors[_typeChange]) {
-            appAlert(errors[_typeChange].message);
+        if (errors[typeChange_]) {
+            appAlert(errors[typeChange_].message);
         } else {
             appAlertYesNo({
                 i18Title: 'setting.personalInfo.alertCfChange',
-                agreeChange: () => agreeChange(_typeChange),
-                refuseChange: refuseChange,
+                agreeChange: () => agreeChange(typeChange_),
+                refuseChange,
             });
         }
     };

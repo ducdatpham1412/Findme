@@ -11,7 +11,7 @@ import AuthenticateService from 'utility/login/loginService';
 import TypeMainSetting from './components/TypeMainSetting';
 
 const SettingScreen = () => {
-    const gender = Redux.getPassport().information.gender;
+    const {gender} = Redux.getPassport().information;
     const logOut = async () => {
         await AuthenticateService.logOut({hadRefreshTokenBlacked: false});
     };

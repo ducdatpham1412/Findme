@@ -31,7 +31,7 @@ const ItemComment = (props: Props) => {
 
     const paddingLeft = !commentReplied
         ? scale(15)
-        : scale(25) + moderateScale(40);
+        : scale(25) + moderateScale(25);
     const marginBottom = !commentReplied ? verticalScale(20) : verticalScale(0);
 
     // const onLikeOrUnLike = async () => {
@@ -54,10 +54,7 @@ const ItemComment = (props: Props) => {
 
     const RenderAvatar = () => {
         return (
-            <StyleTouchable
-                onPress={() => onGoToProfile(item.creatorId)}
-                disable={!item.creatorId}
-                disableOpacity={1}>
+            <StyleTouchable onPress={() => onGoToProfile(item.creator)}>
                 <StyleImage
                     source={{uri: item.creatorAvatar}}
                     customStyle={styles.avatar}
@@ -70,7 +67,9 @@ const ItemComment = (props: Props) => {
         return (
             <View style={styles.nameAndContentTouch}>
                 <StyleText
-                    originValue={item.creatorName}
+                    originValue={`${item.creatorName} ・ ${formatFromNow(
+                        item.created,
+                    )}`}
                     customStyle={[styles.nameText, {color: theme.borderColor}]}
                 />
                 <StyleText
@@ -85,7 +84,8 @@ const ItemComment = (props: Props) => {
                         <StyleTouchable
                             onPress={() =>
                                 onPressReply?.(item.id, item.creatorName)
-                            }>
+                            }
+                            hitSlop={10}>
                             <StyleText
                                 i18Text="common.reply"
                                 customStyle={[
@@ -95,14 +95,6 @@ const ItemComment = (props: Props) => {
                             />
                         </StyleTouchable>
                     )}
-
-                    <StyleText
-                        originValue={formatFromNow(item.createdTime)}
-                        customStyle={[
-                            styles.timeText,
-                            {color: theme.borderColor},
-                        ]}
-                    />
                 </View>
             </View>
         );
@@ -149,7 +141,7 @@ const ItemComment = (props: Props) => {
                     item={itemReply}
                     commentReplied={item.id}
                     key={index}
-                    onGoToProfile={() => onGoToProfile(itemReply.creatorId)}
+                    onGoToProfile={() => onGoToProfile(itemReply.creator)}
                 />
             ))}
         </View>
@@ -163,21 +155,20 @@ const styles = ScaledSheet.create({
         paddingRight: '15@s',
     },
     avatar: {
-        width: '40@ms',
-        height: '40@ms',
+        width: '30@ms',
+        height: '30@ms',
         borderRadius: '20@ms',
     },
     // name, content, reply
     nameAndContentTouch: {
         flex: 1,
-        paddingHorizontal: '10@s',
+        paddingHorizontal: '7@s',
     },
     nameText: {
-        fontSize: '13@ms',
-        fontWeight: 'bold',
+        fontSize: '11.5@ms',
     },
     contentText: {
-        fontSize: '14@ms',
+        fontSize: '13@ms',
         marginTop: '5@ms',
     },
     timeReplyBox: {
@@ -185,15 +176,9 @@ const styles = ScaledSheet.create({
         height: '20@ms',
         flexDirection: 'row',
         alignItems: 'flex-end',
-        paddingLeft: '10@s',
     },
     replyText: {
-        fontSize: '12@ms',
-        fontWeight: 'bold',
-    },
-    timeText: {
-        fontSize: '12@ms',
-        marginLeft: '20@s',
+        fontSize: '10@ms',
     },
     // like
     likeTouch: {

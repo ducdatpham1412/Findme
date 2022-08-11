@@ -22,11 +22,7 @@ import {
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import {
-    bubbleProfileHeight,
-    bubbleProfileWidth,
-    onGoToSignUp,
-} from 'utility/assistant';
+import {bubbleProfileHeight, onGoToSignUp} from 'utility/assistant';
 import BubbleProfile from './BubbleProfile';
 
 interface Props {
@@ -275,7 +271,7 @@ const ListDetailPost = ({route}: Props) => {
                 data={list}
                 renderItem={({item}) => RenderItemBubble(item)}
                 keyExtractor={(_, index) => String(index)}
-                snapToInterval={height}
+                // snapToInterval={height}
                 scrollEventThrottle={16}
                 decelerationRate="fast"
                 initialScrollIndex={initIndex}
@@ -284,7 +280,7 @@ const ListDetailPost = ({route}: Props) => {
                     offset: height * index,
                     index,
                 })}
-                snapToOffsets={list.map((_, index) => index * height)}
+                // snapToOffsets={list.map((_, index) => index * height)}
             />
 
             <HeaderLeftIcon
@@ -308,8 +304,7 @@ const ListDetailPost = ({route}: Props) => {
 
 const styles = ScaledSheet.create({
     container: {
-        width: bubbleProfileWidth(),
-        height: bubbleProfileHeight(),
+        flex: 1,
     },
     backIcon: {
         position: 'absolute',

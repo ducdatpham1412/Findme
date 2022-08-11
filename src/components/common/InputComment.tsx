@@ -1,3 +1,4 @@
+import {Metrics} from 'asset/metrics';
 import {
     StyleImage,
     StyleInput,
@@ -6,8 +7,8 @@ import {
 } from 'components/base';
 import Redux from 'hook/useRedux';
 import React, {forwardRef, useMemo} from 'react';
-import {View} from 'react-native';
-import {ScaledSheet} from 'react-native-size-matters';
+import {Platform, View} from 'react-native';
+import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 
 interface Props {
@@ -42,7 +43,7 @@ const InputComment = (props: Props, inputRef: any) => {
         return (
             <StyleImage source={{uri: avatar}} customStyle={styles.avatar} />
         );
-    }, [avatar]);
+    }, []);
 
     const RenderIconSend = useMemo(() => {
         return (
@@ -101,7 +102,8 @@ const InputComment = (props: Props, inputRef: any) => {
             style={[
                 styles.container,
                 {
-                    backgroundColor: theme.backgroundButtonColor,
+                    backgroundColor: theme.backgroundColor,
+                    borderTopColor: theme.borderColor,
                 },
             ]}>
             {RenderReply()}
@@ -137,17 +139,21 @@ const InputComment = (props: Props, inputRef: any) => {
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
-        backgroundColor: 'blue',
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: '12@s',
-        paddingVertical: '7@ms',
+        paddingTop: '7@ms',
+        paddingBottom: verticalScale(7) + Metrics.safeBottomPadding,
+        borderTopWidth: Platform.select({
+            ios: '0.25@ms',
+            android: '0.5@ms',
+        }),
     },
     replyView: {
         position: 'absolute',
         width: '100%',
-        height: '30@vs',
-        top: '-30@vs',
+        height: '20@vs',
+        top: '-20@vs',
         left: '12@s',
         flexDirection: 'row',
         alignItems: 'center',
@@ -159,18 +165,18 @@ const styles = ScaledSheet.create({
         opacity: 0.8,
     },
     textReply: {
-        fontSize: '12@ms',
+        fontSize: '10@ms',
     },
     avatar: {
-        width: '34@ms',
-        height: '34@ms',
-        borderRadius: '30@ms',
+        width: '30@ms',
+        height: '30@ms',
+        borderRadius: '15@ms',
     },
     containerInput: {
         flex: 1,
     },
     input: {
-        fontSize: '16@ms',
+        fontSize: '15@ms',
     },
     emojiView: {
         alignItems: 'center',

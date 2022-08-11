@@ -1,4 +1,5 @@
 import Images from 'asset/img/images';
+import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
@@ -8,10 +9,14 @@ import {navigate} from 'navigation/NavigationService';
 import React, {useEffect, useRef, useState} from 'react';
 import {Animated, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {moderateScale, ScaledSheet} from 'react-native-size-matters';
+import {
+    moderateScale,
+    ScaledSheet,
+    verticalScale,
+} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 
-// const AnimatedLinear = Animated.createAnimatedComponent(LinearGradient);
+const tabBarHeight = moderateScale(50);
 
 const TabNavigator = (props: any) => {
     const theme = Redux.getTheme();
@@ -24,7 +29,7 @@ const TabNavigator = (props: any) => {
 
     // for animation all tab bar
     const aim = useRef(new Animated.Value(0)).current;
-    const [height, setHeight] = useState(moderateScale(50));
+    const [height, setHeight] = useState(tabBarHeight);
     aim.addListener(({value}) => {
         setHeight(value);
     });
@@ -47,7 +52,7 @@ const TabNavigator = (props: any) => {
             }).start();
         } else {
             Animated.timing(aim, {
-                toValue: moderateScale(50),
+                toValue: tabBarHeight,
                 duration: 120,
                 useNativeDriver: true,
             }).start();
@@ -272,6 +277,12 @@ const TabNavigator = (props: any) => {
                 {NotificationButton()}
                 {ProfileButton()}
             </Animated.View>
+            <View
+                style={[
+                    styles.safeBottom,
+                    {backgroundColor: theme.backgroundColor},
+                ]}
+            />
         </>
     );
 };
@@ -360,6 +371,10 @@ const styles = ScaledSheet.create({
         width: '75%',
         height: '90%',
         borderRadius: '20@ms',
+    },
+    safeBottom: {
+        width: '100%',
+        height: Metrics.safeBottomPadding - verticalScale(10),
     },
 });
 
