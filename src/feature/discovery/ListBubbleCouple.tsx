@@ -12,9 +12,10 @@ import FindmeStore from 'app-redux/store';
 import {TYPE_DYNAMIC_LINK} from 'asset/enum';
 import {
     ANDROID_APP_LINK,
-    DYNAMIC_LINK_ANDORID,
+    DYNAMIC_LINK_ANDROID,
     DYNAMIC_LINK_IOS,
     DYNAMIC_LINK_SHARE,
+    LANDING_PAGE_URL,
 } from 'asset/standardValue';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
@@ -165,14 +166,16 @@ const ListBubbleCouple = () => {
     const onShowModalShare = async (item: TypeBubblePalace) => {
         try {
             const link = await dynamicLinks().buildShortLink({
-                link: `${item.images[0]}?type=${TYPE_DYNAMIC_LINK.post}&post_id=${item.id}`,
+                link: `${item?.images?.[0] || LANDING_PAGE_URL}?type=${
+                    TYPE_DYNAMIC_LINK.post
+                }&post_id=${item.id}`,
                 domainUriPrefix: DYNAMIC_LINK_SHARE,
                 ios: {
                     bundleId: DYNAMIC_LINK_IOS,
                     appStoreId: '570060128',
                 },
                 android: {
-                    packageName: DYNAMIC_LINK_ANDORID,
+                    packageName: DYNAMIC_LINK_ANDROID,
                     fallbackUrl: ANDROID_APP_LINK,
                 },
                 analytics: {
@@ -180,25 +183,27 @@ const ListBubbleCouple = () => {
                 },
             });
 
-            // let imagePath: any = null;
-            // RNFetchBlob.config({
-            //     fileCache: true,
-            // })
-            //     .fetch('GET', item.images[0])
-            //     .then(resp => {
-            //         imagePath = resp.path();
-            //         return resp.readFile('base64');
-            //     })
-            //     .then(async base64Data => {
-            //         const base64Image = `data:image/png;base64,${base64Data}`;
-            //         await Share.open({
-            //             title: 'Title',
-            //             url: base64Image,
-            //             message: link,
-            //             subject: 'Subject',
-            //         });
-            //         return RNFetchBlob.fs.unlink(imagePath);
-            //     });
+            // const imagePath: any = null;
+            // let base64Data = '';
+            // if (isIOS) {
+            //     const resp = await RNFetchBlob.config({
+            //         fileCache: true,
+            //     }).fetch('GET', item.images[0]);
+            //     base64Data = await resp.readFile('base64');
+            // } else {
+            //     base64Data = await RNFetchBlob.fs.readFile(
+            //         item.images[0],
+            //         'base64',
+            //     );
+            // }
+            // const base64Image = `data:image/png;base64,${base64Data}`;
+            // await Share.open({
+            //     title: 'Title',
+            //     url: base64Image,
+            //     message: link,
+            //     subject: 'Subject',
+            // });
+            // return RNFetchBlob.fs.unlink(imagePath);
 
             Share.open({
                 message: 'Doffy share',
