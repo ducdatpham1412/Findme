@@ -21,14 +21,8 @@ import isEqual from 'react-fast-compare';
 import {View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
-import {
-    chooseColorGradient,
-    choosePrivateAvatar,
-    logger,
-    onGoToSignUp,
-} from 'utility/assistant';
+import {onGoToSignUp} from 'utility/assistant';
 import {TypeShowMoreOptions} from '../ListBubbleCouple';
-import IconHobby from './IconHobby';
 
 interface Props {
     item: TypeBubblePalace;
@@ -61,20 +55,14 @@ const Bubble = (props: Props) => {
         onShowModalShare,
     } = props;
     const isModeExp = Redux.getModeExp();
-    const {gradient} = Redux.getResource();
     const theme = Redux.getTheme();
 
     const [isLiked, setIsLiked] = useState(item.isLiked);
     const [totalLikes, setTotalLikes] = useState(item.totalLikes);
 
-    const avatar = item.creatorAvatar || choosePrivateAvatar(item.gender);
-    const color = chooseColorGradient({
-        listGradients: gradient,
-        colorChoose: item.color,
-    });
     const isMyBubble = item.relationship === RELATIONSHIP.self;
 
-    const onLikeUnLike = async () => {
+    const onHandleLike = async () => {
         if (!isModeExp) {
             const currentLike = isLiked;
             const currentNumberLikes = totalLikes;
@@ -111,19 +99,15 @@ const Bubble = (props: Props) => {
      * Render view
      */
     const RenderImage = () => {
-        const imageChoose = item.images[0] ? item.images[0] : avatar;
+        const imageChoose = item.images[0] || item.creatorAvatar;
         const opacity = item.images[0] ? 1 : 0.3;
-
-        const onShowNameBubble = () => {
-            logger(item.name);
-        };
 
         return (
             <StyleTouchHaveDouble
                 customStyle={styles.imageView}
                 onDoubleClick={() => {
                     if (!isLiked) {
-                        onLikeUnLike();
+                        onHandleLike();
                     } else {
                         onSeeDetailImage(imageChoose, isMyBubble);
                     }
@@ -137,7 +121,7 @@ const Bubble = (props: Props) => {
                     customStyle={styles.moreTouch}
                     onPress={() =>
                         onShowMoreOption({
-                            idUser: item.creatorId,
+                            idUser: item.creator,
                             imageWantToSee: imageChoose,
                             allowSaveImage: false,
                         })
@@ -149,13 +133,6 @@ const Bubble = (props: Props) => {
                         resizeMode="contain"
                     />
                 </StyleTouchable>
-
-                <IconHobby
-                    bubbleId={item.id}
-                    color={item.color}
-                    containerStyle={styles.iconHobby}
-                    onTouchStart={onShowNameBubble}
-                />
             </StyleTouchHaveDouble>
         );
     };
@@ -164,8 +141,6 @@ const Bubble = (props: Props) => {
         const textColor = isMyBubble
             ? theme.highlightColor
             : Theme.darkTheme.textHightLight;
-        const creatorName =
-            item.creatorName === null ? 'common.anonymous' : item.creatorName;
 
         return (
             <LinearGradient
@@ -176,14 +151,14 @@ const Bubble = (props: Props) => {
                 <View style={styles.avatarNameContentView}>
                     <StyleTouchable onPress={() => onGoToProfile(item)}>
                         <StyleImage
-                            source={{uri: avatar}}
+                            source={{uri: item.creatorAvatar}}
                             customStyle={styles.avatar}
                         />
                     </StyleTouchable>
 
                     <View style={styles.contentBox}>
                         <StyleText
-                            i18Text={creatorName}
+                            originValue={item.creatorName}
                             customStyle={[styles.textName, {color: textColor}]}
                             onPress={() => onGoToProfile(item)}
                         />
@@ -231,11 +206,11 @@ const Bubble = (props: Props) => {
                 <View>
                     <StyleTouchable
                         customStyle={[styles.buttonTouch, {backgroundColor}]}
-                        onPress={onLikeUnLike}
+                        onPress={onHandleLike}
                         hitSlop={15}>
                         {isLiked ? (
                             <IconLiked
-                                onPress={onLikeUnLike}
+                                onPress={onHandleLike}
                                 customStyle={[
                                     styles.iconLike,
                                     {color: iconColor},
@@ -243,7 +218,7 @@ const Bubble = (props: Props) => {
                             />
                         ) : (
                             <IconNotLiked
-                                onPress={onLikeUnLike}
+                                onPress={onHandleLike}
                                 customStyle={[
                                     styles.iconUnLike,
                                     {color: iconColor},
@@ -319,18 +294,14 @@ const Bubble = (props: Props) => {
     };
 
     return (
-        <LinearGradient
-            style={styles.container}
-            colors={color}
-            start={{x: 0, y: 0}}
-            end={{x: 1, y: 1}}>
+        <View style={styles.container}>
             <View
                 style={[styles.body, {backgroundColor: theme.backgroundColor}]}>
                 {RenderImage()}
                 {RenderContentName()}
                 {RenderTool()}
             </View>
-        </LinearGradient>
+        </View>
     );
 };
 

@@ -13,6 +13,7 @@ import {
     TypeCreateGroupResponse,
     TypeCreatePostRequest,
     TypeCreatePostResponse,
+    TypeEditPostRequest,
     TypeEditProfileRequest,
     TypeEditProfileResponse,
     TypeGetListBlockedResponse,
@@ -298,10 +299,10 @@ export const apiEditProfile = (
 };
 
 export const apiFollowUser = (id: number) => {
-    return request.put(`/profile/follow/enable/${id}`);
+    return request.put(`/profile/follow/${id}`);
 };
 export const apiUnFollowUser = (id: number) => {
-    return request.put(`/profile/follow/disable/${id}`);
+    return request.put(`/profile/un-follow/${id}`);
 };
 
 export const apiCreatePost = (
@@ -315,7 +316,7 @@ export const apiCreatePost = (
 
 export const apiEditPost = (params: {
     idPost: string;
-    data: TypeCreatePostRequest;
+    data: TypeEditPostRequest;
 }) => {
     return request.put(`/profile/edit-post/${params.idPost}`, params.data);
 };

@@ -286,7 +286,7 @@ const styles = ScaledSheet.create({
         justifyContent: 'center',
         backgroundColor: 'red',
         top: '9@ms',
-        right: '-2@ms',
+        right: '-5@ms',
     },
     profile: {
         width: '30@ms',
@@ -329,9 +329,9 @@ const styles = ScaledSheet.create({
     },
     newMessagesBox: {
         position: 'absolute',
-        width: '18@ms',
-        height: '18@ms',
-        right: '-7@ms',
+        width: '15@ms',
+        height: '15@ms',
+        right: '-5@ms',
         top: '-3@ms',
         borderRadius: '10@ms',
         alignItems: 'center',

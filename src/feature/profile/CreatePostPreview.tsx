@@ -1,4 +1,4 @@
-import {TypeBubblePalace, TypeCreatePostRequest} from 'api/interface';
+import {TypeBubblePalace, TypeEditPostRequest} from 'api/interface';
 import {apiCreatePost, apiEditPost} from 'api/module';
 import {RELATIONSHIP, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
@@ -12,12 +12,11 @@ import StyleTouchHaveDouble from 'components/base/StyleTouchHaveDouble';
 import ButtonBack from 'components/common/ButtonBack';
 import StyleMoreText from 'components/StyleMoreText';
 import {bubbleHeight} from 'feature/discovery/components/Bubble';
-import IconHobby from 'feature/discovery/components/IconHobby';
 import Redux from 'hook/useRedux';
 import {appAlert, goBack, popUpPicker} from 'navigation/NavigationService';
-import React, {useCallback, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Animated, ScrollView, TextInput, View} from 'react-native';
+import {Animated, ScrollView, TextInput, Vibration, View} from 'react-native';
 import ActionSheet from 'react-native-actionsheet';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -25,6 +24,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
     chooseImageFromCamera,
     chooseImageFromLibrary,
+    logger,
     optionsImagePicker,
 } from 'utility/assistant';
 import ImageUploader from 'utility/ImageUploader';
@@ -43,8 +43,7 @@ const CreatePostPreview = ({route}: Props) => {
     const {t} = useTranslation();
 
     const theme = Redux.getTheme();
-    const {gender} = Redux.getPassport().information;
-    const profile = Redux.getPassport().profile;
+    const {profile} = Redux.getPassport();
     const isModeExp = Redux.getModeExp();
     const {listHobbies} = Redux.getResource();
 
@@ -53,12 +52,13 @@ const CreatePostPreview = ({route}: Props) => {
     const scrollContentRef = useRef<ScrollView>(null);
     const inputContentRef = useRef<TextInput>(null);
 
-    const [content, setContent] = useState(itemPostFromEdit?.content || '');
-    const [image, setImage] = useState(itemPostFromEdit?.images[0] || '');
-    const [color, setColor] = useState<number | undefined>(
-        itemPostFromEdit?.color,
-    );
-    const [name, setName] = useState(itemPostFromEdit?.name || '');
+    const [content, setContent] = useState(itemPostFromEdit?.content);
+    const [images, setImages] = useState(itemPostFromEdit?.images);
+    const [stars, setStars] = useState(itemPostFromEdit?.stars);
+    const [topic, setTopic] = useState(itemPostFromEdit?.topic);
+    const [feeling, setFeeling] = useState(itemPostFromEdit?.feeling);
+    const [location, setLocation] = useState(itemPostFromEdit?.location);
+    const [link, setLink] = useState(itemPostFromEdit?.link);
 
     const [displayLayer, setDisplayLayer] = useState(false);
     const [displayLayerContent, setDisplayLayerContent] = useState(false);
@@ -66,7 +66,8 @@ const CreatePostPreview = ({route}: Props) => {
     const optionsImgPicker = optionsImagePicker.map(text => t(text));
 
     const onConfirmPost = async () => {
-        if (color === undefined) {
+        if (topic === undefined) {
+            Vibration.vibrate();
             Animated.spring(scaleIconColor, {
                 toValue: 2.3,
                 useNativeDriver: true,
@@ -81,24 +82,38 @@ const CreatePostPreview = ({route}: Props) => {
             return;
         }
 
+        logger(setStars, setTopic, setFeeling, setLocation, setLink);
+
         /**
          * Edit post
          */
         if (itemPostFromEdit) {
             Redux.setIsLoading(true);
-            const updateData: TypeCreatePostRequest = {};
+            const updateData: TypeEditPostRequest = {};
             if (content !== itemPostFromEdit.content) {
                 updateData.content = content;
             }
-            if (image !== itemPostFromEdit.images[0]) {
-                const temp = await ImageUploader.upLoad(image, 1000);
-                updateData.images = [temp];
+            // Not let user edit images
+            // if (images !== itemPostFromEdit.images && images?.length) {
+            //     updateData.images = await ImageUploader.upLoadManyImg(
+            //         images,
+            //         1000,
+            //     );
+            // }
+            if (stars !== itemPostFromEdit.stars) {
+                updateData.stars = stars;
             }
-            if (color !== itemPostFromEdit.color) {
-                updateData.color = color;
+            if (topic !== itemPostFromEdit.topic) {
+                updateData.topic = topic;
             }
-            if (name !== itemPostFromEdit.name) {
-                updateData.name = name;
+            if (feeling !== itemPostFromEdit.feeling) {
+                updateData.feeling = feeling;
+            }
+            if (location !== itemPostFromEdit.location) {
+                updateData.location = location;
+            }
+            if (link !== itemPostFromEdit.link) {
+                updateData.link = link;
             }
 
             try {
@@ -108,7 +123,7 @@ const CreatePostPreview = ({route}: Props) => {
                         data: updateData,
                     });
                 }
-                updateData.images = [image];
+                updateData.images = images;
                 Redux.setBubblePalaceAction({
                     action: TYPE_BUBBLE_PALACE_ACTION.editPostFromProfile,
                     payload: {
@@ -122,71 +137,84 @@ const CreatePostPreview = ({route}: Props) => {
             } finally {
                 Redux.setIsLoading(false);
             }
-
             return;
         }
 
         /**
          * Create post
          */
-        try {
-            Redux.setIsLoading(true);
+        if (content && images?.length && stars) {
+            try {
+                Redux.setIsLoading(true);
+                if (!isModeExp) {
+                    const uploadImages = await ImageUploader.upLoadManyImg(
+                        images,
+                        1000,
+                    );
 
-            if (!isModeExp) {
-                const uploadImage = image
-                    ? await ImageUploader.upLoad(image, 1000)
-                    : '';
-                const res = await apiCreatePost({
-                    content,
-                    images: image ? [uploadImage] : [],
-                    color,
-                    name,
-                });
-                Redux.setBubblePalaceAction({
-                    action: TYPE_BUBBLE_PALACE_ACTION.createNewPostFromProfile,
-                    payload: res.data,
-                });
-            } else {
-                const newPost = {
-                    id: Math.random(),
-                    content,
-                    images: [image],
-                    totalLikes: 0,
-                    creatorId: profile.id,
-                    creatorName: profile.name,
-                    creatorAvatar: profile.avatar,
-                    createdTime: new Date(),
-                    color,
-                    name,
-                    isLiked: false,
-                    relationship: RELATIONSHIP.self,
-                };
-                Redux.setBubblePalaceAction({
-                    action: TYPE_BUBBLE_PALACE_ACTION.createNewPostFromProfile,
-                    payload: newPost,
-                });
+                    const res = await apiCreatePost({
+                        content,
+                        images: uploadImages,
+                        stars,
+                        topic,
+                        feeling,
+                        location,
+                        link,
+                    });
+                    Redux.setBubblePalaceAction({
+                        action: TYPE_BUBBLE_PALACE_ACTION.createNewPostFromProfile,
+                        payload: res.data,
+                    });
+                } else {
+                    const newPost: TypeBubblePalace = {
+                        id: String(Math.random()),
+                        content,
+                        images,
+                        topic,
+                        feeling: feeling || 0,
+                        stars,
+                        location: location || '',
+                        link: link || '',
+                        totalLikes: 100,
+                        totalComments: 100,
+                        creator: profile.id,
+                        creatorName: profile.name,
+                        creatorAvatar: profile.avatar,
+                        created: String(new Date()),
+                        isLiked: true,
+                        relationship: RELATIONSHIP.self,
+                    };
+                    Redux.setBubblePalaceAction({
+                        action: TYPE_BUBBLE_PALACE_ACTION.createNewPostFromProfile,
+                        payload: newPost,
+                    });
+                }
+
+                goBack();
+            } catch (err) {
+                appAlert(err);
+            } finally {
+                Redux.setIsLoading(false);
             }
-
-            goBack();
-        } catch (err) {
-            appAlert(err);
-        } finally {
-            Redux.setIsLoading(false);
         }
     };
 
     const onChooseAction = useCallback(async (index: number) => {
         if (index === 0) {
-            await chooseImageFromCamera(setImage, {
+            await chooseImageFromCamera(setImages, {
                 freeStyleCrop: true,
                 maxWidth: Metrics.width,
                 maxHeight: bubbleHeight,
+                multiple: false,
+                maxFiles: 10,
             });
         } else if (index === 1) {
-            await chooseImageFromLibrary(setImage, {
+            await chooseImageFromLibrary(setImages, {
                 freeStyleCrop: true,
                 maxWidth: Metrics.width,
                 maxHeight: bubbleHeight,
+                multiple: false,
+                maxFiles: 10,
             });
         }
     }, []);
@@ -194,8 +222,8 @@ const CreatePostPreview = ({route}: Props) => {
     /**
      * Render view
      */
-    const RenderImage = useMemo(() => {
-        if (!image) {
+    const RenderImage = () => {
+        if (!images?.length) {
             return null;
         }
         return (
@@ -203,12 +231,15 @@ const CreatePostPreview = ({route}: Props) => {
                 customStyle={styles.imageView}
                 onLongPress={() => setDisplayLayer(true)}
                 onPressOut={() => setDisplayLayer(false)}>
-                <StyleImage source={{uri: image}} customStyle={styles.image} />
+                <StyleImage
+                    source={{uri: images[0]}}
+                    customStyle={styles.image}
+                />
             </StyleTouchHaveDouble>
         );
-    }, [image]);
+    };
 
-    const RenderLayer = useMemo(() => {
+    const RenderLayer = () => {
         if (!displayLayer) {
             return null;
         }
@@ -220,9 +251,9 @@ const CreatePostPreview = ({route}: Props) => {
                 ]}
             />
         );
-    }, [displayLayer, theme]);
+    };
 
-    const RenderLayerContent = useMemo(() => {
+    const RenderLayerContent = () => {
         if (!displayLayerContent) {
             return null;
         }
@@ -235,35 +266,30 @@ const CreatePostPreview = ({route}: Props) => {
                 onTouchEnd={() => setDisplayLayerContent(false)}
             />
         );
-    }, [displayLayerContent, theme]);
+    };
 
-    const RenderButtonComeback = useMemo(() => {
+    const RenderButtonComeback = () => {
         return (
             <ButtonBack
                 containerStyle={styles.buttonBackView}
                 onPress={goBack}
             />
         );
-    }, []);
+    };
 
-    const RenderName = useMemo(() => {
+    const RenderName = () => {
         const textColor = theme.textHightLight;
         return (
             <View style={styles.nameView}>
                 <View style={styles.avatarNameBox}>
                     <StyleText
-                        originValue={`@${profile.anonymousName}`}
+                        originValue={`@${profile.name}`}
                         customStyle={[styles.textName, {color: textColor}]}
                     />
                 </View>
-
-                <StyleText
-                    originValue={`🌙  ${name}`}
-                    customStyle={[styles.textNameBubble, {color: textColor}]}
-                />
             </View>
         );
-    }, [name, content, theme]);
+    };
 
     const showEditCaption = useCallback(() => {
         setDisplayLayerContent(true);
@@ -272,7 +298,7 @@ const CreatePostPreview = ({route}: Props) => {
         }, 100);
     }, []);
 
-    const RenderContent = useMemo(() => {
+    const RenderContent = () => {
         return (
             <Animated.View style={styles.contentView}>
                 {!displayLayerContent ? (
@@ -313,9 +339,9 @@ const CreatePostPreview = ({route}: Props) => {
                 )}
             </Animated.View>
         );
-    }, [content, image, displayLayerContent, theme]);
+    };
 
-    const RenderToolUp = useMemo(() => {
+    const RenderToolUp = () => {
         return (
             <View style={styles.toolUpView}>
                 <StyleTouchHaveDouble
@@ -349,9 +375,9 @@ const CreatePostPreview = ({route}: Props) => {
                 )}
             </View>
         );
-    }, []);
+    };
 
-    const onNavigatePicker = useCallback(() => {
+    const onNavigatePicker = () => {
         popUpPicker({
             data: listHobbies,
             renderItem: (item: any) => {
@@ -364,7 +390,7 @@ const CreatePostPreview = ({route}: Props) => {
                             />
                             <StyleInput
                                 defaultValue={''}
-                                onChangeText={text => setName(text)}
+                                onChangeText={() => null}
                                 containerStyle={styles.inputContainer}
                                 inputStyle={[
                                     styles.inputOther,
@@ -398,65 +424,38 @@ const CreatePostPreview = ({route}: Props) => {
             },
             itemHeight: verticalScale(70),
             onSetItemSelected: (hobby: any) => {
-                console.log('choosing: ', hobby);
-                if (hobby.id === 8) {
-                    // setName(nameIfChooseOther);
-                    setColor(hobby.id);
-                } else {
-                    setColor(hobby.id);
-                    setName(hobby.name);
-                }
+                logger(hobby);
             },
-            initIndex: listHobbies.findIndex(item => item.id === color),
-            onCancel: () => {
-                setName(name);
-                goBack();
-            },
+            initIndex: listHobbies.findIndex(item => item.id === topic),
+            onCancel: goBack,
         });
-    }, [color, name, theme]);
+    };
 
-    const RenderTollRight = useMemo(() => {
-        // const avatar = choosePrivateAvatar(gender);
-
+    const RenderTollRight = () => {
         return (
             <View style={styles.toolView}>
-                {/* <StyleImage
-                    source={{uri: avatar}}
-                    customStyle={styles.avatar}
-                />
-
-                <IconLiked customStyle={styles.iconLike} onPress={() => null} /> */}
-
-                {color ? (
-                    <IconHobby
-                        color={color}
-                        onTouchStart={() => null}
-                        onTouchEnd={onNavigatePicker}
-                    />
-                ) : (
-                    <Animated.View
+                <Animated.View
+                    style={[
+                        styles.iconThemeBox,
+                        {
+                            backgroundColor: theme.backgroundButtonColor,
+                            transform: [{scale: scaleIconColor}],
+                        },
+                    ]}>
+                    <Ionicons
+                        name="ios-color-palette-outline"
                         style={[
-                            styles.iconThemeBox,
-                            {
-                                backgroundColor: theme.backgroundButtonColor,
-                                transform: [{scale: scaleIconColor}],
-                            },
-                        ]}>
-                        <Ionicons
-                            name="ios-color-palette-outline"
-                            style={[
-                                styles.iconTheme,
-                                {color: theme.highlightColor},
-                            ]}
-                            onPress={onNavigatePicker}
-                        />
-                    </Animated.View>
-                )}
+                            styles.iconTheme,
+                            {color: theme.highlightColor},
+                        ]}
+                        onPress={onNavigatePicker}
+                    />
+                </Animated.View>
             </View>
         );
-    }, [gender, color, name]);
+    };
 
-    const RenderButtonPost = useMemo(() => {
+    const RenderButtonPost = () => {
         const titleButton = itemPostFromEdit
             ? 'profile.post.edit'
             : 'profile.post.post';
@@ -479,7 +478,7 @@ const CreatePostPreview = ({route}: Props) => {
                 />
             </StyleTouchable>
         );
-    }, [content, image, color, name]);
+    };
 
     return (
         <View
@@ -487,16 +486,22 @@ const CreatePostPreview = ({route}: Props) => {
                 styles.container,
                 {backgroundColor: theme.backgroundColor},
             ]}>
-            {RenderImage}
-            {RenderButtonComeback}
-            {RenderToolUp}
-            {RenderLayer}
-            {RenderName}
-            {RenderButtonPost}
-            {RenderTollRight}
+            {RenderImage()}
+            {RenderButtonComeback()}
 
-            {RenderLayerContent}
-            {RenderContent}
+            <ButtonBack
+                containerStyle={styles.buttonBackView}
+                onPress={goBack}
+            />
+
+            {RenderToolUp()}
+            {RenderLayer()}
+            {RenderName()}
+            {RenderButtonPost()}
+            {RenderTollRight()}
+
+            {RenderLayerContent()}
+            {RenderContent()}
 
             <ActionSheet
                 ref={actionSheetRef}
@@ -551,10 +556,6 @@ const styles = ScaledSheet.create({
     textName: {
         fontSize: '20@ms',
         fontWeight: 'bold',
-    },
-    textNameBubble: {
-        fontSize: '18.5@ms',
-        marginTop: '7@ms',
     },
     // content view
     contentView: {

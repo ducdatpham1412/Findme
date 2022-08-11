@@ -1,7 +1,6 @@
 import {TypeNotificationResponse} from 'api/interface';
 import {apiReadNotification} from 'api/module';
 import {TYPE_FOLLOW, TYPE_NOTIFICATION} from 'asset/enum';
-import {Metrics} from 'asset/metrics';
 import {StyleText} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import Redux from 'hook/useRedux';
@@ -11,6 +10,7 @@ import {navigate} from 'navigation/NavigationService';
 import React, {useEffect} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
+import {logger} from 'utility/assistant';
 import ItemNotification from './components/ItemComment';
 
 /** ------------------------
@@ -98,7 +98,9 @@ const NotificationAccount = () => {
                         return __item;
                     });
                 });
-            } catch (err) {}
+            } catch (err) {
+                logger(err);
+            }
         }
     };
 

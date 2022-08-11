@@ -6,22 +6,20 @@ import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {navigate, push} from 'navigation/NavigationService';
-import React, {useMemo} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {onGoToSignUp} from 'utility/assistant';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface Props {
     profile: TypeGetProfileResponse;
     routeName: string;
     havingEditProfile?: boolean;
-    anonymousName?: string;
 }
 
 const InformationProfile = (props: Props) => {
-    const {profile, routeName, havingEditProfile, anonymousName} = props;
+    const {profile, routeName, havingEditProfile} = props;
 
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
@@ -39,7 +37,7 @@ const InformationProfile = (props: Props) => {
     /**
      * Render view
      */
-    const RenderBackground = useMemo(() => {
+    const RenderBackground = () => {
         return (
             <View
                 style={[
@@ -48,9 +46,9 @@ const InformationProfile = (props: Props) => {
                 ]}
             />
         );
-    }, [theme]);
+    };
 
-    const RenderIndicator = useMemo(() => {
+    const RenderIndicator = () => {
         return (
             <View
                 style={[
@@ -59,9 +57,9 @@ const InformationProfile = (props: Props) => {
                 ]}
             />
         );
-    }, [theme]);
+    };
 
-    const RenderNameAndDescription = useMemo(() => {
+    const RenderNameAndDescription = () => {
         return (
             <View style={styles.boxNameAndDescription}>
                 <StyleText
@@ -71,27 +69,9 @@ const InformationProfile = (props: Props) => {
                     ]}
                     originValue={name}
                 />
-                {!!anonymousName && (
-                    <View style={styles.nameAnonymousBox}>
-                        <MaterialCommunityIcons
-                            name="incognito"
-                            style={[
-                                styles.iconAnonymous,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                        <StyleText
-                            customStyle={[
-                                styles.textNameAnonymous,
-                                {color: theme.textColor},
-                            ]}
-                            originValue={`@${anonymousName}`}
-                        />
-                    </View>
-                )}
                 {!!description && (
                     <StyleText
-                        i18Text={description}
+                        originValue={description}
                         customStyle={[
                             styles.textDescription,
                             {color: theme.textHightLight},
@@ -100,9 +80,9 @@ const InformationProfile = (props: Props) => {
                 )}
             </View>
         );
-    }, [name, anonymousName, description, theme]);
+    };
 
-    const RenderFollow = useMemo(() => {
+    const RenderFollow = () => {
         return (
             <View
                 style={[styles.followBox, {borderTopColor: theme.borderColor}]}>
@@ -149,7 +129,7 @@ const InformationProfile = (props: Props) => {
                 </StyleTouchable>
             </View>
         );
-    }, [followers, followings, theme]);
+    };
 
     const RenderImageTellSignUp = () => {
         if (isModeExp) {
@@ -181,7 +161,7 @@ const InformationProfile = (props: Props) => {
         return null;
     };
 
-    const RenderButtonEditProfile = useMemo(() => {
+    const RenderButtonEditProfile = () => {
         if (havingEditProfile) {
             return (
                 <StyleTouchable
@@ -201,16 +181,16 @@ const InformationProfile = (props: Props) => {
             );
         }
         return null;
-    }, [havingEditProfile, theme]);
+    };
 
     return (
         <View style={styles.container}>
             <View style={styles.introduceView}>
-                {RenderBackground}
-                {RenderIndicator}
-                {RenderNameAndDescription}
-                {RenderFollow}
-                {RenderButtonEditProfile}
+                {RenderBackground()}
+                {RenderIndicator()}
+                {RenderNameAndDescription()}
+                {RenderFollow()}
+                {RenderButtonEditProfile()}
             </View>
 
             {RenderImageTellSignUp()}
@@ -248,9 +228,9 @@ const styles = ScaledSheet.create({
         position: 'absolute',
         width: '100%',
         height: '100%',
-        borderTopLeftRadius: '30@s',
-        borderTopRightRadius: '30@s',
-        opacity: 0.7,
+        borderTopLeftRadius: '20@s',
+        borderTopRightRadius: '20@s',
+        opacity: 0.8,
     },
     // box name
     boxNameAndDescription: {
@@ -260,7 +240,7 @@ const styles = ScaledSheet.create({
         paddingHorizontal: '15@s',
     },
     textName: {
-        fontSize: '30@ms',
+        fontSize: '20@ms',
         fontWeight: 'bold',
     },
     nameAnonymousBox: {

@@ -8,8 +8,6 @@ import InteractBubble from 'feature/discovery/InteractBubble';
 import ReportUser from 'feature/discovery/ReportUser';
 import ChatDetail from 'feature/mess/ChatDetail';
 import ChatDetailSetting from 'feature/mess/ChatDetailSetting';
-import PublicChatting from 'feature/mess/PublicChatting';
-import CreateGroup from 'feature/profile/CreateGroup';
 import CreatePostPreview from 'feature/profile/CreatePostPreview';
 import ListFollows from 'feature/profile/ListFollows';
 import OtherProfile from 'feature/profile/OtherProfile';
@@ -117,10 +115,6 @@ const AppStack = () => {
                     component={CreatePostPreview}
                 />
                 <Stack.Screen
-                    name={PROFILE_ROUTE.createGroup}
-                    component={CreateGroup}
-                />
-                <Stack.Screen
                     name={MESS_ROUTE.chatDetail}
                     component={ChatDetail}
                     options={{
@@ -137,16 +131,6 @@ const AppStack = () => {
                 <Stack.Screen
                     name={MESS_ROUTE.chatDetailSetting}
                     component={ChatDetailSetting}
-                />
-
-                <Stack.Screen
-                    name={MESS_ROUTE.publicChatting}
-                    component={PublicChatting}
-                    options={{
-                        cardStyleInterpolator:
-                            CardStyleInterpolators.forFadeFromBottomAndroid,
-                        animationEnabled: false,
-                    }}
                 />
             </Stack.Navigator>
         </SafeAreaView>

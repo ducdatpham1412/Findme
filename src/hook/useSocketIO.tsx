@@ -1,5 +1,5 @@
 import {
-    TypeAddCommentRequest,
+    TypeSocketCommentRequest,
     TypeBubblePalace,
     TypeChangeChatColor,
     TypeChangeGroupNameResponse,
@@ -10,9 +10,9 @@ import {
     TypeConversationRequest,
     TypeCreatePostResponse,
     TypeDeleteMessageResponse,
-    TypeJoinCommunityRequest,
     TypeNotificationResponse,
     TypeSeenMessageResponse,
+    TypeSocketCommentResponse,
     TypingResponse,
 } from 'api/interface';
 import {
@@ -589,13 +589,18 @@ export const useSocketChatDetail = (params: {
     };
 };
 
-export const useSocketComment = (
-    bubbleFocusing: TypeBubblePalace | TypeCreatePostResponse,
-) => {
+/** -----------------------------------
+ *          SOCKET COMMENT
+ -----------------------------------  */
+interface ParamSocketComment {
+    bubbleFocusing: TypeBubblePalace | TypeCreatePostResponse;
+    scrollToEnd(): void;
+}
+
+export const useSocketComment = (params: ParamSocketComment) => {
+    const {bubbleFocusing, scrollToEnd} = params;
     const [oldBubbleId, setOldBubbleId] = useState('');
-
     const [isLoading, setIsLoading] = useState(false);
-
     const [dataComment, setDataComment] = useState<Array<TypeCommentResponse>>(
         [],
     );
@@ -624,25 +629,30 @@ export const useSocketComment = (
 
     const hearingSocket = () => {
         socket?.off(SOCKET_EVENT.addComment);
-        socket.on(SOCKET_EVENT.addComment, (data: TypeCommentResponse) => {
-            if (data?.replyOf) {
-                setDataComment(preValue =>
-                    preValue.map(item => {
-                        if (item.id !== data?.replyOf) {
-                            return item;
-                        }
-                        return {
-                            ...item,
-                            listCommentsReply:
-                                item.listCommentsReply?.concat(data),
-                        };
-                    }),
-                );
-            } else {
-                setDataComment(preValue => preValue.concat(data));
-            }
-            Redux.increaseTotalCommentsOfBubbleFocusing(1);
-        });
+        socket.on(
+            SOCKET_EVENT.addComment,
+            (data: TypeSocketCommentResponse) => {
+                if (data.commentReplied) {
+                    setDataComment(preValue =>
+                        preValue.map(item => {
+                            if (item.id !== data.commentReplied) {
+                                return item;
+                            }
+                            return {
+                                ...item,
+                                listCommentsReply:
+                                    item.listCommentsReply?.concat(data.data),
+                            };
+                        }),
+                    );
+                } else {
+                    setDataComment(preValue => preValue.concat(data.data));
+                }
+                // Create a pull request to handle this later
+                scrollToEnd();
+                Redux.increaseTotalCommentsOfBubbleFocusing(1);
+            },
+        );
     };
 
     useEffect(() => {
@@ -727,7 +737,7 @@ export const socketUnTyping = (params: TypingResponse) => {
     socket.emit(SOCKET_EVENT.unTyping, params);
 };
 
-export const socketAddComment = (params: TypeAddCommentRequest) => {
+export const socketAddComment = (params: TypeSocketCommentRequest) => {
     socket.emit(SOCKET_EVENT.addComment, params);
 };
 
@@ -741,44 +751,4 @@ export const socketLeaveRoom = (roomId: string) => {
 
 export const closeSocket = () => {
     SocketClass.close();
-};
-
-// socket?.off(SOCKET_EVENT.joinCommunity);
-// socket.on(SOCKET_EVENT.joinCommunity, (chatTagId: string) => {
-//     Redux.setChatTagFromNotification(chatTagId);
-// });
-
-// socket?.off(SOCKET_EVENT.hadNewUserJoinCommunity);
-// socket.on(
-//     SOCKET_EVENT.hadNewUserJoinCommunity,
-//     async (chatTagId: string) => {
-//         const res = await apiGetDetailChatTag(chatTagId);
-//         setList((previousChatTags: Array<TypeChatTagResponse>) => {
-//             const check = previousChatTags.find(
-//                 item => item.id === chatTagId,
-//             );
-//             if (check) {
-//                 let indexNeedToReorder = 0;
-//                 const temp = previousChatTags.map((item, index) => {
-//                     if (item.id !== chatTagId) {
-//                         return item;
-//                     }
-//                     indexNeedToReorder = index;
-//                     return res.data;
-//                 });
-//                 if (indexNeedToReorder > 0) {
-//                     return reorderListChatTag(temp, indexNeedToReorder);
-//                 }
-//                 return temp;
-//             }
-//             return [res.data].concat(previousChatTags);
-//         });
-//     },
-// );
-
-export const socketJoinCommunity = (params: TypeJoinCommunityRequest) => {
-    socket.emit(SOCKET_EVENT.joinCommunity, {
-        token: FindmeStore.getState().logicSlice.token,
-        profilePostGroupId: params.profilePostGroupId,
-    });
 };

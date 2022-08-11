@@ -1,15 +1,20 @@
 import {TypeCreatePostResponse} from 'api/interface';
-import {apiGetDetailBubble, apiLikePost, apiUnLikePost} from 'api/module';
+import {
+    apiDeletePost,
+    apiGetDetailBubble,
+    apiLikePost,
+    apiUnLikePost,
+} from 'api/module';
 import Theme from 'asset/theme/Theme';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import ModalComment from 'feature/discovery/components/ModalComment';
-import {TypeShowMoreOptions} from 'feature/discovery/ListBubbleCouple';
 import Redux from 'hook/useRedux';
 import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
 import ROOT_SCREEN from 'navigation/config/routes';
 import {
     appAlert,
+    appAlertYesNo,
     goBack,
     navigate,
     showSwipeImages,
@@ -43,14 +48,15 @@ export interface TypeLikeUnlikeParams {
     setTotalLikes: Function;
 }
 
-let idUserReport = 0;
-let imageWantToSee = '';
+let postModalize: TypeCreatePostResponse | undefined;
 
 const ListDetailPost = ({route}: Props) => {
     const {listInProfile, initIndex, setListInProfile} = route.params;
     const allowSaveImage = route.params?.allowSaveImage;
 
     const isModeExp = Redux.getModeExp();
+    const myId = Redux.getPassport().profile.id;
+    const isMyListPost = listInProfile[0].creator === myId;
 
     const optionsRef = useRef<any>(null);
 
@@ -77,9 +83,8 @@ const ListDetailPost = ({route}: Props) => {
         });
     }, [bubbleFocusing]);
 
-    const onShowOptions = (params: TypeShowMoreOptions) => {
-        imageWantToSee = params.imageWantToSee;
-        idUserReport = params.idUser;
+    const onShowOptions = (item: TypeCreatePostResponse) => {
+        postModalize = item;
         optionsRef.current?.show();
     };
 
@@ -102,7 +107,7 @@ const ListDetailPost = ({route}: Props) => {
         }
     };
 
-    const onLikeOrUnLike = async (params: TypeLikeUnlikeParams) => {
+    const onHandleLike = async (params: TypeLikeUnlikeParams) => {
         const {bubbleId, isLiked, setIsLiked, totalLikes, setTotalLikes} =
             params;
         if (!isModeExp) {
@@ -111,9 +116,11 @@ const ListDetailPost = ({route}: Props) => {
             try {
                 setIsLiked(!currentLike);
                 setTotalLikes(currentNumberLikes + (currentLike ? -1 : 1));
-                currentLike
-                    ? await apiUnLikePost(bubbleId)
-                    : await apiLikePost(bubbleId);
+                if (currentLike) {
+                    await apiUnLikePost(bubbleId);
+                } else {
+                    await apiLikePost(bubbleId);
+                }
                 setList((preValue: Array<TypeCreatePostResponse>) => {
                     return preValue.map(item => {
                         if (item.id !== bubbleId) {
@@ -140,6 +147,28 @@ const ListDetailPost = ({route}: Props) => {
         }
     };
 
+    const onDeletePost = (postId: string) => {
+        const agreeDelete = async () => {
+            try {
+                await apiDeletePost(postId);
+                setList(preValue => {
+                    return preValue.filter(item => item.id !== postId);
+                });
+                setListInProfile((preValue: Array<TypeCreatePostResponse>) => {
+                    return preValue.filter(item => item.id !== postId);
+                });
+            } catch (err) {
+                appAlert(err);
+            }
+        };
+
+        appAlertYesNo({
+            i18Title: 'profile.post.sureDeletePost',
+            agreeChange: agreeDelete,
+            refuseChange: goBack,
+        });
+    };
+
     const onShowModalComment = (bubble: TypeCreatePostResponse) => {
         setBubbleFocusing(bubble);
         setDisplayComment(true);
@@ -162,11 +191,83 @@ const ListDetailPost = ({route}: Props) => {
                 onShowOptions={onShowOptions}
                 onRefreshItem={onRefreshItem}
                 onShowModalComment={onShowModalComment}
-                onLikeOrUnLike={onLikeOrUnLike}
+                onLikeOrUnLike={onHandleLike}
                 onSeeDetailImage={onSeeDetailImage}
             />
         );
     }, []);
+
+    const ModalizePost = () => {
+        if (isMyListPost) {
+            return (
+                <StyleActionSheet
+                    ref={optionsRef}
+                    listTextAndAction={[
+                        {
+                            text: 'discovery.seeDetailImage',
+                            action: () => {
+                                showSwipeImages({
+                                    listImages: [
+                                        {url: postModalize?.images[0] || ''},
+                                    ],
+                                    allowSaveImage,
+                                });
+                            },
+                        },
+                        {
+                            text: 'profile.post.editPost',
+                            action: () => {
+                                console.log('edit post: ', postModalize);
+                            },
+                        },
+                        {
+                            text: 'profile.post.delete',
+                            action: () => {
+                                if (postModalize?.id) {
+                                    onDeletePost(postModalize.id);
+                                }
+                            },
+                        },
+                        {
+                            text: 'common.cancel',
+                            action: () => null,
+                        },
+                    ]}
+                />
+            );
+        }
+
+        return (
+            <StyleActionSheet
+                ref={optionsRef}
+                listTextAndAction={[
+                    {
+                        text: 'discovery.report.title',
+                        action: () => {
+                            navigate(ROOT_SCREEN.reportUser, {
+                                idUser: postModalize,
+                            });
+                        },
+                    },
+                    {
+                        text: 'discovery.seeDetailImage',
+                        action: () => {
+                            showSwipeImages({
+                                listImages: [
+                                    {url: postModalize?.images[0] || ''},
+                                ],
+                                allowSaveImage,
+                            });
+                        },
+                    },
+                    {
+                        text: 'common.cancel',
+                        action: () => null,
+                    },
+                ]}
+            />
+        );
+    };
 
     return (
         <View style={styles.container}>
@@ -200,32 +301,7 @@ const ListDetailPost = ({route}: Props) => {
                 isNotModalOfMainTab
             />
 
-            <StyleActionSheet
-                ref={optionsRef}
-                listTextAndAction={[
-                    {
-                        text: 'discovery.report.title',
-                        action: () => {
-                            navigate(ROOT_SCREEN.reportUser, {
-                                idUser: idUserReport,
-                            });
-                        },
-                    },
-                    {
-                        text: 'discovery.seeDetailImage',
-                        action: () => {
-                            showSwipeImages({
-                                listImages: [{url: imageWantToSee}],
-                                allowSaveImage,
-                            });
-                        },
-                    },
-                    {
-                        text: 'common.cancel',
-                        action: () => null,
-                    },
-                ]}
-            />
+            {ModalizePost()}
         </View>
     );
 };
