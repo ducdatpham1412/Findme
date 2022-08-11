@@ -420,7 +420,10 @@ const ChatDetail = ({route}: ChatDetailProps) => {
     return (
         <>
             <StyleKeyboardAwareView
-                containerStyle={{backgroundColor: theme.backgroundColor}}
+                containerStyle={[
+                    styles.container,
+                    {backgroundColor: theme.backgroundColor},
+                ]}
                 onGetKeyBoardHeight={(value: number) =>
                     setModalPickImgHeight(value - Metrics.safeBottomPadding)
                 }>
@@ -444,6 +447,9 @@ const ChatDetail = ({route}: ChatDetailProps) => {
 };
 
 const styles = ScaledSheet.create({
+    container: {
+        paddingBottom: Metrics.safeBottomPadding,
+    },
     contentContainer: {
         flexGrow: 1,
         paddingBottom: '30@vs',

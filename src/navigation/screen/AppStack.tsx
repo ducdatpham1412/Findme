@@ -33,7 +33,7 @@ const AppStack = () => {
     return (
         <SafeAreaView
             style={[styles.container, {backgroundColor: theme.backgroundColor}]}
-            edges={['left', 'top', 'right', 'bottom']}>
+            edges={['left', 'top', 'right']}>
             <Stack.Navigator screenOptions={{headerShown: false}}>
                 <Stack.Screen
                     name={ROOT_SCREEN.mainScreen}

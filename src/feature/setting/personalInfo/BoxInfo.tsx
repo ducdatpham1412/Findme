@@ -48,10 +48,8 @@ const BoxInfo = (props: BoxInfoProps) => {
 
     return (
         <View style={[styles.moduleInfo, {borderColor: theme.borderColor}]}>
-            {/* Icon */}
             <View style={styles.iconModule}>{icon}</View>
 
-            {/* Info value */}
             {[INFO_TYPE.facebook, INFO_TYPE.email, INFO_TYPE.phone].includes(
                 type,
             ) && (
@@ -138,7 +136,7 @@ const styles = ScaledSheet.create({
         overflow: 'scroll',
     },
     inputInfo: {
-        fontSize: '17@ms',
+        fontSize: '15@ms',
         paddingHorizontal: '5@vs',
         textAlign: 'left',
     },

@@ -4,9 +4,10 @@ import React, {ReactNode} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {isIOS} from 'utility/assistant';
+import {I18Normalize} from 'utility/I18Next';
 
 interface TypeDetailSettingProps {
-    title: string;
+    title: I18Normalize;
     icon?: ReactNode;
     onPress?(): void;
 }
@@ -41,7 +42,7 @@ const styles = ScaledSheet.create({
         justifyContent: 'center',
     },
     textHeader: {
-        fontSize: '18@ms',
+        fontSize: '15@ms',
     },
     iconView: {
         position: 'absolute',

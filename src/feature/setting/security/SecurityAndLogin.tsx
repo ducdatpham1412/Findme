@@ -4,13 +4,13 @@ import Redux from 'hook/useRedux';
 import React, {useState} from 'react';
 import {ScaledSheet} from 'react-native-size-matters';
 import Foundation from 'react-native-vector-icons/Foundation';
-import ChangingPassword from './ChangingPassword';
-import UserBlocked from './UserBlocked';
 import Entypo from 'react-native-vector-icons/Entypo';
 import StyleHeader from 'navigation/components/StyleHeader';
 import {navigate} from 'navigation/NavigationService';
 import {SETTING_ROUTE} from 'navigation/config/routes';
 import Feather from 'react-native-vector-icons/Feather';
+import UserBlocked from './UserBlocked';
+import ChangingPassword from './ChangingPassword';
 
 const SecurityAndLogin = () => {
     const theme = Redux.getTheme();

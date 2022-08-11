@@ -37,7 +37,6 @@ const alertOption: StackNavigationOptions = {
 
 const cardSafe = {
     paddingTop: Metrics.safeTopPadding,
-    paddingBottom: Metrics.safeBottomPadding,
 };
 
 const NullNode = () => {
