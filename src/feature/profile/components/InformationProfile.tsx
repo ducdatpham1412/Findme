@@ -7,10 +7,9 @@ import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {navigate, push} from 'navigation/NavigationService';
 import React from 'react';
-import {View} from 'react-native';
+import {Platform, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {onGoToSignUp} from 'utility/assistant';
 
 interface Props {
     profile: TypeGetProfileResponse;
@@ -22,8 +21,7 @@ const InformationProfile = (props: Props) => {
     const {profile, routeName, havingEditProfile} = props;
 
     const theme = Redux.getTheme();
-    const isModeExp = Redux.getModeExp();
-    const {name, description, followers, followings} = profile;
+    const {name, description, followers, followings, avatar} = profile;
 
     const onNavigateFollow = (type: number) => {
         push(ROOT_SCREEN.listFollows, {
@@ -56,29 +54,6 @@ const InformationProfile = (props: Props) => {
                     {backgroundColor: theme.borderColor},
                 ]}
             />
-        );
-    };
-
-    const RenderNameAndDescription = () => {
-        return (
-            <View style={styles.boxNameAndDescription}>
-                <StyleText
-                    customStyle={[
-                        styles.textName,
-                        {color: theme.textHightLight},
-                    ]}
-                    originValue={name}
-                />
-                {!!description && (
-                    <StyleText
-                        originValue={description}
-                        customStyle={[
-                            styles.textDescription,
-                            {color: theme.textHightLight},
-                        ]}
-                    />
-                )}
-            </View>
         );
     };
 
@@ -131,36 +106,6 @@ const InformationProfile = (props: Props) => {
         );
     };
 
-    const RenderImageTellSignUp = () => {
-        if (isModeExp) {
-            return (
-                <View style={styles.signUpBox}>
-                    <StyleImage
-                        customStyle={styles.imageTellSignUp}
-                        source={Images.images.signUpNow}
-                        resizeMode="contain"
-                    />
-
-                    <StyleTouchable
-                        customStyle={[
-                            styles.buttonTellSignUp,
-                            {backgroundColor: theme.highlightColor},
-                        ]}
-                        onPress={onGoToSignUp}>
-                        <StyleText
-                            i18Text="profile.component.infoProfile.tellSignUp"
-                            customStyle={[
-                                styles.textTellSignUp,
-                                {color: theme.textColor},
-                            ]}
-                        />
-                    </StyleTouchable>
-                </View>
-            );
-        }
-        return null;
-    };
-
     const RenderButtonEditProfile = () => {
         if (havingEditProfile) {
             return (
@@ -187,13 +132,36 @@ const InformationProfile = (props: Props) => {
         <View style={styles.container}>
             <View style={styles.introduceView}>
                 {RenderBackground()}
+
                 {RenderIndicator()}
-                {RenderNameAndDescription()}
+
+                <StyleImage
+                    source={{uri: avatar}}
+                    customStyle={styles.avatarHeader}
+                    defaultSource={Images.images.defaultAvatar}
+                />
+
+                <View style={styles.boxNameAndDescription}>
+                    <StyleText
+                        customStyle={[
+                            styles.textName,
+                            {color: theme.textHightLight},
+                        ]}
+                        originValue={name}
+                    />
+                    {!!description && (
+                        <StyleText
+                            originValue={description}
+                            customStyle={[
+                                styles.textDescription,
+                                {color: theme.textHightLight},
+                            ]}
+                        />
+                    )}
+                </View>
                 {RenderFollow()}
                 {RenderButtonEditProfile()}
             </View>
-
-            {RenderImageTellSignUp()}
         </View>
     );
 };
@@ -201,23 +169,30 @@ const InformationProfile = (props: Props) => {
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
-        marginTop: Metrics.height / 2,
+        marginTop: Metrics.width / 1.5,
+    },
+    avatarHeader: {
+        width: '70@s',
+        height: '70@s',
+        borderRadius: '50@s',
+        alignSelf: 'center',
+        marginTop: '10@vs',
     },
     indicatorBox: {
         width: '50%',
-        height: '3@vs',
+        height: '2.5@vs',
         borderRadius: '20@s',
         alignSelf: 'center',
     },
     editProfileBox: {
         position: 'absolute',
-        padding: '10@s',
+        padding: '7@ms',
         borderRadius: '50@s',
         top: '17@s',
         right: '17@s',
     },
     editProfileIcon: {
-        fontSize: '18@ms',
+        fontSize: '16@ms',
     },
     // avatar - cover
     introduceView: {
@@ -230,17 +205,17 @@ const styles = ScaledSheet.create({
         height: '100%',
         borderTopLeftRadius: '20@s',
         borderTopRightRadius: '20@s',
-        opacity: 0.8,
+        opacity: 0.95,
     },
     // box name
     boxNameAndDescription: {
         width: '100%',
         alignItems: 'center',
-        paddingTop: '20@vs',
         paddingHorizontal: '15@s',
+        marginTop: '5@vs',
     },
     textName: {
-        fontSize: '20@ms',
+        fontSize: '17@ms',
         fontWeight: 'bold',
     },
     nameAnonymousBox: {
@@ -248,18 +223,9 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
-    textNameAnonymous: {
-        fontSize: '13@ms',
-        fontWeight: 'bold',
-        fontStyle: 'italic',
-    },
-    iconAnonymous: {
-        fontSize: '15@ms',
-        marginRight: '7@s',
-    },
     textDescription: {
-        fontSize: '15@ms',
-        marginTop: '25@vs',
+        fontSize: '13@ms',
+        marginTop: '15@vs',
     },
     // box follow
     followBox: {
@@ -268,8 +234,11 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         paddingVertical: '10@vs',
         justifyContent: 'center',
-        marginTop: '25@vs',
-        borderTopWidth: '1@ms',
+        marginTop: '15@vs',
+        borderTopWidth: Platform.select({
+            ios: '0.4@ms',
+            android: '1@ms',
+        }),
     },
     elementFollow: {
         flex: 1,
@@ -280,32 +249,9 @@ const styles = ScaledSheet.create({
         fontSize: '13@ms',
     },
     numberFollow: {
-        fontSize: '40@ms',
+        fontSize: '25@ms',
         fontWeight: 'bold',
         marginTop: '5@vs',
-    },
-    // sign up now
-    signUpBox: {
-        width: '100%',
-        height: '100@s',
-        marginTop: '20@vs',
-    },
-    imageTellSignUp: {
-        position: 'absolute',
-        right: '30@s',
-        width: '100@s',
-        height: '100@s',
-    },
-    buttonTellSignUp: {
-        position: 'absolute',
-        right: '140@s',
-        top: '50@s',
-        paddingHorizontal: '30@vs',
-        paddingVertical: '8@vs',
-        borderRadius: '50@vs',
-    },
-    textTellSignUp: {
-        fontSize: '15@ms',
     },
 });
 

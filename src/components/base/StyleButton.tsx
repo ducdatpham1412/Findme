@@ -40,7 +40,7 @@ const styles = ScaledSheet.create({
         backgroundColor: Theme.common.joinGroupChat,
     },
     title: {
-        fontSize: '17@ms',
+        fontSize: '14@ms',
         fontWeight: 'bold',
         color: Theme.common.white,
     },

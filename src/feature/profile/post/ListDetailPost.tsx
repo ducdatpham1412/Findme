@@ -299,7 +299,7 @@ const ListDetailPost = ({route}: Props) => {
                 renderItem={({item}) => RenderItemBubble(item)}
                 keyExtractor={(_, index) => String(index)}
                 // snapToInterval={height}
-                scrollEventThrottle={16}
+                scrollEventThrottle={30}
                 decelerationRate="fast"
                 initialScrollIndex={initIndex}
                 getItemLayout={(_, index) => ({

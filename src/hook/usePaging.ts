@@ -14,12 +14,14 @@ const usePaging = (paramsPaging: {
     };
     onSuccess?: (data?: any, cbParams?: any) => void;
     onError?: (error?: Error, cbParams?: any) => void;
-    numberMaxForList?: number;
+    isInitNotRunRequest?: boolean;
 }) => {
     const [refreshing, setRefreshing] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
 
-    const [pageIndex, setPageIndex] = useState(1);
+    const [pageIndex, setPageIndex] = useState(
+        paramsPaging?.isInitNotRunRequest ? 0 : 1,
+    );
     const [params, setParams] = useState(paramsPaging.params);
     const [list, setList] = useState<Array<any>>([]);
 
@@ -38,17 +40,7 @@ const usePaging = (paramsPaging: {
         if (refreshing) {
             setList(newList);
         } else if (newList.length > 0) {
-            if (!paramsPaging.numberMaxForList) {
-                setList(list.concat(newList));
-            } else {
-                const temp = list.concat(newList);
-                // if (temp.length > paramsPaging.numberMaxForList) {
-                //     setList(temp.splice(-paramsPaging.numberMaxForList));
-                // } else {
-                //     setList(temp);
-                // }
-                setList(temp);
-            }
+            setList(list.concat(newList));
         }
         setNoMore(pageIndex >= resData?.totalPages);
         setRefreshing(false);
@@ -111,7 +103,9 @@ const usePaging = (paramsPaging: {
         if (pageIndex > 1) {
             setLoadingMore(true);
         }
-        runRequest(pageIndex, params);
+        if (pageIndex > 0) {
+            runRequest(pageIndex, params);
+        }
     }, [pageIndex]);
 
     useEffect(() => {

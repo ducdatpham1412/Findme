@@ -193,7 +193,7 @@ const profile = {
             introduce:
                 'Sign up for more chat enjoy and make your own profile !',
             tellSignUp: 'Go to sign up',
-            editProfile: 'Edit own profile',
+            editProfile: 'Edit profile',
         },
         searchAndSetting: 'Finding others',
     },
@@ -250,6 +250,7 @@ const profile = {
         following: 'Followings',
         follow: 'Follow',
     },
+    removeAvatar: 'Remove avatar',
 };
 
 // SETTING ROUTE

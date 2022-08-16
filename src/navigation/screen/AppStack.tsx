@@ -118,6 +118,10 @@ const AppStack = () => {
                 <Stack.Screen
                     name={PROFILE_ROUTE.createPostPickImg}
                     component={CreatPostPickImage}
+                    options={{
+                        cardStyleInterpolator:
+                            CardStyleInterpolators.forScaleFromCenterAndroid,
+                    }}
                 />
                 <Stack.Screen
                     name={MESS_ROUTE.chatDetail}

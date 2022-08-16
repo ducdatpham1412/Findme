@@ -48,13 +48,7 @@ const MainTabs: React.FunctionComponent = () => {
                     }}
                 />
 
-                <BottomTab.Screen
-                    name={'null'}
-                    component={NullTab}
-                    options={{
-                        lazy: false,
-                    }}
-                />
+                <BottomTab.Screen name={'null'} component={NullTab} />
 
                 <BottomTab.Screen
                     name={MAIN_SCREEN.notificationRoute}
@@ -64,9 +58,9 @@ const MainTabs: React.FunctionComponent = () => {
                 <BottomTab.Screen
                     name={MAIN_SCREEN.profileRoute}
                     component={ProfileRoute}
-                    options={{
-                        lazy: false,
-                    }}
+                    // options={{
+                    //     lazy: false,
+                    // }}
                 />
             </BottomTab.Navigator>
 

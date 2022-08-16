@@ -7,6 +7,7 @@ import {
     apiUnFollowUser,
 } from 'api/module';
 import {RELATIONSHIP} from 'asset/enum';
+import {Metrics} from 'asset/metrics';
 import {StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import NoData from 'components/common/NoData';
@@ -15,10 +16,9 @@ import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import {
     interactBubble,
     modalizeMyProfile,
@@ -38,6 +38,8 @@ interface Props {
         [key: string]: any;
     };
 }
+
+let listPosts: Array<TypeCreatePostResponse> = [];
 
 const OtherProfile = ({route}: Props) => {
     const {id, onGoBack} = route.params;
@@ -79,28 +81,14 @@ const OtherProfile = ({route}: Props) => {
         }
     };
 
-    const [left, setLeft] = useState<Array<TypeCreatePostResponse>>([]);
-    const [right, setRight] = useState<Array<TypeCreatePostResponse>>([]);
-
     useEffect(() => {
-        const tempLeft: Array<TypeCreatePostResponse> = [];
-        const tempRight: Array<TypeCreatePostResponse> = [];
-        list.forEach((item: TypeCreatePostResponse, index: number) => {
-            if (index % 2 === 0) {
-                tempLeft.push(item);
-            } else {
-                tempRight.push(item);
-            }
-        });
-        setLeft(tempLeft);
-        setRight(tempRight);
+        listPosts = list;
     }, [list]);
 
     useEffect(() => {
         getData();
     }, [shouldRenderOtherProfile]);
 
-    // on send message
     const onSendMessage = () => {
         if (profile?.name && profile.id && profile.avatar) {
             interactBubble({
@@ -111,7 +99,6 @@ const OtherProfile = ({route}: Props) => {
         }
     };
 
-    // block, report
     const onBlockUser = async () => {
         try {
             await apiBlockUser(id);
@@ -125,34 +112,37 @@ const OtherProfile = ({route}: Props) => {
         });
     };
 
-    // follow
-    const onUnFollow = async () => {
-        try {
-            setIsFollowing(false);
-            await apiUnFollowUser(id);
-        } catch (err) {
-            setIsFollowing(true);
-            appAlert(err);
-        }
-    };
-    const onFollow = async () => {
-        try {
-            if (id) {
-                setIsFollowing(true);
-                await apiFollowUser(id);
+    const onHandleFollow = async () => {
+        if (profile) {
+            const currentFollow = isFollowing;
+            const currentFollowers = profile.followers;
+            try {
+                setIsFollowing(!currentFollow);
+                setProfile({
+                    ...profile,
+                    followers: currentFollowers + (currentFollow ? -1 : 1),
+                });
+                if (currentFollow) {
+                    await apiUnFollowUser(id);
+                } else {
+                    await apiFollowUser(id);
+                }
+            } catch (err) {
+                setIsFollowing(currentFollow);
+                setProfile({
+                    ...profile,
+                    followers: currentFollowers,
+                });
+                appAlert(err);
             }
-        } catch (err) {
-            setIsFollowing(false);
-            appAlert(err);
         }
     };
 
-    // modalize
     const onShowOption = () => {
         if (isBlock) {
             return;
         }
-        optionsRef.current.show();
+        optionsRef.current?.show();
     };
 
     const onRefreshPage = async () => {
@@ -171,10 +161,10 @@ const OtherProfile = ({route}: Props) => {
     };
 
     const onGoToDetailPost = (bubbleId: string) => {
-        const temp = list.findIndex(item => item.id === bubbleId);
+        const temp = listPosts.findIndex(item => item.id === bubbleId);
         const initIndex = temp < 0 ? 0 : temp;
         navigate(ROOT_SCREEN.listDetailPost, {
-            listInProfile: list,
+            listInProfile: listPosts,
             initIndex,
             setListInProfile: setList,
         });
@@ -183,13 +173,9 @@ const OtherProfile = ({route}: Props) => {
     /**
      * Render_view
      */
-    const HeaderComponent = useMemo(() => {
-        const havingButtonFollow = !isFollowing && !isMyProfile;
-        const havingButtonMessage = !isMyProfile;
-
+    const HeaderComponent = () => {
         return (
             <>
-                {/* Information: avatar - cover - name - follow */}
                 {!!profile && (
                     <InformationProfile
                         profile={profile}
@@ -197,104 +183,129 @@ const OtherProfile = ({route}: Props) => {
                     />
                 )}
 
-                <View style={styles.btnInteractView}>
-                    {/* Button follow */}
-                    {havingButtonFollow && (
-                        <StyleTouchable
-                            customStyle={[
-                                styles.buttonEditProfile,
-                                {backgroundColor: theme.backgroundButtonColor},
-                            ]}
-                            onPress={onFollow}>
-                            <StyleText
-                                i18Text="profile.screen.follow"
+                <View
+                    style={[
+                        styles.btnInteractView,
+                        {backgroundColor: theme.backgroundColor},
+                    ]}>
+                    {!isMyProfile && (
+                        <>
+                            <StyleTouchable
                                 customStyle={[
-                                    styles.textEditProfile,
-                                    {color: theme.textColor},
+                                    styles.buttonInteract,
+                                    {
+                                        backgroundColor:
+                                            theme.backgroundButtonColor,
+                                        flex: isFollowing ? 0.6 : 1.5,
+                                    },
                                 ]}
-                            />
-                        </StyleTouchable>
-                    )}
+                                onPress={onHandleFollow}
+                                disable={isFollowing}
+                                disableOpacity={1}>
+                                <StyleText
+                                    i18Text={
+                                        isFollowing
+                                            ? 'profile.component.infoProfile.following'
+                                            : 'profile.screen.follow'
+                                    }
+                                    customStyle={[
+                                        styles.textInteract,
+                                        {
+                                            color: isFollowing
+                                                ? theme.textColor
+                                                : theme.highlightColor,
+                                            fontWeight: isFollowing
+                                                ? 'normal'
+                                                : 'bold',
+                                        },
+                                    ]}
+                                />
+                            </StyleTouchable>
 
-                    {/* Button send message */}
-                    {havingButtonMessage && (
-                        <StyleTouchable
-                            customStyle={[
-                                styles.buttonEditProfile,
-                                {
-                                    flex: havingButtonFollow ? 0.25 : 0.75,
-                                    backgroundColor:
-                                        theme.backgroundButtonColor,
-                                },
-                            ]}
-                            onPress={onSendMessage}>
-                            <AntDesign
-                                name="message1"
-                                style={[
-                                    styles.textEditProfile,
-                                    {color: theme.textColor},
+                            <StyleTouchable
+                                customStyle={[
+                                    styles.buttonInteract,
+                                    {
+                                        backgroundColor:
+                                            theme.backgroundButtonColor,
+                                    },
                                 ]}
-                            />
-                        </StyleTouchable>
+                                onPress={onSendMessage}>
+                                <StyleText
+                                    i18Text="profile.screen.sendMessage"
+                                    customStyle={[
+                                        styles.textInteract,
+                                        {
+                                            color: theme.textHightLight,
+                                        },
+                                    ]}
+                                />
+                            </StyleTouchable>
+                        </>
                     )}
                 </View>
             </>
         );
-    }, [profile, isFollowing, isMyProfile, list]);
-
-    const RenderItemPost = useCallback(
-        (item: TypeCreatePostResponse) => {
-            return (
-                <PostStatus
-                    key={item.id}
-                    itemPost={item}
-                    onGoToDetailPost={onGoToDetailPost}
-                />
-            );
-        },
-        [list],
-    );
-
-    const RenderPostStatus = () => {
-        return (
-            <View
-                style={{
-                    width: '100%',
-                    flexDirection: 'row',
-                }}>
-                <View style={{flex: 1}}>{left.map(RenderItemPost)}</View>
-                <View style={{flex: 1}}>{right.map(RenderItemPost)}</View>
-            </View>
-        );
     };
+
+    const RenderItemPost = useCallback((item: TypeCreatePostResponse) => {
+        return (
+            <PostStatus
+                key={item.id}
+                itemPost={item}
+                onGoToDetailPost={onGoToDetailPost}
+                containerStyle={styles.postStatusView}
+            />
+        );
+    }, []);
+
+    if (isBlock) {
+        return (
+            <>
+                <AvatarBackground avatar={profile?.avatar || ''} />
+                <View
+                    style={[
+                        styles.overlayView,
+                        {backgroundColor: theme.backgroundColor},
+                    ]}
+                />
+                <SearchAndSetting
+                    onShowOptions={onShowOption}
+                    hasSettingBtn={false}
+                    onGoBack={onGoBack}
+                />
+                <NoData content="No Data" />
+            </>
+        );
+    }
 
     return (
         <>
-            {!!profile?.avatar && <AvatarBackground avatar={profile.avatar} />}
+            <AvatarBackground avatar={profile?.avatar || ''} />
+            <View
+                style={[
+                    styles.overlayView,
+                    {backgroundColor: theme.backgroundColor},
+                ]}
+            />
 
-            {isBlock && <NoData content="No Data" />}
-
-            {/* Information profile, List photos */}
-            {!isBlock && (
-                <StyleList
-                    data={[]}
-                    renderItem={() => null}
-                    ListHeaderComponent={HeaderComponent}
-                    ListFooterComponent={RenderPostStatus()}
-                    ListEmptyComponent={() => null}
-                    style={styles.container}
-                    contentContainerStyle={styles.contentContainer}
-                    refreshing={refreshing}
-                    onRefresh={onRefreshPage}
-                    onLoadMore={onLoadMore}
-                />
-            )}
-
-            {/* Header */}
             <SearchAndSetting
                 onShowOptions={onShowOption}
                 hasSettingBtn={false}
                 onGoBack={onGoBack}
+            />
+
+            <StyleList
+                data={list}
+                renderItem={({item}) => RenderItemPost(item)}
+                ListHeaderComponent={HeaderComponent()}
+                ListEmptyComponent={() => null}
+                style={styles.container}
+                contentContainerStyle={styles.contentContainer}
+                refreshing={refreshing}
+                onRefresh={onRefreshPage}
+                onLoadMore={onLoadMore}
+                numColumns={3}
             />
 
             <StyleActionSheet
@@ -305,8 +316,7 @@ const OtherProfile = ({route}: Props) => {
                         : modalizeYourProfile({
                               onBlockUser,
                               onReport,
-                              onUnFollow,
-                              onFollow,
+                              onHandleFollow,
                               isFollowing,
                           })
                 }
@@ -320,8 +330,17 @@ const styles = ScaledSheet.create({
         flexGrow: 1,
         alignContent: 'center',
     },
+    overlayView: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        opacity: 0.75,
+    },
     contentContainer: {
-        paddingBottom: '100@vs',
+        paddingBottom: Metrics.safeBottomPadding,
+    },
+    postStatusView: {
+        marginHorizontal: '0.375@ms',
     },
     buttonActivityBox: {
         width: '100%',
@@ -346,23 +365,20 @@ const styles = ScaledSheet.create({
         width: '100%',
         paddingHorizontal: '20@s',
         flexDirection: 'row',
-        paddingVertical: '10@vs',
         justifyContent: 'center',
+        paddingBottom: '25@vs',
     },
-    buttonEditProfile: {
+    buttonInteract: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: '5@vs',
-        paddingVertical: '10@vs',
+        borderRadius: '3@vs',
+        paddingVertical: '6@vs',
         marginHorizontal: '3@s',
     },
-    textEditProfile: {
-        fontSize: '15@ms',
-        fontStyle: 'italic',
-        fontWeight: 'bold',
+    textInteract: {
+        fontSize: '11@ms',
     },
-    // BLOCK VIEW
     containerBlock: {
         flex: 1,
     },

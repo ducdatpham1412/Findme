@@ -49,6 +49,8 @@ const Images = {
         // discovery
         skyCouple: require('./img_sky_couple.png'),
         skyGroup: require('./img_sky_group.png'),
+        defaultImage: require('./img_default_image.png'),
+        defaultAvatar: require('./img_default_avatar.png'),
     },
 };
 

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import {
     createMaterialTopTabNavigator,
     MaterialTopTabBarProps,
@@ -29,6 +30,10 @@ interface Props {
 
 const Tab = createMaterialTopTabNavigator();
 
+const RenderItem = (item: TypeFollowResponse) => {
+    return <ItemFollow item={item} />;
+};
+
 const FollowerScreen = ({route}: any) => {
     const {userId} = route.params;
     const theme = Redux.getTheme();
@@ -47,10 +52,6 @@ const FollowerScreen = ({route}: any) => {
     useEffect(() => {
         setParams({userId, typeFollow: TYPE_FOLLOW.follower});
     }, [userId]);
-
-    const RenderItem = (item: TypeFollowResponse) => {
-        return <ItemFollow item={item} />;
-    };
 
     return (
         <StyleList
@@ -83,10 +84,6 @@ const FollowingScreen = ({route}: any) => {
     useEffect(() => {
         setParams({userId, typeFollow: TYPE_FOLLOW.following});
     }, [userId]);
-
-    const RenderItem = (item: TypeFollowResponse) => {
-        return <ItemFollow item={item} />;
-    };
 
     return (
         <StyleList

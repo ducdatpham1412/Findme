@@ -23,9 +23,10 @@ import ROOT_SCREEN, {
     PROFILE_ROUTE,
     SETTING_ROUTE,
 } from 'navigation/config/routes';
-import {appAlert, navigate} from 'navigation/NavigationService';
+import {navigate} from 'navigation/NavigationService';
 import {useState} from 'react';
-import {DevSettings, Platform} from 'react-native';
+import {DevSettings, NativeScrollEvent, Platform} from 'react-native';
+import {verticalScale} from 'react-native-size-matters';
 import ImageUploader, {ImagePickerParamsType} from './ImageUploader';
 import AuthenticateService from './login/loginService';
 import {checkCamera, checkPhoto} from './permission/permission';
@@ -201,7 +202,7 @@ export const modalizeOptionBubbleGroup = (params: {
         {
             text: 'profile.post.editPost',
             action: () => {
-                navigate(PROFILE_ROUTE.createGroup, {
+                navigate('profile_create_group', {
                     itemGroupFromEdit: params.itemGroupFromEdit,
                 });
             },
@@ -298,8 +299,7 @@ export const modeExpUsePaging = () => {
 export const modalizeYourProfile = (params: {
     onBlockUser(): void;
     onReport(): void;
-    onUnFollow(): void;
-    onFollow(): void;
+    onHandleFollow(): void;
     isFollowing: boolean;
 }) => {
     return [
@@ -307,37 +307,15 @@ export const modalizeYourProfile = (params: {
             text: params.isFollowing
                 ? 'profile.screen.unFollow'
                 : 'profile.screen.follow',
-            action: async () => {
-                try {
-                    if (params.isFollowing) {
-                        params.onUnFollow();
-                    } else {
-                        params.onFollow();
-                    }
-                } catch (err) {
-                    appAlert(err);
-                }
-            },
+            action: params.onHandleFollow,
         },
         {
             text: 'profile.modalize.block',
-            action: () => {
-                try {
-                    params.onBlockUser();
-                } catch (err) {
-                    appAlert(err);
-                }
-            },
+            action: params.onBlockUser,
         },
         {
             text: 'profile.modalize.report',
-            action: async () => {
-                try {
-                    params.onReport();
-                } catch (err) {
-                    appAlert(err);
-                }
-            },
+            action: params.onReport,
         },
         {
             text: 'common.cancel',
@@ -426,4 +404,16 @@ export const addMenuClearAsyncStorage = () => {
             DevSettings.reload();
         });
     }
+};
+
+const paddingBottomCheckScroll = verticalScale(70);
+export const isScrollCloseToBottom = ({
+    layoutMeasurement,
+    contentOffset,
+    contentSize,
+}: NativeScrollEvent) => {
+    return (
+        layoutMeasurement.height + contentOffset.y >=
+        contentSize.height - paddingBottomCheckScroll
+    );
 };
