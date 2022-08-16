@@ -4,8 +4,11 @@ import {
     accountSliceAction,
     initialAccountState,
 } from 'app-redux/account/accountSlice';
-import {logicSliceAction} from 'app-redux/account/logicSlice';
-import FindmeStore, {RootState} from 'app-redux/store';
+import {
+    logicSliceAction,
+    ReduxPostCreatedHandle,
+} from 'app-redux/account/logicSlice';
+import FindmeStore, {RootState, useAppSelector} from 'app-redux/store';
 import {THEME_TYPE} from 'asset/enum';
 import Theme from 'asset/theme/Theme';
 import {useSelector} from 'react-redux';
@@ -114,6 +117,8 @@ export const Redux = {
         useSelector(
             (state: RootState) => state.logicSlice.numberNewNotifications,
         ),
+    getCreatedPostHandling: () =>
+        useAppSelector(state => state.logicSlice.postCreatedHandling),
 
     // SET METHOD
     setIsLoading: (status: boolean) => {
@@ -182,6 +187,9 @@ export const Redux = {
     },
     setNumberNewNotifications: (value: number) => {
         FindmeStore.dispatch(logicSliceAction.setNumberNewNotification(value));
+    },
+    setPostCreatedHandling: (value: ReduxPostCreatedHandle) => {
+        FindmeStore.dispatch(logicSliceAction.setPostCreatedHandling(value));
     },
 
     /**

@@ -198,7 +198,7 @@ const ModalComment = (props: Props) => {
                     style={[
                         styles.commentBox,
                         {
-                            backgroundColor: theme.backgroundColor,
+                            backgroundColor: theme.backgroundColorSecond,
                             borderColor: theme.borderColor,
                         },
                     ]}>

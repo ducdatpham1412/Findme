@@ -36,26 +36,11 @@ const ProfileEnjoy = ({routeName}: ChildrenProps) => {
     useEffect(() => {
         if (
             bubblePalaceAction.action ===
-            TYPE_BUBBLE_PALACE_ACTION.createNewPostFromProfile
+            TYPE_BUBBLE_PALACE_ACTION.createNewPost
         ) {
             setList((preValue: Array<TypeCreatePostResponse>) =>
                 [bubblePalaceAction.payload].concat(preValue),
             );
-        } else if (
-            bubblePalaceAction.action ===
-            TYPE_BUBBLE_PALACE_ACTION.editPostFromProfile
-        ) {
-            setList((preValue: Array<TypeCreatePostResponse>) => {
-                return preValue.map(item => {
-                    if (item.id !== bubblePalaceAction.payload.id) {
-                        return item;
-                    }
-                    return {
-                        ...item,
-                        ...bubblePalaceAction.payload,
-                    };
-                });
-            });
         }
     }, [bubblePalaceAction]);
 
@@ -169,26 +154,11 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     useEffect(() => {
         if (
             bubblePalaceAction.action ===
-            TYPE_BUBBLE_PALACE_ACTION.createNewPostFromProfile
+            TYPE_BUBBLE_PALACE_ACTION.createNewPost
         ) {
             setList((preValue: Array<TypeCreatePostResponse>) =>
                 [bubblePalaceAction.payload].concat(preValue),
             );
-        } else if (
-            bubblePalaceAction.action ===
-            TYPE_BUBBLE_PALACE_ACTION.editPostFromProfile
-        ) {
-            setList((preValue: Array<TypeCreatePostResponse>) => {
-                return preValue.map(item => {
-                    if (item.id !== bubblePalaceAction.payload.id) {
-                        return item;
-                    }
-                    return {
-                        ...item,
-                        ...bubblePalaceAction.payload,
-                    };
-                });
-            });
         }
     }, [bubblePalaceAction]);
 

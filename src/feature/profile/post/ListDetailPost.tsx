@@ -5,13 +5,14 @@ import {
     apiLikePost,
     apiUnLikePost,
 } from 'api/module';
+import {TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Theme from 'asset/theme/Theme';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import ModalComment from 'feature/discovery/components/ModalComment';
 import Redux from 'hook/useRedux';
 import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
-import ROOT_SCREEN from 'navigation/config/routes';
+import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {
     appAlert,
     appAlertYesNo,
@@ -52,6 +53,7 @@ const ListDetailPost = ({route}: Props) => {
 
     const isModeExp = Redux.getModeExp();
     const myId = Redux.getPassport().profile.id;
+    const bubblePalaceAction = Redux.getBubblePalaceAction();
     const isMyListPost = listInProfile[0].creator === myId;
 
     const optionsRef = useRef<any>(null);
@@ -78,6 +80,25 @@ const ListDetailPost = ({route}: Props) => {
             });
         });
     }, [bubbleFocusing]);
+
+    useEffect(() => {
+        if (
+            bubblePalaceAction.action ===
+            TYPE_BUBBLE_PALACE_ACTION.editPostFromProfile
+        ) {
+            setList((preValue: Array<TypeCreatePostResponse>) => {
+                return preValue.map(item => {
+                    if (item.id !== bubblePalaceAction.payload.id) {
+                        return item;
+                    }
+                    return {
+                        ...item,
+                        ...bubblePalaceAction.payload,
+                    };
+                });
+            });
+        }
+    }, [bubblePalaceAction]);
 
     const onShowOptions = (item: TypeCreatePostResponse) => {
         postModalize = item;
@@ -177,6 +198,14 @@ const ListDetailPost = ({route}: Props) => {
         });
     };
 
+    const onGoToEditPost = () => {
+        if (postModalize) {
+            navigate(PROFILE_ROUTE.createPostPreview, {
+                itemEdit: postModalize,
+            });
+        }
+    };
+
     /**
      * Render view
      */
@@ -212,9 +241,7 @@ const ListDetailPost = ({route}: Props) => {
                         },
                         {
                             text: 'profile.post.editPost',
-                            action: () => {
-                                console.log('edit post: ', postModalize);
-                            },
+                            action: onGoToEditPost,
                         },
                         {
                             text: 'profile.post.delete',

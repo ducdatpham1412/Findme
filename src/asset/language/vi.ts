@@ -20,6 +20,10 @@ const common = {
     continue: 'Tiếp tục',
     reply: 'Trả lời',
     anonymous: '@Ẩn danh',
+    writeSomething: 'Viết gì đó',
+    discard: 'Bỏ đi',
+    stay: 'Ở lại',
+    wantToDiscard: 'Bạn muốn bỏ những thay đổi vừa rồi?',
 };
 
 const login = {
@@ -189,11 +193,30 @@ const profile = {
         title: 'Đăng ảnh',
         caption: 'Cảm nghĩ',
         post: 'Tải lên',
+        draft: 'Lưu nháp',
         edit: 'Sửa',
         editPost: 'Chỉnh sửa',
         delete: 'Xoá',
         sureDeletePost: 'Bạn chắc chắn muốn xoá\nbức ảnh này chứ?',
         enterTopic: 'Tự nhập chủ đề',
+        pickImage: 'Chọn ảnh',
+        addLink: 'Thêm link',
+        feeling: 'Cảm xúc',
+        checkIn: 'Check in',
+        topic: 'Chủ đề review',
+        rating: 'Đánh giá',
+        pasteLink: 'Dán đường dẫn URL',
+        whereAreYouNow: 'Bạn đang ở đâu?',
+        willDebutSearchOnGoogleMap:
+            'Doffy đang phát triển tính năng tìm địa chỉ trên Google map\nBạn đợi xíu nhaaa^^',
+        nice: 'Tốt',
+        omg: 'Omg',
+        wondering: 'Phân vân',
+        cry: 'Khóc',
+        angry: 'Tức giận',
+        travel: 'Du lịch',
+        cuisine: 'Ẩm thực',
+        shopping: 'Mua sắm',
     },
     follow: {
         follower: 'Người theo dõi',
@@ -328,6 +351,7 @@ const alert = {
 
     // PROFILE
     successUpdatePro: 'Cập nhật trang cá nhân thành công !',
+    invalidLink: 'Đường dẫn URL không hợp lệ',
 
     // PERMISSION
     permissionCamera: 'Cho phép Doffy truy cập vào máy ảnh',

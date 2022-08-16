@@ -140,9 +140,8 @@ export enum TYPE_NOTIFICATION {
 }
 
 export enum TYPE_BUBBLE_PALACE_ACTION {
-    disableBubble = 0,
-    createNewPostFromProfile = 1,
-    editPostFromProfile = 2,
+    createNewPost = 0,
+    editPostFromProfile = 1,
 }
 
 export enum TYPE_SOCIAL_LOGIN {
@@ -166,7 +165,16 @@ export enum CONVERSATION_STATUS {
     stop = 0,
 }
 
+export enum FEELING {
+    nice = 0,
+    omg = 1,
+    wondering = 2,
+    cry = 3,
+    angry = 4,
+}
+
 export enum TOPIC {
     travel = 0,
-    culinary = 1,
+    cuisine = 1,
+    shopping = 2,
 }

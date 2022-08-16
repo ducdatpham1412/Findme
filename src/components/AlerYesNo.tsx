@@ -13,6 +13,8 @@ interface AlertConfirmChangeProps {
     route: {
         params: {
             i18Title: I18Normalize;
+            agreeText?: I18Normalize;
+            refuseText?: I18Normalize;
             i18Params?: object;
             agreeChange(): void;
             refuseChange(): void;
@@ -23,48 +25,12 @@ interface AlertConfirmChangeProps {
     };
 }
 
-const ButtonYesOrNo = (props: any) => {
-    const {agreeChange, refuseChange} = props;
-    const theme = Redux.getTheme();
-
-    return (
-        <View style={styles.buttonView}>
-            {/* Button Yes */}
-            <TouchableOpacity
-                style={[
-                    styles.buttonElement,
-                    {backgroundColor: theme.borderColor, opacity: 0.6},
-                ]}
-                onPress={agreeChange}>
-                <StyleText
-                    i18Text="common.yes"
-                    customStyle={styles.textButtonElement}
-                />
-            </TouchableOpacity>
-
-            {/* Button No */}
-            <TouchableOpacity
-                style={[
-                    styles.buttonElement,
-                    {backgroundColor: theme.borderColor},
-                ]}
-                onPress={refuseChange}>
-                <StyleText
-                    i18Text="common.no"
-                    customStyle={styles.textButtonElement}
-                />
-            </TouchableOpacity>
-        </View>
-    );
-};
-
-/**
- * BOX HERE -----------------
- */
 const AlertYesNo = ({route}: AlertConfirmChangeProps) => {
     const theme = Redux.getTheme();
     const {
         i18Title,
+        agreeText = 'common.yes',
+        refuseText = 'common.no',
         i18Params,
         agreeChange,
         refuseChange,
@@ -136,10 +102,34 @@ const AlertYesNo = ({route}: AlertConfirmChangeProps) => {
                 </View>
 
                 {displayButton && (
-                    <ButtonYesOrNo
-                        agreeChange={agreeChange}
-                        refuseChange={refuseChange}
-                    />
+                    <View style={styles.buttonView}>
+                        <TouchableOpacity
+                            style={[
+                                styles.buttonElement,
+                                {
+                                    backgroundColor: theme.borderColor,
+                                    opacity: 0.6,
+                                },
+                            ]}
+                            onPress={agreeChange}>
+                            <StyleText
+                                i18Text={agreeText}
+                                customStyle={styles.textButtonElement}
+                            />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={[
+                                styles.buttonElement,
+                                {backgroundColor: theme.borderColor},
+                            ]}
+                            onPress={refuseChange}>
+                            <StyleText
+                                i18Text={refuseText}
+                                customStyle={styles.textButtonElement}
+                            />
+                        </TouchableOpacity>
+                    </View>
                 )}
             </Animated.View>
         </>

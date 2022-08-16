@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-useless-constructor */
 import {Metrics} from 'asset/metrics';
 import React, {ReactNode} from 'react';
 import {
@@ -26,7 +28,9 @@ interface States {
 
 class StyleKeyboardAwareView extends React.Component<Props, States> {
     _maxHeight = 0;
+
     hadGotKeyboardHeight = false;
+
     state = {
         innerHeight: 0,
     };
@@ -38,12 +42,13 @@ class StyleKeyboardAwareView extends React.Component<Props, States> {
     setMaxHeight = (value: number) => {
         this._maxHeight = value;
     };
+
     getMaxHeight = () => {
         return this._maxHeight;
     };
 
     onMainLayout = (e: LayoutChangeEvent) => {
-        const height = e.nativeEvent.layout.height;
+        const {height} = e.nativeEvent.layout;
         this.setMaxHeight(height);
         this.setState({
             innerHeight: height,
@@ -77,6 +82,7 @@ class StyleKeyboardAwareView extends React.Component<Props, States> {
             this.onKeyboardWillShow(e);
         }
     };
+
     onKeyboardDidHide = () => {
         if (!isIOS) {
             this.onKeyboardWillHide();

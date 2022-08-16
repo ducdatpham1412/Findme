@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import {useIsFocused} from '@react-navigation/native';
 import {TypeChatMessageResponse, TypeChatTagResponse} from 'api/interface';
 import {CONVERSATION_STATUS, MESSAGE_TYPE} from 'asset/enum';
@@ -153,7 +154,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
     });
 
     const [content, setContent] = useState('');
-    const [images, setImages] = useState([]);
+    const [images, setImages] = useState<Array<string>>([]);
 
     const myAvatar = useMemo(() => {
         for (let i = 0; i < itemChatTag.listUser.length; i++) {
@@ -272,6 +273,23 @@ const ChatDetail = ({route}: ChatDetailProps) => {
         const temp = [...images];
         temp.splice(index, 1);
         setImages(temp);
+    };
+
+    const onChooseImage = (item: string) => {
+        const isChosen = images.includes(item);
+        if (!isChosen) {
+            if (images.length < 2) {
+                setImages(images.concat(item));
+            } else {
+                const temp = [item].concat(images[0]);
+                setImages(temp);
+            }
+        } else {
+            const temp = [...images];
+            const _index = temp.indexOf(item);
+            temp.splice(_index, 1);
+            setImages(temp);
+        }
     };
 
     /**
@@ -406,11 +424,12 @@ const ChatDetail = ({route}: ChatDetailProps) => {
             return (
                 <ModalPickImage
                     images={images}
-                    setImages={setImages}
+                    onChooseImage={onChooseImage}
                     containerStyle={{
                         height: modalPickImgHeight,
                         backgroundColor: theme.backgroundColor,
                     }}
+                    numberColumns={4}
                 />
             );
         }

@@ -15,9 +15,11 @@ const Theme = {
         grayLight: '#E5E5EA',
         background: '#F4F4F4',
         red: 'red',
+        orange: 'orange',
     },
     darkTheme: {
         backgroundColor: '#081019',
+        backgroundColorSecond: '#0f1a23',
         textColor: '#9fcaed',
         textHightLight: '#c5e3ff',
         borderColor: '#5e8aa8',
@@ -32,7 +34,8 @@ const Theme = {
         joinGroupChat: '#90BEE9',
     },
     lightTheme: {
-        backgroundColor: 'white',
+        backgroundColor: '#ffffff',
+        backgroundColorSecond: '#f9f9f9',
         textColor: '#214d68',
         textHightLight: '#102a47',
         borderColor: '#2b6189',

@@ -34,28 +34,23 @@ const RowPickImages = (props: Props) => {
     const optionsImgPicker = useMemo(() => {
         return optionsImagePicker.map(item => t(item));
     }, []);
-    const checkArray = useMemo(() => {
+    const checkArray = () => {
         const temp = [];
         for (let i = 0; i < numberImages; i++) {
             temp.push('');
         }
         return temp;
-    }, []);
+    };
 
-    const onSetAgainListImages = useCallback(
-        (addingList: Array<string>) => {
-            const concatList = listImages.concat(addingList);
-            if (concatList.length < numberImages) {
-                setListImages(concatList);
-                return;
-            } else {
-                concatList.splice(numberImages);
-                setListImages(concatList);
-            }
-        },
-        [listImages],
-    );
-
+    const onSetAgainListImages = (addingList: Array<string>) => {
+        const concatList = listImages.concat(addingList);
+        if (concatList.length < numberImages) {
+            setListImages(concatList);
+        } else {
+            concatList.splice(numberImages);
+            setListImages(concatList);
+        }
+    };
     const chooseAction = useCallback(
         async (index: number) => {
             if (index === 0) {
@@ -96,7 +91,7 @@ const RowPickImages = (props: Props) => {
         <View
             style={[styles.container, containerStyle]}
             onLayout={({nativeEvent}) => setWidth(nativeEvent.layout.width)}>
-            {checkArray.map((item: string, index: number) => {
+            {checkArray().map((item: string, index: number) => {
                 let paddingLeft = scale(2);
                 let paddingRight = scale(2);
                 if (index === 0) {
@@ -109,6 +104,7 @@ const RowPickImages = (props: Props) => {
 
                 return (
                     <View
+                        key={index}
                         style={{
                             width: elementWidth,
                             height: elementWidth,

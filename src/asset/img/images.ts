@@ -31,6 +31,7 @@ const Images = {
         more: require('./ic_more.png'),
         reload: require('./ic_reload.png'),
         share: require('./ic_share.png'),
+        house: require('./ic_house.png'),
     },
     images: {
         logo: require('./img_logo.png'),
