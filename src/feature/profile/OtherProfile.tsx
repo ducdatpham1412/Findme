@@ -340,7 +340,7 @@ const styles = ScaledSheet.create({
         paddingBottom: Metrics.safeBottomPadding,
     },
     postStatusView: {
-        marginHorizontal: '0.375@ms',
+        marginHorizontal: '0.25@ms',
     },
     buttonActivityBox: {
         width: '100%',

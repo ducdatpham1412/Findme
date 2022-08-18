@@ -36,11 +36,7 @@ const PostStatus = (props: Props) => {
                 ]}
                 style={styles.starView}>
                 {arrayStars.map((_, index) => (
-                    <AntDesign
-                        key={index}
-                        name="star"
-                        style={[styles.star, {color: Theme.common.orange}]}
-                    />
+                    <AntDesign key={index} name="star" style={styles.star} />
                 ))}
             </LinearGradient>
         </StyleTouchable>
@@ -69,6 +65,7 @@ const styles = ScaledSheet.create({
     star: {
         fontSize: '8@ms',
         marginHorizontal: '1@s',
+        color: Theme.common.orange,
     },
 });
 

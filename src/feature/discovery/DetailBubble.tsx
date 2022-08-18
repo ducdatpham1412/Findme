@@ -1,5 +1,6 @@
 import {TypeBubblePalace} from 'api/interface';
-import {apiGetDetailBubble, apiLikePost, apiUnLikePost} from 'api/module';
+import {apiGetDetailBubble} from 'api/module';
+import {apiLikePost, apiUnLikePost} from 'api/post';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';

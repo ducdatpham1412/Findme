@@ -8,7 +8,6 @@ import {
     apiGetListBubbleActive,
     apiGetListBubbleActiveOfUserEnjoy,
 } from 'api/module';
-import FindmeStore from 'app-redux/store';
 import {TYPE_DYNAMIC_LINK} from 'asset/enum';
 import {
     ANDROID_APP_LINK,
@@ -22,7 +21,7 @@ import StyleActionSheet from 'components/common/StyleActionSheet';
 import LoadingScreen from 'components/LoadingScreen';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
-import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
+import ROOT_SCREEN from 'navigation/config/routes';
 import {
     appAlert,
     goBack,
@@ -39,12 +38,12 @@ import HeaderDoffy, {headerDoffyHeight} from './components/HeaderDoffy';
 
 export interface TypeShowMoreOptions {
     idUser: number;
-    imageWantToSee: string;
+    imageWantToSee: Array<string>;
     allowSaveImage: boolean;
 }
 
 let idUserReport = 0;
-let imageSeeDetail = '';
+let imageSeeDetail: Array<string> = [];
 let allowSaveImage = false;
 
 let oldOffset = 0;
@@ -52,24 +51,6 @@ let oldOffset = 0;
 const onGoToSignUpFromAlert = () => {
     goBack();
     onGoToSignUp();
-};
-
-const onGoToProfile = (item: TypeBubblePalace) => {
-    const myId = FindmeStore.getState().accountSlice.passport.profile.id;
-    if (item.creator === myId) {
-        navigate(PROFILE_ROUTE.myProfile);
-    } else {
-        navigate(ROOT_SCREEN.otherProfile, {
-            id: item.creator,
-        });
-    }
-};
-
-const onSeeDetailImage = (url: string, allowSave: boolean) => {
-    showSwipeImages({
-        listImages: [{url}],
-        allowSaveImage: allowSave,
-    });
 };
 
 const ListBubbleCouple = () => {
@@ -220,12 +201,9 @@ const ListBubbleCouple = () => {
         return (
             <Bubble
                 item={item}
-                onInteractBubble={() => null}
                 onShowMoreOption={onShowOptions}
                 onRefreshItem={onRefreshItem}
-                onGoToProfile={onGoToProfile}
                 onShowModalComment={() => onShowModalComment(item)}
-                onSeeDetailImage={onSeeDetailImage}
                 onShowModalShare={() => onShowModalShare(item)}
             />
         );
@@ -235,7 +213,7 @@ const ListBubbleCouple = () => {
         <View
             style={[
                 styles.container,
-                {backgroundColor: theme.backgroundColor},
+                {backgroundColor: theme.backgroundColorSecond},
             ]}>
             <StyleList
                 data={list}
@@ -255,6 +233,11 @@ const ListBubbleCouple = () => {
                 maxToRenderPerBatch={20}
                 onScroll={e => {
                     const currentOffset = e.nativeEvent.contentOffset.y;
+                    if (currentOffset === 0) {
+                        setIsShowHeader(true);
+                        oldOffset = currentOffset;
+                        return;
+                    }
                     const distance = currentOffset - oldOffset;
                     if (distance > 75) {
                         setIsShowHeader(false);
@@ -284,7 +267,9 @@ const ListBubbleCouple = () => {
                         text: 'discovery.seeDetailImage',
                         action: () => {
                             showSwipeImages({
-                                listImages: [{url: imageSeeDetail}],
+                                listImages: imageSeeDetail.map(item => ({
+                                    url: item,
+                                })),
                                 allowSaveImage,
                             });
                         },

@@ -24,6 +24,7 @@ const common = {
     discard: 'Bỏ đi',
     stay: 'Ở lại',
     wantToDiscard: 'Bạn muốn bỏ những thay đổi vừa rồi?',
+    null: '',
 };
 
 const login = {
@@ -150,11 +151,17 @@ const discovery = {
         reportHadSent:
             'Tố cáo của bạn đã được gửi đi\nChúng tôi sẽ xem xét đối với tố cáo của bạn và người dùng bị tố cáo để có những biện pháp xử lý kịp thời\n\nCám ơn bạn đã chung tay vì một cộng đồng Doffy ngày càng tốt hơn\n\nTrân trọng!\nDoffy Co.',
     },
-    numberComments: '{{numberComments}} bình luận',
     seeDetailImage: 'Xem ảnh',
     share: {
         title: 'Chia sẻ',
     },
+    travel: 'Du lịch',
+    cuisine: 'Ẩm thực',
+    shopping: 'Mua sắm',
+    like: 'Thích',
+    numberLike: '{{value}} lượt thích',
+    comment: 'Bình luận',
+    numberComments: '{{numberComments}} bình luận',
 };
 
 // PROFILE SCREEN
@@ -210,7 +217,7 @@ const profile = {
         willDebutSearchOnGoogleMap:
             'Doffy đang phát triển tính năng tìm địa chỉ trên Google map\nBạn đợi xíu nhaaa^^',
         nice: 'Tốt',
-        omg: 'Omg',
+        cute: 'Cute',
         wondering: 'Phân vân',
         cry: 'Khóc',
         angry: 'Tức giận',

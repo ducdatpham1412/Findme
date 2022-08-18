@@ -1,10 +1,6 @@
 import {TypeCreatePostResponse} from 'api/interface';
-import {
-    apiDeletePost,
-    apiGetDetailBubble,
-    apiLikePost,
-    apiUnLikePost,
-} from 'api/module';
+import {apiDeletePost, apiGetDetailBubble} from 'api/module';
+import {apiLikePost, apiUnLikePost} from 'api/post';
 import {TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Theme from 'asset/theme/Theme';
 import StyleList from 'components/base/StyleList';

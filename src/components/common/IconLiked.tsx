@@ -1,4 +1,3 @@
-import Theme from 'asset/theme/Theme';
 import {StyleTouchable} from 'components/base';
 import React, {useEffect, useRef} from 'react';
 import {Animated, StyleProp, TextStyle} from 'react-native';
