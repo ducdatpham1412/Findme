@@ -98,7 +98,6 @@ const ListBubbleCouple = () => {
         params: {
             take: 30,
         },
-        numberMaxForList: 30,
     });
 
     useEffect(() => {

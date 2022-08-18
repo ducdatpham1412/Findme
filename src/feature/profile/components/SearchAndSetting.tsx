@@ -1,14 +1,13 @@
 import {GUIDELINE_URL} from 'asset/standardValue';
 import {StyleTouchable} from 'components/base';
-import OptionsButton from 'components/common/OptionsButton';
-import SettingButton from 'components/common/SettingButton';
 import Redux from 'hook/useRedux';
 import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {goBack, navigate} from 'navigation/NavigationService';
 import React from 'react';
 import {View} from 'react-native';
-import {moderateScale, ScaledSheet} from 'react-native-size-matters';
+import {moderateScale, scale, ScaledSheet} from 'react-native-size-matters';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 interface Props {
@@ -37,7 +36,11 @@ const SearchAndSetting = (props: Props) => {
     };
 
     return (
-        <View style={styles.container}>
+        <View
+            style={[
+                styles.container,
+                {backgroundColor: theme.backgroundColor},
+            ]}>
             {hasBackBtn && <HeaderLeftIcon onPress={onGoBack || goBack} />}
 
             <View style={styles.leftBtnView}>
@@ -50,55 +53,75 @@ const SearchAndSetting = (props: Props) => {
                         onPress={onGoToUserGuide}>
                         <SimpleLineIcons
                             name="book-open"
-                            style={{
-                                fontSize: moderateScale(16),
-                                color: theme.textHightLight,
-                            }}
+                            style={[
+                                styles.iconSetting,
+                                {color: theme.textColor},
+                            ]}
                         />
                     </StyleTouchable>
                 )}
             </View>
 
             <View style={styles.rightBtnView}>
-                <OptionsButton onPress={onShowOptions} />
+                <StyleTouchable
+                    customStyle={[
+                        styles.buttonBox,
+                        {
+                            backgroundColor: theme.backgroundButtonColor,
+                            marginRight: scale(10),
+                        },
+                    ]}
+                    onPress={onShowOptions}>
+                    <AntDesign
+                        name="bars"
+                        style={[styles.iconSetting, {color: theme.textColor}]}
+                    />
+                </StyleTouchable>
 
                 {hasSettingBtn && (
-                    <SettingButton
-                        onPress={() => navigate(PROFILE_ROUTE.settingRoute)}
-                        customStyle={styles.settingBtn}
-                    />
+                    <StyleTouchable
+                        customStyle={[
+                            styles.buttonBox,
+                            {backgroundColor: theme.backgroundButtonColor},
+                        ]}
+                        onPress={() => navigate(PROFILE_ROUTE.settingRoute)}>
+                        <AntDesign
+                            name="setting"
+                            style={[
+                                styles.iconSetting,
+                                {color: theme.textColor},
+                            ]}
+                        />
+                    </StyleTouchable>
                 )}
             </View>
         </View>
     );
 };
 
+export const searchSettingHeight = moderateScale(40);
 const styles = ScaledSheet.create({
     container: {
-        position: 'absolute',
         width: '100%',
-        height: '50@vs',
-        alignItems: 'center',
+        height: searchSettingHeight,
         flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: '20@s',
     },
     leftBtnView: {
         flexDirection: 'row',
-        position: 'absolute',
-        left: '20@s',
     },
     rightBtnView: {
         flexDirection: 'row',
-        position: 'absolute',
-        right: '20@s',
     },
-    settingBtn: {
-        marginLeft: '7@s',
+    iconSetting: {
+        fontSize: '15@ms',
     },
     buttonBox: {
-        width: '33@vs',
-        height: '33@vs',
-        borderRadius: '20@s',
-        opacity: 0.8,
+        width: '30@ms',
+        height: '30@ms',
+        borderRadius: '15@ms',
         alignItems: 'center',
         justifyContent: 'center',
     },

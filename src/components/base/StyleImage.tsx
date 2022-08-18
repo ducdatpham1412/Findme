@@ -1,3 +1,4 @@
+import Images from 'asset/img/images';
 import React from 'react';
 import {Image, ImageProps, ImageStyle, StyleProp} from 'react-native';
 
@@ -8,7 +9,13 @@ interface StyleImageProps extends ImageProps {
 const StyleImage = (props: StyleImageProps) => {
     const {customStyle} = props;
 
-    return <Image style={customStyle} {...props} />;
+    return (
+        <Image
+            style={customStyle}
+            defaultSource={Images.images.defaultImage}
+            {...props}
+        />
+    );
 };
 
 export default StyleImage;

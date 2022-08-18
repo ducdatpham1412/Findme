@@ -1,80 +1,48 @@
 import {apiEditProfile} from 'api/module';
 import FindmeStore from 'app-redux/store';
-import {Metrics} from 'asset/metrics';
+import Images from 'asset/img/images';
 import {AVATAR_SIZE} from 'asset/standardValue';
 import {
     StyleButton,
     StyleContainer,
+    StyleImage,
     StyleInput,
     StyleTouchable,
 } from 'components/base';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import Redux from 'hook/useRedux';
+import StyleHeader from 'navigation/components/StyleHeader';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
-import {appAlert, navigate} from 'navigation/NavigationService';
-import React, {memo, useMemo, useRef, useState} from 'react';
+import {
+    appAlert,
+    navigate,
+    showSwipeImages,
+} from 'navigation/NavigationService';
+import React, {useMemo, useRef, useState} from 'react';
 import {Platform, TextInput, View} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import {chooseImageFromCamera, chooseImageFromLibrary} from 'utility/assistant';
 import ImageUploader from 'utility/ImageUploader';
-import AvatarElement from './components/AvatarElement';
 import BtnPenEdit from './components/BtnPenEdit';
 
-// Cover
-// const CoverEdit = memo(({cover, setCover}: any) => {
-//     const actionRef = useRef<any>(null);
+const EditProfile = () => {
+    const {profile} = Redux.getPassport();
+    const theme = Redux.getTheme();
 
-//     const listTextAndOption = useMemo(() => {
-//         return [
-//             {
-//                 text: 'common.chooseFromCamera',
-//                 action: async () =>
-//                     await chooseImageFromCamera(setCover, {
-//                         maxWidth: COVER_SIZE.width,
-//                         maxHeight: COVER_SIZE.height,
-//                     }),
-//             },
-//             {
-//                 text: 'common.chooseFromLibrary',
-//                 action: async () =>
-//                     await chooseImageFromLibrary(setCover, {
-//                         maxWidth: COVER_SIZE.width,
-//                         maxHeight: COVER_SIZE.height,
-//                     }),
-//             },
-//             {
-//                 text: 'common.cancel',
-//                 action: () => null,
-//             },
-//         ];
-//     }, [cover]);
-
-//     return (
-//         <View style={styles.coverBox}>
-//             <CoverElement cover={cover} customStyle={{flex: 1}} />
-//             <BtnPenEdit
-//                 btnStyle={styles.buttonEditCover}
-//                 onPress={() => actionRef.current.show()}
-//             />
-
-//             <StyleActionSheet
-//                 ref={actionRef}
-//                 listTextAndAction={listTextAndOption}
-//             />
-//         </View>
-//     );
-// });
-
-// Avatar
-const AvatarEdit = memo(({avatar, setAvatar}: any) => {
+    const inputDescriptionRef = useRef<TextInput>(null);
     const actionRef = useRef<any>(null);
+    const [avatar, setAvatar] = useState(profile?.avatar);
+    const [name, setName] = useState(profile?.name);
+    const [description, setDescription] = useState(profile?.description);
+
+    const disableButton = !name;
 
     const listTextAndOption = useMemo(() => {
         return [
             {
                 text: 'common.chooseFromCamera',
                 action: async () =>
-                    await chooseImageFromCamera(setAvatar, {
+                    chooseImageFromCamera(setAvatar, {
                         maxWidth: AVATAR_SIZE.width,
                         maxHeight: AVATAR_SIZE.height,
                     }),
@@ -82,73 +50,35 @@ const AvatarEdit = memo(({avatar, setAvatar}: any) => {
             {
                 text: 'common.chooseFromLibrary',
                 action: async () =>
-                    await chooseImageFromLibrary(setAvatar, {
+                    chooseImageFromLibrary(setAvatar, {
                         maxWidth: AVATAR_SIZE.width,
                         maxHeight: AVATAR_SIZE.height,
                     }),
+            },
+            {
+                text: 'profile.removeAvatar',
+                action: () => setAvatar(''),
             },
             {
                 text: 'common.cancel',
                 action: () => null,
             },
         ];
-    }, [avatar]);
-
-    return (
-        <View style={styles.avatarBox}>
-            <AvatarElement
-                avatar={avatar}
-                customStyle={styles.avatar}
-                imageStyle={styles.avatarImg}
-            />
-            <BtnPenEdit
-                btnStyle={styles.btnEditAvatar}
-                onPress={() => actionRef.current.show()}
-            />
-
-            <StyleActionSheet
-                ref={actionRef}
-                listTextAndAction={listTextAndOption}
-            />
-        </View>
-    );
-});
-
-/**
- * Edit profile
- */
-const EditProfile = () => {
-    const {profile} = Redux.getPassport();
-    const theme = Redux.getTheme();
-
-    const inputDescriptionRef = useRef<TextInput>(null);
-    const [avatar, setAvatar] = useState(profile?.avatar);
-    const [cover, setCover] = useState(profile?.cover);
-    const [name, setName] = useState(profile?.name);
-    const [anonymousName, setAnonymousName] = useState(profile?.anonymousName);
-    const [description, setDescription] = useState(profile?.description);
-
-    const disableButton = !(avatar && name && anonymousName && description);
+    }, []);
 
     const onSaveChange = async () => {
         try {
             Redux.setIsLoading(true);
-            const modeExp = FindmeStore.getState().accountSlice.modeExp;
+            const {modeExp} = FindmeStore.getState().accountSlice;
             // update in server
             if (!modeExp) {
                 const newAvatar =
                     avatar === profile.avatar
                         ? undefined
-                        : await ImageUploader.upLoad(avatar, 1000);
-                const newCover =
-                    cover === profile.cover
-                        ? undefined
-                        : await ImageUploader.upLoad(cover, 600);
+                        : avatar !== ''
+                        ? await ImageUploader.upLoad(avatar, 1000)
+                        : '';
                 const newName = name === profile.name ? undefined : name;
-                const newAnonymousName =
-                    anonymousName === profile.anonymousName
-                        ? undefined
-                        : anonymousName;
                 const newDescription =
                     description === profile.description
                         ? undefined
@@ -156,16 +86,14 @@ const EditProfile = () => {
 
                 await apiEditProfile({
                     avatar: newAvatar,
-                    cover: newCover,
                     name: newName,
-                    anonymous_name: newAnonymousName,
                     description: newDescription,
                 });
             }
 
             // update in local
             Redux.updatePassport({
-                profile: {avatar, cover, name, description, anonymousName},
+                profile: {avatar: avatar || '', name, description},
             });
 
             // alert success and comeback
@@ -179,66 +107,90 @@ const EditProfile = () => {
         }
     };
 
+    const onSeeDetailAvatar = () => {
+        if (avatar) {
+            showSwipeImages({
+                listImages: [{url: avatar}],
+            });
+        }
+    };
+
     return (
-        <StyleContainer scrollEnabled customStyle={styles.container}>
-            {/* <CoverEdit cover={cover} setCover={setCover} /> */}
+        <>
+            <StyleHeader title="profile.component.infoProfile.editProfile" />
+            <StyleContainer scrollEnabled customStyle={styles.container}>
+                <View style={styles.avatarBox}>
+                    <StyleTouchable
+                        customStyle={[
+                            styles.avatar,
+                            {
+                                borderColor: theme.borderColor,
+                                backgroundColor: theme.backgroundColor,
+                            },
+                        ]}
+                        onPress={onSeeDetailAvatar}>
+                        <StyleImage
+                            source={{uri: avatar}}
+                            customStyle={styles.avatarImg}
+                            defaultSource={Images.images.defaultAvatar}
+                        />
+                    </StyleTouchable>
 
-            <AvatarEdit avatar={avatar} setAvatar={setAvatar} />
+                    <BtnPenEdit
+                        btnStyle={styles.btnEditAvatar}
+                        onPress={() => actionRef.current.show()}
+                    />
 
-            {/* Name */}
-            <View style={styles.nameBox}>
-                <StyleInput
-                    value={name}
-                    i18Placeholder="profile.edit.name"
-                    onChangeText={value => setName(value)}
-                    inputStyle={styles.inputName}
-                    maxLength={100}
+                    <StyleActionSheet
+                        ref={actionRef}
+                        listTextAndAction={listTextAndOption}
+                    />
+                </View>
+
+                {/* Name */}
+                <View style={styles.nameBox}>
+                    <StyleInput
+                        value={name}
+                        i18Placeholder="profile.edit.name"
+                        onChangeText={value => setName(value)}
+                        inputStyle={styles.inputName}
+                        maxLength={100}
+                    />
+                </View>
+
+                {/* Description */}
+                <StyleTouchable
+                    customStyle={[
+                        styles.descriptionBox,
+                        {borderColor: theme.borderColor},
+                    ]}
+                    activeOpacity={1}
+                    onPress={() => inputDescriptionRef.current?.focus()}>
+                    <StyleInput
+                        ref={inputDescriptionRef}
+                        value={description}
+                        i18Placeholder="About me"
+                        multiline
+                        onChangeText={value => setDescription(value)}
+                        containerStyle={{width: '100%'}}
+                        inputStyle={styles.inputDescription}
+                        hasUnderLine={false}
+                        hasErrorBox={false}
+                        maxLength={1000}
+                    />
+                </StyleTouchable>
+
+                {/* Button update */}
+                <StyleButton
+                    title="profile.edit.confirmButton"
+                    containerStyle={styles.saveBtnView}
+                    onPress={onSaveChange}
+                    disable={disableButton}
                 />
-            </View>
 
-            {/* Anonymous name */}
-            <View style={styles.nameAnonymousBox}>
-                <StyleInput
-                    value={anonymousName}
-                    i18Placeholder="profile.edit.anonymousName"
-                    onChangeText={value => setAnonymousName(value)}
-                    inputStyle={styles.inputAnonymous}
-                    maxLength={100}
-                />
-            </View>
-
-            {/* Description */}
-            <StyleTouchable
-                customStyle={[
-                    styles.descriptionBox,
-                    {borderColor: theme.borderColor},
-                ]}
-                activeOpacity={1}
-                onPress={() => inputDescriptionRef.current?.focus()}>
-                <StyleInput
-                    ref={inputDescriptionRef}
-                    value={description}
-                    i18Placeholder="About me"
-                    multiline
-                    onChangeText={value => setDescription(value)}
-                    containerStyle={{width: '100%'}}
-                    inputStyle={styles.inputDescription}
-                    hasUnderLine={false}
-                    hasErrorBox={false}
-                    maxLength={1000}
-                />
-            </StyleTouchable>
-
-            {/* Button update */}
-            <StyleButton
-                title="profile.edit.confirmButton"
-                containerStyle={styles.saveBtnView}
-                onPress={onSaveChange}
-                disable={disableButton}
-            />
-
-            <View style={{height: verticalScale(200)}} />
-        </StyleContainer>
+                <View style={{height: verticalScale(200)}} />
+            </StyleContainer>
+        </>
     );
 };
 
@@ -246,27 +198,17 @@ const styles = ScaledSheet.create({
     container: {
         alignItems: 'center',
     },
-    // cover
-    coverBox: {
-        width: '100%',
-        height: Metrics.width / 2.8,
-    },
-    buttonEditCover: {
-        left: '10@s',
-        bottom: '10@s',
-    },
-
     // avatar
     avatarBox: {
-        width: Metrics.width / 1.3,
-        height: Metrics.width / 1.3,
-        marginTop: '10@ms',
+        width: '200@s',
+        height: '200@s',
+        marginTop: '10@vs',
     },
     avatar: {
         width: '100%',
         height: '100%',
         borderWidth: '2@ms',
-        borderRadius: '25@vs',
+        borderRadius: '100@vs',
     },
     avatarImg: {
         width: '100%',
@@ -274,12 +216,11 @@ const styles = ScaledSheet.create({
         borderRadius: '20@vs',
     },
     btnEditAvatar: {
-        width: '27@s',
-        height: '27@s',
+        width: '27@ms',
+        height: '27@ms',
         bottom: '10@s',
-        left: '15@s',
+        left: '20@s',
     },
-
     // name
     nameBox: {
         height: '50@vs',
@@ -288,16 +229,7 @@ const styles = ScaledSheet.create({
         alignSelf: 'center',
     },
     inputName: {
-        fontSize: '20@ms',
-    },
-    nameAnonymousBox: {
-        height: '50@vs',
-        width: '60%',
-        alignSelf: 'center',
-    },
-    inputAnonymous: {
-        fontSize: '15@ms',
-        fontStyle: 'italic',
+        fontSize: '14@ms',
     },
     iconNameBox: {
         flex: 1,
@@ -317,10 +249,9 @@ const styles = ScaledSheet.create({
         }),
         borderColor: 'white',
         borderRadius: '10@s',
-        marginTop: '15@vs',
     },
     inputDescription: {
-        fontSize: '17@ms',
+        fontSize: '13@ms',
     },
 
     // btnSave

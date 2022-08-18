@@ -17,6 +17,9 @@ import {
 import Feather from 'react-native-vector-icons/Feather';
 
 const tabBarHeight = moderateScale(50);
+const addMoreHeight = moderateScale(5);
+const safeBottomHeight = Metrics.safeBottomPadding - verticalScale(10);
+export const tabBarViewHeight = tabBarHeight + safeBottomHeight + addMoreHeight;
 
 const TabNavigator = (props: any) => {
     const theme = Redux.getTheme();
@@ -170,6 +173,7 @@ const TabNavigator = (props: any) => {
                 <StyleImage
                     source={{uri: avatar}}
                     customStyle={styles.profile}
+                    defaultSource={Images.images.defaultAvatar}
                 />
             </StyleTouchable>
         );
@@ -233,8 +237,8 @@ const TabNavigator = (props: any) => {
         );
     };
 
-    const AddMore = () => {
-        return (
+    return (
+        <>
             <View
                 style={[
                     styles.addMoreView,
@@ -256,12 +260,6 @@ const TabNavigator = (props: any) => {
                     ]}
                 /> */}
             </View>
-        );
-    };
-
-    return (
-        <>
-            {AddMore()}
             <Animated.View
                 style={[
                     styles.tabBarDown,
@@ -306,7 +304,7 @@ const styles = ScaledSheet.create({
     },
     addMoreView: {
         width: '100%',
-        height: '5@ms',
+        height: addMoreHeight,
         alignItems: 'center',
         borderTopWidth: '0.25@ms',
     },
@@ -374,7 +372,7 @@ const styles = ScaledSheet.create({
     },
     safeBottom: {
         width: '100%',
-        height: Metrics.safeBottomPadding - verticalScale(10),
+        height: safeBottomHeight,
     },
 });
 

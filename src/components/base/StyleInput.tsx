@@ -12,6 +12,7 @@ import {
 import {TextInput} from 'react-native-gesture-handler';
 import {scale, ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import {I18Normalize} from 'utility/I18Next';
 import StyleText from './StyleText';
 
 export interface StyleInputProps extends TextInputProps {
@@ -23,7 +24,7 @@ export interface StyleInputProps extends TextInputProps {
     hasUnderLine?: boolean;
     customErrorBox?: StyleProp<ViewStyle>;
     customErrorText?: StyleProp<TextStyle>;
-    errorMessage?: string;
+    errorMessage?: I18Normalize;
     isEffectTabBar?: boolean;
 }
 

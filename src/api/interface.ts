@@ -200,7 +200,6 @@ export interface TypeGetProfileResponse {
 
 export interface TypeEditProfileRequest {
     name?: string;
-    anonymous_name?: string;
     description?: string;
     avatar?: string;
     cover?: string;

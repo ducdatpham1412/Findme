@@ -363,6 +363,17 @@ export const apiGetListPost = ({
     });
 };
 
+export const apiGetListPostsLiked = ({
+    params,
+}: TypeParamsPaging): Promise<{
+    success: boolean;
+    data: Array<TypeCreatePostResponse>;
+}> => {
+    return request.get('/profile/list-posts-liked', {
+        params,
+    });
+};
+
 export const apiLikePost = (idPost: string) => {
     return request.put(`/profile/like-post/${idPost}`);
 };

@@ -166,7 +166,7 @@ const profile = {
             introduce:
                 'Đăng ký tài khoản để trải nghiệm các năng chat và tạo trang cá nhân của riêng mình nhé !',
             tellSignUp: 'Đi tới đăng ký',
-            editProfile: 'Chỉnh sửa trang cá nhân',
+            editProfile: 'Trang cá nhân',
         },
         searchAndSetting: 'Tìm những người khác',
     },
@@ -223,6 +223,7 @@ const profile = {
         following: 'Đang theo dõi',
         follow: 'Theo dõi',
     },
+    removeAvatar: 'Xoá ảnh',
 };
 
 // MESS ROUTE

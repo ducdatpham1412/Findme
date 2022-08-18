@@ -75,7 +75,10 @@ const Alert = ({route}: Props) => {
                     <TouchableOpacity
                         style={[
                             styles.buttonElement,
-                            {backgroundColor: theme.borderColor, opacity: 0.6},
+                            {
+                                backgroundColor: theme.borderColor,
+                                opacity: moreNotice ? 0.6 : 1,
+                            },
                         ]}
                         onPress={actionClickOk || goBack}>
                         <StyleText
