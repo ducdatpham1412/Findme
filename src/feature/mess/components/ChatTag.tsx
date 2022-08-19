@@ -1,4 +1,5 @@
 import {TypeChatTagResponse} from 'api/interface';
+import Images from 'asset/img/images';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import React, {memo} from 'react';
@@ -43,6 +44,7 @@ const ChatTag = (props: Props) => {
             <StyleImage
                 source={{uri: chooseLink()}}
                 customStyle={styles.avatar}
+                defaultSource={Images.images.defaultAvatar}
             />
         );
     };

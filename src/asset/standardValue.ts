@@ -94,27 +94,27 @@ export const LIST_FEELINGS: Array<{
     {
         id: FEELING.nice,
         text: 'profile.post.nice',
-        icon: Images.icons.girl,
+        icon: Images.icons.nice,
     },
     {
-        id: FEELING.omg,
-        text: 'profile.post.omg',
-        icon: Images.icons.apple,
+        id: FEELING.cute,
+        text: 'profile.post.cute',
+        icon: Images.icons.cute,
     },
     {
         id: FEELING.wondering,
         text: 'profile.post.wondering',
-        icon: Images.icons.boy,
+        icon: Images.icons.wondering,
     },
     {
         id: FEELING.cry,
         text: 'profile.post.cry',
-        icon: Images.icons.house,
+        icon: Images.icons.cry,
     },
     {
         id: FEELING.angry,
         text: 'profile.post.angry',
-        icon: Images.icons.facebook,
+        icon: Images.icons.angry,
     },
 ];
 

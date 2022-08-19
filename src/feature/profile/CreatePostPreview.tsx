@@ -448,7 +448,7 @@ const CreatePostPreview = ({route}: Props) => {
                         )}
                         {!!chooseFeeling && !!chooseTopic && (
                             <StyleText
-                                originValue="・"
+                                originValue="  ・  "
                                 customStyle={[
                                     styles.textTopic,
                                     {color: theme.textColor},

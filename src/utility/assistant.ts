@@ -8,10 +8,12 @@ import {
 } from 'api/interface';
 import FindmeStore from 'app-redux/store';
 import {
+    FEELING,
     GENDER_TYPE,
     LANGUAGE_TYPE,
     SIGN_UP_TYPE,
     THEME_TYPE,
+    TOPIC,
     TYPE_COLOR,
 } from 'asset/enum';
 import Images from 'asset/img/images';
@@ -27,6 +29,7 @@ import {navigate} from 'navigation/NavigationService';
 import {useState} from 'react';
 import {DevSettings, NativeScrollEvent, Platform} from 'react-native';
 import {verticalScale} from 'react-native-size-matters';
+import {I18Normalize} from './I18Next';
 import ImageUploader, {ImagePickerParamsType} from './ImageUploader';
 import AuthenticateService from './login/loginService';
 import {checkCamera, checkPhoto} from './permission/permission';
@@ -416,4 +419,34 @@ export const isScrollCloseToBottom = ({
         layoutMeasurement.height + contentOffset.y >=
         contentSize.height - paddingBottomCheckScroll
     );
+};
+
+export const chooseIconFeeling = (feeling: number) => {
+    switch (feeling) {
+        case FEELING.nice:
+            return Images.icons.nice;
+        case FEELING.cute:
+            return Images.icons.cute;
+        case FEELING.wondering:
+            return Images.icons.wondering;
+        case FEELING.cry:
+            return Images.icons.cry;
+        case FEELING.angry:
+            return Images.icons.angry;
+        default:
+            return null;
+    }
+};
+
+export const chooseTextTopic = (topic: number | null): I18Normalize => {
+    switch (topic) {
+        case TOPIC.travel:
+            return 'discovery.travel';
+        case TOPIC.cuisine:
+            return 'discovery.cuisine';
+        case TOPIC.shopping:
+            return 'discovery.shopping';
+        default:
+            return 'common.null';
+    }
 };

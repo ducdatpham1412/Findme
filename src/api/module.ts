@@ -374,11 +374,15 @@ export const apiGetListPostsLiked = ({
     });
 };
 
-export const apiLikePost = (idPost: string) => {
-    return request.put(`/profile/like-post/${idPost}`);
-};
-export const apiUnLikePost = (idPost: string) => {
-    return request.put(`/profile/unlike-post/${idPost}`);
+export const apiGetListPostsSaved = ({
+    params,
+}: TypeParamsPaging): Promise<{
+    success: boolean;
+    data: Array<TypeCreatePostResponse>;
+}> => {
+    return request.get('/profile/list-posts-saved', {
+        params,
+    });
 };
 
 export const apiGetListFollow = ({params}: TypeParamsPaging) => {

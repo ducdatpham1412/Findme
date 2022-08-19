@@ -24,6 +24,7 @@ const common = {
     discard: 'Discard',
     stay: 'Stay',
     wantToDiscard: 'You want to discard the changes?',
+    null: '',
 };
 
 const login = {
@@ -147,11 +148,17 @@ const discovery = {
         reportHadSent:
             'Your report has been sent\nWe will review this report and the denounced user for timely handling measures\n\nThank you for joining hands for a better Doffy community\n\nBest regards!\nDoffy Co.',
     },
-    numberComments: '{{numberComments}} comments',
     seeDetailImage: 'Watch image',
     share: {
         title: 'Share',
     },
+    travel: 'Travel',
+    cuisine: 'Cuisine',
+    shopping: 'Shopping',
+    like: 'Like',
+    numberLike: '{{value}} likes',
+    comment: 'Comment',
+    numberComments: '{{numberComments}} comments',
 };
 
 // MESS ROUTE
@@ -237,7 +244,7 @@ const profile = {
         willDebutSearchOnGoogleMap:
             "Doffy're developing searching on Google map\nLet's wait for us ^^",
         nice: 'Nice',
-        omg: 'Omg',
+        cute: 'Cute',
         wondering: 'Wondering',
         cry: 'Cry',
         angry: 'Angry',

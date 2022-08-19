@@ -20,7 +20,7 @@ export default class StyleTouchable extends Component<StyleTouchableProps> {
             onLongPress,
             children,
             disableOpacity = 0.4,
-            activeOpacity = 0.6,
+            activeOpacity = 0.8,
             normalOpacity = 1,
         } = this.props;
 

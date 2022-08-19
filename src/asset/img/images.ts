@@ -32,6 +32,11 @@ const Images = {
         reload: require('./ic_reload.png'),
         share: require('./ic_share.png'),
         house: require('./ic_house.png'),
+        nice: require('./ic_nice.gif'),
+        cute: require('./ic_cute.gif'),
+        wondering: require('./ic_wondering.gif'),
+        cry: require('./ic_crying.gif'),
+        angry: require('./ic_angry.gif'),
     },
     images: {
         logo: require('./img_logo.png'),

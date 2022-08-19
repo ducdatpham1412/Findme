@@ -167,7 +167,7 @@ export enum CONVERSATION_STATUS {
 
 export enum FEELING {
     nice = 0,
-    omg = 1,
+    cute = 1,
     wondering = 2,
     cry = 3,
     angry = 4,

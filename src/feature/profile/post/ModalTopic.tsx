@@ -6,6 +6,7 @@ import React, {forwardRef} from 'react';
 import {Platform, View} from 'react-native';
 import {Modalize} from 'react-native-modalize';
 import {ScaledSheet} from 'react-native-size-matters';
+import {selectBgCardStyle} from 'utility/assistant';
 
 interface Props {
     onChangeTopic(value: number): void;
@@ -21,7 +22,13 @@ const ModalTopic = (props: Props, ref: any) => {
     };
 
     return (
-        <Modalize ref={ref} modalStyle={styles.modal} withHandle={false}>
+        <Modalize
+            ref={ref}
+            modalStyle={styles.modal}
+            withHandle={false}
+            overlayStyle={{
+                backgroundColor: selectBgCardStyle(0.6),
+            }}>
             <View
                 style={[
                     styles.container,

@@ -7,6 +7,7 @@ import {View} from 'react-native';
 import {Modalize} from 'react-native-modalize';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import {selectBgCardStyle} from 'utility/assistant';
 
 interface Props {
     numberStars: number;
@@ -22,7 +23,13 @@ const ModalPickStars = (props: Props, ref: any) => {
     };
 
     return (
-        <Modalize ref={ref} modalStyle={styles.modal} withHandle={false}>
+        <Modalize
+            ref={ref}
+            modalStyle={styles.modal}
+            withHandle={false}
+            overlayStyle={{
+                backgroundColor: selectBgCardStyle(0.6),
+            }}>
             <View
                 style={[
                     styles.container,

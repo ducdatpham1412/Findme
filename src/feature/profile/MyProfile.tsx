@@ -1,5 +1,10 @@
 import {TypeCreatePostResponse} from 'api/interface';
-import {apiGetListPost, apiGetListPostsLiked, apiGetProfile} from 'api/module';
+import {
+    apiGetListPost,
+    apiGetListPostsLiked,
+    apiGetListPostsSaved,
+    apiGetProfile,
+} from 'api/module';
 import {TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
@@ -117,7 +122,7 @@ const safeLoadMoreStyle: any = {
         Metrics.height -
         tabBarViewHeight -
         toolProfileHeight -
-        searchSettingHeight,
+        searchSettingHeight, // check to remove this
 };
 
 const ProfileAccount = ({routeName}: ChildrenProps) => {
@@ -133,16 +138,10 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     });
     const postsLikedPaging = usePaging({
         request: apiGetListPostsLiked,
-        params: {
-            userId: profile.id,
-        },
         isInitNotRunRequest: true,
     });
     const postsSavedPaging = usePaging({
-        request: apiGetListPost,
-        params: {
-            userId: profile.id,
-        },
+        request: apiGetListPostsSaved,
         isInitNotRunRequest: true,
     });
 
@@ -188,7 +187,13 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             Redux.updatePassport({
                 profile: res.data,
             });
-            // check tab index here and set
+            if (tabIndex === 0) {
+                myPostsPaging.onRefresh();
+            } else if (tabIndex === 1) {
+                postsLikedPaging.onRefresh();
+            } else if (tabIndex === 2) {
+                postsSavedPaging.onRefresh();
+            }
         } catch (err) {
             appAlert(err);
         }
@@ -215,6 +220,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 key={item.id}
                 itemPost={item}
                 onGoToDetailPost={onGoToDetailPost}
+                containerStyle={styles.itemPostView}
             />
         );
     }, []);
@@ -350,7 +356,9 @@ const styles = ScaledSheet.create({
         width: Metrics.width,
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'space-between',
+    },
+    itemPostView: {
+        marginHorizontal: '0.25@ms',
     },
 });
 

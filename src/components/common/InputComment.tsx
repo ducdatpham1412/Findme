@@ -1,3 +1,4 @@
+import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {
     StyleImage,
@@ -7,7 +8,7 @@ import {
 } from 'components/base';
 import Redux from 'hook/useRedux';
 import React, {forwardRef, useMemo} from 'react';
-import {Platform, View} from 'react-native';
+import {View} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 
@@ -41,7 +42,11 @@ const InputComment = (props: Props, inputRef: any) => {
 
     const RenderAvatar = useMemo(() => {
         return (
-            <StyleImage source={{uri: avatar}} customStyle={styles.avatar} />
+            <StyleImage
+                source={{uri: avatar}}
+                customStyle={styles.avatar}
+                defaultSource={Images.images.defaultAvatar}
+            />
         );
     }, []);
 

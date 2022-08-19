@@ -11,6 +11,7 @@ import {
 } from 'react-native-size-matters';
 import {formatFromNow} from 'utility/format';
 import isEqual from 'react-fast-compare';
+import Images from 'asset/img/images';
 
 interface Props {
     item: TypeCommentResponse;
@@ -51,18 +52,6 @@ const ItemComment = (props: Props) => {
     /**
      * Render View
      */
-
-    const RenderAvatar = () => {
-        return (
-            <StyleTouchable onPress={() => onGoToProfile(item.creator)}>
-                <StyleImage
-                    source={{uri: item.creatorAvatar}}
-                    customStyle={styles.avatar}
-                />
-            </StyleTouchable>
-        );
-    };
-
     const RenderNameAndContent = () => {
         return (
             <View style={styles.nameAndContentTouch}>
@@ -131,7 +120,13 @@ const ItemComment = (props: Props) => {
     return (
         <View style={{marginBottom, marginTop: verticalScale(10)}}>
             <View style={[styles.itemCommentBox, {paddingLeft}]}>
-                {RenderAvatar()}
+                <StyleTouchable onPress={() => onGoToProfile(item.creator)}>
+                    <StyleImage
+                        source={{uri: item.creatorAvatar}}
+                        customStyle={styles.avatar}
+                        defaultSource={Images.images.defaultAvatar}
+                    />
+                </StyleTouchable>
                 {RenderNameAndContent()}
                 {RenderLike()}
             </View>

@@ -239,11 +239,13 @@ export interface TypeCreatePostResponse {
     link: string | null;
     totalLikes: number;
     totalComments: number;
+    totalSaved: number;
     creator: number;
     creatorName: string;
     creatorAvatar: string;
     created: string;
     isLiked: boolean;
+    isSaved: boolean;
     relationship: number;
 }
 
@@ -286,11 +288,13 @@ export interface TypeBubblePalace {
     stars: number;
     totalLikes: number;
     totalComments: number;
+    totalSaved: number;
     creator: number;
     creatorName: string;
     creatorAvatar: string;
     created: string;
     isLiked: boolean;
+    isSaved: boolean;
     relationship: number;
 }
 

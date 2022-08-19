@@ -46,7 +46,7 @@ const Theme = {
         backgroundTextInput: '#cbe1ef',
         tabBarIconColor: '#102a47',
         likeHeart: '#DD0B0B',
-        unLikeHeart: '#c5e3ff',
+        unLikeHeart: '#102a47',
         joinGroupChat: '#90BEE9',
     },
 };

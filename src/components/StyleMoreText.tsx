@@ -7,6 +7,7 @@ import {
     TextLayoutEventData,
     TextStyle,
     View,
+    ViewStyle,
 } from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import {StyleText, StyleTouchable} from './base';
@@ -16,6 +17,7 @@ interface Props {
     maxHeight?: number | string;
     maxRows?: number;
     textStyle?: StyleProp<TextStyle>;
+    containerStyle?: StyleProp<ViewStyle>;
     onPress?(): void;
 }
 
@@ -25,6 +27,7 @@ const StyleMoreText = (props: Props) => {
         maxHeight = verticalScale(400),
         maxRows = 8,
         textStyle,
+        containerStyle,
         onPress,
     } = props;
 
@@ -78,7 +81,7 @@ const StyleMoreText = (props: Props) => {
     const styleScroll = displayButton ? (isShowMore ? {} : {maxHeight}) : {};
 
     return (
-        <View style={[styles.container, styleScroll]}>
+        <View style={[styles.container, containerStyle, styleScroll]}>
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 nestedScrollEnabled>

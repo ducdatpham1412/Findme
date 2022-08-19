@@ -30,13 +30,13 @@ const HeaderDoffy = (props: Props) => {
         if (isShowHeader) {
             Animated.timing(aim, {
                 toValue: 0,
-                duration: 800,
+                duration: 300,
                 useNativeDriver: true,
             }).start();
         } else {
             Animated.timing(aim, {
                 toValue: 1,
-                duration: 1000,
+                duration: 300,
                 useNativeDriver: true,
             }).start();
         }

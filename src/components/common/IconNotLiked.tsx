@@ -24,7 +24,7 @@ const IconNotLiked = ({onPress, customStyle}: Props) => {
         <Animated.View style={{transform: [{scale: aim}]}}>
             <StyleTouchable onPress={onPress}>
                 <AntDesign
-                    name="heart"
+                    name="hearto"
                     style={[styles.heartNotLikeIcon, customStyle]}
                 />
             </StyleTouchable>
