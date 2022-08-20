@@ -6,8 +6,8 @@ import ModalPickImage from 'feature/mess/components/ModalPickImage';
 import Redux from 'hook/useRedux';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
 import {goBack, navigate} from 'navigation/NavigationService';
-import React, {useMemo, useRef, useState} from 'react';
-import {Platform, ScrollView, View} from 'react-native';
+import React, {useState} from 'react';
+import {Platform, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -15,9 +15,8 @@ import {chooseImageFromCamera} from 'utility/assistant';
 
 const CreatPostPickImage = () => {
     const theme = Redux.getTheme();
-    const scrollRef = useRef<ScrollView>(null);
     const [images, setImages] = useState<Array<string>>([]);
-    const [indexScroll, setIndexScroll] = useState(1);
+    const [indexScroll, setIndexScroll] = useState(0);
 
     const onChooseImage = (url: string) => {
         if (images.length === MAX_NUMBER_IMAGES_POST) {
@@ -31,12 +30,7 @@ const CreatPostPickImage = () => {
         } else {
             const oldLength = images.length;
             setImages(images.concat(url));
-            setTimeout(() => {
-                scrollRef.current?.scrollTo({
-                    x: Metrics.width * oldLength,
-                    animated: true,
-                });
-            }, 100);
+            setIndexScroll(oldLength);
         }
     };
 
@@ -91,35 +85,29 @@ const CreatPostPickImage = () => {
         );
     };
 
-    const ImagePreview = useMemo(() => {
+    const ImagePreview = () => {
         return (
-            <View
-                style={[
-                    styles.imagePreviewView,
-                    {maxHeight: Metrics.width * 1.2},
-                ]}>
-                <ScrollSyncSizeImage
-                    ref={scrollRef}
-                    images={images}
-                    syncWidth={Metrics.width}
-                    scrollViewProps={{
-                        onScroll: e => {
-                            const index = Math.floor(
-                                e.nativeEvent.contentOffset.x / Metrics.width,
-                            );
-                            setIndexScroll(index + 1);
-                        },
-                    }}
-                />
-            </View>
+            <ScrollSyncSizeImage
+                images={images}
+                syncWidth={Metrics.width}
+                containerStyle={styles.imagePreviewView}
+                index={indexScroll}
+                onChangeIndex={value => setIndexScroll(value)}
+            />
         );
-    }, [images]);
+    };
 
     const Tool = () => {
         return (
-            <View style={[styles.toolView, {borderColor: theme.holderColor}]}>
+            <View
+                style={[
+                    styles.toolView,
+                    {
+                        borderColor: theme.holderColor,
+                    },
+                ]}>
                 <StyleText
-                    originValue={`${indexScroll} / ${images.length}`}
+                    originValue={`${indexScroll + 1} / ${images.length}`}
                     customStyle={[styles.indexText, {color: theme.textColor}]}
                 />
                 <StyleTouchable
@@ -166,7 +154,7 @@ const CreatPostPickImage = () => {
                 {backgroundColor: theme.backgroundColor},
             ]}>
             {Header()}
-            {ImagePreview}
+            {ImagePreview()}
             {Tool()}
             {ModalImage()}
         </View>
@@ -209,9 +197,7 @@ const styles = ScaledSheet.create({
     },
     // image preview
     imagePreviewView: {
-        width: '100%',
-        overflow: 'hidden',
-        justifyContent: 'center',
+        maxHeight: '60%',
     },
     // tool
     toolView: {

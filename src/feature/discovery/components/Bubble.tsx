@@ -20,7 +20,12 @@ import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
 import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
-import {appAlert, goBack, navigate} from 'navigation/NavigationService';
+import {
+    appAlert,
+    goBack,
+    navigate,
+    showSwipeImages,
+} from 'navigation/NavigationService';
 import React, {memo, useEffect, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import {View} from 'react-native';
@@ -56,12 +61,12 @@ const onGoToProfile = (userId: number) => {
     }
 };
 
-// const onSeeDetailImage = (images: Array<string>) => {
-//     showSwipeImages({
-//         listImages: images.map(item => ({url: item})),
-//         allowSaveImage: true,
-//     });
-// };
+const onSeeDetailImage = (images: Array<string>) => {
+    showSwipeImages({
+        listImages: images.map(item => ({url: item})),
+        allowSaveImage: true,
+    });
+};
 
 const onHandleLike = async (params: {
     isModeExp: boolean;
@@ -453,6 +458,20 @@ const Bubble = (props: Props) => {
             <ScrollSyncSizeImage
                 images={item.images}
                 syncWidth={Metrics.width}
+                onDoublePress={() => {
+                    if (!isLiked) {
+                        onHandleLike({
+                            isModeExp,
+                            isLiked,
+                            setIsLiked,
+                            totalLikes,
+                            setTotalLikes,
+                            postId: item.id,
+                        });
+                    } else {
+                        onSeeDetailImage(item.images);
+                    }
+                }}
             />
 
             {Footer()}
