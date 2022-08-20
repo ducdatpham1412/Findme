@@ -1,3 +1,4 @@
+import {useIsFocused} from '@react-navigation/native';
 import {
     TypeSocketCommentRequest,
     TypeBubblePalace,
@@ -38,14 +39,18 @@ import {isIOS, reorderListChatTag} from 'utility/assistant';
 import {isTimeBefore} from 'utility/format';
 import ImageUploader from 'utility/ImageUploader';
 import usePaging from './usePaging';
-import Redux from './useRedux';
+import Redux, {TypeBubblePalaceUpdate} from './useRedux';
 
 let socket: Socket;
 const socketDev = isIOS ? Config.API_SOCKET : 'http://10.0.2.2:3000';
 const socketProduction = Config.API_SOCKET;
 const socketUrl = __DEV__ ? socketDev : socketProduction;
 
-class SocketClass {
+export default class SocketClass {
+    static getSocket = () => {
+        return socket;
+    };
+
     static start = () => {
         socket = io(socketUrl, {
             transports: ['websocket'],
@@ -593,14 +598,28 @@ export const useSocketChatDetail = (params: {
  *          SOCKET COMMENT
  -----------------------------------  */
 interface ParamSocketComment {
-    bubbleFocusing: TypeBubblePalace | TypeCreatePostResponse;
+    bubbleFocusing: TypeBubblePalace | TypeCreatePostResponse | undefined;
+    updateBubbleFocusing(value: TypeBubblePalaceUpdate): void;
+    myId: number;
+    scrollToIndex(value: number): void;
     scrollToEnd(): void;
+    clearText(): void;
 }
 
+let oldBubbleFocusingId = '';
+
 export const useSocketComment = (params: ParamSocketComment) => {
-    const {bubbleFocusing, scrollToEnd} = params;
-    const [oldBubbleId, setOldBubbleId] = useState('');
+    const {
+        bubbleFocusing,
+        updateBubbleFocusing,
+        myId,
+        scrollToIndex,
+        clearText,
+        scrollToEnd,
+    } = params;
+    const isFocused = useIsFocused();
     const [isLoading, setIsLoading] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
     const [dataComment, setDataComment] = useState<Array<TypeCommentResponse>>(
         [],
     );
@@ -608,7 +627,7 @@ export const useSocketComment = (params: ParamSocketComment) => {
     const getData = async () => {
         try {
             setIsLoading(true);
-            const res = await apiGetListComments(bubbleFocusing.id);
+            const res = await apiGetListComments(bubbleFocusing?.id || '');
             setDataComment(res.data);
 
             let totalComments = res.data.length;
@@ -617,13 +636,31 @@ export const useSocketComment = (params: ParamSocketComment) => {
                     totalComments += item.listCommentsReply?.length;
                 }
             });
-            Redux.updateBubbleFocusing({
-                totalComments,
-            });
+            updateBubbleFocusing({totalComments});
         } catch (err) {
             appAlert(err);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const onRefresh = async () => {
+        try {
+            setRefreshing(true);
+            const res = await apiGetListComments(bubbleFocusing?.id || '');
+            setDataComment(res.data);
+
+            let totalComments = res.data.length;
+            res.data.forEach(item => {
+                if (item.listCommentsReply) {
+                    totalComments += item.listCommentsReply?.length;
+                }
+            });
+            updateBubbleFocusing({totalComments});
+        } catch (err) {
+            appAlert(err);
+        } finally {
+            setRefreshing(false);
         }
     };
 
@@ -634,9 +671,13 @@ export const useSocketComment = (params: ParamSocketComment) => {
             (data: TypeSocketCommentResponse) => {
                 if (data.commentReplied) {
                     setDataComment(preValue =>
-                        preValue.map(item => {
+                        preValue.map((item, index) => {
                             if (item.id !== data.commentReplied) {
                                 return item;
+                            }
+                            if (data.data.creator === myId) {
+                                scrollToIndex(index);
+                                clearText();
                             }
                             return {
                                 ...item,
@@ -647,30 +688,44 @@ export const useSocketComment = (params: ParamSocketComment) => {
                     );
                 } else {
                     setDataComment(preValue => preValue.concat(data.data));
+                    if (data.data.creator === myId) {
+                        scrollToEnd();
+                        clearText();
+                    }
                 }
-                // Create a pull request to handle this later
-                scrollToEnd();
-                Redux.increaseTotalCommentsOfBubbleFocusing(1);
+                const currentComments =
+                    FindmeStore.getState().logicSlice.bubbleFocusing
+                        .totalComments;
+                Redux.updateBubbleFocusing({
+                    totalComments: currentComments + 1,
+                });
             },
         );
     };
 
     useEffect(() => {
-        if (bubbleFocusing.id && bubbleFocusing.id !== oldBubbleId) {
+        if (!isFocused) {
+            oldBubbleFocusingId = '';
+        }
+    }, [isFocused]);
+
+    useEffect(() => {
+        if (bubbleFocusing?.id && bubbleFocusing.id !== oldBubbleFocusingId) {
             getData();
             socket.emit(SOCKET_EVENT.joinRoom, bubbleFocusing.id);
             hearingSocket();
-            if (oldBubbleId) {
-                socket.emit(SOCKET_EVENT.leaveRoom, oldBubbleId);
+            if (oldBubbleFocusingId) {
+                socket.emit(SOCKET_EVENT.leaveRoom, oldBubbleFocusingId);
             }
-            setOldBubbleId(bubbleFocusing.id);
+            oldBubbleFocusingId = bubbleFocusing.id;
         }
-    }, [bubbleFocusing.id, oldBubbleId]);
+    }, [bubbleFocusing?.id, myId]);
 
     return {
         list: dataComment,
-        onRefresh: getData,
         loading: isLoading,
+        refreshing,
+        onRefresh,
     };
 };
 

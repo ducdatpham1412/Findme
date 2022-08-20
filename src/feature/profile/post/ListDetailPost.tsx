@@ -1,13 +1,19 @@
+import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeCreatePostResponse} from 'api/interface';
-import {apiDeletePost, apiGetDetailBubble} from 'api/module';
-import {apiLikePost, apiUnLikePost} from 'api/post';
-import {TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
-import Theme from 'asset/theme/Theme';
+import {apiDeletePost} from 'api/module';
+import {TYPE_BUBBLE_PALACE_ACTION, TYPE_DYNAMIC_LINK} from 'asset/enum';
+import {
+    ANDROID_APP_LINK,
+    DYNAMIC_LINK_ANDROID,
+    DYNAMIC_LINK_IOS,
+    DYNAMIC_LINK_SHARE,
+    LANDING_PAGE_URL,
+} from 'asset/standardValue';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
-import ModalComment from 'feature/discovery/components/ModalComment';
+import Bubble from 'feature/discovery/components/Bubble';
+import {TypeShowMoreOptions} from 'feature/discovery/ListBubbleCouple';
 import Redux from 'hook/useRedux';
-import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {
     appAlert,
@@ -18,9 +24,11 @@ import {
 } from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
+import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
-import {bubbleProfileHeight, onGoToSignUp} from 'utility/assistant';
-import BubbleProfile from './BubbleProfile';
+import ModalCommentListDetailPost, {
+    showModalCommentListDetailPost,
+} from './ModalCommentListDetailPost';
 
 interface Props {
     route: {
@@ -28,7 +36,6 @@ interface Props {
             listInProfile: Array<TypeCreatePostResponse>;
             initIndex: number;
             setListInProfile: Function;
-            allowSaveImage?: boolean;
         };
     };
 }
@@ -41,41 +48,35 @@ export interface TypeLikeUnlikeParams {
     setTotalLikes: Function;
 }
 
-let postModalize: TypeCreatePostResponse | undefined;
+export interface TypeMoreOptionsMe {
+    postModal: TypeCreatePostResponse;
+}
+
+let postModal: TypeCreatePostResponse;
+
+const onGoToEditPost = () => {
+    if (postModal) {
+        navigate(PROFILE_ROUTE.createPostPreview, {
+            itemEdit: postModal,
+        });
+    }
+};
 
 const ListDetailPost = ({route}: Props) => {
-    const {listInProfile, initIndex, setListInProfile} = route.params;
-    const allowSaveImage = route.params?.allowSaveImage;
-
-    const isModeExp = Redux.getModeExp();
+    const {listInProfile, setListInProfile} = route.params;
     const myId = Redux.getPassport().profile.id;
     const bubblePalaceAction = Redux.getBubblePalaceAction();
     const isMyListPost = listInProfile[0].creator === myId;
 
     const optionsRef = useRef<any>(null);
 
-    const [bubbleFocusing, setBubbleFocusing] = useState(
-        listInProfile[initIndex],
-    );
-    const [displayComment, setDisplayComment] = useState(false);
     const [list, setList] = useState(listInProfile);
-
-    const height = bubbleProfileHeight();
+    const [bubbleFocusing, setBubbleFocusing] =
+        useState<TypeCreatePostResponse>();
 
     useEffect(() => {
         setListInProfile(list);
     }, [list]);
-
-    useEffect(() => {
-        setList((preValue: Array<TypeCreatePostResponse>) => {
-            return preValue.map(item => {
-                if (item.id !== bubbleFocusing.id) {
-                    return item;
-                }
-                return bubbleFocusing;
-            });
-        });
-    }, [bubbleFocusing]);
 
     useEffect(() => {
         if (
@@ -95,70 +96,6 @@ const ListDetailPost = ({route}: Props) => {
             });
         }
     }, [bubblePalaceAction]);
-
-    const onShowOptions = (item: TypeCreatePostResponse) => {
-        postModalize = item;
-        optionsRef.current?.show();
-    };
-
-    const onRefreshItem = async (idBubble: string) => {
-        if (isModeExp) {
-            return;
-        }
-        try {
-            const res: any = await apiGetDetailBubble(idBubble);
-            setList((preValue: Array<TypeCreatePostResponse>) => {
-                return preValue.map(item => {
-                    if (item.id !== idBubble) {
-                        return item;
-                    }
-                    return res.data;
-                });
-            });
-        } catch (err) {
-            appAlert(err);
-        }
-    };
-
-    const onHandleLike = async (params: TypeLikeUnlikeParams) => {
-        const {bubbleId, isLiked, setIsLiked, totalLikes, setTotalLikes} =
-            params;
-        if (!isModeExp) {
-            const currentLike = isLiked;
-            const currentNumberLikes = totalLikes;
-            try {
-                setIsLiked(!currentLike);
-                setTotalLikes(currentNumberLikes + (currentLike ? -1 : 1));
-                if (currentLike) {
-                    await apiUnLikePost(bubbleId);
-                } else {
-                    await apiLikePost(bubbleId);
-                }
-                setList((preValue: Array<TypeCreatePostResponse>) => {
-                    return preValue.map(item => {
-                        if (item.id !== bubbleId) {
-                            return item;
-                        }
-                        return {
-                            ...item,
-                            isLiked: !currentLike,
-                            totalLikes:
-                                currentNumberLikes + (currentLike ? -1 : 1),
-                        };
-                    });
-                });
-            } catch (err) {
-                setIsLiked(currentLike);
-                setTotalLikes(currentNumberLikes);
-                appAlert(err);
-            }
-        } else {
-            appAlert('discovery.bubble.goToSignUp', {
-                moreNotice: 'common.letGo',
-                moreAction: onGoToSignUp,
-            });
-        }
-    };
 
     const onDeletePost = (postId: string) => {
         const agreeDelete = async () => {
@@ -182,24 +119,68 @@ const ListDetailPost = ({route}: Props) => {
         });
     };
 
-    const onShowModalComment = (bubble: TypeCreatePostResponse) => {
-        setBubbleFocusing(bubble);
-        setDisplayComment(true);
+    const onShowModalShare = async (item: TypeCreatePostResponse) => {
+        try {
+            const link = await dynamicLinks().buildShortLink({
+                link: `${item?.images?.[0] || LANDING_PAGE_URL}?type=${
+                    TYPE_DYNAMIC_LINK.post
+                }&post_id=${item.id}`,
+                domainUriPrefix: DYNAMIC_LINK_SHARE,
+                ios: {
+                    bundleId: DYNAMIC_LINK_IOS,
+                    appStoreId: '570060128',
+                },
+                android: {
+                    packageName: DYNAMIC_LINK_ANDROID,
+                    fallbackUrl: ANDROID_APP_LINK,
+                },
+                analytics: {
+                    campaign: 'banner',
+                },
+            });
+
+            // const imagePath: any = null;
+            // let base64Data = '';
+            // if (isIOS) {
+            //     const resp = await RNFetchBlob.config({
+            //         fileCache: true,
+            //     }).fetch('GET', item.images[0]);
+            //     base64Data = await resp.readFile('base64');
+            // } else {
+            //     base64Data = await RNFetchBlob.fs.readFile(
+            //         item.images[0],
+            //         'base64',
+            //     );
+            // }
+            // const base64Image = `data:image/png;base64,${base64Data}`;
+            // await Share.open({
+            //     title: 'Title',
+            //     url: base64Image,
+            //     message: link,
+            //     subject: 'Subject',
+            // });
+            // return RNFetchBlob.fs.unlink(imagePath);
+
+            Share.open({
+                message: 'Doffy share',
+                url: link,
+            });
+        } catch (err) {
+            appAlert(err);
+        }
     };
 
-    const onSeeDetailImage = (imageUrl: string) => {
-        showSwipeImages({
-            listImages: [{url: imageUrl}],
-            allowSaveImage,
+    const showModalComment = (post: TypeCreatePostResponse) => {
+        setBubbleFocusing(post);
+        showModalCommentListDetailPost({
+            post,
+            setList,
         });
     };
 
-    const onGoToEditPost = () => {
-        if (postModalize) {
-            navigate(PROFILE_ROUTE.createPostPreview, {
-                itemEdit: postModalize,
-            });
-        }
+    const onShowOptions = (params: TypeShowMoreOptions & TypeMoreOptionsMe) => {
+        postModal = params.postModal;
+        optionsRef.current?.show();
     };
 
     /**
@@ -207,13 +188,11 @@ const ListDetailPost = ({route}: Props) => {
      */
     const RenderItemBubble = useCallback((item: TypeCreatePostResponse) => {
         return (
-            <BubbleProfile
+            <Bubble
                 item={item}
-                onShowOptions={onShowOptions}
-                onRefreshItem={onRefreshItem}
-                onShowModalComment={onShowModalComment}
-                onLikeOrUnLike={onHandleLike}
-                onSeeDetailImage={onSeeDetailImage}
+                onShowMoreOption={onShowOptions}
+                onShowModalComment={showModalComment}
+                onShowModalShare={onShowModalShare}
             />
         );
     }, []);
@@ -227,12 +206,16 @@ const ListDetailPost = ({route}: Props) => {
                         {
                             text: 'discovery.seeDetailImage',
                             action: () => {
-                                showSwipeImages({
-                                    listImages: [
-                                        {url: postModalize?.images[0] || ''},
-                                    ],
-                                    allowSaveImage,
-                                });
+                                if (postModal?.images.length) {
+                                    showSwipeImages({
+                                        listImages: postModal.images.map(
+                                            item => ({
+                                                url: item,
+                                            }),
+                                        ),
+                                        allowSaveImage: false,
+                                    });
+                                }
                             },
                         },
                         {
@@ -242,8 +225,8 @@ const ListDetailPost = ({route}: Props) => {
                         {
                             text: 'profile.post.delete',
                             action: () => {
-                                if (postModalize?.id) {
-                                    onDeletePost(postModalize.id);
+                                if (postModal?.id) {
+                                    onDeletePost(postModal.id);
                                 }
                             },
                         },
@@ -264,19 +247,21 @@ const ListDetailPost = ({route}: Props) => {
                         text: 'discovery.report.title',
                         action: () => {
                             navigate(ROOT_SCREEN.reportUser, {
-                                idUser: postModalize,
+                                idUser: postModal.creator,
                             });
                         },
                     },
                     {
                         text: 'discovery.seeDetailImage',
                         action: () => {
-                            showSwipeImages({
-                                listImages: [
-                                    {url: postModalize?.images[0] || ''},
-                                ],
-                                allowSaveImage,
-                            });
+                            if (postModal?.images.length) {
+                                showSwipeImages({
+                                    listImages: postModal.images.map(item => ({
+                                        url: item,
+                                    })),
+                                    allowSaveImage: false,
+                                });
+                            }
                         },
                     },
                     {
@@ -297,30 +282,21 @@ const ListDetailPost = ({route}: Props) => {
                 // snapToInterval={height}
                 scrollEventThrottle={30}
                 decelerationRate="fast"
-                initialScrollIndex={initIndex}
-                getItemLayout={(_, index) => ({
-                    length: height,
-                    offset: height * index,
-                    index,
-                })}
+                // initialScrollIndex={initIndex}
+                // getItemLayout={(_, index) => ({
+                //     length: height,
+                //     offset: height * index,
+                //     index,
+                // })}
                 // snapToOffsets={list.map((_, index) => index * height)}
             />
 
-            <HeaderLeftIcon
-                style={styles.backIcon}
-                onPress={goBack}
-                iconStyle={{color: Theme.darkTheme.textColor}}
-            />
+            {ModalizePost()}
 
-            <ModalComment
+            <ModalCommentListDetailPost
                 bubbleFocusing={bubbleFocusing}
                 setBubbleFocusing={setBubbleFocusing}
-                displayComment={displayComment}
-                setDisplayComment={setDisplayComment}
-                isNotModalOfMainTab
             />
-
-            {ModalizePost()}
         </View>
     );
 };
@@ -328,12 +304,6 @@ const ListDetailPost = ({route}: Props) => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
-    },
-    backIcon: {
-        position: 'absolute',
-        top: '100@vs',
-        backgroundColor: `rgba(8, 16, 25, ${0.4})`,
-        borderRadius: '20@vs',
     },
 });
 

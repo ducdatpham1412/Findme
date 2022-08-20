@@ -681,7 +681,7 @@ const CreatePostPreview = ({route}: Props) => {
             ]}>
             {Header()}
 
-            <ScrollView>
+            <ScrollView showsVerticalScrollIndicator={false}>
                 {FeelingTopicLocation()}
                 <View style={styles.captionView}>
                     <TextInput

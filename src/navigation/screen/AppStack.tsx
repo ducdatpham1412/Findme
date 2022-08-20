@@ -3,7 +3,7 @@ import {
     createStackNavigator,
 } from '@react-navigation/stack';
 import SwipeImages from 'components/SwipeImages';
-import DetailBubble from 'feature/discovery/DetailBubble';
+import DetailBubble from 'feature/notification/DetailBubble';
 import InteractBubble from 'feature/discovery/InteractBubble';
 import ReportUser from 'feature/discovery/ReportUser';
 import ChatDetail from 'feature/mess/ChatDetail';

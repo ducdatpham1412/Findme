@@ -23,6 +23,8 @@ interface Props {
     commentIdReplied?: string;
     personNameReplied?: string;
     onDeleteReply?(): void;
+    onFocus?(): void;
+    onBlur?(): void;
 }
 
 const InputComment = (props: Props, inputRef: any) => {
@@ -35,6 +37,8 @@ const InputComment = (props: Props, inputRef: any) => {
         commentIdReplied,
         personNameReplied = '',
         onDeleteReply,
+        onFocus,
+        onBlur,
     } = props;
 
     const theme = Redux.getTheme();
@@ -127,10 +131,11 @@ const InputComment = (props: Props, inputRef: any) => {
                     {backgroundColor: theme.backgroundColorSecond},
                 ]}
                 inputStyle={[styles.input, {color: theme.textColor}]}
-                value={text}
                 onChangeText={onChangeText}
                 isEffectTabBar={false}
                 multiline
+                onFocus={onFocus}
+                onBlur={onBlur}
             />
 
             <StyleTouchable

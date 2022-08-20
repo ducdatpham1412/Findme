@@ -76,6 +76,7 @@ module.exports = {
         camelcase: 'off',
         'no-plusplus': 'off',
         '@typescript-eslint/ban-types': 'off',
+        'class-methods-use-this': 'off',
     },
     parserOptions: {
         ecmaVersion: 2018,

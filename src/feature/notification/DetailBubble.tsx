@@ -2,11 +2,21 @@
 /* eslint-disable no-shadow */
 /* eslint-disable react/jsx-key */
 /* eslint-disable no-unused-expressions */
+import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeBubblePalace} from 'api/interface';
+import {apiGetDetailBubble} from 'api/module';
 import {apiLikePost, apiSavePost, apiUnLikePost, apiUnSavePost} from 'api/post';
 import FindmeStore from 'app-redux/store';
+import {TYPE_DYNAMIC_LINK} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
+import {
+    ANDROID_APP_LINK,
+    DYNAMIC_LINK_ANDROID,
+    DYNAMIC_LINK_IOS,
+    DYNAMIC_LINK_SHARE,
+    LANDING_PAGE_URL,
+} from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
 import {
     StyleIcon,
@@ -16,48 +26,51 @@ import {
 } from 'components/base';
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
+import InputComment from 'components/common/InputComment';
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
+import StyleKeyboardAwareView from 'components/StyleKeyboardAwareView';
 import StyleMoreText from 'components/StyleMoreText';
-import {TypeMoreOptionsMe} from 'feature/profile/post/ListDetailPost';
 import Redux from 'hook/useRedux';
+import StyleHeader from 'navigation/components/StyleHeader';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {
     appAlert,
-    goBack,
     navigate,
     showSwipeImages,
 } from 'navigation/NavigationService';
-import React, {memo, useEffect, useState} from 'react';
-import isEqual from 'react-fast-compare';
-import {View} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {ScrollView, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {
-    chooseIconFeeling,
-    chooseTextTopic,
-    onGoToSignUp,
-} from 'utility/assistant';
+import {chooseIconFeeling, chooseTextTopic} from 'utility/assistant';
 import {formatFromNow} from 'utility/format';
-import {TypeShowMoreOptions} from '../ListBubbleCouple';
+import ModalCommentDetailBubble, {
+    showModalCommentDetailBubble,
+} from './components/ModalCommentDetailBubble';
 
 interface Props {
-    item: TypeBubblePalace;
-    onShowMoreOption(params: TypeShowMoreOptions & TypeMoreOptionsMe): void;
-    onShowModalComment(post: TypeBubblePalace): void;
-    onShowModalShare(item: any): void;
+    route: {
+        params: {
+            bubbleId: string;
+            displayComment: boolean;
+        };
+    };
 }
 
-const onGoToProfile = (userId: number) => {
-    const myId = FindmeStore.getState().accountSlice.passport.profile.id;
-    if (userId === myId) {
-        navigate(PROFILE_ROUTE.myProfile);
-    } else {
-        navigate(ROOT_SCREEN.otherProfile, {
-            id: userId,
-        });
+const onGoToProfile = (userId: number | undefined) => {
+    if (userId) {
+        const myId = FindmeStore.getState().accountSlice.passport.profile.id;
+        if (userId === myId) {
+            navigate(PROFILE_ROUTE.myProfile);
+        } else {
+            navigate(ROOT_SCREEN.otherProfile, {
+                id: userId,
+            });
+        }
     }
 };
 
@@ -68,89 +81,137 @@ const onSeeDetailImage = (images: Array<string>) => {
     });
 };
 
-const onHandleLike = async (params: {
-    isModeExp: boolean;
-    isLiked: boolean;
-    setIsLiked: Function;
-    totalLikes: number;
-    setTotalLikes: Function;
-    postId: string;
-}) => {
-    const {isModeExp, isLiked, setIsLiked, totalLikes, setTotalLikes, postId} =
-        params;
-
-    if (!isModeExp) {
-        const currentLike = isLiked;
-        const currentNumberLikes = totalLikes;
-        try {
-            setIsLiked(!currentLike);
-            setTotalLikes(currentNumberLikes + (currentLike ? -1 : 1));
-            if (currentLike) {
-                await apiUnLikePost(postId);
-            } else {
-                await apiLikePost(postId);
-            }
-        } catch (err) {
-            setIsLiked(currentLike);
-            setTotalLikes(currentNumberLikes);
-            appAlert(err);
-        }
-    } else {
-        appAlert('discovery.bubble.goToSignUp', {
-            moreNotice: 'common.letGo',
-            moreAction: () => {
-                goBack();
-                onGoToSignUp();
-            },
-        });
-    }
-};
-
-const onHandleSave = async (params: {
-    isModeExp: boolean;
-    isSaved: boolean;
-    setIsSaved: Function;
-    postId: string;
-}) => {
-    const {isModeExp, isSaved, setIsSaved, postId} = params;
-    if (!isModeExp) {
-        const currenSaved = isSaved;
-        try {
-            setIsSaved(!currenSaved);
-            if (currenSaved) {
-                await apiUnSavePost(postId);
-            } else {
-                await apiSavePost(postId);
-            }
-        } catch (err) {
-            setIsSaved(currenSaved);
-            appAlert(err);
-        }
-    } else {
-        appAlert('discovery.bubble.goToSignUp', {
-            moreNotice: 'common.letGo',
-            moreAction: () => {
-                goBack();
-                onGoToSignUp();
-            },
-        });
-    }
-};
-
-const Bubble = (props: Props) => {
-    const {item, onShowMoreOption, onShowModalComment, onShowModalShare} =
-        props;
-    const isModeExp = Redux.getModeExp();
+const DetailBubble = ({route}: Props) => {
+    const {bubbleId, displayComment} = route.params;
     const theme = Redux.getTheme();
 
-    const [isLiked, setIsLiked] = useState(item.isLiked);
-    const [totalLikes, setTotalLikes] = useState(item.totalLikes);
-    const [isSaved, setIsSaved] = useState(item.isSaved);
+    const optionsRef = useRef<any>(null);
+
+    const [bubble, setBubble] = useState<TypeBubblePalace>();
+
+    const getData = async () => {
+        try {
+            const res = await apiGetDetailBubble(bubbleId);
+            setBubble(res.data);
+        } catch (err) {
+            appAlert(err);
+        }
+    };
 
     useEffect(() => {
-        setIsLiked(item.isLiked);
-        setTotalLikes(item.totalLikes);
-    }, [item.isLiked, item.totalLikes]);
+        getData();
+    }, []);
+
+    useEffect(() => {
+        if (displayComment) {
+            showModalCommentDetailBubble();
+        }
+    }, [displayComment]);
+
+    const onHandleLike = async () => {
+        if (bubble) {
+            const currentLike = bubble.isLiked;
+            const currentTotalLikes = bubble.totalLikes;
+
+            try {
+                setBubble({
+                    ...bubble,
+                    isLiked: !currentLike,
+                    totalLikes: currentTotalLikes + (currentLike ? -1 : 1),
+                });
+                if (currentLike) {
+                    await apiUnLikePost(bubble.id);
+                } else {
+                    apiLikePost(bubble.id);
+                }
+            } catch (err) {
+                setBubble({
+                    ...bubble,
+                    isLiked: currentLike,
+                    totalLikes: currentTotalLikes,
+                });
+                appAlert(err);
+            }
+        }
+    };
+
+    const onHandleSave = async () => {
+        if (bubble) {
+            const currentSave = bubble?.isSaved;
+
+            try {
+                setBubble({
+                    ...bubble,
+                    isSaved: !currentSave,
+                });
+                if (currentSave) {
+                    await apiUnSavePost(bubble.id);
+                } else {
+                    await apiSavePost(bubble.id);
+                }
+            } catch (err) {
+                setBubble({
+                    ...bubble,
+                    isSaved: currentSave,
+                });
+                appAlert(err);
+            }
+        }
+    };
+
+    const onShowModalShare = async () => {
+        if (!bubble?.id) {
+            return;
+        }
+        try {
+            const link = await dynamicLinks().buildShortLink({
+                link: `${bubble?.images?.[0] || LANDING_PAGE_URL}?type=${
+                    TYPE_DYNAMIC_LINK.post
+                }&post_id=${bubble.id}`,
+                domainUriPrefix: DYNAMIC_LINK_SHARE,
+                ios: {
+                    bundleId: DYNAMIC_LINK_IOS,
+                    appStoreId: '570060128',
+                },
+                android: {
+                    packageName: DYNAMIC_LINK_ANDROID,
+                    fallbackUrl: ANDROID_APP_LINK,
+                },
+                analytics: {
+                    campaign: 'banner',
+                },
+            });
+
+            // const imagePath: any = null;
+            // let base64Data = '';
+            // if (isIOS) {
+            //     const resp = await RNFetchBlob.config({
+            //         fileCache: true,
+            //     }).fetch('GET', item.images[0]);
+            //     base64Data = await resp.readFile('base64');
+            // } else {
+            //     base64Data = await RNFetchBlob.fs.readFile(
+            //         item.images[0],
+            //         'base64',
+            //     );
+            // }
+            // const base64Image = `data:image/png;base64,${base64Data}`;
+            // await Share.open({
+            //     title: 'Title',
+            //     url: base64Image,
+            //     message: link,
+            //     subject: 'Subject',
+            // });
+            // return RNFetchBlob.fs.unlink(imagePath);
+
+            Share.open({
+                message: 'Doffy share',
+                url: link,
+            });
+        } catch (err) {
+            appAlert(err);
+        }
+    };
 
     /**
      * Render view
@@ -161,17 +222,17 @@ const Bubble = (props: Props) => {
                 <View style={styles.avatarNameOptionBox}>
                     <StyleTouchable
                         customStyle={styles.avatarFeeling}
-                        onPress={() => onGoToProfile(item.creator)}>
+                        onPress={() => onGoToProfile(bubble?.creator)}>
                         <StyleImage
-                            source={{uri: item.creatorAvatar}}
+                            source={{uri: bubble?.creatorAvatar}}
                             customStyle={styles.avatar}
                             defaultSource={Images.images.defaultAvatar}
                         />
                     </StyleTouchable>
 
-                    {!!item.feeling && (
+                    {typeof bubble?.feeling === 'number' && (
                         <StyleIcon
-                            source={chooseIconFeeling(item.feeling)}
+                            source={chooseIconFeeling(bubble?.feeling)}
                             customStyle={styles.feeling}
                             size={17}
                         />
@@ -179,22 +240,24 @@ const Bubble = (props: Props) => {
 
                     <View style={styles.nameTime}>
                         <StyleText
-                            originValue={item.creatorName}
+                            originValue={bubble?.creatorName || ''}
                             customStyle={[
                                 styles.textName,
                                 {color: theme.textHightLight},
                             ]}
                         />
-                        <StyleText
-                            originValue={formatFromNow(item.created)}
-                            customStyle={[
-                                styles.textCreated,
-                                {color: theme.borderColor},
-                            ]}
-                        />
+                        {bubble?.created && (
+                            <StyleText
+                                originValue={formatFromNow(bubble?.created)}
+                                customStyle={[
+                                    styles.textCreated,
+                                    {color: theme.borderColor},
+                                ]}
+                            />
+                        )}
                     </View>
 
-                    {item.topic !== null && (
+                    {typeof bubble?.topic === 'number' && (
                         <StyleText
                             originValue="   ・ "
                             customStyle={[
@@ -202,7 +265,7 @@ const Bubble = (props: Props) => {
                                 {color: theme.textColor},
                             ]}>
                             <StyleText
-                                i18Text={chooseTextTopic(item.topic)}
+                                i18Text={chooseTextTopic(bubble.topic)}
                                 customStyle={[
                                     styles.textTopic,
                                     {color: theme.textColor},
@@ -213,14 +276,7 @@ const Bubble = (props: Props) => {
 
                     <StyleTouchable
                         customStyle={styles.iconMore}
-                        onPress={() =>
-                            onShowMoreOption({
-                                idUser: item.creator,
-                                imageWantToSee: item.images,
-                                allowSaveImage: true,
-                                postModal: item,
-                            })
-                        }>
+                        onPress={() => optionsRef.current?.show()}>
                         <StyleIcon
                             source={Images.icons.more}
                             size={15}
@@ -229,7 +285,7 @@ const Bubble = (props: Props) => {
                     </StyleTouchable>
                 </View>
 
-                {item.location && (
+                {bubble?.location && (
                     <View style={styles.locationBox}>
                         <Ionicons
                             name="ios-location-sharp"
@@ -239,7 +295,7 @@ const Bubble = (props: Props) => {
                             ]}
                         />
                         <StyleText
-                            originValue={item.location}
+                            originValue={bubble.location}
                             customStyle={[
                                 styles.textLocation,
                                 {color: theme.highlightColor},
@@ -248,9 +304,9 @@ const Bubble = (props: Props) => {
                     </View>
                 )}
 
-                {item.content ? (
+                {bubble?.content ? (
                     <StyleMoreText
-                        value={item.content}
+                        value={bubble.content}
                         textStyle={[
                             styles.textCaption,
                             {color: theme.textColor},
@@ -266,7 +322,7 @@ const Bubble = (props: Props) => {
     };
 
     const Footer = () => {
-        const arrayStars = Array(item.stars).fill(0);
+        const arrayStars = Array(bubble?.stars).fill(0);
         return (
             <View style={styles.footerView}>
                 <View style={styles.starLink}>
@@ -284,7 +340,7 @@ const Bubble = (props: Props) => {
                             />
                         ))}
                     </LinearGradient>
-                    {item.link && (
+                    {bubble?.link && (
                         <StyleTouchable customStyle={styles.linkBox}>
                             <LinearGradient
                                 colors={[
@@ -308,22 +364,13 @@ const Bubble = (props: Props) => {
                 </View>
 
                 <View style={styles.likeCommentShareSave}>
-                    {isLiked ? (
+                    {bubble?.isLiked ? (
                         <IconLiked
                             customStyle={[
                                 styles.iconLike,
                                 {color: theme.likeHeart},
                             ]}
-                            onPress={() =>
-                                onHandleLike({
-                                    isModeExp,
-                                    isLiked,
-                                    setIsLiked,
-                                    totalLikes,
-                                    setTotalLikes,
-                                    postId: item.id,
-                                })
-                            }
+                            onPress={onHandleLike}
                         />
                     ) : (
                         <IconNotLiked
@@ -331,22 +378,13 @@ const Bubble = (props: Props) => {
                                 styles.iconLike,
                                 {color: theme.textHightLight},
                             ]}
-                            onPress={() =>
-                                onHandleLike({
-                                    isModeExp,
-                                    isLiked,
-                                    setIsLiked,
-                                    totalLikes,
-                                    setTotalLikes,
-                                    postId: item.id,
-                                })
-                            }
+                            onPress={onHandleLike}
                         />
                     )}
 
                     <StyleTouchable
                         customStyle={styles.iconComment}
-                        onPress={() => onShowModalComment(item)}>
+                        onPress={showModalCommentDetailBubble}>
                         <StyleIcon
                             source={Images.icons.comment}
                             size={20}
@@ -356,7 +394,7 @@ const Bubble = (props: Props) => {
 
                     <StyleTouchable
                         customStyle={styles.iconComment}
-                        onPress={() => onShowModalShare(item)}>
+                        onPress={onShowModalShare}>
                         <StyleIcon
                             source={Images.icons.share}
                             size={21}
@@ -366,15 +404,8 @@ const Bubble = (props: Props) => {
 
                     <StyleTouchable
                         customStyle={styles.iconSave}
-                        onPress={() =>
-                            onHandleSave({
-                                isModeExp,
-                                isSaved,
-                                setIsSaved,
-                                postId: item.id,
-                            })
-                        }>
-                        {isSaved ? (
+                        onPress={onHandleSave}>
+                        {bubble?.isSaved ? (
                             <FontAwesome
                                 name="bookmark"
                                 style={[
@@ -396,28 +427,15 @@ const Bubble = (props: Props) => {
 
                 <StyleTouchable
                     customStyle={styles.likeTouch}
-                    onPress={() => {
-                        if (totalLikes) {
-                            onShowModalComment(item);
-                        } else {
-                            onHandleLike({
-                                isModeExp,
-                                isLiked,
-                                setIsLiked,
-                                totalLikes,
-                                setTotalLikes,
-                                postId: item.id,
-                            });
-                        }
-                    }}>
+                    onPress={showModalCommentDetailBubble}>
                     <StyleText
                         i18Text={
-                            totalLikes
+                            bubble?.totalLikes
                                 ? 'discovery.numberLike'
                                 : 'discovery.like'
                         }
                         i18Params={{
-                            value: totalLikes,
+                            value: bubble?.totalLikes || '',
                         }}
                         customStyle={[
                             styles.textLike,
@@ -428,15 +446,15 @@ const Bubble = (props: Props) => {
 
                 <StyleTouchable
                     customStyle={styles.commentTouch}
-                    onPress={() => onShowModalComment(item)}>
+                    onPress={showModalCommentDetailBubble}>
                     <StyleText
                         i18Text={
-                            item.totalComments
+                            bubble?.totalComments
                                 ? 'discovery.numberComments'
                                 : 'discovery.comment'
                         }
                         i18Params={{
-                            numberComments: item.totalComments,
+                            numberComments: bubble?.totalComments || '',
                         }}
                         customStyle={[
                             styles.textComment,
@@ -449,48 +467,48 @@ const Bubble = (props: Props) => {
     };
 
     return (
-        <View
-            style={[
-                styles.container,
-                {backgroundColor: theme.backgroundColor},
-            ]}>
-            {Header()}
+        <>
+            <StyleHeader title={bubble?.creatorName || ''} />
+            <ScrollView
+                contentContainerStyle={[
+                    styles.container,
+                    {backgroundColor: theme.backgroundColor},
+                ]}
+                showsVerticalScrollIndicator={false}>
+                {Header()}
+                <ScrollSyncSizeImage
+                    images={bubble?.images || []}
+                    syncWidth={Metrics.width}
+                    onDoublePress={() => {
+                        if (!bubble?.isLiked) {
+                            onHandleLike();
+                        } else {
+                            onSeeDetailImage(bubble?.images);
+                        }
+                    }}
+                    containerStyle={styles.imageView}
+                />
+                {Footer()}
+            </ScrollView>
 
-            <ScrollSyncSizeImage
-                images={item.images}
-                syncWidth={Metrics.width}
-                onDoublePress={() => {
-                    if (!isLiked) {
-                        onHandleLike({
-                            isModeExp,
-                            isLiked,
-                            setIsLiked,
-                            totalLikes,
-                            setTotalLikes,
-                            postId: item.id,
-                        });
-                    } else {
-                        onSeeDetailImage(item.images);
-                    }
-                }}
-                containerStyle={styles.imageView}
+            <ModalCommentDetailBubble
+                bubbleFocusing={bubble}
+                setBubbleFocusing={setBubble}
             />
-
-            {Footer()}
-        </View>
+        </>
     );
 };
 
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
-        marginBottom: '5@vs',
-        paddingVertical: '10@vs',
+        paddingBottom: Metrics.safeBottomPadding,
     },
     // header
     headerView: {
         width: '100%',
         paddingHorizontal: '15@s',
+        marginTop: '10@vs',
     },
     avatarNameOptionBox: {
         width: '100%',
@@ -642,9 +660,4 @@ const styles = ScaledSheet.create({
     },
 });
 
-export default memo(Bubble, (preProps: Props, nextProps: any) => {
-    if (!isEqual(preProps.item, nextProps.item)) {
-        return false;
-    }
-    return true;
-});
+export default DetailBubble;
