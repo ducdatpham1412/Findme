@@ -9,6 +9,13 @@ import {
     PanResponderGestureState,
     StyleSheet,
 } from 'react-native';
+import {
+    DEAD_ZONE,
+    DefaultTransitionSpec,
+    isMovingHorizontally,
+    swipeVelocityThreshold,
+    useAnimatedValue,
+} from 'utility/animation';
 
 interface Props {
     onChangeTabBarProps?(e: any): void;
@@ -19,24 +26,7 @@ interface Props {
 }
 
 const screenWidth = Metrics.width;
-const DEAD_ZONE = 12;
-const DefaultTransitionSpec = {
-    timing: Animated.spring,
-    stiffness: 1500,
-    damping: 500,
-    mass: 3,
-    overshootClamping: true,
-};
-const swipeVelocityThreshold = 0.15;
 const swipeDistanceThreshold = screenWidth / 1.75;
-
-function useAnimatedValue(initialValue: number) {
-    const lazyRef = React.useRef<Animated.Value>();
-    if (lazyRef.current === undefined) {
-        lazyRef.current = new Animated.Value(initialValue);
-    }
-    return lazyRef.current as Animated.Value;
-}
 
 const StyleTabView = (props: Props) => {
     const {children, index = 0, onChangeIndex, listCallbackWhenFocus} = props;
@@ -95,16 +85,6 @@ const StyleTabView = (props: Props) => {
     }, []);
 
     // Check can moving
-    const isMovingHorizontally = (
-        _: GestureResponderEvent,
-        gestureState: PanResponderGestureState,
-    ) => {
-        return (
-            Math.abs(gestureState.dx) > Math.abs(gestureState.dy * 2) &&
-            Math.abs(gestureState.vx) > Math.abs(gestureState.vy * 2)
-        );
-    };
-
     const canMoveScreen = (
         event: GestureResponderEvent,
         gestureState: PanResponderGestureState,
@@ -121,7 +101,8 @@ const StyleTabView = (props: Props) => {
     // Start grant move
     const startGesture = () => {
         panX.stopAnimation();
-        panX.setOffset(panX._value);
+        const temp: any = panX;
+        panX.setOffset(temp._value);
     };
 
     // Moving

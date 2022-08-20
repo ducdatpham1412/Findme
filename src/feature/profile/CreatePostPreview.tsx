@@ -488,6 +488,12 @@ const CreatePostPreview = ({route}: Props) => {
         );
     };
 
+    const ImagePreview = useMemo(() => {
+        return (
+            <ScrollSyncSizeImage images={images} syncWidth={Metrics.width} />
+        );
+    }, []);
+
     const StarLink = () => {
         return (
             <View style={styles.starLinkView}>
@@ -694,13 +700,8 @@ const CreatePostPreview = ({route}: Props) => {
                     />
                 </View>
 
-                <ScrollSyncSizeImage
-                    images={images}
-                    syncWidth={Metrics.width}
-                    scrollViewProps={{
-                        keyboardShouldPersistTaps: 'handled',
-                    }}
-                />
+                {ImagePreview}
+
                 {StarLink()}
                 {ModalVertical()}
             </ScrollView>
