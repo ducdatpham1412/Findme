@@ -22,7 +22,7 @@ interface Props {
     children: ReactNode;
     index: number;
     onChangeIndex(value: number): void;
-    listCallbackWhenFocus?: Array<Function>;
+    listCallbackWhenFocus: Array<Function>;
 }
 
 const screenWidth = Metrics.width;
@@ -52,7 +52,6 @@ const StyleTabView = (props: Props) => {
         onChangeIndex?.(__index);
 
         const {timing, ...transitionConfig} = DefaultTransitionSpec;
-
         Animated.parallel([
             timing(panX, {
                 ...transitionConfig,

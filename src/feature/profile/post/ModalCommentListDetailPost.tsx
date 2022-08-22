@@ -14,24 +14,31 @@ import {socketAddComment, useSocketComment} from 'hook/useSocketIO';
 import ROOT_SCREEN from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
 import React, {useCallback, useRef, useState} from 'react';
-import {FlatList, TextInput, View} from 'react-native';
+import {FlatList, StyleProp, TextInput, View, ViewStyle} from 'react-native';
 import {Modalize} from 'react-native-modalize';
 import {ScaledSheet} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 
 interface Props {
     bubbleFocusing: TypeCreatePostResponse | undefined;
-    setBubbleFocusing: Function;
+    setBubbleFocusing(value: TypeCreatePostResponse): void;
+    changeTotalCommentsFocusing(value: number): void;
+    extraHeight?: number;
+    inputCommentStyle?: StyleProp<ViewStyle>;
+}
+
+export interface TypeModalCommentPost {
+    post: TypeCreatePostResponse;
+    setList: Function;
 }
 
 const modalRef = React.createRef<Modalize>();
 let preNumberComment = 0;
 let setList: Function;
 
-export const showModalCommentListDetailPost = (params: {
-    post: TypeCreatePostResponse;
-    setList: Function;
-}) => {
+export const showModalCommentListDetailPost = (
+    params: TypeModalCommentPost,
+) => {
     preNumberComment = params.post.totalComments;
     setList = params.setList;
     modalRef.current?.open();
@@ -42,7 +49,13 @@ const closeModal = () => {
 };
 
 const ModalCommentListDetailPost = (props: Props) => {
-    const {bubbleFocusing, setBubbleFocusing} = props;
+    const {
+        bubbleFocusing,
+        setBubbleFocusing,
+        changeTotalCommentsFocusing,
+        extraHeight,
+        inputCommentStyle,
+    } = props;
     const theme = Redux.getTheme();
     const token = Redux.getToken();
     const {profile} = Redux.getPassport();
@@ -56,12 +69,8 @@ const ModalCommentListDetailPost = (props: Props) => {
 
     const {list, loading, refreshing, onRefresh} = useSocketComment({
         bubbleFocusing,
-        updateBubbleFocusing: value => {
-            setBubbleFocusing((preValue: TypeCreatePostResponse) => ({
-                ...preValue,
-                ...value,
-            }));
-        },
+        updateBubbleFocusing: setBubbleFocusing,
+        changeTotalComments: changeTotalCommentsFocusing,
         scrollToIndex: (value: number) => {
             listCommentRef.current?.scrollToIndex({
                 index: value,
@@ -138,7 +147,7 @@ const ModalCommentListDetailPost = (props: Props) => {
                 <StyleText
                     i18Text="discovery.numberComments"
                     i18Params={{
-                        numberComments: bubbleFocusing?.totalComments || '',
+                        numberComments: bubbleFocusing?.totalComments,
                     }}
                     customStyle={[
                         styles.textNumberComments,
@@ -178,6 +187,9 @@ const ModalCommentListDetailPost = (props: Props) => {
             modalStyle={{
                 backgroundColor: 'transparent',
             }}
+            overlayStyle={{
+                backgroundColor: theme.backgroundOpacity(),
+            }}
             scrollViewProps={{
                 keyboardShouldPersistTaps: 'handled',
                 nestedScrollEnabled: true,
@@ -188,7 +200,8 @@ const ModalCommentListDetailPost = (props: Props) => {
                     {
                         backgroundColor: theme.backgroundColorSecond,
                     },
-                ]}>
+                ]}
+                extraHeight={extraHeight}>
                 {Header()}
 
                 {!loading && (
@@ -212,6 +225,7 @@ const ModalCommentListDetailPost = (props: Props) => {
                     commentIdReplied={commentReplied}
                     personNameReplied={personReplied}
                     onDeleteReply={onDeleteReply}
+                    containerStyle={inputCommentStyle}
                 />
             </StyleKeyboardAwareView>
         </Modalize>
@@ -219,6 +233,7 @@ const ModalCommentListDetailPost = (props: Props) => {
 };
 
 const commentModalHeight = (Metrics.height * 2) / 2.7;
+// const a = -(Metrics.safeBottomPadding + verticalScale(7));
 const styles = ScaledSheet.create({
     container: {
         width: '100%',

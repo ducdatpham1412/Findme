@@ -8,7 +8,7 @@ import {
 } from 'components/base';
 import Redux from 'hook/useRedux';
 import React, {forwardRef, useMemo} from 'react';
-import {View} from 'react-native';
+import {StyleProp, View, ViewStyle} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 
@@ -25,6 +25,7 @@ interface Props {
     onDeleteReply?(): void;
     onFocus?(): void;
     onBlur?(): void;
+    containerStyle?: StyleProp<ViewStyle>;
 }
 
 const InputComment = (props: Props, inputRef: any) => {
@@ -39,6 +40,7 @@ const InputComment = (props: Props, inputRef: any) => {
         onDeleteReply,
         onFocus,
         onBlur,
+        containerStyle,
     } = props;
 
     const theme = Redux.getTheme();
@@ -113,6 +115,7 @@ const InputComment = (props: Props, inputRef: any) => {
                 {
                     backgroundColor: theme.backgroundColor,
                 },
+                containerStyle,
             ]}>
             {RenderReply()}
 
@@ -141,7 +144,8 @@ const InputComment = (props: Props, inputRef: any) => {
             <StyleTouchable
                 customStyle={styles.emojiView}
                 disable={!text}
-                onPress={onSendComment}>
+                onPress={onSendComment}
+                hitSlop={10}>
                 {RenderIconSend}
             </StyleTouchable>
         </View>

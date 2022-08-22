@@ -27,6 +27,10 @@ import {
 import AvatarBackground from './components/AvatarBackground';
 import InformationProfile from './components/InformationProfile';
 import SearchAndSetting from './components/SearchAndSetting';
+import ListShareElement from './post/ListShareElement';
+import ModalCommentListDetailPost, {
+    showModalCommentListDetailPost,
+} from './post/ModalCommentListDetailPost';
 import PostStatus from './post/PostStatus';
 
 interface Props {
@@ -50,19 +54,22 @@ const OtherProfile = ({route}: Props) => {
     const myId = Redux.getPassport().profile.id;
 
     const optionsRef = useRef<any>(null);
+    const shareRef = useRef<ListShareElement>(null);
 
     const [profile, setProfile] = useState<TypeGetProfileResponse>();
     const [isFollowing, setIsFollowing] = useState(false);
+    const [bubbleFocusing, setBubbleFocusing] =
+        useState<TypeCreatePostResponse>();
 
     const isMyProfile = id === myId;
     const isBlock = profile?.relationship === RELATIONSHIP.block;
-
-    const {list, setList, refreshing, onRefresh, onLoadMore} = usePaging({
+    const listPaging = usePaging({
         request: apiGetListPost,
         params: {
             userId: id,
         },
     });
+    const {list, refreshing, onRefresh, onLoadMore} = listPaging;
 
     const getData = async () => {
         try {
@@ -161,12 +168,9 @@ const OtherProfile = ({route}: Props) => {
     };
 
     const onGoToDetailPost = (bubbleId: string) => {
-        const temp = listPosts.findIndex(item => item.id === bubbleId);
-        const initIndex = temp < 0 ? 0 : temp;
-        navigate(ROOT_SCREEN.listDetailPost, {
-            listInProfile: listPosts,
-            initIndex,
-            setListInProfile: setList,
+        const initIndex = listPosts.findIndex(item => item.id === bubbleId);
+        shareRef.current?.show({
+            index: initIndex === -1 ? 0 : initIndex,
         });
     };
 
@@ -306,6 +310,48 @@ const OtherProfile = ({route}: Props) => {
                 onRefresh={onRefreshPage}
                 onLoadMore={onLoadMore}
                 numColumns={3}
+                onScrollBeginDrag={() => {
+                    shareRef.current?.scrollToNearingEnd();
+                }}
+            />
+
+            <ListShareElement
+                ref={shareRef}
+                title={profile?.name || ''}
+                listPaging={listPaging}
+                containerStyle={{
+                    backgroundColor: theme.backgroundColorSecond,
+                }}
+                onShowModalComment={params => {
+                    setBubbleFocusing(params.post);
+                    showModalCommentListDetailPost(params);
+                }}
+            />
+
+            <ModalCommentListDetailPost
+                bubbleFocusing={bubbleFocusing}
+                setBubbleFocusing={(value: TypeCreatePostResponse) => {
+                    if (bubbleFocusing) {
+                        setBubbleFocusing(preValue => ({
+                            ...preValue,
+                            ...value,
+                        }));
+                    }
+                }}
+                changeTotalCommentsFocusing={value => {
+                    if (bubbleFocusing) {
+                        setBubbleFocusing(preValue => {
+                            if (preValue) {
+                                return {
+                                    ...preValue,
+                                    totalComments:
+                                        preValue.totalComments + value,
+                                };
+                            }
+                            return preValue;
+                        });
+                    }
+                }}
             />
 
             <StyleActionSheet

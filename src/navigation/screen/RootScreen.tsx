@@ -20,7 +20,7 @@ import {StatusBar} from 'react-native';
 import CodePush from 'react-native-code-push';
 import Config from 'react-native-config';
 import SplashScreen from 'react-native-splash-screen';
-import {isIOS, logger, selectBgCardStyle} from 'utility/assistant';
+import {isIOS, logger} from 'utility/assistant';
 import {selectIsHaveActiveUser} from 'utility/login/selectScreen';
 import AppStack from './AppStack';
 import DynamicLink from './DynamicLink';
@@ -117,7 +117,7 @@ const RootScreen = () => {
                         options={{
                             ...alertOption,
                             cardStyle: {
-                                backgroundColor: selectBgCardStyle(0.6),
+                                backgroundColor: theme.backgroundOpacity(0.6),
                             },
                         }}
                         name={ROOT_SCREEN.alert}
@@ -128,7 +128,7 @@ const RootScreen = () => {
                         options={{
                             ...alertOption,
                             cardStyle: {
-                                backgroundColor: selectBgCardStyle(0.6),
+                                backgroundColor: theme.backgroundOpacity(0.6),
                             },
                         }}
                         name={ROOT_SCREEN.alertYesNo}
@@ -160,7 +160,7 @@ const RootScreen = () => {
                         component={StylePicker}
                         options={{
                             cardStyle: [
-                                {backgroundColor: selectBgCardStyle(0.6)},
+                                {backgroundColor: theme.backgroundOpacity(0.6)},
                                 cardSafe,
                             ],
                             cardStyleInterpolator:

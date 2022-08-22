@@ -1,7 +1,7 @@
 /* eslint-disable no-shadow */
 /* eslint-disable react/jsx-key */
 import dynamicLinks from '@react-native-firebase/dynamic-links';
-import {TypeBubblePalace} from 'api/interface';
+import {TypeBubblePalace, TypeCreatePostResponse} from 'api/interface';
 import {
     apiGetListBubbleActive,
     apiGetListBubbleActiveOfUserEnjoy,
@@ -39,6 +39,10 @@ export interface TypeShowMoreOptions {
     idUser: number;
     imageWantToSee: Array<string>;
     allowSaveImage: boolean;
+}
+
+export interface TypeMoreOptionsMe {
+    postModal: TypeCreatePostResponse;
 }
 
 let idUserReport = 0;
@@ -175,10 +179,6 @@ const ListBubbleCouple = () => {
                 data={list}
                 renderItem={({item}) => RenderItemBubble(item)}
                 keyExtractor={(_, index) => String(index)}
-                // snapToInterval={bubbleHeight}
-                // snapToOffsets={list.map((_, index) => index * bubbleHeight)}
-                // scrollEventThrottle={16}
-                decelerationRate="fast"
                 refreshing={refreshing}
                 onRefresh={onRefresh}
                 onLoadMore={onLoadMore}

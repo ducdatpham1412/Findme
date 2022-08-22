@@ -21,7 +21,8 @@ const ButtonX = ({containerStyle, onPress, iconStyle}: Props) => {
                 {backgroundColor: theme.textColor},
                 containerStyle,
             ]}
-            onPress={onPress}>
+            onPress={onPress}
+            hitSlop={10}>
             <Feather
                 name="x"
                 style={[

@@ -171,8 +171,6 @@ const EditBasicInformation = ({route}: Props) => {
                     <ScrollView
                         ref={scrollPickerRef}
                         snapToInterval={scrollItemHeight}
-                        scrollEventThrottle={16}
-                        decelerationRate="fast"
                         indicatorStyle="white"
                         onMomentumScrollEnd={e => {
                             const offSet = e.nativeEvent.contentOffset.y;

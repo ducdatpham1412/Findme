@@ -102,8 +102,6 @@ const StylePicker = ({route}: Props) => {
                             },
                         ]}
                         snapToInterval={itemHeight}
-                        scrollEventThrottle={16}
-                        decelerationRate="fast"
                         onScroll={event => {
                             const newIndex = Math.round(
                                 event.nativeEvent.contentOffset.y / itemHeight,

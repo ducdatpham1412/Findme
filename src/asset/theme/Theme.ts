@@ -19,6 +19,7 @@ const Theme = {
     },
     darkTheme: {
         backgroundColor: '#081019',
+        backgroundOpacity: (value = 0.6) => `rgba(8, 16, 25, ${value})`,
         backgroundColorSecond: '#0f1a23',
         textColor: '#9fcaed',
         textHightLight: '#c5e3ff',
@@ -35,6 +36,7 @@ const Theme = {
     },
     lightTheme: {
         backgroundColor: '#ffffff',
+        backgroundOpacity: (value = 0.6) => `rgba(255, 255, 255, ${value})`,
         backgroundColorSecond: '#f9f9f9',
         textColor: '#214d68',
         textHightLight: '#102a47',

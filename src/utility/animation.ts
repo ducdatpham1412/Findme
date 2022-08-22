@@ -26,7 +26,7 @@ export const isMovingHorizontally = (
 export const DEAD_ZONE = 12;
 export const DefaultTransitionSpec = {
     timing: Animated.spring,
-    stiffness: 1500,
+    stiffness: 1000,
     damping: 500,
     mass: 3,
     overshootClamping: true,

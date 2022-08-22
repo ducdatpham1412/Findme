@@ -6,7 +6,6 @@ import React, {forwardRef} from 'react';
 import {Platform, View} from 'react-native';
 import {Modalize} from 'react-native-modalize';
 import {ScaledSheet} from 'react-native-size-matters';
-import {selectBgCardStyle} from 'utility/assistant';
 
 interface Props {
     onChangeFeeling(value: number): void;
@@ -27,7 +26,7 @@ const ModalFeeling = (props: Props, ref: any) => {
             modalStyle={styles.modal}
             withHandle={false}
             overlayStyle={{
-                backgroundColor: selectBgCardStyle(0.6),
+                backgroundColor: theme.backgroundOpacity(0.6),
             }}>
             <View
                 style={[

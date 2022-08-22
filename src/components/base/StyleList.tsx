@@ -63,8 +63,7 @@ const StyleList = (props: StyleListProps, ref: any) => {
     return (
         <FlatList
             ref={ref || listRef}
-            initialNumToRender={10}
-            onEndReachedThreshold={0.01}
+            initialNumToRender={20}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
             refreshControl={

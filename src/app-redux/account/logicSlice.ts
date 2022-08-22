@@ -26,7 +26,6 @@ export const initialLogicState = {
     borderMessRoute: 'yellow',
 
     bubbleFocusing: <TypeBubblePalace>{},
-    displayComment: false,
 
     // notification
     numberNewMessages: 0,
@@ -83,9 +82,6 @@ const logicSlice = createSlice({
         },
         setBubbleFocusing: (state, action) => {
             state.bubbleFocusing = action.payload;
-        },
-        setDisplayComment: (state, action) => {
-            state.displayComment = action.payload;
         },
         setNumberNewNotification: (state, action) => {
             state.numberNewNotifications = action.payload;

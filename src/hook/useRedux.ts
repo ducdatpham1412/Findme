@@ -56,7 +56,7 @@ interface ResourceType {
     imageBackground?: string;
 }
 
-export interface TypeBubblePalaceUpdate {
+interface TypeBubblePalaceUpdate {
     id?: string;
     topic?: number | null;
     feeling?: number | null;
@@ -114,8 +114,6 @@ export const Redux = {
         ),
     getBubbleFocusing: () =>
         useSelector((state: RootState) => state.logicSlice.bubbleFocusing),
-    getDisplayComment: () =>
-        useSelector((state: RootState) => state.logicSlice.displayComment),
     getNumberNewNotifications: () =>
         useSelector(
             (state: RootState) => state.logicSlice.numberNewNotifications,
@@ -178,9 +176,6 @@ export const Redux = {
                 ...value,
             }),
         );
-    },
-    setDisplayComment: (value: boolean) => {
-        FindmeStore.dispatch(logicSliceAction.setDisplayComment(value));
     },
     setNumberNewNotifications: (value: number) => {
         FindmeStore.dispatch(logicSliceAction.setNumberNewNotification(value));
