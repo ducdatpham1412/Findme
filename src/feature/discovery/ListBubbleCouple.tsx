@@ -3,8 +3,6 @@
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeBubblePalace} from 'api/interface';
 import {
-    apiGetDetailBubble,
-    apiGetDetailBubbleEnjoy,
     apiGetListBubbleActive,
     apiGetListBubbleActiveOfUserEnjoy,
 } from 'api/module';
@@ -19,6 +17,7 @@ import {
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import LoadingScreen from 'components/LoadingScreen';
+import {showModalCommentDiscovery} from 'feature/discovery/components/ModalCommentDiscovery';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
@@ -28,7 +27,7 @@ import {
     navigate,
     showSwipeImages,
 } from 'navigation/NavigationService';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {View} from 'react-native';
 import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
@@ -68,10 +67,6 @@ const ListBubbleCouple = () => {
             : apiGetListBubbleActiveOfUserEnjoy;
     }, [token]);
 
-    const displayComment = Redux.getDisplayComment();
-    const bubbleFocusing = Redux.getBubbleFocusing();
-    const [preNumberComment, setPreNumberComment] = useState(0);
-
     const [isShowHeader, setIsShowHeader] = useState(true);
 
     const {list, setList, onLoadMore, refreshing, onRefresh} = usePaging({
@@ -80,27 +75,6 @@ const ListBubbleCouple = () => {
             take: 30,
         },
     });
-
-    useEffect(() => {
-        if (
-            bubbleFocusing &&
-            bubbleFocusing.totalComments !== preNumberComment &&
-            !displayComment
-        ) {
-            setList((preValue: Array<TypeBubblePalace>) => {
-                return preValue.map(item => {
-                    if (item.id !== bubbleFocusing.id) {
-                        return item;
-                    }
-                    return {
-                        ...item,
-                        totalComments: bubbleFocusing?.totalComments,
-                    };
-                });
-            });
-            setPreNumberComment(bubbleFocusing?.totalComments);
-        }
-    }, [bubbleFocusing, preNumberComment, displayComment]);
 
     /**
      * Functions
@@ -112,9 +86,10 @@ const ListBubbleCouple = () => {
                 moreAction: onGoToSignUpFromAlert,
             });
         } else {
-            Redux.updateBubbleFocusing(post);
-            Redux.setDisplayComment(true);
-            setPreNumberComment(post.totalComments);
+            showModalCommentDiscovery({
+                post,
+                setList,
+            });
         }
     };
 
@@ -123,24 +98,6 @@ const ListBubbleCouple = () => {
         imageSeeDetail = params.imageWantToSee;
         allowSaveImage = params.allowSaveImage;
         optionsRef.current?.show();
-    };
-
-    const onRefreshItem = async (idBubble: string) => {
-        try {
-            const res = hadLogan
-                ? await apiGetDetailBubble(idBubble)
-                : await apiGetDetailBubbleEnjoy(idBubble);
-            setList((preValue: Array<TypeBubblePalace>) => {
-                return preValue.map(item => {
-                    if (item.id !== idBubble) {
-                        return item;
-                    }
-                    return res.data;
-                });
-            });
-        } catch (err) {
-            appAlert(err);
-        }
     };
 
     const onShowModalShare = async (item: TypeBubblePalace) => {
@@ -202,7 +159,6 @@ const ListBubbleCouple = () => {
             <Bubble
                 item={item}
                 onShowMoreOption={onShowOptions}
-                onRefreshItem={onRefreshItem}
                 onShowModalComment={() => onShowModalComment(item)}
                 onShowModalShare={() => onShowModalShare(item)}
             />

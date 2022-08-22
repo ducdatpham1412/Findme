@@ -44,7 +44,6 @@ export interface TypeSwipeImages {
     listImages: Array<{url: string}>;
     initIndex?: number;
     allowSaveImage?: boolean;
-    textSaveImage?: string;
 }
 
 export const appAlert = (notice: any, more?: TypeMoreChoiceAlert) => {

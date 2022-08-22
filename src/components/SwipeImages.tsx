@@ -22,12 +22,7 @@ interface Props {
 let uriToSave = '';
 
 const SwipeImages = ({route}: Props) => {
-    const {
-        listImages,
-        initIndex = 0,
-        allowSaveImage = true,
-        textSaveImage = 'common.canNotSave',
-    } = route.params;
+    const {listImages, initIndex = 0, allowSaveImage = false} = route.params;
     const theme = Redux.getTheme();
     const optionsRef = useRef<any>(null);
 
@@ -120,7 +115,7 @@ const SwipeImages = ({route}: Props) => {
                 ref={optionsRef}
                 listTextAndAction={[
                     {
-                        text: allowSaveImage ? 'common.save' : textSaveImage,
+                        text: 'common.save',
                         action: onSaveToLibrary,
                     },
                     {

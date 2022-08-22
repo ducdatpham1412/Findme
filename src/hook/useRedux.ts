@@ -56,21 +56,24 @@ interface ResourceType {
     imageBackground?: string;
 }
 
-interface TypeBubblePalaceUpdate {
+export interface TypeBubblePalaceUpdate {
     id?: string;
+    topic?: number | null;
+    feeling?: number | null;
+    location?: string | null;
+    link?: string | null;
     content?: string;
     images?: Array<string>;
+    stars?: number;
     totalLikes?: number;
-    hadKnowEachOther?: boolean;
-    creatorId?: number;
-    creatorName?: string;
-    creatorAvatar?: string | null;
-    gender?: number;
-    createdTime?: string;
     totalComments?: number;
-    color?: number;
-    name?: string;
+    totalSaved?: number;
+    creator?: number;
+    creatorName?: string;
+    creatorAvatar?: string;
+    created?: string;
     isLiked?: boolean;
+    isSaved?: boolean;
     relationship?: number;
 }
 
@@ -175,12 +178,6 @@ export const Redux = {
                 ...value,
             }),
         );
-    },
-    increaseTotalCommentsOfBubbleFocusing: (value: number) => {
-        const temp = FindmeStore.getState().logicSlice.bubbleFocusing;
-        Redux.updateBubbleFocusing({
-            totalComments: temp.totalComments + value,
-        });
     },
     setDisplayComment: (value: boolean) => {
         FindmeStore.dispatch(logicSliceAction.setDisplayComment(value));

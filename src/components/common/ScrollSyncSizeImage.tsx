@@ -184,6 +184,7 @@ const ScrollSyncSizeImage = (props: Props) => {
                 containerStyle,
                 {
                     width: syncWidth,
+                    overflow: 'hidden',
                 },
             ]}
             onDoubleClick={onDoublePress}>
