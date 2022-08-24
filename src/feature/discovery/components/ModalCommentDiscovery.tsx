@@ -3,6 +3,7 @@ import {
     TypeCommentResponse,
     TypeCreatePostResponse,
 } from 'api/interface';
+import FindmeStore from 'app-redux/store';
 import {Metrics} from 'asset/metrics';
 import {StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
@@ -55,6 +56,13 @@ const ModalCommentDiscovery = () => {
         updateBubbleFocusing: value => {
             Redux.updateBubbleFocusing({
                 ...value,
+            });
+        },
+        changeTotalComments: value => {
+            const currentComments =
+                FindmeStore.getState().logicSlice.bubbleFocusing.totalComments;
+            Redux.updateBubbleFocusing({
+                totalComments: currentComments + value,
             });
         },
         scrollToIndex: (value: number) => {
@@ -172,6 +180,9 @@ const ModalCommentDiscovery = () => {
             modalHeight={commentModalHeight}
             modalStyle={{
                 backgroundColor: 'transparent',
+            }}
+            overlayStyle={{
+                backgroundColor: theme.backgroundOpacity(),
             }}
             scrollViewProps={{
                 keyboardShouldPersistTaps: 'handled',

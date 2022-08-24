@@ -11,7 +11,7 @@ interface Props {
     onChangeTab(index: number): void;
 }
 
-const unFocusOpacity = 0.4;
+const unFocusOpacity = 0.3;
 
 const ToolProfile = (props: Props) => {
     const {index, onChangeTab} = props;

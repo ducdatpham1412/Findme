@@ -1,3 +1,4 @@
+import Images from 'asset/img/images';
 import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
@@ -66,6 +67,7 @@ const HeaderChat = (props: Props) => {
                 <StyleImage
                     source={{uri: avatar}}
                     customStyle={styles.avatar}
+                    defaultSource={Images.images.defaultAvatar}
                 />
             </StyleTouchable>
 

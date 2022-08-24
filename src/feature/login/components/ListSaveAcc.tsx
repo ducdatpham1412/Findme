@@ -20,12 +20,10 @@ const ModuleTagAcc = (props: any) => {
         <StyleTouchable
             customStyle={styles.moduleAcc}
             onPress={() => onSelectAcc(index)}>
-            {/* Logo */}
             <View style={styles.iconBox}>
                 <StyleIcon source={Images.images.logo} size={14} />
             </View>
 
-            {/* username */}
             <View style={styles.usernameBox}>
                 <StyleText
                     originValue={indexAcc.username}
@@ -33,7 +31,6 @@ const ModuleTagAcc = (props: any) => {
                 />
             </View>
 
-            {/* delete from local storage */}
             <StyleTouchable
                 style={styles.deleteAccBox}
                 onPress={() => onDeleteAcc(index)}>

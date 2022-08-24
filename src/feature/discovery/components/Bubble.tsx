@@ -18,7 +18,6 @@ import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
 import StyleMoreText from 'components/StyleMoreText';
-import {TypeMoreOptionsMe} from 'feature/profile/post/ListDetailPost';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {
@@ -41,10 +40,11 @@ import {
     onGoToSignUp,
 } from 'utility/assistant';
 import {formatFromNow} from 'utility/format';
-import {TypeShowMoreOptions} from '../ListBubbleCouple';
+import {TypeMoreOptionsMe, TypeShowMoreOptions} from '../ListBubbleCouple';
 
 interface Props {
     item: TypeBubblePalace;
+    isRectangle?: boolean;
     onShowMoreOption(params: TypeShowMoreOptions & TypeMoreOptionsMe): void;
     onShowModalComment(post: TypeBubblePalace): void;
     onShowModalShare(item: any): void;
@@ -138,8 +138,13 @@ const onHandleSave = async (params: {
 };
 
 const Bubble = (props: Props) => {
-    const {item, onShowMoreOption, onShowModalComment, onShowModalShare} =
-        props;
+    const {
+        item,
+        onShowMoreOption,
+        onShowModalComment,
+        onShowModalShare,
+        isRectangle = false,
+    } = props;
     const isModeExp = Redux.getModeExp();
     const theme = Redux.getTheme();
 
@@ -220,7 +225,8 @@ const Bubble = (props: Props) => {
                                 allowSaveImage: true,
                                 postModal: item,
                             })
-                        }>
+                        }
+                        hitSlop={{left: 5, right: 5, top: 10, bottom: 10}}>
                         <StyleIcon
                             source={Images.icons.more}
                             size={15}
@@ -458,6 +464,7 @@ const Bubble = (props: Props) => {
 
             <ScrollSyncSizeImage
                 images={item.images}
+                isRectangle={isRectangle}
                 syncWidth={Metrics.width}
                 onDoublePress={() => {
                     if (!isLiked) {
@@ -622,7 +629,7 @@ const styles = ScaledSheet.create({
         right: 0,
     },
     save: {
-        fontSize: '22@ms',
+        fontSize: '24@ms',
     },
     likeTouch: {
         marginTop: '10@vs',

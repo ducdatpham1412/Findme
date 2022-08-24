@@ -12,7 +12,6 @@ import {
     GENDER_TYPE,
     LANGUAGE_TYPE,
     SIGN_UP_TYPE,
-    THEME_TYPE,
     TOPIC,
     TYPE_COLOR,
 } from 'asset/enum';
@@ -32,17 +31,6 @@ import {I18Normalize} from './I18Next';
 import ImageUploader, {ImagePickerParamsType} from './ImageUploader';
 import AuthenticateService from './login/loginService';
 import {checkCamera, checkPhoto} from './permission/permission';
-
-/**
- * FOR CARD STYLE
- */
-export const selectBgCardStyle = (opacity?: number) => {
-    const temp = FindmeStore.getState().accountSlice.passport.setting.theme;
-    const valueOpacity = opacity || 0.9;
-    return temp === THEME_TYPE.darkTheme
-        ? `rgba(8, 16, 25, ${valueOpacity})`
-        : `rgba(255, 255, 255, ${valueOpacity})`;
-};
 
 export const interactBubble = (params: TypeInteractBubble) => {
     navigate(ROOT_SCREEN.interactBubble, params);

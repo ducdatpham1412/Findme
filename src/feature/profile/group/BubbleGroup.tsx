@@ -11,7 +11,6 @@ import {
     chooseIconHobby,
     modalizeGoToChatTagFromGroup,
     modalizeOptionBubbleGroup,
-    selectBgCardStyle,
 } from 'utility/assistant';
 
 interface Props {
@@ -71,7 +70,10 @@ const BubbleGroup = (props: Props) => {
                         setY(e.nativeEvent.layout.height);
                     }}>
                     <Svg style={styles.svgBox}>
-                        <Path d={SVG_PATH} fill={selectBgCardStyle(0.7)} />
+                        <Path
+                            d={SVG_PATH}
+                            fill={theme.backgroundOpacity(0.7)}
+                        />
                     </Svg>
                     <View style={styles.iconBox}>
                         <StyleImage

@@ -1,6 +1,5 @@
 import {useIsFocused} from '@react-navigation/native';
 import {
-    TypeSocketCommentRequest,
     TypeBubblePalace,
     TypeChangeChatColor,
     TypeChangeGroupNameResponse,
@@ -13,6 +12,7 @@ import {
     TypeDeleteMessageResponse,
     TypeNotificationResponse,
     TypeSeenMessageResponse,
+    TypeSocketCommentRequest,
     TypeSocketCommentResponse,
     TypingResponse,
 } from 'api/interface';
@@ -39,7 +39,7 @@ import {isIOS, reorderListChatTag} from 'utility/assistant';
 import {isTimeBefore} from 'utility/format';
 import ImageUploader from 'utility/ImageUploader';
 import usePaging from './usePaging';
-import Redux, {TypeBubblePalaceUpdate} from './useRedux';
+import Redux from './useRedux';
 
 let socket: Socket;
 const socketDev = isIOS ? Config.API_SOCKET : 'http://10.0.2.2:3000';
@@ -599,7 +599,8 @@ export const useSocketChatDetail = (params: {
  -----------------------------------  */
 interface ParamSocketComment {
     bubbleFocusing: TypeBubblePalace | TypeCreatePostResponse | undefined;
-    updateBubbleFocusing(value: TypeBubblePalaceUpdate): void;
+    updateBubbleFocusing(value: any): void;
+    changeTotalComments(value: number): void;
     myId: number;
     scrollToIndex(value: number): void;
     scrollToEnd(): void;
@@ -612,6 +613,7 @@ export const useSocketComment = (params: ParamSocketComment) => {
     const {
         bubbleFocusing,
         updateBubbleFocusing,
+        changeTotalComments,
         myId,
         scrollToIndex,
         clearText,
@@ -693,12 +695,7 @@ export const useSocketComment = (params: ParamSocketComment) => {
                         clearText();
                     }
                 }
-                const currentComments =
-                    FindmeStore.getState().logicSlice.bubbleFocusing
-                        .totalComments;
-                Redux.updateBubbleFocusing({
-                    totalComments: currentComments + 1,
-                });
+                changeTotalComments(1);
             },
         );
     };

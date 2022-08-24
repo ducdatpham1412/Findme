@@ -13,7 +13,6 @@ const ROOT_SCREEN = {
     otherProfile: '@ROOT_SCREEN/otherProfile',
     listFollows: '@ROOT_SCREEN/listFollows',
     detailBubble: '@ROOT_SCREEN/detailBubble',
-    listDetailPost: '@ROOT_SCREEN/listDetailPost',
 };
 /**
  * ||

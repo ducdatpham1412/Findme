@@ -55,6 +55,12 @@ const ModalCommentDetailBubble = (props: Props) => {
                 ...value,
             }));
         },
+        changeTotalComments: value => {
+            setBubbleFocusing((preValue: TypeBubblePalace) => ({
+                ...preValue,
+                totalComments: preValue.totalComments + value,
+            }));
+        },
         scrollToIndex: (value: number) => {
             listCommentRef.current?.scrollToIndex({
                 index: value,
@@ -151,6 +157,9 @@ const ModalCommentDetailBubble = (props: Props) => {
             modalHeight={commentModalHeight}
             modalStyle={{
                 backgroundColor: 'transparent',
+            }}
+            overlayStyle={{
+                backgroundColor: theme.backgroundOpacity(),
             }}
             scrollViewProps={{
                 keyboardShouldPersistTaps: 'handled',

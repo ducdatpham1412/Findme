@@ -1,7 +1,6 @@
 import React from 'react';
 import {ScrollView, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import {selectBgCardStyle} from 'utility/assistant';
 
 const SearchView = () => {
     return (
@@ -16,7 +15,6 @@ const styles = ScaledSheet.create({
         position: 'absolute',
         width: '100%',
         height: '100%',
-        backgroundColor: selectBgCardStyle(0.7),
     },
 });
 

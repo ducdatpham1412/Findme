@@ -4,7 +4,6 @@ import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import {MAIN_SCREEN, PROFILE_ROUTE} from 'navigation/config/routes';
-import {useTabBar} from 'navigation/config/TabBarProvider';
 import {navigate} from 'navigation/NavigationService';
 import React, {useEffect, useRef, useState} from 'react';
 import {Animated, View} from 'react-native';
@@ -28,14 +27,12 @@ const TabNavigator = (props: any) => {
     const numberNewNotifications = Redux.getNumberNewNotifications();
     const {avatar} = Redux.getPassport().profile;
 
-    const {showTabBar} = useTabBar();
-
     // for animation all tab bar
-    const aim = useRef(new Animated.Value(0)).current;
-    const [height, setHeight] = useState(tabBarHeight);
-    aim.addListener(({value}) => {
-        setHeight(value);
-    });
+    // const aim = useRef(new Animated.Value(0)).current;
+    // const [height, setHeight] = useState(tabBarHeight);
+    // aim.addListener(({value}) => {
+    //     setHeight(value);
+    // });
 
     // for indicator
     const tabIndexFocus = props.state.index;
@@ -46,25 +43,25 @@ const TabNavigator = (props: any) => {
     // for add more view
     // const addMoreWidth = useRef(new Animated.Value(0)).current;
 
-    const controlTabBar = () => {
-        if (!showTabBar) {
-            Animated.timing(aim, {
-                toValue: 0,
-                duration: 150,
-                useNativeDriver: true,
-            }).start();
-        } else {
-            Animated.timing(aim, {
-                toValue: tabBarHeight,
-                duration: 120,
-                useNativeDriver: true,
-            }).start();
-        }
-    };
+    // const controlTabBar = () => {
+    //     if (!showTabBar) {
+    //         Animated.timing(aim, {
+    //             toValue: 0,
+    //             duration: 150,
+    //             useNativeDriver: true,
+    //         }).start();
+    //     } else {
+    //         Animated.timing(aim, {
+    //             toValue: tabBarHeight,
+    //             duration: 120,
+    //             useNativeDriver: true,
+    //         }).start();
+    //     }
+    // };
 
-    useEffect(() => {
-        controlTabBar();
-    }, [showTabBar]);
+    // useEffect(() => {
+    //     controlTabBar();
+    // }, [showTabBar]);
 
     useEffect(() => {
         Animated.spring(indicatorTranslateX, {
@@ -264,7 +261,7 @@ const TabNavigator = (props: any) => {
                 style={[
                     styles.tabBarDown,
                     {
-                        height,
+                        height: tabBarHeight,
                         backgroundColor: theme.backgroundColor,
                     },
                 ]}>

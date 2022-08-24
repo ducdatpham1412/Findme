@@ -2,7 +2,6 @@ import {TypeCreatePostResponse} from 'api/interface';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleTouchable} from 'components/base';
-import Redux from 'hook/useRedux';
 import React, {memo} from 'react';
 import isEqual from 'react-fast-compare';
 import {StyleProp, ViewStyle} from 'react-native';
@@ -18,8 +17,7 @@ interface Props {
 
 const PostStatus = (props: Props) => {
     const {itemPost, onGoToDetailPost, containerStyle} = props;
-    const {profile} = Redux.getPassport();
-    const imageUrl = itemPost.images[0] || profile.avatar;
+    const imageUrl = itemPost.images[0] || '';
 
     const arrayStars = Array(itemPost.stars).fill(0);
 
@@ -27,7 +25,15 @@ const PostStatus = (props: Props) => {
         <StyleTouchable
             customStyle={[styles.container, containerStyle]}
             onPress={() => onGoToDetailPost(itemPost.id)}
-            activeOpacity={0.95}>
+            activeOpacity={0.95}
+            onTouchEnd={() => {
+                // console.log(
+                //     'with element: ',
+                //     e.nativeEvent.locationX,
+                //     ' - ',
+                //     e.nativeEvent.locationY,
+                // );
+            }}>
             <StyleImage source={{uri: imageUrl}} customStyle={styles.image} />
             <LinearGradient
                 colors={[

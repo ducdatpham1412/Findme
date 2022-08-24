@@ -11,11 +11,11 @@ import {Metrics} from 'asset/metrics';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import StyleTabView from 'components/StyleTabView';
+import ListShareElement from 'feature/profile/post/ListShareElement';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import {tabBarViewHeight} from 'navigation/components/TabNavigator';
-import ROOT_SCREEN from 'navigation/config/routes';
-import {appAlert, navigate} from 'navigation/NavigationService';
+import {appAlert} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
     NativeScrollEvent,
@@ -23,7 +23,7 @@ import {
     ScrollView,
     View,
 } from 'react-native';
-import {ScaledSheet} from 'react-native-size-matters';
+import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import {
     isScrollCloseToBottom,
     modalizeMyProfile,
@@ -35,11 +35,16 @@ import SearchAndSetting, {
     searchSettingHeight,
 } from './components/SearchAndSetting';
 import ToolProfile, {toolProfileHeight} from './components/ToolProfile';
+import ModalCommentListDetailPost, {
+    showModalCommentListDetailPost,
+} from './post/ModalCommentListDetailPost';
 import PostStatus from './post/PostStatus';
 
 interface ChildrenProps {
     routeName: string;
 }
+
+const extraHeight = -(Metrics.safeBottomPadding + verticalScale(7));
 
 /** ------------------------
  * Profile Enjoy
@@ -114,7 +119,8 @@ const ProfileEnjoy = ({routeName}: ChildrenProps) => {
  * Profile User
  * -------------------------
  */
-let listMyPosts: Array<TypeCreatePostResponse> = [];
+let listShareElement: Array<TypeCreatePostResponse> = [];
+let tabIndexRef = 0;
 
 const safeLoadMoreStyle: any = {
     overflow: 'hidden',
@@ -146,7 +152,16 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     });
 
     const optionRef = useRef<any>(null);
+    const myPostRef = useRef<ListShareElement>(null);
+    const postLikedRef = useRef<ListShareElement>(null);
+    const postSavedRef = useRef<ListShareElement>(null);
+
     const [tabIndex, setTabIndex] = useState(0);
+    const [bubbleFocusing, setBubbleFocusing] =
+        useState<TypeCreatePostResponse>();
+    const isFocusMyPost = tabIndex === 0;
+    const isFocusPostLiked = tabIndex === 1;
+    const isFocusPostSaved = tabIndex === 2;
 
     useEffect(() => {
         if (
@@ -160,8 +175,20 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     }, [bubblePalaceAction]);
 
     useEffect(() => {
-        listMyPosts = myPostsPaging.list;
-    }, [myPostsPaging.list]);
+        if (tabIndex === 0) {
+            listShareElement = myPostsPaging.list;
+        } else if (tabIndex === 1) {
+            listShareElement = postsLikedPaging.list;
+        } else if (tabIndex === 2) {
+            listShareElement = postsSavedPaging.list;
+        }
+        tabIndexRef = tabIndex;
+    }, [
+        tabIndex,
+        myPostsPaging.list,
+        postsLikedPaging.list,
+        postsSavedPaging.list,
+    ]);
 
     /**
      * Functions
@@ -171,14 +198,22 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     };
 
     const onGoToDetailPost = (bubbleId: string) => {
-        const temp = listMyPosts.findIndex(item => item.id === bubbleId);
-        const initIndex = temp < 0 ? 0 : temp;
-        navigate(ROOT_SCREEN.listDetailPost, {
-            listInProfile: listMyPosts,
-            initIndex,
-            setListInProfile: myPostsPaging.setList,
-            allowSaveImage: true,
-        });
+        const initIndex = listShareElement.findIndex(
+            item => item.id === bubbleId,
+        );
+        if (tabIndexRef === 0) {
+            myPostRef.current?.show({
+                index: initIndex === -1 ? 0 : initIndex,
+            });
+        } else if (tabIndexRef === 1) {
+            postLikedRef.current?.show({
+                index: initIndex === -1 ? 0 : initIndex,
+            });
+        } else if (tabIndexRef === 2) {
+            postSavedRef.current?.show({
+                index: initIndex === -1 ? 0 : initIndex,
+            });
+        }
     };
 
     const onRefreshPage = async () => {
@@ -187,11 +222,11 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             Redux.updatePassport({
                 profile: res.data,
             });
-            if (tabIndex === 0) {
+            if (isFocusMyPost) {
                 myPostsPaging.onRefresh();
-            } else if (tabIndex === 1) {
+            } else if (isFocusPostLiked) {
                 postsLikedPaging.onRefresh();
-            } else if (tabIndex === 2) {
+            } else if (isFocusPostSaved) {
                 postsSavedPaging.onRefresh();
             }
         } catch (err) {
@@ -201,13 +236,21 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
 
     const checkScrollEnd = (nativeEvent: NativeScrollEvent) => {
         if (isScrollCloseToBottom(nativeEvent)) {
-            if (tabIndex === 0) {
+            if (isFocusMyPost) {
                 myPostsPaging.onLoadMore();
-            } else if (tabIndex === 1) {
+            } else if (isFocusPostLiked) {
                 postsLikedPaging.onLoadMore();
-            } else if (tabIndex === 2) {
+            } else if (isFocusPostSaved) {
                 postsSavedPaging.onLoadMore();
             }
+        }
+
+        if (isFocusMyPost) {
+            myPostRef.current?.scrollToNearingEnd();
+        } else if (isFocusPostLiked) {
+            postLikedRef.current?.scrollToNearingEnd();
+        } else if (isFocusPostSaved) {
+            postSavedRef.current?.scrollToNearingEnd();
         }
     };
 
@@ -226,27 +269,28 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     }, []);
 
     return (
-        <>
+        <View
+            style={{flex: 1}}
+            onTouchEnd={() => {
+                // console.log(e.nativeEvent.pageX, ' - ', e.nativeEvent.pageY);
+            }}>
             <AvatarBackground avatar={profile.avatar} />
-
             <View
                 style={[
                     styles.overlayView,
                     {backgroundColor: theme.backgroundColorSecond},
                 ]}
             />
-
             <SearchAndSetting
                 onShowOptions={onShowOption}
                 hasBackBtn={false}
                 hasGuideButton
             />
-
             <ScrollView
                 stickyHeaderIndices={[1]}
-                onMomentumScrollEnd={({nativeEvent}) =>
-                    checkScrollEnd(nativeEvent)
-                }
+                onMomentumScrollEnd={({nativeEvent}) => {
+                    checkScrollEnd(nativeEvent);
+                }}
                 refreshControl={
                     <RefreshControl
                         refreshing={!!myPostsPaging.refreshing}
@@ -277,32 +321,99 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                     <View
                         style={[
                             styles.contentContainerPost,
-                            tabIndex === 0 ? {} : safeLoadMoreStyle,
+                            isFocusMyPost ? {} : safeLoadMoreStyle,
                         ]}>
                         {myPostsPaging.list.map(RenderItemPost)}
                     </View>
                     <View
                         style={[
                             styles.contentContainerPost,
-                            tabIndex === 1 ? {} : safeLoadMoreStyle,
+                            isFocusPostLiked ? {} : safeLoadMoreStyle,
                         ]}>
                         {postsLikedPaging.list.map(RenderItemPost)}
                     </View>
                     <View
                         style={[
                             styles.contentContainerPost,
-                            tabIndex === 2 ? {} : safeLoadMoreStyle,
+                            isFocusPostSaved ? {} : safeLoadMoreStyle,
                         ]}>
                         {postsSavedPaging.list.map(RenderItemPost)}
                     </View>
                 </StyleTabView>
             </ScrollView>
 
+            <ListShareElement
+                ref={myPostRef}
+                title={profile.name}
+                listPaging={myPostsPaging}
+                containerStyle={{
+                    backgroundColor: theme.backgroundColorSecond,
+                }}
+                onShowModalComment={params => {
+                    setBubbleFocusing(params.post);
+                    showModalCommentListDetailPost(params);
+                }}
+            />
+
+            <ListShareElement
+                ref={postLikedRef}
+                title={profile.name}
+                listPaging={postsLikedPaging}
+                containerStyle={{
+                    backgroundColor: theme.backgroundColorSecond,
+                }}
+                onShowModalComment={params => {
+                    setBubbleFocusing(params.post);
+                    showModalCommentListDetailPost(params);
+                }}
+            />
+
+            <ListShareElement
+                ref={postSavedRef}
+                title={profile.name}
+                listPaging={postsSavedPaging}
+                containerStyle={{
+                    backgroundColor: theme.backgroundColorSecond,
+                }}
+                onShowModalComment={params => {
+                    setBubbleFocusing(params.post);
+                    showModalCommentListDetailPost(params);
+                }}
+            />
+
+            <ModalCommentListDetailPost
+                bubbleFocusing={bubbleFocusing}
+                setBubbleFocusing={(value: TypeCreatePostResponse) => {
+                    if (bubbleFocusing) {
+                        setBubbleFocusing(preValue => ({
+                            ...preValue,
+                            ...value,
+                        }));
+                    }
+                }}
+                changeTotalCommentsFocusing={value => {
+                    if (bubbleFocusing) {
+                        setBubbleFocusing(preValue => {
+                            if (preValue) {
+                                return {
+                                    ...preValue,
+                                    totalComments:
+                                        preValue.totalComments + value,
+                                };
+                            }
+                            return preValue;
+                        });
+                    }
+                }}
+                inputCommentStyle={styles.inputCommentView}
+                extraHeight={extraHeight}
+            />
+
             <StyleActionSheet
                 ref={optionRef}
                 listTextAndAction={modalizeMyProfile}
             />
-        </>
+        </View>
     );
 };
 
@@ -359,6 +470,10 @@ const styles = ScaledSheet.create({
     },
     itemPostView: {
         marginHorizontal: '0.25@ms',
+    },
+    // input
+    inputCommentView: {
+        paddingBottom: '7@vs',
     },
 });
 
