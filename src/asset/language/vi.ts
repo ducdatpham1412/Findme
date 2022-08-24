@@ -120,7 +120,6 @@ const login = {
 
 // DISCOVERY ROUTE
 const discovery = {
-    component: {},
     heart: {
         headerTitle: 'Sở thích chat',
     },
@@ -155,13 +154,12 @@ const discovery = {
     share: {
         title: 'Chia sẻ',
     },
-    travel: 'Du lịch',
-    cuisine: 'Ẩm thực',
-    shopping: 'Mua sắm',
+    all: 'Tất cả',
     like: 'Thích',
     numberLike: '{{value}} lượt thích',
     comment: 'Bình luận',
     numberComments: '{{numberComments}} bình luận',
+    chooseTopic: 'Chủ đề yêu thích',
 };
 
 // PROFILE SCREEN

@@ -17,7 +17,7 @@ import Bubble from 'feature/discovery/components/Bubble';
 import {
     TypeMoreOptionsMe,
     TypeShowMoreOptions,
-} from 'feature/discovery/ListBubbleCouple';
+} from 'feature/discovery/DiscoveryScreen';
 import StyleHeader from 'navigation/components/StyleHeader';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {

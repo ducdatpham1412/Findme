@@ -37,6 +37,7 @@ const Images = {
         wondering: require('./ic_wondering.gif'),
         cry: require('./ic_crying.gif'),
         angry: require('./ic_angry.gif'),
+        category: require('./ic_category.png'),
     },
     images: {
         logo: require('./img_logo.png'),

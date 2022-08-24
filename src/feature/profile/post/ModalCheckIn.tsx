@@ -1,4 +1,5 @@
 import Images from 'asset/img/images';
+import {TypeTheme} from 'asset/theme/Theme';
 import {StyleButton, StyleImage, StyleText} from 'components/base';
 import ButtonX from 'components/common/ButtonX';
 import React, {Component} from 'react';
@@ -11,7 +12,7 @@ import I18Next from 'utility/I18Next';
 interface Props {
     location: string;
     onChangeLocation(value: string): void;
-    theme: any;
+    theme: TypeTheme;
 }
 
 interface States {

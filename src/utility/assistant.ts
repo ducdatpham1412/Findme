@@ -12,11 +12,10 @@ import {
     GENDER_TYPE,
     LANGUAGE_TYPE,
     SIGN_UP_TYPE,
-    TOPIC,
     TYPE_COLOR,
 } from 'asset/enum';
 import Images from 'asset/img/images';
-import {PRIVATE_AVATAR} from 'asset/standardValue';
+import {LIST_TOPICS, PRIVATE_AVATAR} from 'asset/standardValue';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {
     LOGIN_ROUTE,
@@ -420,14 +419,9 @@ export const chooseIconFeeling = (feeling: number) => {
 };
 
 export const chooseTextTopic = (topic: number | null): I18Normalize => {
-    switch (topic) {
-        case TOPIC.travel:
-            return 'discovery.travel';
-        case TOPIC.cuisine:
-            return 'discovery.cuisine';
-        case TOPIC.shopping:
-            return 'discovery.shopping';
-        default:
-            return 'common.null';
-    }
+    return LIST_TOPICS.find(item => item.id === topic)?.text || 'common.null';
+};
+
+export const chooseIconTopic = (topic: number) => {
+    return LIST_TOPICS.find(item => item.id === topic)?.icon || null;
 };

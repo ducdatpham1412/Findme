@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import {Metrics} from 'asset/metrics';
+import {TypeTheme} from 'asset/theme/Theme';
 import {StyleImage, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import Redux from 'hook/useRedux';
@@ -26,7 +27,7 @@ interface RenderImageParams {
     item: any;
     images: Array<string>;
     onChooseImage(image: string): void;
-    theme: any;
+    theme: TypeTheme;
     numberColumns: number;
 }
 

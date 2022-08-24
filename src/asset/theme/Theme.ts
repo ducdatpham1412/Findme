@@ -53,4 +53,6 @@ const Theme = {
     },
 };
 
+export type TypeTheme = typeof Theme.darkTheme;
+
 export default Theme;

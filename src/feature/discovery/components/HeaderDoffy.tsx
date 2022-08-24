@@ -1,65 +1,71 @@
-import {StyleText} from 'components/base';
-import Redux from 'hook/useRedux';
-import React, {useEffect, useRef} from 'react';
+import Images from 'asset/img/images';
+import Theme, {TypeTheme} from 'asset/theme/Theme';
+import {StyleIcon, StyleText, StyleTouchable} from 'components/base';
+import React, {Component} from 'react';
 import {Animated, Platform} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 
-export const headerDoffyHeight = verticalScale(45);
+export const headerDoffyHeight = verticalScale(40);
 
 interface Props {
-    isShowHeader: boolean;
+    onPressFilter(): void;
+    theme: TypeTheme;
 }
 
-const HeaderDoffy = (props: Props) => {
-    const {isShowHeader} = props;
-    const theme = Redux.getTheme();
+export class HeaderDoffy extends Component<Props> {
+    aim = new Animated.Value(0);
 
-    const aim = useRef(new Animated.Value(0)).current;
+    show() {
+        Animated.timing(this.aim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }
 
-    const translateY = aim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, -headerDoffyHeight],
-    });
+    hide() {
+        Animated.timing(this.aim, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }
 
-    const opacity = aim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [1, 0.3],
-    });
+    render() {
+        const {theme, onPressFilter} = this.props;
+        const translateY = this.aim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, -headerDoffyHeight],
+        });
 
-    useEffect(() => {
-        if (isShowHeader) {
-            Animated.timing(aim, {
-                toValue: 0,
-                duration: 300,
-                useNativeDriver: true,
-            }).start();
-        } else {
-            Animated.timing(aim, {
-                toValue: 1,
-                duration: 300,
-                useNativeDriver: true,
-            }).start();
-        }
-    }, [isShowHeader]);
+        const opacity = this.aim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [1, 0.3],
+        });
 
-    return (
-        <Animated.View
-            style={[
-                styles.container,
-                {
-                    backgroundColor: theme.backgroundColor,
-                    borderBottomColor: theme.borderColor,
-                    transform: [{translateY}],
-                    opacity,
-                },
-            ]}>
-            <StyleText
-                originValue="DOFFY"
-                customStyle={[styles.doffyText, {color: theme.textColor}]}
-            />
-        </Animated.View>
-    );
-};
+        return (
+            <Animated.View
+                style={[
+                    styles.container,
+                    {
+                        backgroundColor: theme.backgroundColor,
+                        borderBottomColor: theme.borderColor,
+                        transform: [{translateY}],
+                        opacity,
+                    },
+                ]}>
+                <StyleText originValue="DOFFY" customStyle={styles.doffyText} />
+                <StyleTouchable onPress={onPressFilter} hitSlop={10}>
+                    <StyleIcon
+                        source={Images.icons.category}
+                        customStyle={styles.iconCategory}
+                        size={18}
+                    />
+                </StyleTouchable>
+            </Animated.View>
+        );
+    }
+}
 
 const styles = ScaledSheet.create({
     container: {
@@ -71,11 +77,17 @@ const styles = ScaledSheet.create({
             android: '0.5@ms',
         }),
         paddingHorizontal: '20@s',
-        justifyContent: 'center',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
     },
     doffyText: {
         fontSize: '18@ms',
         fontWeight: 'bold',
+        color: Theme.common.gradientTabBar1,
+    },
+    iconCategory: {
+        tintColor: Theme.common.gradientTabBar2,
     },
 });
 
