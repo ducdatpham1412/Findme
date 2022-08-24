@@ -29,20 +29,20 @@ const ToolProfile = (props: Props) => {
                     {backgroundColor: theme.backgroundColor},
                 ]}
             />
-            <View style={styles.buttonBox}>
-                <StyleTouchable onPress={() => onChangeTab(0)} hitSlop={15}>
-                    <Entypo
-                        name="list"
-                        style={[
-                            styles.icon,
-                            {
-                                color: theme.textHightLight,
-                                opacity: isInMyPosts ? 1 : unFocusOpacity,
-                            },
-                        ]}
-                    />
-                </StyleTouchable>
-            </View>
+            <StyleTouchable
+                onPress={() => onChangeTab(0)}
+                customStyle={styles.buttonBox}>
+                <Entypo
+                    name="list"
+                    style={[
+                        styles.icon,
+                        {
+                            color: theme.textHightLight,
+                            opacity: isInMyPosts ? 1 : unFocusOpacity,
+                        },
+                    ]}
+                />
+            </StyleTouchable>
 
             <View
                 style={[
@@ -51,20 +51,20 @@ const ToolProfile = (props: Props) => {
                 ]}
             />
 
-            <View style={styles.buttonBox}>
-                <StyleTouchable onPress={() => onChangeTab(1)} hitSlop={15}>
-                    <Entypo
-                        name="heart-outlined"
-                        style={[
-                            styles.icon,
-                            {
-                                color: theme.textHightLight,
-                                opacity: isPostsLiked ? 1 : unFocusOpacity,
-                            },
-                        ]}
-                    />
-                </StyleTouchable>
-            </View>
+            <StyleTouchable
+                customStyle={styles.buttonBox}
+                onPress={() => onChangeTab(1)}>
+                <Entypo
+                    name="heart-outlined"
+                    style={[
+                        styles.icon,
+                        {
+                            color: theme.textHightLight,
+                            opacity: isPostsLiked ? 1 : unFocusOpacity,
+                        },
+                    ]}
+                />
+            </StyleTouchable>
 
             <View
                 style={[
@@ -73,20 +73,20 @@ const ToolProfile = (props: Props) => {
                 ]}
             />
 
-            <View style={styles.buttonBox}>
-                <StyleTouchable onPress={() => onChangeTab(2)} hitSlop={15}>
-                    <Feather
-                        name="bookmark"
-                        style={[
-                            styles.iconBookMark,
-                            {
-                                color: theme.textHightLight,
-                                opacity: isPostsSaved ? 1 : unFocusOpacity,
-                            },
-                        ]}
-                    />
-                </StyleTouchable>
-            </View>
+            <StyleTouchable
+                customStyle={styles.buttonBox}
+                onPress={() => onChangeTab(2)}>
+                <Feather
+                    name="bookmark"
+                    style={[
+                        styles.iconBookMark,
+                        {
+                            color: theme.textHightLight,
+                            opacity: isPostsSaved ? 1 : unFocusOpacity,
+                        },
+                    ]}
+                />
+            </StyleTouchable>
         </View>
     );
 };

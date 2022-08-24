@@ -48,6 +48,7 @@ const StyleTabView = (props: Props) => {
     );
 
     const jumpToIndex = (__index: number) => {
+        currentIndexRef.current = __index;
         const offset = -__index * screenWidth;
         onChangeIndex?.(__index);
 
@@ -60,7 +61,6 @@ const StyleTabView = (props: Props) => {
             }),
         ]).start(({finished}) => {
             if (finished) {
-                currentIndexRef.current = __index;
                 if (listCheckLazy.current[__index] === false) {
                     listCallbackWhenFocus?.[__index]?.();
                     listCheckLazy.current[__index] = true;

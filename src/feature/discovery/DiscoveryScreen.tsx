@@ -28,7 +28,7 @@ import {
     showSwipeImages,
 } from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {View} from 'react-native';
+import {FlatList, View} from 'react-native';
 import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
 import {onGoToSignUp} from 'utility/assistant';
@@ -60,6 +60,8 @@ const onGoToSignUpFromAlert = () => {
 
 const DiscoveryScreen = () => {
     useNotification();
+
+    const listRef = useRef<FlatList>(null);
     const optionsRef = useRef<any>(null);
     const headerFilterRef = useRef<HeaderFilterTopic>(null);
     const headerDoffyRef = useRef<HeaderDoffy>(null);
@@ -99,6 +101,10 @@ const DiscoveryScreen = () => {
     });
 
     useEffect(() => {
+        listRef.current?.scrollToOffset({
+            offset: 0,
+            animated: false,
+        });
         const paramsTopic =
             listTopics.length === 3 ? undefined : `[${String(listTopics)}]`;
         setParams({
@@ -210,6 +216,7 @@ const DiscoveryScreen = () => {
                 {backgroundColor: theme.backgroundColorSecond},
             ]}>
             <StyleList
+                ref={listRef}
                 data={list}
                 renderItem={({item}) => RenderItemBubble(item)}
                 keyExtractor={(_, index) => String(index)}
