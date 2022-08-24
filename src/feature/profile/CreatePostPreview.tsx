@@ -113,7 +113,7 @@ const CreatePostPreview = ({route}: Props) => {
 
     const starRef = useRef<Modalize>(null);
     const linkRef = useRef<Modalize>(null);
-    const checkInRef = useRef<Modalize>(null);
+    const checkInRef = useRef<ModalCheckIn>(null);
     const feelingRef = useRef<Modalize>(null);
     const topicRef = useRef<Modalize>(null);
 
@@ -189,7 +189,7 @@ const CreatePostPreview = ({route}: Props) => {
 
     const onCheckIn = () => {
         shouldShowToolHorizontal = false;
-        checkInRef.current?.open();
+        checkInRef.current?.show();
     };
 
     const onGoBack = () => {
@@ -723,6 +723,7 @@ const CreatePostPreview = ({route}: Props) => {
                 ref={checkInRef}
                 location={location || ''}
                 onChangeLocation={value => setLocation(value)}
+                theme={theme}
             />
             <ModalFeeling
                 ref={feelingRef}

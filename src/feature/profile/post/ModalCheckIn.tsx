@@ -1,97 +1,132 @@
 import Images from 'asset/img/images';
 import {StyleButton, StyleImage, StyleText} from 'components/base';
 import ButtonX from 'components/common/ButtonX';
-import Redux from 'hook/useRedux';
-import React, {forwardRef, useRef, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import React, {Component} from 'react';
 import {TextInput, View} from 'react-native';
 import {Modalize} from 'react-native-modalize';
 import {ScaledSheet} from 'react-native-size-matters';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import I18Next from 'utility/I18Next';
 
 interface Props {
     location: string;
     onChangeLocation(value: string): void;
+    theme: any;
 }
 
-const ModalCheckIn = (props: Props, ref: any) => {
-    const {location, onChangeLocation} = props;
-    const {t} = useTranslation();
-    const theme = Redux.getTheme();
-    const inputRef = useRef<TextInput>(null);
+interface States {
+    tempLocation: string;
+}
 
-    const [tempLocation, setTempLocation] = useState(location);
+let timeout: any;
 
-    const onConfirm = (value: string) => {
-        onChangeLocation(value);
-        ref.current.close();
+class ModalCheckIn extends Component<Props, States> {
+    modalRef = React.createRef<Modalize>();
+
+    inputRef = React.createRef<TextInput>();
+
+    state: States = {
+        tempLocation: this.props.location,
     };
 
-    return (
-        <Modalize ref={ref} modalStyle={styles.modal} withHandle={false}>
-            <View
-                style={[
-                    styles.container,
-                    {backgroundColor: theme.backgroundColor},
-                ]}>
-                <ButtonX
-                    containerStyle={styles.buttonClose}
-                    onPress={() => {
-                        ref.current.close();
-                        setTempLocation(location);
-                    }}
-                />
+    show() {
+        this.modalRef.current?.open();
+        timeout = setTimeout(() => {
+            this.inputRef.current?.focus();
+        }, 100);
+        return () => clearTimeout(timeout);
+    }
 
-                <StyleText
-                    i18Text="profile.post.checkIn"
-                    customStyle={[styles.title, {color: theme.textColor}]}
-                />
+    private onConfirm(value: string) {
+        this.props.onChangeLocation(value);
+        this.modalRef.current?.close();
+    }
 
+    render() {
+        const {location, theme} = this.props;
+
+        return (
+            <Modalize
+                ref={this.modalRef}
+                modalStyle={styles.modal}
+                withHandle={false}>
                 <View
                     style={[
-                        styles.inputView,
-                        {
-                            backgroundColor: theme.backgroundTextInput,
-                        },
+                        styles.container,
+                        {backgroundColor: theme.backgroundColor},
                     ]}>
-                    <Ionicons
-                        name="ios-location-sharp"
-                        style={[styles.iconLocation, {color: theme.textColor}]}
+                    <ButtonX
+                        containerStyle={styles.buttonClose}
+                        onPress={() => {
+                            this.modalRef.current?.close();
+                            this.setState({
+                                tempLocation: location,
+                            });
+                        }}
                     />
-                    <TextInput
-                        ref={inputRef}
-                        defaultValue={location}
-                        onChangeText={value => setTempLocation(value)}
-                        placeholder={t('profile.post.whereAreYouNow')}
-                        placeholderTextColor={theme.borderColor}
-                        style={[styles.input, {color: theme.textColor}]}
-                        returnKeyType="done"
-                        onSubmitEditing={() => onConfirm(tempLocation)}
+
+                    <StyleText
+                        i18Text="profile.post.checkIn"
+                        customStyle={[styles.title, {color: theme.textColor}]}
+                    />
+
+                    <View
+                        style={[
+                            styles.inputView,
+                            {
+                                backgroundColor: theme.backgroundTextInput,
+                            },
+                        ]}>
+                        <Ionicons
+                            name="ios-location-sharp"
+                            style={[
+                                styles.iconLocation,
+                                {color: theme.textColor},
+                            ]}
+                        />
+                        <TextInput
+                            ref={this.inputRef}
+                            defaultValue={location}
+                            onChangeText={value =>
+                                this.setState({
+                                    tempLocation: value,
+                                })
+                            }
+                            placeholder={I18Next.t(
+                                'profile.post.whereAreYouNow',
+                            )}
+                            placeholderTextColor={theme.borderColor}
+                            style={[styles.input, {color: theme.textColor}]}
+                            returnKeyType="done"
+                            onSubmitEditing={() =>
+                                this.onConfirm(this.state.tempLocation)
+                            }
+                        />
+                    </View>
+
+                    <StyleButton
+                        containerStyle={styles.buttonView}
+                        titleStyle={styles.titleButton}
+                        title="common.save"
+                        onPress={() => this.onConfirm(this.state.tempLocation)}
+                    />
+
+                    <StyleText
+                        i18Text="profile.post.willDebutSearchOnGoogleMap"
+                        customStyle={[
+                            styles.waitForUsText,
+                            {color: theme.borderColor},
+                        ]}
+                    />
+                    <StyleImage
+                        source={Images.images.successful}
+                        customStyle={styles.imgSquirrel}
                     />
                 </View>
-
-                <StyleButton
-                    containerStyle={styles.buttonView}
-                    titleStyle={styles.titleButton}
-                    title="common.save"
-                    onPress={() => onConfirm(tempLocation)}
-                />
-
-                <StyleText
-                    i18Text="profile.post.willDebutSearchOnGoogleMap"
-                    customStyle={[
-                        styles.waitForUsText,
-                        {color: theme.borderColor},
-                    ]}
-                />
-                <StyleImage
-                    source={Images.images.successful}
-                    customStyle={styles.imgSquirrel}
-                />
-            </View>
-        </Modalize>
-    );
-};
+            </Modalize>
+        );
+    }
+}
 
 const styles = ScaledSheet.create({
     modal: {
@@ -122,6 +157,7 @@ const styles = ScaledSheet.create({
         paddingHorizontal: '8@s',
         paddingVertical: '8@vs',
         flexDirection: 'row',
+        backgroundColor: 'blue',
     },
     iconLocation: {
         fontSize: '17@ms',
@@ -131,7 +167,8 @@ const styles = ScaledSheet.create({
         paddingVertical: 0,
         maxHeight: '70@vs',
         paddingLeft: '5@s',
-        paddingRight: '15@s',
+        paddingRight: '13@s',
+        minWidth: '80%',
     },
     imgSquirrel: {
         width: '150@s',
@@ -154,4 +191,4 @@ const styles = ScaledSheet.create({
     },
 });
 
-export default forwardRef(ModalCheckIn);
+export default ModalCheckIn;
