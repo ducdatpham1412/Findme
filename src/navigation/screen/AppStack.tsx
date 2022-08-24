@@ -106,6 +106,9 @@ const AppStack = () => {
                 <Stack.Screen
                     name={PROFILE_ROUTE.createPostPreview}
                     component={CreatePostPreview}
+                    options={{
+                        gestureEnabled: false,
+                    }}
                 />
                 <Stack.Screen
                     name={PROFILE_ROUTE.createPostPickImg}
@@ -113,6 +116,7 @@ const AppStack = () => {
                     options={{
                         cardStyleInterpolator:
                             CardStyleInterpolators.forScaleFromCenterAndroid,
+                        gestureEnabled: false,
                     }}
                 />
                 <Stack.Screen

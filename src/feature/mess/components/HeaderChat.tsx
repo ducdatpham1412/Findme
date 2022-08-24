@@ -36,7 +36,8 @@ const HeaderChat = (props: Props) => {
                 onPress={() => {
                     Redux.setChatTagFocusing('');
                     goBack();
-                }}>
+                }}
+                hitSlop={10}>
                 <AntDesign
                     name="left"
                     style={[styles.iconLeft, {color: borderMessRoute}]}
