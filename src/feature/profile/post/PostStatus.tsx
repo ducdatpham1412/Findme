@@ -6,7 +6,7 @@ import React, {memo} from 'react';
 import isEqual from 'react-fast-compare';
 import {StyleProp, ViewStyle} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {moderateScale, ScaledSheet} from 'react-native-size-matters';
+import {moderateScale, scale, ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
 interface Props {
@@ -52,7 +52,7 @@ const PostStatus = (props: Props) => {
 const styles = ScaledSheet.create({
     container: {
         width: Metrics.width / 3 - moderateScale(0.5),
-        height: Metrics.width / 3 + moderateScale(10),
+        height: Metrics.width / 3 + scale(30),
         marginBottom: '0.75@ms',
     },
     image: {

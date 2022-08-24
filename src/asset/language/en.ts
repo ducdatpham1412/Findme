@@ -118,7 +118,6 @@ const login = {
 
 // DISCOVERY ROUTE
 const discovery = {
-    component: {},
     heart: {
         headerTitle: 'Chat hobbies',
     },
@@ -152,13 +151,12 @@ const discovery = {
     share: {
         title: 'Share',
     },
-    travel: 'Travel',
-    cuisine: 'Cuisine',
-    shopping: 'Shopping',
+    all: 'All',
     like: 'Like',
     numberLike: '{{value}} likes',
     comment: 'Comment',
     numberComments: '{{numberComments}} comments',
+    chooseTopic: 'Topic you like',
 };
 
 // MESS ROUTE

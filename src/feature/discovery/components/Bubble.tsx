@@ -40,7 +40,7 @@ import {
     onGoToSignUp,
 } from 'utility/assistant';
 import {formatFromNow} from 'utility/format';
-import {TypeMoreOptionsMe, TypeShowMoreOptions} from '../ListBubbleCouple';
+import {TypeMoreOptionsMe, TypeShowMoreOptions} from '../DiscoveryScreen';
 
 interface Props {
     item: TypeBubblePalace;
