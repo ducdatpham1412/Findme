@@ -12,6 +12,7 @@ import {StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import NoData from 'components/common/NoData';
 import StyleActionSheet from 'components/common/StyleActionSheet';
+import ModalCommentLike from 'components/ModalCommentLike';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
@@ -20,6 +21,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {
+    fakeBubbleFocusing,
     interactBubble,
     modalizeMyProfile,
     modalizeYourProfile,
@@ -28,9 +30,6 @@ import AvatarBackground from './components/AvatarBackground';
 import InformationProfile from './components/InformationProfile';
 import SearchAndSetting from './components/SearchAndSetting';
 import ListShareElement from './post/ListShareElement';
-import ModalCommentListDetailPost, {
-    showModalCommentListDetailPost,
-} from './post/ModalCommentListDetailPost';
 import PostStatus from './post/PostStatus';
 
 interface Props {
@@ -53,6 +52,7 @@ const OtherProfile = ({route}: Props) => {
     const isModeExp = Redux.getModeExp();
     const myId = Redux.getPassport().profile.id;
 
+    const modalRef = useRef<ModalCommentLike>(null);
     const optionsRef = useRef<any>(null);
     const shareRef = useRef<ListShareElement>(null);
 
@@ -323,34 +323,41 @@ const OtherProfile = ({route}: Props) => {
                     backgroundColor: theme.backgroundColorSecond,
                 }}
                 onShowModalComment={params => {
-                    setBubbleFocusing(params.post);
-                    showModalCommentListDetailPost(params);
+                    modalRef.current?.show(params);
                 }}
             />
 
-            <ModalCommentListDetailPost
-                bubbleFocusing={bubbleFocusing}
-                setBubbleFocusing={(value: TypeCreatePostResponse) => {
-                    if (bubbleFocusing) {
-                        setBubbleFocusing(preValue => ({
-                            ...preValue,
-                            ...value,
-                        }));
-                    }
+            <ModalCommentLike
+                ref={modalRef}
+                theme={theme}
+                bubbleFocusing={bubbleFocusing || fakeBubbleFocusing}
+                updateBubbleFocusing={value =>
+                    setBubbleFocusing(preValue => ({
+                        ...preValue,
+                        ...value,
+                    }))
+                }
+                setTotalComments={value => {
+                    setBubbleFocusing(preValue => {
+                        if (preValue) {
+                            return {
+                                ...preValue,
+                                totalComments: value,
+                            };
+                        }
+                        return preValue;
+                    });
                 }}
-                changeTotalCommentsFocusing={value => {
-                    if (bubbleFocusing) {
-                        setBubbleFocusing(preValue => {
-                            if (preValue) {
-                                return {
-                                    ...preValue,
-                                    totalComments:
-                                        preValue.totalComments + value,
-                                };
-                            }
-                            return preValue;
-                        });
-                    }
+                increaseTotalComments={value => {
+                    setBubbleFocusing(preValue => {
+                        if (preValue) {
+                            return {
+                                ...preValue,
+                                totalComments: preValue.totalComments + value,
+                            };
+                        }
+                        return preValue;
+                    });
                 }}
             />
 
@@ -424,9 +431,6 @@ const styles = ScaledSheet.create({
     },
     textInteract: {
         fontSize: '11@ms',
-    },
-    containerBlock: {
-        flex: 1,
     },
 });
 

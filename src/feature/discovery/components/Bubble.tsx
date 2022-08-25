@@ -46,7 +46,7 @@ interface Props {
     item: TypeBubblePalace;
     isRectangle?: boolean;
     onShowMoreOption(params: TypeShowMoreOptions & TypeMoreOptionsMe): void;
-    onShowModalComment(post: TypeBubblePalace): void;
+    onShowModalComment(post: TypeBubblePalace, type: 'comment' | 'like'): void;
     onShowModalShare(item: any): void;
 }
 
@@ -352,7 +352,7 @@ const Bubble = (props: Props) => {
 
                     <StyleTouchable
                         customStyle={styles.iconComment}
-                        onPress={() => onShowModalComment(item)}>
+                        onPress={() => onShowModalComment(item, 'comment')}>
                         <StyleIcon
                             source={Images.icons.comment}
                             size={20}
@@ -404,7 +404,7 @@ const Bubble = (props: Props) => {
                     customStyle={styles.likeTouch}
                     onPress={() => {
                         if (totalLikes) {
-                            onShowModalComment(item);
+                            onShowModalComment(item, 'like');
                         } else {
                             onHandleLike({
                                 isModeExp,
@@ -434,7 +434,7 @@ const Bubble = (props: Props) => {
 
                 <StyleTouchable
                     customStyle={styles.commentTouch}
-                    onPress={() => onShowModalComment(item)}>
+                    onPress={() => onShowModalComment(item, 'comment')}>
                     <StyleText
                         i18Text={
                             item.totalComments

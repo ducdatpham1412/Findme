@@ -4,6 +4,7 @@
 /* eslint-disable no-unused-expressions */
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeBubblePalace} from 'api/interface';
+import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {apiGetDetailBubble} from 'api/module';
 import {apiLikePost, apiSavePost, apiUnLikePost, apiUnSavePost} from 'api/post';
 import FindmeStore from 'app-redux/store';
@@ -26,9 +27,8 @@ import {
 } from 'components/base';
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
-import InputComment from 'components/common/InputComment';
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
-import StyleKeyboardAwareView from 'components/StyleKeyboardAwareView';
+import ModalCommentLike from 'components/ModalCommentLike';
 import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
@@ -38,25 +38,27 @@ import {
     navigate,
     showSwipeImages,
 } from 'navigation/NavigationService';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {ScrollView, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Share from 'react-native-share';
-import {ScaledSheet} from 'react-native-size-matters';
+import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {chooseIconFeeling, chooseTextTopic} from 'utility/assistant';
+import {
+    chooseIconFeeling,
+    chooseTextTopic,
+    fakeBubbleFocusing,
+} from 'utility/assistant';
 import {formatFromNow} from 'utility/format';
-import ModalCommentDetailBubble, {
-    showModalCommentDetailBubble,
-} from './components/ModalCommentDetailBubble';
 
 interface Props {
     route: {
         params: {
             bubbleId: string;
-            displayComment: boolean;
+            displayComment?: boolean;
+            displayLike?: boolean;
         };
     };
 }
@@ -82,17 +84,33 @@ const onSeeDetailImage = (images: Array<string>) => {
 };
 
 const DetailBubble = ({route}: Props) => {
-    const {bubbleId, displayComment} = route.params;
+    const {bubbleId, displayComment, displayLike} = route.params;
     const theme = Redux.getTheme();
 
     const optionsRef = useRef<any>(null);
+    const modalRef = useRef<ModalCommentLike>(null);
 
     const [bubble, setBubble] = useState<TypeBubblePalace>();
+
+    const onShowModalComment = useCallback(
+        (post: TypeBubblePalace, type: TypeShowModalCommentOrLike) => {
+            modalRef.current?.show({
+                post,
+                type,
+            });
+        },
+        [],
+    );
 
     const getData = async () => {
         try {
             const res = await apiGetDetailBubble(bubbleId);
             setBubble(res.data);
+            if (displayComment) {
+                onShowModalComment(res.data, 'comment');
+            } else if (displayLike) {
+                onShowModalComment(res.data, 'like');
+            }
         } catch (err) {
             appAlert(err);
         }
@@ -101,12 +119,6 @@ const DetailBubble = ({route}: Props) => {
     useEffect(() => {
         getData();
     }, []);
-
-    useEffect(() => {
-        if (displayComment) {
-            showModalCommentDetailBubble();
-        }
-    }, [displayComment]);
 
     const onHandleLike = async () => {
         if (bubble) {
@@ -384,7 +396,11 @@ const DetailBubble = ({route}: Props) => {
 
                     <StyleTouchable
                         customStyle={styles.iconComment}
-                        onPress={showModalCommentDetailBubble}>
+                        onPress={() => {
+                            if (bubble) {
+                                onShowModalComment(bubble, 'comment');
+                            }
+                        }}>
                         <StyleIcon
                             source={Images.icons.comment}
                             size={20}
@@ -427,7 +443,11 @@ const DetailBubble = ({route}: Props) => {
 
                 <StyleTouchable
                     customStyle={styles.likeTouch}
-                    onPress={showModalCommentDetailBubble}>
+                    onPress={() => {
+                        if (bubble) {
+                            onShowModalComment(bubble, 'like');
+                        }
+                    }}>
                     <StyleText
                         i18Text={
                             bubble?.totalLikes
@@ -446,7 +466,11 @@ const DetailBubble = ({route}: Props) => {
 
                 <StyleTouchable
                     customStyle={styles.commentTouch}
-                    onPress={showModalCommentDetailBubble}>
+                    onPress={() => {
+                        if (bubble) {
+                            onShowModalComment(bubble, 'comment');
+                        }
+                    }}>
                     <StyleText
                         i18Text={
                             bubble?.totalComments
@@ -491,9 +515,38 @@ const DetailBubble = ({route}: Props) => {
                 {Footer()}
             </ScrollView>
 
-            <ModalCommentDetailBubble
-                bubbleFocusing={bubble}
-                setBubbleFocusing={setBubble}
+            <ModalCommentLike
+                ref={modalRef}
+                theme={theme}
+                bubbleFocusing={bubble || fakeBubbleFocusing}
+                updateBubbleFocusing={value =>
+                    setBubble(preValue => ({
+                        ...preValue,
+                        ...value,
+                    }))
+                }
+                setTotalComments={value =>
+                    setBubble(preValue => {
+                        if (preValue) {
+                            return {
+                                ...preValue,
+                                totalComments: value,
+                            };
+                        }
+                        return preValue;
+                    })
+                }
+                increaseTotalComments={value => {
+                    setBubble(preValue => {
+                        if (preValue) {
+                            return {
+                                ...preValue,
+                                totalComments: preValue.totalComments + value,
+                            };
+                        }
+                        return preValue;
+                    });
+                }}
             />
         </>
     );
@@ -502,7 +555,7 @@ const DetailBubble = ({route}: Props) => {
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
-        paddingBottom: Metrics.safeBottomPadding,
+        paddingBottom: Metrics.safeBottomPadding + verticalScale(20),
     },
     // header
     headerView: {

@@ -1,135 +1,133 @@
 /* eslint-disable no-underscore-dangle */
 import {Metrics} from 'asset/metrics';
-import React, {Children, ReactNode, useEffect, useRef} from 'react';
+import React, {Children, Component, ReactNode} from 'react';
 import {
     Animated,
     GestureResponderEvent,
     I18nManager,
     PanResponder,
     PanResponderGestureState,
+    StyleProp,
     StyleSheet,
+    View,
+    ViewStyle,
 } from 'react-native';
 import {
     DEAD_ZONE,
     DefaultTransitionSpec,
     isMovingHorizontally,
     swipeVelocityThreshold,
-    useAnimatedValue,
 } from 'utility/animation';
 
-interface Props {
-    onChangeTabBarProps?(e: any): void;
-    children: ReactNode;
+interface TypeNativeEvent {
+    position: number;
     index: number;
-    onChangeIndex(value: number): void;
-    listCallbackWhenFocus: Array<Function>;
+}
+
+interface Props {
+    children: ReactNode;
+    initIndex?: number;
+    onFirstNavigateToIndex?(value: number): void;
+    onScroll?(e: TypeNativeEvent): void;
+    containerStyle?: StyleProp<ViewStyle>;
+}
+
+interface States {
+    listCheckLazy: Array<boolean>;
+    layOutWidth: number;
 }
 
 const screenWidth = Metrics.width;
 const swipeDistanceThreshold = screenWidth / 1.75;
 
-const StyleTabView = (props: Props) => {
-    const {children, index = 0, onChangeIndex, listCallbackWhenFocus} = props;
-    const numberTabs = Children.toArray(children).length;
-    const layOutWidth = screenWidth * numberTabs;
-    const maxTranslate = layOutWidth * (numberTabs - 1);
+class StyleTabView extends Component<Props, States> {
+    panX = new Animated.Value(-(this.props.initIndex || 0) * screenWidth);
 
-    const currentIndexRef = useRef(0);
-    const listCheckLazy = useRef<Array<boolean>>([]);
+    currentIndexRef = this.props.initIndex || 0;
 
-    const panX = useAnimatedValue(0);
-    const translateX = Animated.multiply(
-        panX.interpolate({
-            inputRange: [-maxTranslate, 0],
-            outputRange: [-maxTranslate, 0],
-            extrapolate: 'clamp',
-        }),
-        I18nManager.isRTL ? -1 : 1,
-    );
-
-    const jumpToIndex = (__index: number) => {
-        currentIndexRef.current = __index;
-        const offset = -__index * screenWidth;
-        onChangeIndex?.(__index);
-
-        const {timing, ...transitionConfig} = DefaultTransitionSpec;
-        Animated.parallel([
-            timing(panX, {
-                ...transitionConfig,
-                toValue: offset,
-                useNativeDriver: false,
-            }),
-        ]).start(({finished}) => {
-            if (finished) {
-                if (listCheckLazy.current[__index] === false) {
-                    listCallbackWhenFocus?.[__index]?.();
-                    listCheckLazy.current[__index] = true;
-                }
-            }
-        });
+    animation = {
+        numberTabs: 0,
+        maxTranslateX: 0,
     };
 
-    useEffect(() => {
-        if (index !== currentIndexRef.current) {
-            jumpToIndex(index);
-        }
-    }, [index]);
+    listCheckLazyRef: Array<boolean> = [];
 
-    useEffect(() => {
-        const temp: Array<boolean> = [];
-        for (let i = 0; i < numberTabs; i++) {
-            temp.push(false);
-        }
-        listCheckLazy.current = temp;
-    }, []);
+    state: States = {
+        listCheckLazy: [],
+        layOutWidth: 0,
+    };
 
-    // Check can moving
-    const canMoveScreen = (
+    private canMoveScreen = (
         event: GestureResponderEvent,
         gestureState: PanResponderGestureState,
     ) => {
         const diffX = I18nManager.isRTL ? -gestureState.dx : gestureState.dx;
         const check =
             isMovingHorizontally(event, gestureState) &&
-            ((diffX >= DEAD_ZONE && currentIndexRef.current > 0) ||
+            ((diffX >= DEAD_ZONE && this.currentIndexRef > 0) ||
                 (diffX <= -DEAD_ZONE &&
-                    currentIndexRef.current < numberTabs - 1));
+                    this.currentIndexRef < this.animation.numberTabs - 1));
         return check;
     };
 
-    // Start grant move
-    const startGesture = () => {
-        panX.stopAnimation();
-        const temp: any = panX;
-        panX.setOffset(temp._value);
+    private startGesture = () => {
+        this.panX.stopAnimation();
+        const temp: any = this.panX;
+        this.panX.setOffset(temp._value);
     };
 
-    // Moving
-    const respondToGesture = (
+    private respondToGesture = (
         _: GestureResponderEvent,
         gestureState: PanResponderGestureState,
     ) => {
         const diffX = I18nManager.isRTL ? -gestureState.dx : gestureState.dx;
 
         if (
-            (diffX > 0 && currentIndexRef.current <= 0) ||
-            (diffX < 0 && currentIndexRef.current >= numberTabs - 1)
+            (diffX > 0 && this.currentIndexRef <= 0) ||
+            (diffX < 0 && this.currentIndexRef >= this.animation.numberTabs - 1)
         ) {
             return;
         }
-
-        panX.setValue(diffX);
+        this.panX.setValue(diffX);
     };
 
-    // Finish
-    const finishGesture = (
+    private jumpToIndex = (index: number) => {
+        this.currentIndexRef = index;
+        const offset = -index * screenWidth;
+        if (this.listCheckLazyRef[index] === false) {
+            this.setState(preValue => ({
+                listCheckLazy: preValue.listCheckLazy.map((value, ind) => {
+                    if (ind !== index) return value;
+                    return true;
+                }),
+            }));
+        }
+
+        const {timing, ...transitionConfig} = DefaultTransitionSpec;
+        Animated.parallel([
+            timing(this.panX, {
+                ...transitionConfig,
+                toValue: offset,
+                useNativeDriver: false,
+            }),
+        ]).start(({finished}) => {
+            if (finished) {
+                if (this.listCheckLazyRef[index] === false) {
+                    this.props.onFirstNavigateToIndex?.(index);
+                    this.listCheckLazyRef[index] = true;
+                }
+            }
+        });
+    };
+
+    private finishGesture = (
         _: GestureResponderEvent,
         gestureState: PanResponderGestureState,
     ) => {
-        panX.flattenOffset();
+        this.panX.flattenOffset();
 
-        const currentIndex = currentIndexRef.current;
-        let nextIndex = currentIndexRef.current;
+        const currentIndex = this.currentIndexRef;
+        let nextIndex = this.currentIndexRef;
 
         if (
             Math.abs(gestureState.dx) > Math.abs(gestureState.dy) &&
@@ -147,41 +145,99 @@ const StyleTabView = (props: Props) => {
                             : currentIndex -
                                   gestureState.dx / Math.abs(gestureState.dx),
                     ),
-                    numberTabs - 1,
+                    this.animation.numberTabs - 1,
                 ),
             );
 
-            currentIndexRef.current = nextIndex;
+            this.currentIndexRef = nextIndex;
         }
 
         if (!Number.isFinite(nextIndex)) {
             nextIndex = currentIndex;
         }
 
-        jumpToIndex(nextIndex);
+        this.jumpToIndex(nextIndex);
     };
 
-    const panResponder = PanResponder.create({
-        onMoveShouldSetPanResponder: canMoveScreen,
-        onMoveShouldSetPanResponderCapture: canMoveScreen,
-        onPanResponderGrant: startGesture,
-        onPanResponderMove: respondToGesture,
-        onPanResponderTerminate: finishGesture,
-        onPanResponderRelease: finishGesture,
+    private panResponder = PanResponder.create({
+        onMoveShouldSetPanResponder: this.canMoveScreen,
+        onMoveShouldSetPanResponderCapture: this.canMoveScreen,
+        onPanResponderGrant: this.startGesture,
+        onPanResponderMove: this.respondToGesture,
+        onPanResponderTerminate: this.finishGesture,
+        onPanResponderRelease: this.finishGesture,
         onPanResponderTerminationRequest: () => true,
     });
 
-    return (
-        <Animated.View
-            style={[
-                styles.container,
-                {width: layOutWidth, transform: [{translateX}]},
-            ]}
-            {...panResponder.panHandlers}>
-            {children}
-        </Animated.View>
-    );
-};
+    navigateToIndex(index: number) {
+        this.jumpToIndex(index);
+    }
+
+    componentDidMount() {
+        const {initIndex = 0, children} = this.props;
+        const numberTabs = Children.toArray(children).length;
+        const layOutWidth = screenWidth * numberTabs;
+        const maxTranslateX = layOutWidth * (numberTabs - 1);
+
+        const temp = [];
+        for (let i = 0; i < numberTabs; i++) {
+            temp.push(initIndex === i);
+        }
+        this.listCheckLazyRef = temp;
+        this.animation = {
+            numberTabs,
+            maxTranslateX,
+        };
+        this.setState({
+            listCheckLazy: temp,
+            layOutWidth,
+        });
+
+        this.panX.addListener(({value}) => {
+            if (this.props.onScroll) {
+                const position = Math.abs(value / layOutWidth);
+                const index = Math.round(position * numberTabs);
+                this.props.onScroll?.({
+                    position,
+                    index,
+                });
+            }
+        });
+    }
+
+    render() {
+        const {children, containerStyle} = this.props;
+
+        const translateX = Animated.multiply(
+            this.panX.interpolate({
+                inputRange: [-this.animation.maxTranslateX, 0],
+                outputRange: [-this.animation.maxTranslateX, 0],
+                extrapolate: 'clamp',
+            }),
+            I18nManager.isRTL ? -1 : 1,
+        );
+
+        return (
+            <Animated.View
+                style={[
+                    styles.container,
+                    {
+                        width: this.state.layOutWidth,
+                        transform: [{translateX}],
+                    },
+                    containerStyle,
+                ]}
+                {...this.panResponder.panHandlers}>
+                {Children.toArray(children).map((view, ind) => {
+                    if (this.state.listCheckLazy[ind]) {
+                        return view;
+                    }
+                    return <View key={ind} style={{width: screenWidth}} />;
+                })}
+            </Animated.View>
+        );
+    }
+}
 
 const styles = StyleSheet.create({
     container: {

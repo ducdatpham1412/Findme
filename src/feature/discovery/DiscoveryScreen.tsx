@@ -2,6 +2,7 @@
 /* eslint-disable react/jsx-key */
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeBubblePalace, TypeCreatePostResponse} from 'api/interface';
+import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {
     apiGetListBubbleActive,
     apiGetListBubbleActiveOfUserEnjoy,
@@ -17,7 +18,6 @@ import {
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import LoadingScreen from 'components/LoadingScreen';
-import {showModalCommentDiscovery} from 'feature/discovery/components/ModalCommentDiscovery';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
@@ -27,6 +27,7 @@ import {
     navigate,
     showSwipeImages,
 } from 'navigation/NavigationService';
+import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 import Share from 'react-native-share';
@@ -116,19 +117,23 @@ const DiscoveryScreen = () => {
     /**
      * Functions
      */
-    const onShowModalComment = (post: TypeBubblePalace) => {
-        if (!hadLogan) {
-            appAlert('discovery.bubble.goToSignUp', {
-                moreNotice: 'common.letGo',
-                moreAction: onGoToSignUpFromAlert,
-            });
-        } else {
-            showModalCommentDiscovery({
-                post,
-                setList,
-            });
-        }
-    };
+    const onShowModalComment = useCallback(
+        (post: TypeBubblePalace, type: TypeShowModalCommentOrLike) => {
+            if (!hadLogan) {
+                appAlert('discovery.bubble.goToSignUp', {
+                    moreNotice: 'common.letGo',
+                    moreAction: onGoToSignUpFromAlert,
+                });
+            } else {
+                showCommentDiscovery({
+                    post,
+                    setList,
+                    type,
+                });
+            }
+        },
+        [hadLogan],
+    );
 
     const onShowOptions = (params: TypeShowMoreOptions) => {
         idUserReport = params.idUser;
@@ -196,8 +201,10 @@ const DiscoveryScreen = () => {
             <Bubble
                 item={item}
                 onShowMoreOption={onShowOptions}
-                onShowModalComment={() => onShowModalComment(item)}
-                onShowModalShare={() => onShowModalShare(item)}
+                onShowModalComment={(post, type) =>
+                    onShowModalComment(post, type)
+                }
+                onShowModalShare={post => onShowModalShare(post)}
             />
         );
     }, []);

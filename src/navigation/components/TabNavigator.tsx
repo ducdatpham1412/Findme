@@ -241,7 +241,7 @@ const TabNavigator = (props: any) => {
                     styles.addMoreView,
                     {
                         backgroundColor: theme.backgroundColor,
-                        borderTopColor: theme.borderColor,
+                        borderTopColor: theme.holderColor,
                     },
                 ]}>
                 {/* <AnimatedLinear

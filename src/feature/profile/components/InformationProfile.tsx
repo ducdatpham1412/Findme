@@ -60,7 +60,7 @@ const InformationProfile = (props: Props) => {
     const RenderFollow = () => {
         return (
             <View
-                style={[styles.followBox, {borderTopColor: theme.borderColor}]}>
+                style={[styles.followBox, {borderTopColor: theme.holderColor}]}>
                 {/* Follower */}
                 <StyleTouchable
                     customStyle={styles.elementFollow}
@@ -236,8 +236,8 @@ const styles = ScaledSheet.create({
         justifyContent: 'center',
         marginTop: '15@vs',
         borderTopWidth: Platform.select({
-            ios: '0.4@ms',
-            android: '1@ms',
+            ios: '0.25@ms',
+            android: '0.5@ms',
         }),
     },
     elementFollow: {

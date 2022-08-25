@@ -178,3 +178,9 @@ export enum TOPIC {
     cuisine = 1,
     shopping = 2,
 }
+
+export enum REACT {
+    post = 0,
+    comment = 1,
+    message = 2,
+}

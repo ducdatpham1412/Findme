@@ -49,7 +49,7 @@ export class HeaderDoffy extends Component<Props> {
                     styles.container,
                     {
                         backgroundColor: theme.backgroundColor,
-                        borderBottomColor: theme.borderColor,
+                        borderBottomColor: theme.holderColor,
                         transform: [{translateY}],
                         opacity,
                     },

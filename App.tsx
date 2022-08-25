@@ -11,7 +11,12 @@ import {addMenuClearAsyncStorage} from 'utility/assistant';
 import I18Next from 'utility/I18Next';
 
 if (__DEV__) {
-    LogBox.ignoreLogs(['componentWillMount', 'Non-serializable']);
+    LogBox.ignoreLogs([
+        'componentWillMount',
+        'Non-serializable',
+        'VirtualizedLists should never be nested',
+        'source.uri should not be an empty string',
+    ]);
     addMenuClearAsyncStorage();
 }
 
