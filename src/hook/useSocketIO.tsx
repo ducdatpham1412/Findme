@@ -88,6 +88,12 @@ export const SocketProvider = ({children}: any) => {
         if (e === 'active') {
             socket?.emit(SOCKET_EVENT.appActive, socket.id);
         } else if (e === 'background') {
+            const {id} = FindmeStore.getState().accountSlice.passport.profile;
+            const {chatTagFocusing} = FindmeStore.getState().logicSlice;
+            socketUnTyping({
+                userId: id,
+                conversationId: chatTagFocusing,
+            });
             socket?.emit(SOCKET_EVENT.appBackground, socket.id);
         }
     };
