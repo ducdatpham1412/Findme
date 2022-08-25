@@ -83,8 +83,12 @@ export default class HeaderFilterTopic extends Component<Props, States> {
         } else {
             temp = this.state.tempListTopics.concat(topic);
         }
+
+        const final = temp.length
+            ? temp
+            : [TOPIC.travel, TOPIC.cuisine, TOPIC.shopping];
         this.setState({
-            tempListTopics: temp,
+            tempListTopics: final,
         });
     }
 
@@ -149,7 +153,7 @@ export default class HeaderFilterTopic extends Component<Props, States> {
                     <View style={styles.threeTopicBox}>
                         <ItemFilterTopic
                             isChosen={isTravel}
-                            icon={Images.icons.girl}
+                            icon={Images.icons.travel}
                             title="profile.post.travel"
                             onPressTopic={() =>
                                 this.onChooseTopic(TOPIC.travel)
@@ -157,7 +161,7 @@ export default class HeaderFilterTopic extends Component<Props, States> {
                         />
                         <ItemFilterTopic
                             isChosen={isCuisine}
-                            icon={Images.icons.boy}
+                            icon={Images.icons.cuisine}
                             title="profile.post.cuisine"
                             onPressTopic={() =>
                                 this.onChooseTopic(TOPIC.cuisine)
@@ -165,7 +169,7 @@ export default class HeaderFilterTopic extends Component<Props, States> {
                         />
                         <ItemFilterTopic
                             isChosen={isShopping}
-                            icon={Images.icons.lgbt}
+                            icon={Images.icons.shopping}
                             title="profile.post.shopping"
                             onPressTopic={() =>
                                 this.onChooseTopic(TOPIC.shopping)

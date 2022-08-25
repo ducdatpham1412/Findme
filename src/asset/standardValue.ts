@@ -126,16 +126,16 @@ export const LIST_TOPICS: Array<{
     {
         id: TOPIC.travel,
         text: 'profile.post.travel',
-        icon: Images.icons.boy,
+        icon: Images.icons.travel,
     },
     {
         id: TOPIC.cuisine,
         text: 'profile.post.cuisine',
-        icon: Images.icons.girl,
+        icon: Images.icons.cuisine,
     },
     {
         id: TOPIC.shopping,
         text: 'profile.post.shopping',
-        icon: Images.icons.lgbt,
+        icon: Images.icons.shopping,
     },
 ];

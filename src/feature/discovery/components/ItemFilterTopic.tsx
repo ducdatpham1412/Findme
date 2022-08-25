@@ -20,7 +20,7 @@ const ItemFilterTopic = (props: Props) => {
 
     useEffect(() => {
         Animated.spring(scale, {
-            toValue: isChosen ? 1 : 0.65,
+            toValue: isChosen ? 1 : 0.45,
             useNativeDriver: true,
         }).start();
     }, [isChosen]);

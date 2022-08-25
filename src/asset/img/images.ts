@@ -38,6 +38,9 @@ const Images = {
         cry: require('./ic_crying.gif'),
         angry: require('./ic_angry.gif'),
         category: require('./ic_category.png'),
+        travel: require('./ic_travel.png'),
+        cuisine: require('./ic_cuisine.png'),
+        shopping: require('./ic_shopping.png'),
     },
     images: {
         logo: require('./img_logo.png'),

@@ -257,7 +257,7 @@ const styles = ScaledSheet.create({
         right: '10@s',
     },
     iconTurnOff: {
-        fontSize: '20@ms',
+        fontSize: '13@ms',
     },
     // list comment
     listCommentBox: {

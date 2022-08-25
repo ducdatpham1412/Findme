@@ -915,7 +915,7 @@ const styles = ScaledSheet.create({
     },
     // modal vertical
     modalVerticalView: {
-        paddingBottom: Metrics.safeBottomPadding,
+        paddingBottom: Metrics.safeBottomPadding + verticalScale(20),
         shadowOffset: {
             width: 0,
             height: -verticalScale(3),
