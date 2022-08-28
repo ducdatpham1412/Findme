@@ -16,6 +16,7 @@ import {
     TypeEditPostRequest,
     TypeEditProfileRequest,
     TypeEditProfileResponse,
+    TypeGetLikePostsResponse,
     TypeGetListBlockedResponse,
     TypeGetPassportResponse,
     TypeGetProfileResponse,
@@ -185,6 +186,21 @@ export const apiGetListComments = (
     data: Array<TypeCommentResponse>;
 }> => {
     return request.get(`/common/list-comments/${idBubble}`);
+};
+
+export const apiGetListReactsPost = ({
+    params,
+}: TypeParamsPaging): Promise<{
+    success: boolean;
+    data: Array<TypeGetLikePostsResponse>;
+}> => {
+    return request.get(`/common/list-people-react/${params.idBubble}`, {
+        params: {
+            pageIndex: params.pageIndex,
+            take: params.take,
+            type: params.type,
+        },
+    });
 };
 
 /**

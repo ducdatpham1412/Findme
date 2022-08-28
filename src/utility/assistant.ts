@@ -1,11 +1,12 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
+    TypeBubblePalace,
     TypeCreateGroupResponse,
     TypeGradient,
     TypeInteractBubble,
     TypeMemberInListChatTag,
 } from 'api/interface';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import FindmeStore from 'app-redux/store';
 import {
     FEELING,
@@ -424,4 +425,25 @@ export const chooseTextTopic = (topic: number | null): I18Normalize => {
 
 export const chooseIconTopic = (topic: number) => {
     return LIST_TOPICS.find(item => item.id === topic)?.icon || null;
+};
+
+export const fakeBubbleFocusing: TypeBubblePalace = {
+    id: '',
+    topic: 0,
+    feeling: 0,
+    location: '',
+    link: '',
+    content: '',
+    images: [],
+    stars: 0,
+    totalLikes: 0,
+    totalComments: 0,
+    totalSaved: 0,
+    creator: 0,
+    creatorName: '',
+    creatorAvatar: '',
+    created: '',
+    isLiked: false,
+    isSaved: false,
+    relationship: 0,
 };

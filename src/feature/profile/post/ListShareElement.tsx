@@ -14,6 +14,7 @@ import Theme from 'asset/theme/Theme';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import Bubble from 'feature/discovery/components/Bubble';
+import {TypeModalCommentPost} from 'components/ModalCommentLike';
 import {
     TypeMoreOptionsMe,
     TypeShowMoreOptions,
@@ -33,7 +34,7 @@ import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
 import {DefaultTransitionSpec} from 'utility/animation';
 import {logger} from 'utility/assistant';
-import {TypeModalCommentPost} from './ModalCommentListDetailPost';
+import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 
 interface Props {
     title: string;
@@ -156,14 +157,14 @@ export default class ListShareElement extends Component<Props, States> {
         }
     }
 
-    private showModalComment(post: TypeCreatePostResponse) {
-        // showModalCommentListDetailPost({
-        //     post,
-        //     setList: this.props.listPaging.setList,
-        // });
+    private showModalComment(
+        post: TypeCreatePostResponse,
+        type: TypeShowModalCommentOrLike,
+    ) {
         this.props.onShowModalComment({
             post,
             setList: this.props.listPaging.setList,
+            type,
         });
     }
 
@@ -224,7 +225,9 @@ export default class ListShareElement extends Component<Props, States> {
                 item={item}
                 isRectangle
                 onShowMoreOption={value => this.showOptions(value)}
-                onShowModalComment={post => this.showModalComment(post)}
+                onShowModalComment={(post, type) =>
+                    this.showModalComment(post, type)
+                }
                 onShowModalShare={post => this.showModalShare(post)}
             />
         );

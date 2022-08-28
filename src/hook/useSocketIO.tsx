@@ -1,6 +1,4 @@
-import {useIsFocused} from '@react-navigation/native';
 import {
-    TypeBubblePalace,
     TypeChangeChatColor,
     TypeChangeGroupNameResponse,
     TypeChatMessageResponse,
@@ -8,7 +6,6 @@ import {
     TypeChatTagResponse,
     TypeCommentResponse,
     TypeConversationRequest,
-    TypeCreatePostResponse,
     TypeDeleteMessageResponse,
     TypeNotificationResponse,
     TypeSeenMessageResponse,
@@ -604,9 +601,9 @@ export const useSocketChatDetail = (params: {
  *          SOCKET COMMENT
  -----------------------------------  */
 interface ParamSocketComment {
-    bubbleFocusing: TypeBubblePalace | TypeCreatePostResponse | undefined;
-    updateBubbleFocusing(value: any): void;
-    changeTotalComments(value: number): void;
+    bubbleFocusingId: string;
+    setTotalComments(value: any): void;
+    increaseTotalComments(value: number): void;
     myId: number;
     scrollToIndex(value: number): void;
     scrollToEnd(): void;
@@ -614,18 +611,18 @@ interface ParamSocketComment {
 }
 
 let oldBubbleFocusingId = '';
+let cachedListComments: Array<TypeCommentResponse> = [];
 
 export const useSocketComment = (params: ParamSocketComment) => {
     const {
-        bubbleFocusing,
-        updateBubbleFocusing,
-        changeTotalComments,
+        bubbleFocusingId,
+        setTotalComments,
+        increaseTotalComments,
         myId,
         scrollToIndex,
         clearText,
         scrollToEnd,
     } = params;
-    const isFocused = useIsFocused();
     const [isLoading, setIsLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [dataComment, setDataComment] = useState<Array<TypeCommentResponse>>(
@@ -635,7 +632,7 @@ export const useSocketComment = (params: ParamSocketComment) => {
     const getData = async () => {
         try {
             setIsLoading(true);
-            const res = await apiGetListComments(bubbleFocusing?.id || '');
+            const res = await apiGetListComments(bubbleFocusingId || '');
             setDataComment(res.data);
 
             let totalComments = res.data.length;
@@ -644,7 +641,7 @@ export const useSocketComment = (params: ParamSocketComment) => {
                     totalComments += item.listCommentsReply?.length;
                 }
             });
-            updateBubbleFocusing({totalComments});
+            setTotalComments(totalComments);
         } catch (err) {
             appAlert(err);
         } finally {
@@ -655,7 +652,7 @@ export const useSocketComment = (params: ParamSocketComment) => {
     const onRefresh = async () => {
         try {
             setRefreshing(true);
-            const res = await apiGetListComments(bubbleFocusing?.id || '');
+            const res = await apiGetListComments(bubbleFocusingId || '');
             setDataComment(res.data);
 
             let totalComments = res.data.length;
@@ -664,7 +661,7 @@ export const useSocketComment = (params: ParamSocketComment) => {
                     totalComments += item.listCommentsReply?.length;
                 }
             });
-            updateBubbleFocusing({totalComments});
+            setTotalComments(totalComments);
         } catch (err) {
             appAlert(err);
         } finally {
@@ -701,28 +698,35 @@ export const useSocketComment = (params: ParamSocketComment) => {
                         clearText();
                     }
                 }
-                changeTotalComments(1);
+                increaseTotalComments(1);
             },
         );
     };
 
     useEffect(() => {
-        if (!isFocused) {
-            oldBubbleFocusingId = '';
-        }
-    }, [isFocused]);
+        return () => {
+            cachedListComments = dataComment;
+        };
+    }, [dataComment]);
 
     useEffect(() => {
-        if (bubbleFocusing?.id && bubbleFocusing.id !== oldBubbleFocusingId) {
-            getData();
-            socket.emit(SOCKET_EVENT.joinRoom, bubbleFocusing.id);
-            hearingSocket();
-            if (oldBubbleFocusingId) {
-                socket.emit(SOCKET_EVENT.leaveRoom, oldBubbleFocusingId);
+        if (bubbleFocusingId) {
+            if (bubbleFocusingId !== oldBubbleFocusingId) {
+                getData();
+                socket.emit(SOCKET_EVENT.joinRoom, bubbleFocusingId);
+                hearingSocket();
+                if (oldBubbleFocusingId) {
+                    socket.emit(SOCKET_EVENT.leaveRoom, oldBubbleFocusingId);
+                }
+                oldBubbleFocusingId = bubbleFocusingId;
+            } else {
+                socket.emit(SOCKET_EVENT.leaveRoom, bubbleFocusingId);
+                socket.emit(SOCKET_EVENT.joinRoom, bubbleFocusingId);
+                hearingSocket();
+                setDataComment(cachedListComments);
             }
-            oldBubbleFocusingId = bubbleFocusing.id;
         }
-    }, [bubbleFocusing?.id, myId]);
+    }, [bubbleFocusingId, myId]);
 
     return {
         list: dataComment,

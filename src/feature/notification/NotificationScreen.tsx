@@ -62,6 +62,7 @@ const NotificationAccount = () => {
             if (item?.bubbleId) {
                 navigate(ROOT_SCREEN.detailBubble, {
                     bubbleId: item.bubbleId,
+                    displayLike: true,
                 });
             }
         } else if (item.type === TYPE_NOTIFICATION.newChatTag) {

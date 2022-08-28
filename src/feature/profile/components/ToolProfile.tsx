@@ -1,7 +1,7 @@
 import {StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import React from 'react';
-import {Platform, View} from 'react-native';
+import {View} from 'react-native';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Feather from 'react-native-vector-icons/Feather';
@@ -22,7 +22,7 @@ const ToolProfile = (props: Props) => {
     const isPostsSaved = index === 2;
 
     return (
-        <View style={[styles.container, {borderTopColor: theme.borderColor}]}>
+        <View style={styles.container}>
             <View
                 style={[
                     styles.spaceBackground,
@@ -44,13 +44,6 @@ const ToolProfile = (props: Props) => {
                 />
             </StyleTouchable>
 
-            <View
-                style={[
-                    styles.dividerBetween,
-                    {borderRightColor: theme.borderColor},
-                ]}
-            />
-
             <StyleTouchable
                 customStyle={styles.buttonBox}
                 onPress={() => onChangeTab(1)}>
@@ -65,13 +58,6 @@ const ToolProfile = (props: Props) => {
                     ]}
                 />
             </StyleTouchable>
-
-            <View
-                style={[
-                    styles.dividerBetween,
-                    {borderRightColor: theme.borderColor},
-                ]}
-            />
 
             <StyleTouchable
                 customStyle={styles.buttonBox}
@@ -99,10 +85,7 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        borderTopWidth: Platform.select({
-            ios: '0.4@ms',
-            android: '1@ms',
-        }),
+        borderTopWidth: 0,
     },
     spaceBackground: {
         position: 'absolute',
@@ -120,13 +103,6 @@ const styles = ScaledSheet.create({
     },
     iconBookMark: {
         fontSize: '18@ms',
-    },
-    dividerBetween: {
-        height: '70%',
-        borderRightWidth: Platform.select({
-            ios: '0.4@ms',
-            android: '1@ms',
-        }),
     },
 });
 

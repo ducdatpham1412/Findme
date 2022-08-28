@@ -10,6 +10,9 @@ import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import StyleActionSheet from 'components/common/StyleActionSheet';
+import ModalCommentLike, {
+    TypeModalCommentPost,
+} from 'components/ModalCommentLike';
 import StyleTabView from 'components/StyleTabView';
 import ListShareElement from 'feature/profile/post/ListShareElement';
 import usePaging from 'hook/usePaging';
@@ -18,13 +21,16 @@ import {tabBarViewHeight} from 'navigation/components/TabNavigator';
 import {appAlert} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
+    Animated,
     NativeScrollEvent,
+    Platform,
     RefreshControl,
     ScrollView,
     View,
 } from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import {
+    fakeBubbleFocusing,
     isScrollCloseToBottom,
     modalizeMyProfile,
     onGoToSignUp,
@@ -35,9 +41,6 @@ import SearchAndSetting, {
     searchSettingHeight,
 } from './components/SearchAndSetting';
 import ToolProfile, {toolProfileHeight} from './components/ToolProfile';
-import ModalCommentListDetailPost, {
-    showModalCommentListDetailPost,
-} from './post/ModalCommentListDetailPost';
 import PostStatus from './post/PostStatus';
 
 interface ChildrenProps {
@@ -45,6 +48,7 @@ interface ChildrenProps {
 }
 
 const extraHeight = -(Metrics.safeBottomPadding + verticalScale(7));
+const screenWidth = Metrics.width;
 
 /** ------------------------
  * Profile Enjoy
@@ -136,6 +140,12 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     const bubblePalaceAction = Redux.getBubblePalaceAction();
     const theme = Redux.getTheme();
 
+    const modalLikeCommentRef = useRef<ModalCommentLike>(null);
+
+    const showModalLikeComment = useCallback((params: TypeModalCommentPost) => {
+        modalLikeCommentRef.current?.show(params);
+    }, []);
+
     const myPostsPaging = usePaging({
         request: apiGetListPost,
         params: {
@@ -151,10 +161,12 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
         isInitNotRunRequest: true,
     });
 
+    const translateXIndicator = useRef(new Animated.Value(0)).current;
     const optionRef = useRef<any>(null);
     const myPostRef = useRef<ListShareElement>(null);
     const postLikedRef = useRef<ListShareElement>(null);
     const postSavedRef = useRef<ListShareElement>(null);
+    const tabViewRef = useRef<StyleTabView>(null);
 
     const [tabIndex, setTabIndex] = useState(0);
     const [bubbleFocusing, setBubbleFocusing] =
@@ -269,11 +281,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     }, []);
 
     return (
-        <View
-            style={{flex: 1}}
-            onTouchEnd={() => {
-                // console.log(e.nativeEvent.pageX, ' - ', e.nativeEvent.pageY);
-            }}>
+        <View style={{flex: 1}}>
             <AvatarBackground avatar={profile.avatar} />
             <View
                 style={[
@@ -305,23 +313,53 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                     routeName={routeName}
                     havingEditProfile
                 />
-                <ToolProfile
-                    index={tabIndex}
-                    onChangeTab={index => setTabIndex(index)}
-                />
+                <>
+                    <ToolProfile
+                        index={tabIndex}
+                        onChangeTab={index => {
+                            setTabIndex(index);
+                            tabViewRef.current?.navigateToIndex(index);
+                        }}
+                    />
+                    <View
+                        style={[
+                            styles.indicatorView,
+                            {backgroundColor: theme.backgroundColor},
+                        ]}>
+                        <Animated.View
+                            style={[
+                                styles.indicator,
+                                {
+                                    flex: 1 / 3,
+                                    borderTopColor: theme.borderColor,
+                                    transform: [
+                                        {translateX: translateXIndicator},
+                                    ],
+                                },
+                            ]}
+                        />
+                    </View>
+                </>
 
                 <StyleTabView
-                    index={tabIndex}
-                    onChangeIndex={value => setTabIndex(value)}
-                    listCallbackWhenFocus={[
-                        () => null,
-                        () => postsLikedPaging.onLoadMore(),
-                        () => postsSavedPaging.onLoadMore(),
-                    ]}>
+                    ref={tabViewRef}
+                    onFirstNavigateToIndex={index => {
+                        if (index === 1) {
+                            postsLikedPaging.onLoadMore();
+                        } else if (index === 2) {
+                            postsSavedPaging.onLoadMore();
+                        }
+                    }}
+                    onScroll={e => {
+                        translateXIndicator.setValue(e.position * screenWidth);
+                        if (e.index !== tabIndex) {
+                            setTabIndex(e.index);
+                        }
+                    }}>
                     <View
                         style={[
                             styles.contentContainerPost,
-                            isFocusMyPost ? {} : safeLoadMoreStyle,
+                            isFocusPostLiked ? {} : safeLoadMoreStyle,
                         ]}>
                         {myPostsPaging.list.map(RenderItemPost)}
                     </View>
@@ -335,7 +373,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                     <View
                         style={[
                             styles.contentContainerPost,
-                            isFocusPostSaved ? {} : safeLoadMoreStyle,
+                            isFocusPostLiked ? {} : safeLoadMoreStyle,
                         ]}>
                         {postsSavedPaging.list.map(RenderItemPost)}
                     </View>
@@ -349,10 +387,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 containerStyle={{
                     backgroundColor: theme.backgroundColorSecond,
                 }}
-                onShowModalComment={params => {
-                    setBubbleFocusing(params.post);
-                    showModalCommentListDetailPost(params);
-                }}
+                onShowModalComment={showModalLikeComment}
             />
 
             <ListShareElement
@@ -362,10 +397,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 containerStyle={{
                     backgroundColor: theme.backgroundColorSecond,
                 }}
-                onShowModalComment={params => {
-                    setBubbleFocusing(params.post);
-                    showModalCommentListDetailPost(params);
-                }}
+                onShowModalComment={showModalLikeComment}
             />
 
             <ListShareElement
@@ -375,37 +407,42 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 containerStyle={{
                     backgroundColor: theme.backgroundColorSecond,
                 }}
-                onShowModalComment={params => {
-                    setBubbleFocusing(params.post);
-                    showModalCommentListDetailPost(params);
-                }}
+                onShowModalComment={showModalLikeComment}
             />
 
-            <ModalCommentListDetailPost
-                bubbleFocusing={bubbleFocusing}
-                setBubbleFocusing={(value: TypeCreatePostResponse) => {
-                    if (bubbleFocusing) {
-                        setBubbleFocusing(preValue => ({
-                            ...preValue,
-                            ...value,
-                        }));
-                    }
+            <ModalCommentLike
+                ref={modalLikeCommentRef}
+                theme={theme}
+                bubbleFocusing={bubbleFocusing || fakeBubbleFocusing}
+                updateBubbleFocusing={value =>
+                    setBubbleFocusing(preValue => ({
+                        ...preValue,
+                        ...value,
+                    }))
+                }
+                setTotalComments={value => {
+                    setBubbleFocusing(preValue => {
+                        if (preValue) {
+                            return {
+                                ...preValue,
+                                totalComments: value,
+                            };
+                        }
+                        return preValue;
+                    });
                 }}
-                changeTotalCommentsFocusing={value => {
-                    if (bubbleFocusing) {
-                        setBubbleFocusing(preValue => {
-                            if (preValue) {
-                                return {
-                                    ...preValue,
-                                    totalComments:
-                                        preValue.totalComments + value,
-                                };
-                            }
-                            return preValue;
-                        });
-                    }
+                increaseTotalComments={value => {
+                    setBubbleFocusing(preValue => {
+                        if (preValue) {
+                            return {
+                                ...preValue,
+                                totalComments: preValue.totalComments + value,
+                            };
+                        }
+                        return preValue;
+                    });
                 }}
-                inputCommentStyle={styles.inputCommentView}
+                inputCommentContainerStyle={styles.inputCommentView}
                 extraHeight={extraHeight}
             />
 
@@ -473,7 +510,20 @@ const styles = ScaledSheet.create({
     },
     // input
     inputCommentView: {
-        paddingBottom: '7@vs',
+        paddingBottom: '14@vs',
+    },
+    // indicator
+    indicatorView: {
+        width: '100%',
+        flexDirection: 'row',
+        height: '2@vs',
+    },
+    indicator: {
+        flex: 1 / 3,
+        borderTopWidth: Platform.select({
+            ios: '1@ms',
+            android: '2@ms',
+        }),
     },
 });
 

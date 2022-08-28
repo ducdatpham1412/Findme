@@ -139,6 +139,15 @@ export interface TypeCommentResponse {
     listCommentsReply?: Array<TypeCommentResponse>;
 }
 
+export interface TypeGetLikePostsResponse {
+    id: string;
+    creator: number;
+    creatorName: string;
+    creatorAvatar: string;
+    created: string;
+    relationship: number;
+}
+
 export interface TypeSocketCommentRequest {
     token: string;
     comment: {
@@ -297,6 +306,27 @@ export interface TypeBubblePalace {
     isSaved: boolean;
     relationship: number;
 }
+
+// export interface TypeUpdateBubblePalace {
+//     id?: string;
+//     topic?: number | null;
+//     feeling?: number | null;
+//     location?: string | null;
+//     link?: string | null;
+//     content?: string;
+//     images?: Array<string>;
+//     stars?: number;
+//     totalLikes?: number;
+//     totalComments?: number;
+//     totalSaved?: number;
+//     creator?: number;
+//     creatorName?: string;
+//     creatorAvatar?: string;
+//     created?: string;
+//     isLiked?: boolean;
+//     isSaved?: boolean;
+//     relationship?: number;
+// }
 
 export interface TypeBubblePalaceAction {
     action: number;
