@@ -131,12 +131,11 @@ export enum TYPE_COLOR {
 }
 
 export enum TYPE_NOTIFICATION {
-    newChatTag = 0,
-    follow = 1,
-    likePost = 2,
-    friendPostNew = 3,
-    comment = 4,
-    message = 5,
+    message = 0,
+    comment = 1,
+    follow = 2,
+    likePost = 3,
+    friendPostNew = 4,
 }
 
 export enum TYPE_BUBBLE_PALACE_ACTION {

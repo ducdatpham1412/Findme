@@ -752,6 +752,9 @@ export const useSocketNotification = () => {
                 setList((preValue: Array<TypeNotificationResponse>) => {
                     return [data].concat(preValue);
                 });
+                const {numberNewNotifications} =
+                    FindmeStore.getState().logicSlice;
+                Redux.setNumberNewNotifications(numberNewNotifications + 1);
             },
         );
     };

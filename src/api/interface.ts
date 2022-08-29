@@ -437,10 +437,11 @@ export interface TypingResponse {
 export interface TypeNotificationResponse {
     id: string;
     type: number;
-    content: string;
-    image: string;
-    creatorId: number;
-    hadRead: boolean;
-    chatTagId?: string;
-    bubbleId?: string;
+    image?: string;
+    postId?: string;
+    creator: number;
+    creatorName: string;
+    creatorAvatar: string;
+    created: string;
+    isRead: boolean;
 }
