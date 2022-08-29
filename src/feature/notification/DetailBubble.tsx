@@ -7,7 +7,6 @@ import {TypeBubblePalace} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {apiGetDetailBubble} from 'api/module';
 import {apiLikePost, apiSavePost, apiUnLikePost, apiUnSavePost} from 'api/post';
-import FindmeStore from 'app-redux/store';
 import {TYPE_DYNAMIC_LINK} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
@@ -32,12 +31,7 @@ import ModalCommentLike from 'components/ModalCommentLike';
 import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
-import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
-import {
-    appAlert,
-    navigate,
-    showSwipeImages,
-} from 'navigation/NavigationService';
+import {appAlert, showSwipeImages} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {ScrollView, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -50,6 +44,7 @@ import {
     chooseIconFeeling,
     chooseTextTopic,
     fakeBubbleFocusing,
+    onGoToProfile,
 } from 'utility/assistant';
 import {formatFromNow} from 'utility/format';
 
@@ -62,19 +57,6 @@ interface Props {
         };
     };
 }
-
-const onGoToProfile = (userId: number | undefined) => {
-    if (userId) {
-        const myId = FindmeStore.getState().accountSlice.passport.profile.id;
-        if (userId === myId) {
-            navigate(PROFILE_ROUTE.myProfile);
-        } else {
-            navigate(ROOT_SCREEN.otherProfile, {
-                id: userId,
-            });
-        }
-    }
-};
 
 const onSeeDetailImage = (images: Array<string>) => {
     showSwipeImages({
@@ -234,7 +216,11 @@ const DetailBubble = ({route}: Props) => {
                 <View style={styles.avatarNameOptionBox}>
                     <StyleTouchable
                         customStyle={styles.avatarFeeling}
-                        onPress={() => onGoToProfile(bubble?.creator)}>
+                        onPress={() => {
+                            if (bubble?.creator) {
+                                onGoToProfile(bubble.creator);
+                            }
+                        }}>
                         <StyleImage
                             source={{uri: bubble?.creatorAvatar}}
                             customStyle={styles.avatar}

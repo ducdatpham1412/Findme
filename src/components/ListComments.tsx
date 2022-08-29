@@ -7,8 +7,6 @@ import {Metrics} from 'asset/metrics';
 import ItemComment from 'feature/discovery/components/ItemComment';
 import Redux from 'hook/useRedux';
 import {socketAddComment, useSocketComment} from 'hook/useSocketIO';
-import ROOT_SCREEN from 'navigation/config/routes';
-import {navigate} from 'navigation/NavigationService';
 import React, {useCallback, useRef, useState} from 'react';
 import {
     FlatList,
@@ -29,12 +27,6 @@ interface Props {
     inputCommentContainerStyle?: StyleProp<ViewStyle>;
     extraHeight?: number;
 }
-
-const onGoToProfile = (userId: number) => {
-    navigate(ROOT_SCREEN.otherProfile, {
-        id: userId,
-    });
-};
 
 const ListComments = (props: Props) => {
     const {
@@ -106,7 +98,6 @@ const ListComments = (props: Props) => {
                 item={item}
                 commentReplied=""
                 onPressReply={onPresReply}
-                onGoToProfile={onGoToProfile}
             />
         );
     }, []);

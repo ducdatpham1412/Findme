@@ -22,7 +22,11 @@ import {ScaledSheet} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Octicons from 'react-native-vector-icons/Octicons';
-import {chooseColorGradient, renderIconGender} from 'utility/assistant';
+import {
+    chooseColorGradient,
+    onGoToProfile,
+    renderIconGender,
+} from 'utility/assistant';
 import ItemSetting from './components/ItemSetting';
 import ItemSettingSwitch from './components/ItemSettingSwitch';
 
@@ -37,12 +41,6 @@ interface Props {
 /**
  * Functions
  */
-const onGoToProfile = (userId: number) => {
-    navigate(ROOT_SCREEN.otherProfile, {
-        id: userId,
-    });
-};
-
 const onReportUser = (userId: number) => {
     navigate(ROOT_SCREEN.reportUser, {
         idUser: userId,

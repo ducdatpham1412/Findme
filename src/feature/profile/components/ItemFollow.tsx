@@ -4,12 +4,12 @@ import {RELATIONSHIP} from 'asset/enum';
 import Images from 'asset/img/images';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
-import ROOT_SCREEN from 'navigation/config/routes';
-import {appAlert, push} from 'navigation/NavigationService';
+import {appAlert} from 'navigation/NavigationService';
 import React, {useState} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {onGoToProfile} from 'utility/assistant';
 
 interface Props {
     item: TypeFollowResponse;
@@ -33,17 +33,10 @@ const ItemFollow = (props: Props) => {
         }
     };
 
-    const onGoToProfile = () => {
-        push(ROOT_SCREEN.otherProfile, {
-            id: item.id,
-            onGoBack: undefined,
-        });
-    };
-
     return (
         <StyleTouchable
             style={styles.container}
-            onPress={onGoToProfile}
+            onPress={() => onGoToProfile(item.id)}
             disable={!item.id}>
             <StyleImage
                 source={{uri: item.avatar}}

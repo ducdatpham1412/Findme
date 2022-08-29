@@ -160,11 +160,9 @@ const TabNavigator = (props: any) => {
         return (
             <StyleTouchable
                 onPress={() => {
-                    if (tabIndexFocus !== 2) {
-                        navigate(MAIN_SCREEN.profileRoute);
-                    } else {
-                        navigate(PROFILE_ROUTE.myProfile);
-                    }
+                    navigate(MAIN_SCREEN.profileRoute, {
+                        screen: PROFILE_ROUTE.myProfile,
+                    });
                 }}
                 customStyle={styles.buttonView}>
                 <StyleImage

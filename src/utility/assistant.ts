@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
     TypeBubblePalace,
     TypeCreateGroupResponse,
@@ -6,7 +7,6 @@ import {
     TypeInteractBubble,
     TypeMemberInListChatTag,
 } from 'api/interface';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import FindmeStore from 'app-redux/store';
 import {
     FEELING,
@@ -23,7 +23,7 @@ import ROOT_SCREEN, {
     PROFILE_ROUTE,
     SETTING_ROUTE,
 } from 'navigation/config/routes';
-import {navigate} from 'navigation/NavigationService';
+import {navigate, push} from 'navigation/NavigationService';
 import {useState} from 'react';
 import {DevSettings, NativeScrollEvent, Platform} from 'react-native';
 import {verticalScale} from 'react-native-size-matters';
@@ -446,4 +446,20 @@ export const fakeBubbleFocusing: TypeBubblePalace = {
     isLiked: false,
     isSaved: false,
     relationship: 0,
+};
+
+export const onGoToProfile = (userId: number) => {
+    const myId = FindmeStore.getState().accountSlice.passport.profile.id;
+    if (userId === myId) {
+        // navigate(MAIN_SCREEN.profileRoute, {
+        //     screen: PROFILE_ROUTE.myProfile,
+        // });
+        push(ROOT_SCREEN.otherProfile, {
+            id: userId,
+        });
+    } else {
+        push(ROOT_SCREEN.otherProfile, {
+            id: userId,
+        });
+    }
 };
