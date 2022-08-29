@@ -12,7 +12,6 @@ import {
     TypeCommentResponse,
     TypeCreateGroupResponse,
     TypeCreatePostRequest,
-    TypeCreatePostResponse,
     TypeEditPostRequest,
     TypeEditProfileRequest,
     TypeEditProfileResponse,
@@ -325,7 +324,7 @@ export const apiCreatePost = (
     params: TypeCreatePostRequest,
 ): Promise<{
     success: boolean;
-    data: TypeCreatePostResponse;
+    data: TypeBubblePalace;
 }> => {
     return request.post('/profile/create-post', params);
 };
@@ -372,7 +371,7 @@ export const apiGetListPost = ({
     params,
 }: TypeParamsPaging): Promise<{
     success: boolean;
-    data: Array<TypeCreatePostResponse>;
+    data: Array<TypeBubblePalace>;
 }> => {
     return request.get(`/profile/list-posts/${params.userId}`, {
         params,
@@ -383,7 +382,7 @@ export const apiGetListPostsLiked = ({
     params,
 }: TypeParamsPaging): Promise<{
     success: boolean;
-    data: Array<TypeCreatePostResponse>;
+    data: Array<TypeBubblePalace>;
 }> => {
     return request.get('/profile/list-posts-liked', {
         params,
@@ -394,7 +393,7 @@ export const apiGetListPostsSaved = ({
     params,
 }: TypeParamsPaging): Promise<{
     success: boolean;
-    data: Array<TypeCreatePostResponse>;
+    data: Array<TypeBubblePalace>;
 }> => {
     return request.get('/profile/list-posts-saved', {
         params,

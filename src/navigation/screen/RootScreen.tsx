@@ -117,7 +117,7 @@ const RootScreen = () => {
                         options={{
                             ...alertOption,
                             cardStyle: {
-                                backgroundColor: theme.backgroundOpacity(0.6),
+                                backgroundColor: theme.backgroundOpacity(),
                             },
                         }}
                         name={ROOT_SCREEN.alert}
@@ -128,7 +128,7 @@ const RootScreen = () => {
                         options={{
                             ...alertOption,
                             cardStyle: {
-                                backgroundColor: theme.backgroundOpacity(0.6),
+                                backgroundColor: theme.backgroundOpacity(),
                             },
                         }}
                         name={ROOT_SCREEN.alertYesNo}
@@ -160,7 +160,7 @@ const RootScreen = () => {
                         component={StylePicker}
                         options={{
                             cardStyle: [
-                                {backgroundColor: theme.backgroundOpacity(0.6)},
+                                {backgroundColor: theme.backgroundOpacity()},
                                 cardSafe,
                             ],
                             cardStyleInterpolator:

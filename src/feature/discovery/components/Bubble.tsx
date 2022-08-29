@@ -4,7 +4,6 @@
 /* eslint-disable no-unused-expressions */
 import {TypeBubblePalace} from 'api/interface';
 import {apiLikePost, apiSavePost, apiUnLikePost, apiUnSavePost} from 'api/post';
-import FindmeStore from 'app-redux/store';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
@@ -19,7 +18,7 @@ import IconNotLiked from 'components/common/IconNotLiked';
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
 import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
-import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
+import {PROFILE_ROUTE} from 'navigation/config/routes';
 import {
     appAlert,
     goBack,
@@ -125,6 +124,12 @@ const onHandleSave = async (params: {
             },
         });
     }
+};
+
+const onGoToPublicDraft = (item: TypeBubblePalace) => {
+    navigate(PROFILE_ROUTE.createPostPreview, {
+        itemDraft: item,
+    });
 };
 
 const Bubble = (props: Props) => {
@@ -261,48 +266,80 @@ const Bubble = (props: Props) => {
         );
     };
 
-    const Footer = () => {
+    const StarLink = () => {
         const arrayStars = Array(item.stars).fill(0);
         return (
-            <View style={styles.footerView}>
-                <View style={styles.starLink}>
-                    <LinearGradient
-                        colors={[
-                            Theme.common.gradientTabBar1,
-                            Theme.common.gradientTabBar2,
-                        ]}
-                        style={styles.starBox}>
-                        {arrayStars.map((_, index) => (
-                            <AntDesign
-                                key={index}
-                                name="star"
-                                style={styles.star}
-                            />
-                        ))}
-                    </LinearGradient>
-                    {item.link && (
-                        <StyleTouchable customStyle={styles.linkBox}>
-                            <LinearGradient
-                                colors={[
-                                    Theme.common.gradientTabBar1,
-                                    Theme.common.gradientTabBar2,
-                                ]}
-                                style={styles.linkTouch}>
-                                <View style={styles.iconHouseTouch}>
-                                    <StyleImage
-                                        source={Images.icons.house}
-                                        customStyle={styles.iconHouse}
-                                    />
-                                </View>
-                                <StyleText
-                                    originValue={'See now'}
-                                    customStyle={styles.textSeeNow}
+            <View style={styles.starLink}>
+                <LinearGradient
+                    colors={[
+                        Theme.common.gradientTabBar1,
+                        Theme.common.gradientTabBar2,
+                    ]}
+                    style={styles.starBox}>
+                    {arrayStars.map((_, index) => (
+                        <AntDesign
+                            key={index}
+                            name="star"
+                            style={styles.star}
+                        />
+                    ))}
+                </LinearGradient>
+                {item.link && (
+                    <StyleTouchable customStyle={styles.linkBox}>
+                        <LinearGradient
+                            colors={[
+                                Theme.common.gradientTabBar1,
+                                Theme.common.gradientTabBar2,
+                            ]}
+                            style={styles.linkTouch}>
+                            <View style={styles.iconHouseTouch}>
+                                <StyleImage
+                                    source={Images.icons.house}
+                                    customStyle={styles.iconHouse}
                                 />
-                            </LinearGradient>
-                        </StyleTouchable>
-                    )}
-                </View>
+                            </View>
+                            <StyleText
+                                originValue={'See now'}
+                                customStyle={styles.textSeeNow}
+                            />
+                        </LinearGradient>
+                    </StyleTouchable>
+                )}
+            </View>
+        );
+    };
 
+    const Footer = () => {
+        if (item.isDraft) {
+            return (
+                <View style={styles.footerView}>
+                    <StyleText
+                        i18Text="profile.thisPostInDraft"
+                        customStyle={[
+                            styles.textThisPostInDraft,
+                            {color: theme.holderColorLighter},
+                        ]}
+                    />
+                    <StyleTouchable
+                        customStyle={[
+                            styles.goToPostBox,
+                            {backgroundColor: theme.backgroundButtonColor},
+                        ]}
+                        onPress={() => onGoToPublicDraft(item)}>
+                        <StyleText
+                            i18Text="profile.goToPost"
+                            customStyle={[
+                                styles.textGoToPost,
+                                {color: theme.textHightLight},
+                            ]}
+                        />
+                    </StyleTouchable>
+                </View>
+            );
+        }
+
+        return (
+            <View style={styles.footerView}>
                 <View style={styles.likeCommentShareSave}>
                     {isLiked ? (
                         <IconLiked
@@ -472,7 +509,7 @@ const Bubble = (props: Props) => {
                 }}
                 containerStyle={styles.imageView}
             />
-
+            {StarLink()}
             {Footer()}
         </View>
     );
@@ -552,15 +589,12 @@ const styles = ScaledSheet.create({
     imageView: {
         maxHeight: Metrics.width * 1.5,
     },
-    // footer
-    footerView: {
-        width: '100%',
-        paddingHorizontal: '15@s',
-        marginTop: '6@vs',
-    },
+    // star link
     starLink: {
         width: '100%',
         flexDirection: 'row',
+        marginTop: '10@vs',
+        paddingHorizontal: '14@s',
     },
     starBox: {
         height: '22@ms',
@@ -601,6 +635,30 @@ const styles = ScaledSheet.create({
         fontWeight: 'bold',
         color: Theme.common.white,
         marginLeft: '7@s',
+    },
+    // footer
+    footerView: {
+        width: '100%',
+        paddingHorizontal: '15@s',
+    },
+    textThisPostInDraft: {
+        fontSize: '12@ms',
+        marginTop: '10@vs',
+        alignSelf: 'center',
+    },
+    goToPostBox: {
+        paddingHorizontal: '10@s',
+        paddingVertical: '5@vs',
+        borderRadius: '5@ms',
+        width: '50%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: '5@vs',
+        alignSelf: 'center',
+    },
+    textGoToPost: {
+        fontSize: '14@ms',
+        fontWeight: 'bold',
     },
     likeCommentShareSave: {
         width: '100%',

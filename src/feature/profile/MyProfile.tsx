@@ -1,4 +1,4 @@
-import {TypeCreatePostResponse} from 'api/interface';
+import {TypeBubblePalace} from 'api/interface';
 import {
     apiGetListPost,
     apiGetListPostsLiked,
@@ -123,7 +123,7 @@ const ProfileEnjoy = ({routeName}: ChildrenProps) => {
  * Profile User
  * -------------------------
  */
-let listShareElement: Array<TypeCreatePostResponse> = [];
+let listShareElement: Array<TypeBubblePalace> = [];
 let tabIndexRef = 0;
 
 const safeLoadMoreStyle: any = {
@@ -169,8 +169,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     const tabViewRef = useRef<StyleTabView>(null);
 
     const [tabIndex, setTabIndex] = useState(0);
-    const [bubbleFocusing, setBubbleFocusing] =
-        useState<TypeCreatePostResponse>();
+    const [bubbleFocusing, setBubbleFocusing] = useState<TypeBubblePalace>();
     const isFocusMyPost = tabIndex === 0;
     const isFocusPostLiked = tabIndex === 1;
     const isFocusPostSaved = tabIndex === 2;
@@ -180,13 +179,28 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             bubblePalaceAction.action ===
             TYPE_BUBBLE_PALACE_ACTION.createNewPost
         ) {
-            myPostsPaging.setList((preValue: Array<TypeCreatePostResponse>) =>
+            myPostsPaging.setList((preValue: Array<TypeBubblePalace>) =>
                 [bubblePalaceAction.payload].concat(preValue),
             );
             Redux.setBubblePalaceAction({
                 action: TYPE_BUBBLE_PALACE_ACTION.null,
                 payload: null,
             });
+        } else if (
+            bubblePalaceAction.action ===
+            TYPE_BUBBLE_PALACE_ACTION.editPostFromProfile
+        ) {
+            myPostsPaging.setList((preValue: Array<TypeBubblePalace>) =>
+                preValue.map(item => {
+                    if (item.id !== bubblePalaceAction.payload.id) {
+                        return item;
+                    }
+                    return {
+                        ...item,
+                        ...bubblePalaceAction.payload,
+                    };
+                }),
+            );
         }
     }, [bubblePalaceAction]);
 
@@ -273,7 +287,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     /**
      * Render views
      */
-    const RenderItemPost = useCallback((item: TypeCreatePostResponse) => {
+    const RenderItemPost = useCallback((item: TypeBubblePalace) => {
         return (
             <PostStatus
                 key={item.id}
@@ -363,7 +377,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                     <View
                         style={[
                             styles.contentContainerPost,
-                            isFocusPostLiked ? {} : safeLoadMoreStyle,
+                            isFocusMyPost ? {} : safeLoadMoreStyle,
                         ]}>
                         {myPostsPaging.list.map(RenderItemPost)}
                     </View>
@@ -377,7 +391,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                     <View
                         style={[
                             styles.contentContainerPost,
-                            isFocusPostLiked ? {} : safeLoadMoreStyle,
+                            isFocusPostSaved ? {} : safeLoadMoreStyle,
                         ]}>
                         {postsSavedPaging.list.map(RenderItemPost)}
                     </View>
@@ -418,12 +432,12 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 ref={modalLikeCommentRef}
                 theme={theme}
                 bubbleFocusing={bubbleFocusing || fakeBubbleFocusing}
-                updateBubbleFocusing={value =>
+                updateBubbleFocusing={value => {
                     setBubbleFocusing(preValue => ({
                         ...preValue,
                         ...value,
-                    }))
-                }
+                    }));
+                }}
                 setTotalComments={value => {
                     setBubbleFocusing(preValue => {
                         if (preValue) {

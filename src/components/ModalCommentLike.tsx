@@ -1,4 +1,4 @@
-import {TypeBubblePalace, TypeCreatePostResponse} from 'api/interface';
+import {TypeBubblePalace} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {Metrics} from 'asset/metrics';
 import {TypeTheme} from 'asset/theme/Theme';
@@ -23,7 +23,7 @@ interface Props {
 }
 
 export interface TypeModalCommentPost {
-    post: TypeCreatePostResponse;
+    post: TypeBubblePalace;
     setList?: Function;
     type: TypeShowModalCommentOrLike;
 }
@@ -104,7 +104,7 @@ class ModalCommentLike extends Component<Props> {
                     backgroundColor: 'transparent',
                 }}
                 overlayStyle={{
-                    backgroundColor: theme.backgroundOpacity(),
+                    backgroundColor: theme.backgroundOpacity(0.3),
                 }}
                 scrollViewProps={{
                     keyboardShouldPersistTaps: 'handled',

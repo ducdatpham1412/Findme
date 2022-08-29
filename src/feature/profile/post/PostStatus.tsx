@@ -1,16 +1,16 @@
-import {TypeCreatePostResponse} from 'api/interface';
+import {TypeBubblePalace} from 'api/interface';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
-import {StyleImage, StyleTouchable} from 'components/base';
+import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import React, {memo} from 'react';
 import isEqual from 'react-fast-compare';
-import {StyleProp, ViewStyle} from 'react-native';
+import {StyleProp, View, ViewStyle} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {moderateScale, scale, ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
 interface Props {
-    itemPost: TypeCreatePostResponse;
+    itemPost: TypeBubblePalace;
     onGoToDetailPost(bubble: string): void;
     containerStyle?: StyleProp<ViewStyle>;
 }
@@ -25,15 +25,7 @@ const PostStatus = (props: Props) => {
         <StyleTouchable
             customStyle={[styles.container, containerStyle]}
             onPress={() => onGoToDetailPost(itemPost.id)}
-            activeOpacity={0.95}
-            onTouchEnd={() => {
-                // console.log(
-                //     'with element: ',
-                //     e.nativeEvent.locationX,
-                //     ' - ',
-                //     e.nativeEvent.locationY,
-                // );
-            }}>
+            activeOpacity={0.95}>
             <StyleImage source={{uri: imageUrl}} customStyle={styles.image} />
             <LinearGradient
                 colors={[
@@ -45,6 +37,14 @@ const PostStatus = (props: Props) => {
                     <AntDesign key={index} name="star" style={styles.star} />
                 ))}
             </LinearGradient>
+            {itemPost.isDraft && (
+                <View style={styles.draftView}>
+                    <StyleText
+                        i18Text="profile.draftPost"
+                        customStyle={styles.textDraft}
+                    />
+                </View>
+            )}
         </StyleTouchable>
     );
 };
@@ -72,6 +72,18 @@ const styles = ScaledSheet.create({
         fontSize: '8@ms',
         marginHorizontal: '1@s',
         color: Theme.common.orange,
+    },
+    draftView: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundColor: Theme.darkTheme.backgroundOpacity(),
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    textDraft: {
+        fontSize: '14@ms',
+        color: Theme.common.white,
     },
 });
 
