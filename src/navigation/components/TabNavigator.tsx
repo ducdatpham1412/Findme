@@ -1,3 +1,4 @@
+import {TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
@@ -17,7 +18,9 @@ import Feather from 'react-native-vector-icons/Feather';
 
 const tabBarHeight = moderateScale(50);
 const addMoreHeight = moderateScale(5);
-const safeBottomHeight = Metrics.safeBottomPadding - verticalScale(10);
+const checkBottom = Metrics.safeBottomPadding - verticalScale(10);
+const indicatorHeight = moderateScale(37);
+const safeBottomHeight = checkBottom <= 0 ? verticalScale(10) : checkBottom;
 export const tabBarViewHeight = tabBarHeight + safeBottomHeight + addMoreHeight;
 
 const TabNavigator = (props: any) => {
@@ -89,13 +92,20 @@ const TabNavigator = (props: any) => {
      * Render view
      */
     const DiscoveryButton = () => {
-        const tintColor =
-            tabIndexFocus === 0 ? Theme.common.white : theme.tabBarIconColor;
+        const isFocus = tabIndexFocus === 0;
+        const tintColor = isFocus ? Theme.common.white : theme.tabBarIconColor;
         return (
             <StyleTouchable
                 customStyle={styles.buttonView}
                 onPress={() => {
-                    navigate(MAIN_SCREEN.discoveryRoute);
+                    if (!isFocus) {
+                        navigate(MAIN_SCREEN.discoveryRoute);
+                    } else {
+                        Redux.setBubblePalaceAction({
+                            action: TYPE_BUBBLE_PALACE_ACTION.scrollToTopDiscovery,
+                            payload: null,
+                        });
+                    }
                 }}
                 onLayout={e => {
                     if (!indicatorWidth) {
@@ -210,7 +220,7 @@ const TabNavigator = (props: any) => {
                     styles.indicatorView,
                     {
                         width: indicatorWidth,
-                        height: moderateScale(40),
+                        height: indicatorHeight,
                         transform: [
                             {
                                 translateX: indicatorTranslateX,

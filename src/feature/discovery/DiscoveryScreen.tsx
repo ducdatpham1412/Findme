@@ -7,7 +7,7 @@ import {
     apiGetListBubbleActive,
     apiGetListBubbleActiveOfUserEnjoy,
 } from 'api/module';
-import {TOPIC, TYPE_DYNAMIC_LINK} from 'asset/enum';
+import {TOPIC, TYPE_BUBBLE_PALACE_ACTION, TYPE_DYNAMIC_LINK} from 'asset/enum';
 import {
     ANDROID_APP_LINK,
     DYNAMIC_LINK_ANDROID,
@@ -70,6 +70,7 @@ const DiscoveryScreen = () => {
     const theme = Redux.getTheme();
     const token = Redux.getToken();
     const isModeExp = Redux.getModeExp();
+    const bubblePalace = Redux.getBubblePalaceAction();
 
     const hadLogan = token && !isModeExp;
 
@@ -113,6 +114,22 @@ const DiscoveryScreen = () => {
             listTopics: paramsTopic,
         });
     }, [listTopics]);
+
+    useEffect(() => {
+        if (
+            bubblePalace.action ===
+            TYPE_BUBBLE_PALACE_ACTION.scrollToTopDiscovery
+        ) {
+            listRef.current?.scrollToOffset({
+                offset: 0,
+                animated: true,
+            });
+            Redux.setBubblePalaceAction({
+                action: TYPE_BUBBLE_PALACE_ACTION.null,
+                payload: null,
+            });
+        }
+    }, [bubblePalace.action]);
 
     /**
      * Functions

@@ -140,8 +140,10 @@ export enum TYPE_NOTIFICATION {
 }
 
 export enum TYPE_BUBBLE_PALACE_ACTION {
+    null = -1,
     createNewPost = 0,
     editPostFromProfile = 1,
+    scrollToTopDiscovery = 2,
 }
 
 export enum TYPE_SOCIAL_LOGIN {
