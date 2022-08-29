@@ -8,6 +8,7 @@ import {
     apiGetListBubbleActiveOfUserEnjoy,
 } from 'api/module';
 import {TOPIC, TYPE_BUBBLE_PALACE_ACTION, TYPE_DYNAMIC_LINK} from 'asset/enum';
+import Images from 'asset/img/images';
 import {
     ANDROID_APP_LINK,
     DYNAMIC_LINK_ANDROID,
@@ -15,6 +16,7 @@ import {
     DYNAMIC_LINK_SHARE,
     LANDING_PAGE_URL,
 } from 'asset/standardValue';
+import {StyleIcon} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import LoadingScreen from 'components/LoadingScreen';
@@ -94,6 +96,7 @@ const DiscoveryScreen = () => {
         onLoadMore,
         refreshing,
         onRefresh,
+        noMore,
     } = usePaging({
         request: selectedApi,
         params: {
@@ -233,6 +236,19 @@ const DiscoveryScreen = () => {
         return null;
     };
 
+    const FooterComponent = () => {
+        if (noMore) {
+            return (
+                <StyleIcon
+                    source={Images.images.successful}
+                    size={80}
+                    customStyle={{alignSelf: 'center'}}
+                />
+            );
+        }
+        return null;
+    };
+
     return (
         <View
             style={[
@@ -251,6 +267,11 @@ const DiscoveryScreen = () => {
                     <View style={{height: headerDoffyHeight}} />
                 }
                 ListEmptyComponent={EmptyView}
+                ListFooterComponent={FooterComponent}
+                ListFooterComponentStyle={{
+                    backgroundColor: theme.backgroundColor,
+                    paddingVertical: 20,
+                }}
                 maxToRenderPerBatch={20}
                 onScroll={e => {
                     const currentOffset = e.nativeEvent.contentOffset.y;

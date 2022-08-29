@@ -1,4 +1,5 @@
 /* eslint-disable no-underscore-dangle */
+import Theme from 'asset/theme/Theme';
 import {StyleImage} from 'components/base';
 import StyleTouchHaveDouble from 'components/base/StyleTouchHaveDouble';
 import React, {useEffect, useRef, useState} from 'react';
@@ -10,8 +11,10 @@ import {
     PanResponder,
     PanResponderGestureState,
     StyleProp,
+    View,
     ViewStyle,
 } from 'react-native';
+import {scale, ScaledSheet} from 'react-native-size-matters';
 import {
     DEAD_ZONE,
     DefaultTransitionSpec,
@@ -29,6 +32,9 @@ interface Props {
     onChangeIndex?(value: number): void;
     isRectangle?: boolean;
 }
+
+const indicatorPointWidth = scale(20);
+const marginIndicatorPoint = scale(5);
 
 const ScrollSyncSizeImage = (props: Props) => {
     const {
@@ -50,6 +56,9 @@ const ScrollSyncSizeImage = (props: Props) => {
     const layOutWidth = syncWidth * numberTabs;
     const maxTranslate = layOutWidth * (numberTabs - 1);
     const swipeDistanceThreshold = syncWidth / 1.75;
+    const indicatorWidth =
+        indicatorPointWidth * numberTabs +
+        marginIndicatorPoint * (numberTabs - 1);
 
     const panX = useAnimatedValue(0);
     const translateX = Animated.multiply(
@@ -60,6 +69,14 @@ const ScrollSyncSizeImage = (props: Props) => {
         }),
         I18nManager.isRTL ? -1 : 1,
     );
+
+    const translateXIndicator = useAnimatedValue(0);
+    translateX.addListener(({value}) => {
+        const newRatio = -value / layOutWidth;
+        translateXIndicator.setValue(
+            newRatio * (indicatorWidth + marginIndicatorPoint),
+        );
+    });
 
     const jumpToIndex = (__index: number) => {
         onChangeIndex?.(__index);
@@ -226,8 +243,46 @@ const ScrollSyncSizeImage = (props: Props) => {
                     />
                 ))}
             </Animated.View>
+
+            {numberTabs >= 2 && (
+                <View style={[styles.indicatorView, {width: indicatorWidth}]}>
+                    {Array(numberTabs)
+                        .fill(0)
+                        .map((_, ind) => (
+                            <View key={ind} style={styles.afterBox} />
+                        ))}
+                    <Animated.View
+                        style={[
+                            styles.indicator,
+                            {transform: [{translateX: translateXIndicator}]},
+                        ]}
+                    />
+                </View>
+            )}
         </StyleTouchHaveDouble>
     );
 };
+
+const styles = ScaledSheet.create({
+    indicatorView: {
+        position: 'absolute',
+        height: '1.5@ms',
+        alignSelf: 'center',
+        bottom: '2@ms',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    afterBox: {
+        width: indicatorPointWidth,
+        height: '100%',
+        backgroundColor: Theme.common.grayLight,
+    },
+    indicator: {
+        width: indicatorPointWidth,
+        height: '100%',
+        position: 'absolute',
+        backgroundColor: Theme.common.gradientTabBar1,
+    },
+});
 
 export default ScrollSyncSizeImage;
