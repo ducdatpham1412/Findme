@@ -5,11 +5,11 @@ import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
-import ROOT_SCREEN from 'navigation/config/routes';
-import {appAlert, push} from 'navigation/NavigationService';
+import {appAlert} from 'navigation/NavigationService';
 import React, {useEffect} from 'react';
 import {Platform, ScrollView, View} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
+import {onGoToProfile} from 'utility/assistant';
 import {StyleImage, StyleText, StyleTouchable} from './base';
 
 interface Props {
@@ -35,10 +35,6 @@ const onFollowUser = async (params: {userId: number; setList: Function}) => {
     } catch (err) {
         appAlert(err);
     }
-};
-
-const onGoToProfile = (userId: number) => {
-    push(ROOT_SCREEN.otherProfile, {id: userId});
 };
 
 const ListReacts = (props: Props) => {

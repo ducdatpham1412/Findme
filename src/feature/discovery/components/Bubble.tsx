@@ -37,6 +37,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
     chooseIconFeeling,
     chooseTextTopic,
+    onGoToProfile,
     onGoToSignUp,
 } from 'utility/assistant';
 import {formatFromNow} from 'utility/format';
@@ -49,17 +50,6 @@ interface Props {
     onShowModalComment(post: TypeBubblePalace, type: 'comment' | 'like'): void;
     onShowModalShare(item: any): void;
 }
-
-const onGoToProfile = (userId: number) => {
-    const myId = FindmeStore.getState().accountSlice.passport.profile.id;
-    if (userId === myId) {
-        navigate(PROFILE_ROUTE.myProfile);
-    } else {
-        navigate(ROOT_SCREEN.otherProfile, {
-            id: userId,
-        });
-    }
-};
 
 const onSeeDetailImage = (images: Array<string>) => {
     showSwipeImages({

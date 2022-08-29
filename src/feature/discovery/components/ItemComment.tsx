@@ -12,16 +12,16 @@ import {
 import {formatFromNow} from 'utility/format';
 import isEqual from 'react-fast-compare';
 import Images from 'asset/img/images';
+import {onGoToProfile} from 'utility/assistant';
 
 interface Props {
     item: TypeCommentResponse;
     commentReplied: string;
     onPressReply?(idComment: string, personReplied: string): void;
-    onGoToProfile(userId: number): void;
 }
 
 const ItemComment = (props: Props) => {
-    const {item, commentReplied = '', onPressReply, onGoToProfile} = props;
+    const {item, commentReplied = '', onPressReply} = props;
 
     const theme = Redux.getTheme();
 
@@ -136,7 +136,6 @@ const ItemComment = (props: Props) => {
                     item={itemReply}
                     commentReplied={item.id}
                     key={index}
-                    onGoToProfile={() => onGoToProfile(itemReply.creator)}
                 />
             ))}
         </View>
