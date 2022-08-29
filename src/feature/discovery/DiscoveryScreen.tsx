@@ -1,7 +1,7 @@
 /* eslint-disable no-shadow */
 /* eslint-disable react/jsx-key */
 import dynamicLinks from '@react-native-firebase/dynamic-links';
-import {TypeBubblePalace, TypeCreatePostResponse} from 'api/interface';
+import {TypeBubblePalace} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {
     apiGetListBubbleActive,
@@ -45,7 +45,7 @@ export interface TypeShowMoreOptions {
 }
 
 export interface TypeMoreOptionsMe {
-    postModal: TypeCreatePostResponse;
+    postModal: TypeBubblePalace;
 }
 
 let idUserReport = 0;
@@ -152,12 +152,12 @@ const DiscoveryScreen = () => {
         [hadLogan],
     );
 
-    const onShowOptions = (params: TypeShowMoreOptions) => {
+    const onShowOptions = useCallback((params: TypeShowMoreOptions) => {
         idUserReport = params.idUser;
         imageSeeDetail = params.imageWantToSee;
         allowSaveImage = params.allowSaveImage;
         optionsRef.current?.show();
-    };
+    }, []);
 
     const onShowModalShare = async (item: TypeBubblePalace) => {
         try {

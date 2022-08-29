@@ -1,6 +1,6 @@
 import {
     TypeCreatePostRequest,
-    TypeCreatePostResponse,
+    TypeBubblePalace,
     TypeEditPostRequest,
 } from 'api/interface';
 import {apiCreatePost, apiEditPost} from 'api/module';
@@ -19,7 +19,7 @@ import {
     goBack,
     navigate,
 } from 'navigation/NavigationService';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
     Animated,
@@ -53,7 +53,8 @@ interface Props {
             itemNew?: {
                 images: Array<string>;
             };
-            itemEdit?: TypeCreatePostResponse;
+            itemEdit?: TypeBubblePalace;
+            itemDraft?: TypeBubblePalace;
             itemError?: TypeCreatePostRequest;
         };
     };
@@ -101,6 +102,7 @@ const CreatePostPreview = ({route}: Props) => {
     const itemNew = route.params?.itemNew;
     const itemEdit = route.params?.itemEdit;
     const itemError = route.params?.itemError;
+    const itemDraft = route.params?.itemDraft;
     const {t} = useTranslation();
 
     const theme = Redux.getTheme();
@@ -119,14 +121,27 @@ const CreatePostPreview = ({route}: Props) => {
 
     const initValue = useMemo(() => {
         return {
-            content: itemEdit?.content || itemError?.content || '',
+            content:
+                itemEdit?.content ||
+                itemError?.content ||
+                itemDraft?.content ||
+                '',
             images:
-                itemEdit?.images || itemError?.images || itemNew?.images || [],
-            starts: itemEdit?.stars || itemError?.stars || 0,
-            topic: itemEdit?.topic || itemError?.topic,
-            feeling: itemEdit?.feeling || itemError?.feeling,
-            location: itemEdit?.location || itemError?.location,
-            link: itemEdit?.link || itemError?.link,
+                itemEdit?.images ||
+                itemError?.images ||
+                itemDraft?.images ||
+                itemNew?.images ||
+                [],
+            starts:
+                itemEdit?.stars || itemError?.stars || itemDraft?.stars || 0,
+            topic: itemEdit?.topic || itemError?.topic || itemDraft?.topic,
+            feeling:
+                itemEdit?.feeling || itemError?.feeling || itemDraft?.feeling,
+            location:
+                itemEdit?.location ||
+                itemError?.location ||
+                itemDraft?.location,
+            link: itemEdit?.link || itemError?.link || itemDraft?.link,
         };
     }, []);
 
@@ -170,27 +185,27 @@ const CreatePostPreview = ({route}: Props) => {
     /**
      * Functions
      */
-    const onChooseStar = () => {
+    const onChooseStar = useCallback(() => {
         starRef.current?.open();
-    };
+    }, []);
 
-    const onAddLink = () => {
+    const onAddLink = useCallback(() => {
         shouldShowToolHorizontal = false;
         linkRef.current?.open();
-    };
+    }, []);
 
-    const onFeeling = () => {
+    const onFeeling = useCallback(() => {
         feelingRef.current?.open();
-    };
+    }, []);
 
-    const onTopic = () => {
+    const onTopic = useCallback(() => {
         topicRef.current?.open();
-    };
+    }, []);
 
-    const onCheckIn = () => {
+    const onCheckIn = useCallback(() => {
         shouldShowToolHorizontal = false;
         checkInRef.current?.show();
-    };
+    }, []);
 
     const onGoBack = () => {
         if (
@@ -344,10 +359,25 @@ const CreatePostPreview = ({route}: Props) => {
                     idPost: itemEdit.id,
                     data: updateObject,
                 });
+
                 Redux.setBubblePalaceAction({
                     action: TYPE_BUBBLE_PALACE_ACTION.editPostFromProfile,
                     payload: {
                         id: itemEdit.id,
+                        ...updateObject,
+                    },
+                });
+                goBack();
+            } else if (itemDraft?.id) {
+                updateObject.isDraft = false;
+                await apiEditPost({
+                    idPost: itemDraft.id,
+                    data: updateObject,
+                });
+                Redux.setBubblePalaceAction({
+                    action: TYPE_BUBBLE_PALACE_ACTION.editPostFromProfile,
+                    payload: {
+                        id: itemDraft.id,
                         ...updateObject,
                     },
                 });
@@ -379,13 +409,19 @@ const CreatePostPreview = ({route}: Props) => {
                     />
                 </StyleTouchable>
 
-                {(!!itemNew || !!itemError) && (
+                {(itemNew || itemError || itemDraft) && (
                     <StyleTouchable
                         customStyle={[
                             styles.postBox,
                             {borderColor: theme.highlightColor},
                         ]}
-                        onPress={() => onConfirmPost(false)}>
+                        onPress={() => {
+                            if (itemDraft) {
+                                onEditPost();
+                            } else {
+                                onConfirmPost(false);
+                            }
+                        }}>
                         <StyleText
                             i18Text="profile.post.post"
                             customStyle={[
@@ -396,7 +432,7 @@ const CreatePostPreview = ({route}: Props) => {
                     </StyleTouchable>
                 )}
 
-                {(!!itemNew || !!itemError) && (
+                {(itemNew || itemError) && (
                     <StyleTouchable
                         customStyle={[
                             styles.draftBox,
@@ -413,7 +449,7 @@ const CreatePostPreview = ({route}: Props) => {
                     </StyleTouchable>
                 )}
 
-                {!!itemEdit && (
+                {itemEdit && (
                     <StyleTouchable
                         customStyle={[
                             styles.postBox,

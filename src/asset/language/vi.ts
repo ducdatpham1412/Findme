@@ -229,6 +229,9 @@ const profile = {
         follow: 'Theo dõi',
     },
     removeAvatar: 'Xoá ảnh',
+    draftPost: 'Bài nháp',
+    thisPostInDraft: 'Bạn đang lưu nháp bài này',
+    goToPost: 'Đi tới đăng bài',
 };
 
 // MESS ROUTE

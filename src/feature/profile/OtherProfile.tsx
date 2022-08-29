@@ -1,4 +1,4 @@
-import {TypeCreatePostResponse, TypeGetProfileResponse} from 'api/interface';
+import {TypeBubblePalace, TypeGetProfileResponse} from 'api/interface';
 import {
     apiBlockUser,
     apiFollowUser,
@@ -42,7 +42,7 @@ interface Props {
     };
 }
 
-let listPosts: Array<TypeCreatePostResponse> = [];
+let listPosts: Array<TypeBubblePalace> = [];
 
 const OtherProfile = ({route}: Props) => {
     const {id, onGoBack} = route.params;
@@ -58,8 +58,7 @@ const OtherProfile = ({route}: Props) => {
 
     const [profile, setProfile] = useState<TypeGetProfileResponse>();
     const [isFollowing, setIsFollowing] = useState(false);
-    const [bubbleFocusing, setBubbleFocusing] =
-        useState<TypeCreatePostResponse>();
+    const [bubbleFocusing, setBubbleFocusing] = useState<TypeBubblePalace>();
 
     const isMyProfile = id === myId;
     const isBlock = profile?.relationship === RELATIONSHIP.block;
@@ -252,7 +251,7 @@ const OtherProfile = ({route}: Props) => {
         );
     };
 
-    const RenderItemPost = useCallback((item: TypeCreatePostResponse) => {
+    const RenderItemPost = useCallback((item: TypeBubblePalace) => {
         return (
             <PostStatus
                 key={item.id}

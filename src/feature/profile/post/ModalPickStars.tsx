@@ -27,7 +27,7 @@ const ModalPickStars = (props: Props, ref: any) => {
             modalStyle={styles.modal}
             withHandle={false}
             overlayStyle={{
-                backgroundColor: theme.backgroundOpacity(0.6),
+                backgroundColor: theme.backgroundOpacity(),
             }}>
             <View
                 style={[

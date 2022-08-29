@@ -28,8 +28,8 @@ import RemForPass from './components/RemForPass';
 
 const loginForm = __DEV__
     ? {
-          username: 'yeuquaimo@gmail.com',
-          password: '12345678',
+          username: 'ducdat@gmail.com',
+          password: 'ducdat123',
       }
     : {username: '', password: ''};
 

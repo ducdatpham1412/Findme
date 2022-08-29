@@ -1,8 +1,4 @@
-import {
-    TypeBubblePalace,
-    TypeCommentResponse,
-    TypeCreatePostResponse,
-} from 'api/interface';
+import {TypeBubblePalace, TypeCommentResponse} from 'api/interface';
 import {Metrics} from 'asset/metrics';
 import ItemComment from 'feature/discovery/components/ItemComment';
 import Redux from 'hook/useRedux';
@@ -21,7 +17,7 @@ import InputComment from './common/InputComment';
 import StyleKeyboardAwareView from './StyleKeyboardAwareView';
 
 interface Props {
-    bubbleFocusing: TypeBubblePalace | TypeCreatePostResponse;
+    bubbleFocusing: TypeBubblePalace;
     setTotalComments(value: number): void;
     increaseTotalComments(value: number): void;
     inputCommentContainerStyle?: StyleProp<ViewStyle>;

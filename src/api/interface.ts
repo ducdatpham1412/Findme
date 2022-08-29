@@ -235,27 +235,7 @@ export interface TypeEditPostRequest {
     feeling?: number | null;
     location?: string | null;
     link?: string | null;
-}
-
-export interface TypeCreatePostResponse {
-    id: string;
-    content: string;
-    images: Array<string>;
-    stars: number;
-    topic: number | null;
-    feeling: number | null;
-    location: string | null;
-    link: string | null;
-    totalLikes: number;
-    totalComments: number;
-    totalSaved: number;
-    creator: number;
-    creatorName: string;
-    creatorAvatar: string;
-    created: string;
-    isLiked: boolean;
-    isSaved: boolean;
-    relationship: number;
+    isDraft?: boolean;
 }
 
 export interface TypeCreateGroupResponse {
@@ -272,7 +252,7 @@ export interface TypeCreateGroupResponse {
 
 export interface TypeGetListPostProfile {
     success: boolean;
-    data: Array<TypeCreatePostResponse>;
+    data: Array<TypeBubblePalace>;
 }
 
 export interface TypeFollowResponse {
@@ -304,29 +284,9 @@ export interface TypeBubblePalace {
     created: string;
     isLiked: boolean;
     isSaved: boolean;
+    isDraft: boolean;
     relationship: number;
 }
-
-// export interface TypeUpdateBubblePalace {
-//     id?: string;
-//     topic?: number | null;
-//     feeling?: number | null;
-//     location?: string | null;
-//     link?: string | null;
-//     content?: string;
-//     images?: Array<string>;
-//     stars?: number;
-//     totalLikes?: number;
-//     totalComments?: number;
-//     totalSaved?: number;
-//     creator?: number;
-//     creatorName?: string;
-//     creatorAvatar?: string;
-//     created?: string;
-//     isLiked?: boolean;
-//     isSaved?: boolean;
-//     relationship?: number;
-// }
 
 export interface TypeBubblePalaceAction {
     action: number;

@@ -256,6 +256,9 @@ const profile = {
         follow: 'Follow',
     },
     removeAvatar: 'Remove avatar',
+    draftPost: 'Draft',
+    thisPostInDraft: 'This post is in draft',
+    goToPost: 'Go to post',
 };
 
 // SETTING ROUTE

@@ -1,5 +1,5 @@
 import dynamicLinks from '@react-native-firebase/dynamic-links';
-import {TypeCreatePostResponse} from 'api/interface';
+import {TypeBubblePalace} from 'api/interface';
 import {apiDeletePost} from 'api/module';
 import FindmeStore from 'app-redux/store';
 import {TYPE_DYNAMIC_LINK} from 'asset/enum';
@@ -44,14 +44,14 @@ interface Props {
 }
 
 interface States {
-    bubbleFocusing: undefined | TypeCreatePostResponse;
+    bubbleFocusing: undefined | TypeBubblePalace;
 }
 
 interface TypeShow {
     index: number;
 }
 
-let postModal: TypeCreatePostResponse;
+let postModal: TypeBubblePalace;
 
 const onGoToEditPost = () => {
     if (postModal) {
@@ -131,7 +131,7 @@ export default class ListShareElement extends Component<Props, States> {
             try {
                 await apiDeletePost(postId);
                 this.props.listPaging.setList(
-                    (preValue: Array<TypeCreatePostResponse>) => {
+                    (preValue: Array<TypeBubblePalace>) => {
                         return preValue.filter(item => item.id !== postId);
                     },
                 );
@@ -158,7 +158,7 @@ export default class ListShareElement extends Component<Props, States> {
     }
 
     private showModalComment(
-        post: TypeCreatePostResponse,
+        post: TypeBubblePalace,
         type: TypeShowModalCommentOrLike,
     ) {
         this.props.onShowModalComment({
@@ -168,7 +168,7 @@ export default class ListShareElement extends Component<Props, States> {
         });
     }
 
-    private async showModalShare(post: TypeCreatePostResponse) {
+    private async showModalShare(post: TypeBubblePalace) {
         try {
             const link = await dynamicLinks().buildShortLink({
                 link: `${post?.images?.[0] || LANDING_PAGE_URL}?type=${
@@ -219,7 +219,7 @@ export default class ListShareElement extends Component<Props, States> {
         }
     }
 
-    RenderItemBubble = (item: TypeCreatePostResponse) => {
+    RenderItemBubble = (item: TypeBubblePalace) => {
         return (
             <Bubble
                 item={item}
@@ -337,6 +337,8 @@ export default class ListShareElement extends Component<Props, States> {
                         renderItem={({item}) => this.RenderItemBubble(item)}
                         keyExtractor={(_, index) => String(index)}
                         onEndReached={listPaging.onLoadMore}
+                        refreshing={listPaging.loading}
+                        onRefresh={listPaging.onRefresh}
                         onScrollToIndexFailed={e => {
                             if (this.enableCatchScrollFail) {
                                 logger(e.highestMeasuredFrameIndex);

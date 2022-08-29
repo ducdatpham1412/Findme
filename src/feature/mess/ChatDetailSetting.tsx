@@ -291,7 +291,7 @@ const ChatDetailSetting = ({route}: Props) => {
                     keyboardShouldPersistTaps: 'always',
                 }}
                 overlayStyle={{
-                    backgroundColor: theme.backgroundOpacity(0.8),
+                    backgroundColor: theme.backgroundOpacity(),
                 }}>
                 <View
                     style={[
