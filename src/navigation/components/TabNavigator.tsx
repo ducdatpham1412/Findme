@@ -190,7 +190,10 @@ const TabNavigator = (props: any) => {
         return (
             <StyleTouchable
                 customStyle={styles.buttonView}
-                onPress={() => navigate(MAIN_SCREEN.notificationRoute)}>
+                onPress={() => {
+                    Redux.setNumberNewNotifications(0);
+                    navigate(MAIN_SCREEN.notificationRoute);
+                }}>
                 <View
                     style={{
                         height: '100%',
