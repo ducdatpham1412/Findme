@@ -183,6 +183,10 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             myPostsPaging.setList((preValue: Array<TypeCreatePostResponse>) =>
                 [bubblePalaceAction.payload].concat(preValue),
             );
+            Redux.setBubblePalaceAction({
+                action: TYPE_BUBBLE_PALACE_ACTION.null,
+                payload: null,
+            });
         }
     }, [bubblePalaceAction]);
 
