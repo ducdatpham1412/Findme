@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-shadow */
-/* eslint-disable react/jsx-key */
-/* eslint-disable no-unused-expressions */
 import {TypeBubblePalace} from 'api/interface';
 import {apiLikePost, apiSavePost, apiUnLikePost, apiUnSavePost} from 'api/post';
 import Images from 'asset/img/images';
@@ -27,7 +23,7 @@ import {
 } from 'navigation/NavigationService';
 import React, {memo, useEffect, useState} from 'react';
 import isEqual from 'react-fast-compare';
-import {View} from 'react-native';
+import {Linking, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -36,6 +32,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
     chooseIconFeeling,
     chooseTextTopic,
+    logger,
     onGoToProfile,
     onGoToSignUp,
 } from 'utility/assistant';
@@ -130,6 +127,14 @@ const onGoToPublicDraft = (item: TypeBubblePalace) => {
     navigate(PROFILE_ROUTE.createPostPreview, {
         itemDraft: item,
     });
+};
+
+const onOpenLink = (link: string) => {
+    try {
+        Linking.openURL(link);
+    } catch (err) {
+        logger(err);
+    }
 };
 
 const Bubble = (props: Props) => {
@@ -284,8 +289,10 @@ const Bubble = (props: Props) => {
                         />
                     ))}
                 </LinearGradient>
-                {item.link && (
-                    <StyleTouchable customStyle={styles.linkBox}>
+                {item?.link && (
+                    <StyleTouchable
+                        customStyle={styles.linkBox}
+                        onPress={() => onOpenLink(item.link || '')}>
                         <LinearGradient
                             colors={[
                                 Theme.common.gradientTabBar1,

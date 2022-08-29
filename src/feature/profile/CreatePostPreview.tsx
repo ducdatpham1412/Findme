@@ -114,7 +114,7 @@ const CreatePostPreview = ({route}: Props) => {
     const [keyboardHeight, setKeyboardHeight] = useState(0);
 
     const starRef = useRef<Modalize>(null);
-    const linkRef = useRef<Modalize>(null);
+    const linkRef = useRef<ModalAddLink>(null);
     const checkInRef = useRef<ModalCheckIn>(null);
     const feelingRef = useRef<Modalize>(null);
     const topicRef = useRef<Modalize>(null);
@@ -191,7 +191,7 @@ const CreatePostPreview = ({route}: Props) => {
 
     const onAddLink = useCallback(() => {
         shouldShowToolHorizontal = false;
-        linkRef.current?.open();
+        linkRef.current?.show();
     }, []);
 
     const onFeeling = useCallback(() => {
@@ -754,6 +754,7 @@ const CreatePostPreview = ({route}: Props) => {
                 ref={linkRef}
                 link={link || ''}
                 onChangeLink={value => setLink(value)}
+                theme={theme}
             />
             <ModalCheckIn
                 ref={checkInRef}

@@ -34,7 +34,7 @@ class ModalCheckIn extends Component<Props, States> {
         this.modalRef.current?.open();
         timeout = setTimeout(() => {
             this.inputRef.current?.focus();
-        }, 100);
+        }, 200);
         return () => clearTimeout(timeout);
     }
 

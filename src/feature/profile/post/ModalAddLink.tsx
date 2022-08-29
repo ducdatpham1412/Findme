@@ -1,98 +1,129 @@
+import {TypeTheme} from 'asset/theme/Theme';
 import {StyleButton, StyleText} from 'components/base';
 import ButtonX from 'components/common/ButtonX';
-import Redux from 'hook/useRedux';
-import React, {forwardRef, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import React, {Component} from 'react';
 import {Platform, TextInput, View} from 'react-native';
 import {Modalize} from 'react-native-modalize';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
+import I18Next from 'utility/I18Next';
 import {validateIsLink} from 'utility/validate';
 
 interface Props {
     link: string;
     onChangeLink(value: string): void;
+    theme: TypeTheme;
 }
+
+interface States {
+    tempLink: string;
+}
+
+let timeout: any;
 
 const borderWidthError = Platform.select({
     ios: moderateScale(0.5),
     android: moderateScale(1),
 });
 
-const ModalAddLink = (props: Props, ref: any) => {
-    const {link, onChangeLink} = props;
-    const {t} = useTranslation();
-    const theme = Redux.getTheme();
+class ModalAddLink extends Component<Props, States> {
+    modalRef = React.createRef<Modalize>();
 
-    const [tempLink, setTempLink] = useState(link);
+    inputRef = React.createRef<TextInput>();
 
-    const isValid = tempLink ? validateIsLink(tempLink) : true;
-    const borderWidth = isValid ? 0 : borderWidthError;
-
-    const onConfirm = (value: string) => {
-        onChangeLink(value);
-        ref.current.close();
+    state: States = {
+        tempLink: this.props.link,
     };
 
-    return (
-        <Modalize ref={ref} modalStyle={styles.modal} withHandle={false}>
-            <View
-                style={[
-                    styles.container,
-                    {backgroundColor: theme.backgroundColor},
-                ]}>
-                <ButtonX
-                    containerStyle={styles.buttonClose}
-                    onPress={() => {
-                        ref.current.close();
-                        setTempLink(link);
-                    }}
-                />
+    show() {
+        this.modalRef.current?.open();
+        timeout = setTimeout(() => {
+            this.inputRef.current?.focus();
+        }, 200);
+        return () => clearTimeout(timeout);
+    }
 
-                <StyleText
-                    i18Text="profile.post.addLink"
-                    customStyle={[styles.title, {color: theme.textColor}]}
-                />
+    private onConfirm = (value: string) => {
+        this.props.onChangeLink(value);
+        this.modalRef.current?.close();
+    };
 
+    render() {
+        const {theme, link} = this.props;
+        const {tempLink} = this.state;
+        const isValid = tempLink ? validateIsLink(tempLink) : true;
+        const borderWidth = isValid ? 0 : borderWidthError;
+
+        return (
+            <Modalize
+                ref={this.modalRef}
+                modalStyle={styles.modal}
+                withHandle={false}>
                 <View
                     style={[
-                        styles.inputView,
-                        {
-                            backgroundColor: theme.backgroundTextInput,
-                            borderWidth,
-                            borderColor: theme.highlightColor,
-                        },
+                        styles.container,
+                        {backgroundColor: theme.backgroundColor},
                     ]}>
-                    <TextInput
-                        defaultValue={tempLink}
-                        onChangeText={value => setTempLink(value)}
-                        placeholder={t('profile.post.pasteLink')}
-                        placeholderTextColor={theme.borderColor}
-                        multiline
-                        style={[styles.input, {color: theme.textColor}]}
+                    <ButtonX
+                        containerStyle={styles.buttonClose}
+                        onPress={() => {
+                            this.modalRef.current?.close();
+                            this.setState({
+                                tempLink: link,
+                            });
+                        }}
+                    />
+
+                    <StyleText
+                        i18Text="profile.post.addLink"
+                        customStyle={[styles.title, {color: theme.textColor}]}
+                    />
+
+                    <View
+                        style={[
+                            styles.inputView,
+                            {
+                                backgroundColor: theme.backgroundTextInput,
+                                borderWidth,
+                                borderColor: theme.highlightColor,
+                            },
+                        ]}>
+                        <TextInput
+                            ref={this.inputRef}
+                            defaultValue={tempLink}
+                            onChangeText={value =>
+                                this.setState({
+                                    tempLink: value,
+                                })
+                            }
+                            placeholder={I18Next.t('profile.post.pasteLink')}
+                            placeholderTextColor={theme.borderColor}
+                            multiline
+                            style={[styles.input, {color: theme.textColor}]}
+                        />
+                    </View>
+
+                    {!isValid && (
+                        <StyleText
+                            i18Text="alert.invalidLink"
+                            customStyle={[
+                                styles.textInvalidLink,
+                                {color: theme.highlightColor},
+                            ]}
+                        />
+                    )}
+
+                    <StyleButton
+                        containerStyle={styles.buttonView}
+                        titleStyle={styles.titleButton}
+                        title="common.save"
+                        disable={!isValid}
+                        onPress={() => this.onConfirm(tempLink)}
                     />
                 </View>
-
-                {!isValid && (
-                    <StyleText
-                        i18Text="alert.invalidLink"
-                        customStyle={[
-                            styles.textInvalidLink,
-                            {color: theme.highlightColor},
-                        ]}
-                    />
-                )}
-
-                <StyleButton
-                    containerStyle={styles.buttonView}
-                    titleStyle={styles.titleButton}
-                    title="common.save"
-                    disable={!isValid}
-                    onPress={() => onConfirm(tempLink)}
-                />
-            </View>
-        </Modalize>
-    );
-};
+            </Modalize>
+        );
+    }
+}
 
 const styles = ScaledSheet.create({
     modal: {
@@ -146,4 +177,4 @@ const styles = ScaledSheet.create({
     },
 });
 
-export default forwardRef(ModalAddLink);
+export default ModalAddLink;
