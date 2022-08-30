@@ -10,30 +10,34 @@ import {
 import RowPickImages from 'components/common/RowPickImages';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
-import {PROFILE_ROUTE} from 'navigation/config/routes';
-import {appAlert, navigate, popUpPicker} from 'navigation/NavigationService';
+import {appAlert, goBack, popUpPicker} from 'navigation/NavigationService';
 import React, {useCallback, useRef, useState} from 'react';
 import {TextInput, View} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import {I18Normalize} from 'utility/I18Next';
 import ImageUploader from 'utility/ImageUploader';
 
 interface Props {
     route: {
         params: {
             idUser: number;
+            nameUser?: string;
         };
     };
 }
 
 const ReportUser = ({route}: Props) => {
-    const {idUser} = route.params;
+    const {idUser, nameUser = ''} = route.params;
 
     const theme = Redux.getTheme();
 
     const inputDescriptionRef = useRef<TextInput>(null);
 
-    const [reasonReport, setReasonReport] = useState('');
+    const [reasonReport, setReasonReport] = useState<{
+        id: number;
+        name: I18Normalize;
+    }>();
     const [description, setDescription] = useState('');
     const [images, setImages] = useState([]);
 
@@ -53,44 +57,59 @@ const ReportUser = ({route}: Props) => {
             ),
             itemHeight: verticalScale(50),
             onSetItemSelected: (item: any) => {
-                setReasonReport(item.name);
+                setReasonReport(item);
             },
             initIndex:
-                REPORT_REASONS.findIndex(item => item.name === reasonReport) ||
-                0,
+                REPORT_REASONS.findIndex(
+                    item => item.name === reasonReport?.name,
+                ) || 0,
         });
     }, [reasonReport]);
 
     const onSubmitReport = async () => {
-        try {
-            Redux.setIsLoading(true);
+        if (reasonReport) {
+            try {
+                Redux.setIsLoading(true);
 
-            let nameImages: Array<string> = [];
-            if (images.length) {
-                nameImages = await ImageUploader.upLoadManyImg(images);
+                let nameImages: Array<string> = [];
+                if (images.length) {
+                    nameImages = await ImageUploader.upLoadManyImg(images);
+                }
+                await apiReportUser({
+                    userId: idUser,
+                    body: {
+                        reason: reasonReport.id,
+                        description,
+                        listImages: nameImages,
+                    },
+                });
+
+                appAlert('discovery.report.reportHadSent', {
+                    actionClickOk: () => {
+                        goBack();
+                        goBack();
+                    },
+                });
+            } catch (err) {
+                appAlert(err);
+            } finally {
+                Redux.setIsLoading(false);
             }
-            await apiReportUser({
-                userId: idUser,
-                body: {
-                    reason: reasonReport,
-                    description,
-                    listImages: nameImages,
-                },
-            });
-
-            appAlert('discovery.report.reportHadSent', {
-                actionClickOk: () => navigate(PROFILE_ROUTE.otherProfile),
-            });
-        } catch (err) {
-            appAlert(err);
-        } finally {
-            Redux.setIsLoading(false);
         }
     };
 
     return (
         <>
-            <StyleHeader title="discovery.report.title" />
+            <StyleHeader
+                title={
+                    nameUser
+                        ? 'discovery.report.reportPerson'
+                        : 'discovery.report.title'
+                }
+                titleParams={{
+                    name: nameUser,
+                }}
+            />
             <StyleContainer customStyle={styles.container} scrollEnabled>
                 {/* Pick one reason */}
                 <StyleText
@@ -107,7 +126,7 @@ const ReportUser = ({route}: Props) => {
                             {borderColor: theme.borderColor},
                         ]}>
                         <StyleText
-                            i18Text={reasonReport}
+                            i18Text={reasonReport?.name || 'common.null'}
                             customStyle={[
                                 styles.textReason,
                                 {color: theme.textColor},
@@ -153,9 +172,9 @@ const ReportUser = ({route}: Props) => {
                         containerStyle={{width: '100%'}}
                         i18Placeholder="Aa"
                         maxLength={200}
-                        value={description}
                         onChangeText={(text: string) => setDescription(text)}
                         isEffectTabBar={false}
+                        inputStyle={styles.inputDescription}
                     />
                 </StyleTouchable>
 
@@ -209,7 +228,7 @@ const styles = ScaledSheet.create({
         justifyContent: 'center',
     },
     textReason: {
-        fontSize: '15@ms',
+        fontSize: '14@ms',
     },
     buttonOpenPicker: {
         width: '40@vs',
@@ -236,7 +255,7 @@ const styles = ScaledSheet.create({
     uploadImageView: {
         marginTop: '10@vs',
     },
-    //button
+    // button
     buttonSendReport: {
         marginTop: '40@vs',
     },
@@ -250,6 +269,9 @@ const styles = ScaledSheet.create({
     textReport: {
         fontSize: '14@ms',
         fontWeight: 'bold',
+    },
+    inputDescription: {
+        fontSize: '14@ms',
     },
 });
 

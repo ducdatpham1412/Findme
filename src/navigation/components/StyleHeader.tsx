@@ -9,6 +9,7 @@ import HeaderLeftIcon from './HeaderLeftIcon';
 
 export interface StyleHeaderProps {
     title: I18Normalize | string;
+    titleParams?: any;
     onGoBack?(): void;
     containerStyle?: StyleProp<ViewStyle>;
     titleStyle?: StyleProp<TextStyle>;
@@ -16,7 +17,14 @@ export interface StyleHeaderProps {
 }
 
 const StyleHeader = (props: StyleHeaderProps) => {
-    const {title, onGoBack, containerStyle, titleStyle, iconStyle} = props;
+    const {
+        title,
+        titleParams,
+        onGoBack,
+        containerStyle,
+        titleStyle,
+        iconStyle,
+    } = props;
 
     const theme = Redux.getTheme();
 
@@ -32,6 +40,7 @@ const StyleHeader = (props: StyleHeaderProps) => {
             ]}>
             <StyleText
                 i18Text={title}
+                i18Params={titleParams}
                 customStyle={[
                     styles.titleText,
                     {color: theme.textColor},

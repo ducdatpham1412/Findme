@@ -221,6 +221,7 @@ const Bubble = (props: Props) => {
                         onPress={() =>
                             onShowMoreOption({
                                 idUser: item.creator,
+                                nameUser: item.creatorName,
                                 imageWantToSee: item.images,
                                 allowSaveImage: true,
                                 postModal: item,

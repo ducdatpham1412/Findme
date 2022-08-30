@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeBubblePalace} from 'api/interface';
 import {apiDeletePost} from 'api/module';
@@ -83,6 +84,11 @@ export default class ListShareElement extends Component<Props, States> {
     // When show ListShareElement
     // Disable hearing scrollEvent in ProfileScreen to avoid scrollToEnd
     private enableHearingScrollEvent = true;
+
+    isShowing() {
+        const temp: any = this.scale;
+        return temp._value === 1;
+    }
 
     show(params: TypeShow) {
         this.enableCatchScrollFail = false;

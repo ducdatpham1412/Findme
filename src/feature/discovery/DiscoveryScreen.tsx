@@ -42,6 +42,7 @@ import HeaderFilterTopic from './HeaderFilterTopic';
 
 export interface TypeShowMoreOptions {
     idUser: number;
+    nameUser: string;
     imageWantToSee: Array<string>;
     allowSaveImage: boolean;
 }
@@ -50,9 +51,12 @@ export interface TypeMoreOptionsMe {
     postModal: TypeBubblePalace;
 }
 
-let idUserReport = 0;
-let imageSeeDetail: Array<string> = [];
-let allowSaveImage = false;
+let modalOptions: TypeShowMoreOptions = {
+    idUser: 0,
+    nameUser: '',
+    imageWantToSee: [],
+    allowSaveImage: true,
+};
 
 let oldOffset = 0;
 
@@ -156,9 +160,7 @@ const DiscoveryScreen = () => {
     );
 
     const onShowOptions = useCallback((params: TypeShowMoreOptions) => {
-        idUserReport = params.idUser;
-        imageSeeDetail = params.imageWantToSee;
-        allowSaveImage = params.allowSaveImage;
+        modalOptions = params;
         optionsRef.current?.show();
     }, []);
 
@@ -311,7 +313,8 @@ const DiscoveryScreen = () => {
                         text: 'discovery.report.title',
                         action: () => {
                             navigate(ROOT_SCREEN.reportUser, {
-                                idUser: idUserReport,
+                                idUser: modalOptions.idUser,
+                                nameUser: modalOptions.nameUser,
                             });
                         },
                     },
@@ -319,10 +322,12 @@ const DiscoveryScreen = () => {
                         text: 'discovery.seeDetailImage',
                         action: () => {
                             showSwipeImages({
-                                listImages: imageSeeDetail.map(item => ({
-                                    url: item,
-                                })),
-                                allowSaveImage,
+                                listImages: modalOptions.imageWantToSee.map(
+                                    item => ({
+                                        url: item,
+                                    }),
+                                ),
+                                allowSaveImage: false,
                             });
                         },
                     },

@@ -109,46 +109,47 @@ const InputComment = (props: Props, inputRef: any) => {
     };
 
     return (
-        <View
-            style={[
-                styles.container,
-                {
-                    backgroundColor: theme.backgroundColor,
-                },
-                containerStyle,
-            ]}>
+        <>
             {RenderReply()}
+            <View
+                style={[
+                    styles.container,
+                    {
+                        backgroundColor: theme.backgroundColor,
+                    },
+                    containerStyle,
+                ]}>
+                {RenderAvatar}
 
-            {RenderAvatar}
+                <StyleInput
+                    ref={inputRef}
+                    hasUnderLine={false}
+                    hasErrorBox={false}
+                    onPressOut={onPressOut}
+                    editable={editable}
+                    i18Placeholder="Comment..."
+                    placeholderTextColor={theme.holderColorLighter}
+                    containerStyle={[
+                        styles.containerInput,
+                        {backgroundColor: theme.backgroundColorSecond},
+                    ]}
+                    inputStyle={[styles.input, {color: theme.textColor}]}
+                    onChangeText={onChangeText}
+                    isEffectTabBar={false}
+                    multiline
+                    onFocus={onFocus}
+                    onBlur={onBlur}
+                />
 
-            <StyleInput
-                ref={inputRef}
-                hasUnderLine={false}
-                hasErrorBox={false}
-                onPressOut={onPressOut}
-                editable={editable}
-                i18Placeholder="Comment..."
-                placeholderTextColor={theme.holderColorLighter}
-                containerStyle={[
-                    styles.containerInput,
-                    {backgroundColor: theme.backgroundColorSecond},
-                ]}
-                inputStyle={[styles.input, {color: theme.textColor}]}
-                onChangeText={onChangeText}
-                isEffectTabBar={false}
-                multiline
-                onFocus={onFocus}
-                onBlur={onBlur}
-            />
-
-            <StyleTouchable
-                customStyle={styles.emojiView}
-                disable={!text}
-                onPress={onSendComment}
-                hitSlop={10}>
-                {RenderIconSend}
-            </StyleTouchable>
-        </View>
+                <StyleTouchable
+                    customStyle={styles.emojiView}
+                    disable={!text}
+                    onPress={onSendComment}
+                    hitSlop={10}>
+                    {RenderIconSend}
+                </StyleTouchable>
+            </View>
+        </>
     );
 };
 
@@ -163,11 +164,8 @@ const styles = ScaledSheet.create({
         paddingBottom: verticalScale(7) + Metrics.safeBottomPadding,
     },
     replyView: {
-        position: 'absolute',
         width: '100%',
         height: '20@vs',
-        top: '-20@vs',
-        left: '12@s',
         flexDirection: 'row',
         alignItems: 'center',
     },
@@ -179,6 +177,7 @@ const styles = ScaledSheet.create({
     },
     textReply: {
         fontSize: '10@ms',
+        marginLeft: '20@s',
     },
     avatar: {
         width: '30@ms',

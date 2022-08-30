@@ -104,7 +104,8 @@ const SwipeImages = ({route}: Props) => {
                     styles.comebackView,
                     {backgroundColor: theme.backgroundButtonColor},
                 ]}
-                onPress={goBack}>
+                onPress={goBack}
+                hitSlop={15}>
                 <Feather
                     name="x"
                     style={[styles.iconComeBack, {color: theme.textColor}]}
@@ -136,13 +137,13 @@ const styles = ScaledSheet.create({
     },
     comebackView: {
         position: 'absolute',
-        padding: '7@ms',
+        padding: '4@ms',
         right: '20@s',
         top: '10@vs',
         borderRadius: '20@ms',
     },
     iconComeBack: {
-        fontSize: '20@ms',
+        fontSize: '14@ms',
     },
     image: {
         width: Metrics.width,

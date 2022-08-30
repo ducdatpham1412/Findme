@@ -167,12 +167,21 @@ const TabNavigator = (props: any) => {
     };
 
     const ProfileButton = () => {
+        const isFocus = tabIndexFocus === 4;
         return (
             <StyleTouchable
                 onPress={() => {
-                    navigate(MAIN_SCREEN.profileRoute, {
-                        screen: PROFILE_ROUTE.myProfile,
-                    });
+                    if (isFocus) {
+                        navigate(MAIN_SCREEN.profileRoute, {
+                            screen: PROFILE_ROUTE.myProfile,
+                        });
+                        Redux.setBubblePalaceAction({
+                            action: TYPE_BUBBLE_PALACE_ACTION.scrollToTopMyProfile,
+                            payload: null,
+                        });
+                    } else {
+                        navigate(MAIN_SCREEN.profileRoute);
+                    }
                 }}
                 customStyle={styles.buttonView}>
                 <StyleImage
