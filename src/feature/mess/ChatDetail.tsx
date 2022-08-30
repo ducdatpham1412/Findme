@@ -468,6 +468,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
 const styles = ScaledSheet.create({
     container: {
         paddingBottom: Metrics.safeBottomPadding,
+        paddingTop: Metrics.safeTopPadding,
     },
     contentContainer: {
         flexGrow: 1,

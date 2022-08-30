@@ -7,6 +7,7 @@ import {TypeFollowResponse} from 'api/interface';
 import {apiGetListFollow} from 'api/module';
 import {TYPE_FOLLOW} from 'asset/enum';
 import StyleList from 'components/base/StyleList';
+import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
@@ -133,6 +134,7 @@ const ListFollows = ({route}: Props) => {
 
     return (
         <>
+            <ViewSafeTopPadding />
             <StyleHeader title={name} onGoBack={onGoBack} />
 
             <Tab.Navigator

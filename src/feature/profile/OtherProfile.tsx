@@ -13,6 +13,7 @@ import StyleList from 'components/base/StyleList';
 import NoData from 'components/common/NoData';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import ModalCommentLike from 'components/ModalCommentLike';
+import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
@@ -291,6 +292,7 @@ const OtherProfile = ({route}: Props) => {
                     {backgroundColor: theme.backgroundColor},
                 ]}
             />
+            <ViewSafeTopPadding />
 
             <SearchAndSetting
                 onShowOptions={onShowOption}
@@ -303,7 +305,7 @@ const OtherProfile = ({route}: Props) => {
                 renderItem={({item}) => RenderItemPost(item)}
                 ListHeaderComponent={HeaderComponent()}
                 ListEmptyComponent={() => null}
-                style={styles.container}
+                style={styles.body}
                 contentContainerStyle={styles.contentContainer}
                 refreshing={refreshing}
                 onRefresh={onRefreshPage}
@@ -378,7 +380,7 @@ const OtherProfile = ({route}: Props) => {
 };
 
 const styles = ScaledSheet.create({
-    container: {
+    body: {
         flexGrow: 1,
         alignContent: 'center',
     },

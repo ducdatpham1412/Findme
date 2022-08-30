@@ -33,7 +33,7 @@ interface Props {
     isRectangle?: boolean;
 }
 
-const indicatorPointWidth = scale(20);
+const indicatorPointWidth = scale(10);
 const marginIndicatorPoint = scale(5);
 
 const ScrollSyncSizeImage = (props: Props) => {
@@ -268,7 +268,7 @@ const ScrollSyncSizeImage = (props: Props) => {
 const styles = ScaledSheet.create({
     indicatorView: {
         position: 'absolute',
-        height: '1.5@ms',
+        height: '2.5@ms',
         alignSelf: 'center',
         bottom: '2@ms',
         flexDirection: 'row',
@@ -278,10 +278,12 @@ const styles = ScaledSheet.create({
         width: indicatorPointWidth,
         height: '100%',
         backgroundColor: Theme.common.grayLight,
+        borderRadius: 10,
     },
     indicator: {
         width: indicatorPointWidth,
         height: '100%',
+        borderRadius: 10,
         position: 'absolute',
         backgroundColor: Theme.common.gradientTabBar1,
     },

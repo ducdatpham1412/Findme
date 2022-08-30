@@ -8,6 +8,7 @@ import {
     StyleTouchable,
 } from 'components/base';
 import RowPickImages from 'components/common/RowPickImages';
+import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
 import {appAlert, goBack, popUpPicker} from 'navigation/NavigationService';
@@ -100,6 +101,7 @@ const ReportUser = ({route}: Props) => {
 
     return (
         <>
+            <ViewSafeTopPadding />
             <StyleHeader
                 title={
                     nameUser
@@ -110,7 +112,7 @@ const ReportUser = ({route}: Props) => {
                     name: nameUser,
                 }}
             />
-            <StyleContainer customStyle={styles.container} scrollEnabled>
+            <StyleContainer customStyle={styles.body} scrollEnabled>
                 {/* Pick one reason */}
                 <StyleText
                     i18Text="discovery.report.chooseReason"
@@ -206,7 +208,7 @@ const ReportUser = ({route}: Props) => {
 };
 
 const styles = ScaledSheet.create({
-    container: {
+    body: {
         paddingHorizontal: '15@s',
     },
     // pick reason

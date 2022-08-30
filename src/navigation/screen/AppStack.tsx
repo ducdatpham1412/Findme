@@ -9,16 +9,13 @@ import ChatDetail from 'feature/mess/ChatDetail';
 import ChatDetailSetting from 'feature/mess/ChatDetailSetting';
 import DetailBubble from 'feature/notification/DetailBubble';
 import CreatePostPreview from 'feature/profile/CreatePostPreview';
-import CreatPostPickImage from 'feature/profile/CreatPostPickImage';
+import CreatePostPickImage from 'feature/profile/CreatePostPickImage';
 import ListFollows from 'feature/profile/ListFollows';
 import OtherProfile from 'feature/profile/OtherProfile';
 import Redux from 'hook/useRedux';
 import StatusPostCreated from 'navigation/components/StatusPostCreated';
 import ROOT_SCREEN, {MESS_ROUTE, PROFILE_ROUTE} from 'navigation/config/routes';
 import React from 'react';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {ScaledSheet} from 'react-native-size-matters';
-import {isIOS} from 'utility/assistant';
 import MainTabs from './MainTabs';
 import SettingRoute from './tabs/SettingRoute';
 
@@ -30,10 +27,9 @@ const AppStack = () => {
     const cardStyle = {
         backgroundColor: theme.backgroundColor,
     };
+
     return (
-        <SafeAreaView
-            style={[styles.container, {backgroundColor: theme.backgroundColor}]}
-            edges={['left', 'top', 'right']}>
+        <>
             <Stack.Navigator screenOptions={{headerShown: false}}>
                 <Stack.Screen
                     name={ROOT_SCREEN.mainScreen}
@@ -46,24 +42,15 @@ const AppStack = () => {
                 <Stack.Screen
                     name={ROOT_SCREEN.otherProfile}
                     component={OtherProfile}
-                    options={{
-                        cardStyle,
-                    }}
                 />
                 <Stack.Screen
                     name={ROOT_SCREEN.listFollows}
                     component={ListFollows}
-                    options={{
-                        cardStyle,
-                    }}
                 />
 
                 <Stack.Screen
                     name={ROOT_SCREEN.detailBubble}
                     component={DetailBubble}
-                    options={{
-                        cardStyle,
-                    }}
                 />
 
                 {/* Interact Bubble */}
@@ -93,9 +80,6 @@ const AppStack = () => {
                 <Stack.Screen
                     name={ROOT_SCREEN.reportUser}
                     component={ReportUser}
-                    options={{
-                        cardStyle,
-                    }}
                 />
 
                 <Stack.Screen
@@ -112,7 +96,7 @@ const AppStack = () => {
                 />
                 <Stack.Screen
                     name={PROFILE_ROUTE.createPostPickImg}
-                    component={CreatPostPickImage}
+                    component={CreatePostPickImage}
                     options={{
                         cardStyleInterpolator:
                             CardStyleInterpolators.forScaleFromCenterAndroid,
@@ -122,9 +106,6 @@ const AppStack = () => {
                 <Stack.Screen
                     name={MESS_ROUTE.chatDetail}
                     component={ChatDetail}
-                    options={{
-                        gestureEnabled: isIOS,
-                    }}
                 />
                 {/* <Stack.Screen
                     name={MESS_ROUTE.chatDetailGroup}
@@ -140,15 +121,8 @@ const AppStack = () => {
             </Stack.Navigator>
 
             <StatusPostCreated />
-        </SafeAreaView>
+        </>
     );
 };
-
-const styles = ScaledSheet.create({
-    container: {
-        flex: 1,
-        overflow: 'visible',
-    },
-});
 
 export default AppStack;

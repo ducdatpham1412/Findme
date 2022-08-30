@@ -2,6 +2,7 @@ import {
     CardStyleInterpolators,
     createStackNavigator,
 } from '@react-navigation/stack';
+import {Metrics} from 'asset/metrics';
 import AboutUs from 'feature/setting/aboutUs/AboutUs';
 import ExtendSetting from 'feature/setting/extend/ExtendSetting';
 import EnterPassword from 'feature/setting/personalInfo/EnterPassword';
@@ -16,6 +17,7 @@ import {SETTING_ROUTE} from 'navigation/config/routes';
 import React from 'react';
 
 const SettingStack = createStackNavigator();
+const {safeTopPadding} = Metrics;
 
 const SettingRoute = () => {
     const theme = Redux.getTheme();
@@ -28,6 +30,7 @@ const SettingRoute = () => {
                 headerShown: false,
                 cardStyle: {
                     backgroundColor: theme.backgroundColor,
+                    paddingTop: safeTopPadding,
                 },
             }}>
             <SettingStack.Screen

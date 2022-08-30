@@ -5,7 +5,7 @@ import {appAlert, goBack, TypeSwipeImages} from 'navigation/NavigationService';
 import React, {useRef} from 'react';
 import {View} from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
-import {ScaledSheet} from 'react-native-size-matters';
+import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 import RNFetchBlob from 'rn-fetch-blob';
 import {isIOS} from 'utility/assistant';
@@ -139,7 +139,7 @@ const styles = ScaledSheet.create({
         position: 'absolute',
         padding: '4@ms',
         right: '20@s',
-        top: '10@vs',
+        top: Metrics.safeTopPadding + verticalScale(10),
         borderRadius: '20@ms',
     },
     iconComeBack: {

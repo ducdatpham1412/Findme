@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeBubblePalace} from 'api/interface';
+import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {apiDeletePost} from 'api/module';
 import FindmeStore from 'app-redux/store';
 import {TYPE_DYNAMIC_LINK} from 'asset/enum';
@@ -11,11 +12,10 @@ import {
     DYNAMIC_LINK_SHARE,
     LANDING_PAGE_URL,
 } from 'asset/standardValue';
-import Theme from 'asset/theme/Theme';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
-import Bubble from 'feature/discovery/components/Bubble';
 import {TypeModalCommentPost} from 'components/ModalCommentLike';
+import Bubble from 'feature/discovery/components/Bubble';
 import {
     TypeMoreOptionsMe,
     TypeShowMoreOptions,
@@ -35,7 +35,6 @@ import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
 import {DefaultTransitionSpec} from 'utility/animation';
 import {logger} from 'utility/assistant';
-import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 
 interface Props {
     title: string;
@@ -371,6 +370,5 @@ const styles = ScaledSheet.create({
         position: 'absolute',
         width: '100%',
         height: '100%',
-        backgroundColor: Theme.common.white,
     },
 });

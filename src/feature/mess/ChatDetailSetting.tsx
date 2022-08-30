@@ -465,6 +465,7 @@ const ChatDetailSetting = ({route}: Props) => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
+        paddingTop: Metrics.safeTopPadding,
     },
     avatarNameView: {
         alignSelf: 'center',

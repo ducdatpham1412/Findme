@@ -11,6 +11,7 @@ import Redux from 'hook/useRedux';
 import TabNavigator from 'navigation/components/TabNavigator';
 import {MAIN_SCREEN} from 'navigation/config/routes';
 import React from 'react';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import DiscoveryRoute from './tabs/DiscoveryRoute';
 import MessRoute from './tabs/MessRoute';
 import ProfileRoute from './tabs/ProfileRoute';
@@ -32,7 +33,13 @@ const MainTabs: React.FunctionComponent = () => {
     const theme = Redux.getTheme();
 
     return (
-        <>
+        <SafeAreaView
+            style={{
+                flex: 1,
+                overflow: 'visible',
+                backgroundColor: theme.backgroundColor,
+            }}
+            edges={['top']}>
             <BottomTab.Navigator
                 tabBar={(props: BottomTabBarProps) => (
                     <TabNavigator {...props} />
@@ -90,7 +97,7 @@ const MainTabs: React.FunctionComponent = () => {
                     });
                 }}
             />
-        </>
+        </SafeAreaView>
     );
 };
 
