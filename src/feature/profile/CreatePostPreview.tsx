@@ -777,6 +777,7 @@ const CreatePostPreview = ({route}: Props) => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
+        paddingTop: Metrics.safeTopPadding,
     },
     // feelingTopicLocation
     feelingTopicLocationView: {

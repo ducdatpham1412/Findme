@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-shadow */
-/* eslint-disable react/jsx-key */
-/* eslint-disable no-unused-expressions */
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeBubblePalace} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
@@ -29,6 +25,7 @@ import IconNotLiked from 'components/common/IconNotLiked';
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
 import ModalCommentLike from 'components/ModalCommentLike';
 import StyleMoreText from 'components/StyleMoreText';
+import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
 import {appAlert, showSwipeImages} from 'navigation/NavigationService';
@@ -478,6 +475,7 @@ const DetailBubble = ({route}: Props) => {
 
     return (
         <>
+            <ViewSafeTopPadding />
             <StyleHeader title={bubble?.creatorName || ''} />
             <ScrollView
                 contentContainerStyle={[

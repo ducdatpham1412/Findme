@@ -164,6 +164,7 @@ const CreatPostPickImage = () => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
+        paddingTop: Metrics.safeTopPadding,
     },
     // header
     headerView: {
