@@ -16,11 +16,11 @@ const deleteTagMember = () => {
 
 const onMoveNavigation = (data: any) => {
     switch (data.type) {
-        case TYPE_NOTIFICATION.newChatTag:
-            if (data.conversationId) {
-                Redux.setChatTagFromNotification(data.conversationId);
-            }
-            break;
+        // case TYPE_NOTIFICATION.newChatTag:
+        //     if (data.conversationId) {
+        //         Redux.setChatTagFromNotification(data.conversationId);
+        //     }
+        //     break;
         case TYPE_NOTIFICATION.message:
             if (data.conversationId) {
                 Redux.setChatTagFromNotification(data.conversationId);
@@ -53,14 +53,14 @@ export const useNotification = () => {
             OneSignal.setAppId(Config.ONESIGNAL_KEY);
 
             OneSignal.addSubscriptionObserver(event => {
-                console.log('mission sub: ', event);
+                logger('mission sub: ', event);
             });
 
             // Prompt for push on iOS
             if (isIOS) {
                 OneSignal.promptForPushNotificationsWithUserResponse(
                     response => {
-                        console.log('Prompt response:', response);
+                        logger('Prompt response:', response);
                     },
                 );
             }

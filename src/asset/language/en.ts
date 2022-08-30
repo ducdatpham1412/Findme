@@ -321,6 +321,10 @@ const setting = {
 // NOTIFICATION
 const notification = {
     title: 'Notifications',
+    comment: ' commented on your post',
+    follow: ' start following you',
+    likePost: ' liked your post',
+    friendPostNew: ' post new post',
 };
 
 // ALERT

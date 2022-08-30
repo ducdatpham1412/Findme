@@ -14,6 +14,7 @@ import {
     LANGUAGE_TYPE,
     SIGN_UP_TYPE,
     TYPE_COLOR,
+    TYPE_NOTIFICATION,
 } from 'asset/enum';
 import Images from 'asset/img/images';
 import {LIST_TOPICS, PRIVATE_AVATAR} from 'asset/standardValue';
@@ -445,6 +446,7 @@ export const fakeBubbleFocusing: TypeBubblePalace = {
     created: '',
     isLiked: false,
     isSaved: false,
+    isDraft: false,
     relationship: 0,
 };
 
@@ -461,5 +463,20 @@ export const onGoToProfile = (userId: number) => {
         push(ROOT_SCREEN.otherProfile, {
             id: userId,
         });
+    }
+};
+
+export const chooseTextNotification = (type: number): I18Normalize => {
+    switch (type) {
+        case TYPE_NOTIFICATION.comment:
+            return 'notification.comment';
+        case TYPE_NOTIFICATION.follow:
+            return 'notification.follow';
+        case TYPE_NOTIFICATION.friendPostNew:
+            return 'notification.friendPostNew';
+        case TYPE_NOTIFICATION.likePost:
+            return 'notification.likePost';
+        default:
+            return 'common.null';
     }
 };

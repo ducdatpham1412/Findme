@@ -325,6 +325,10 @@ const setting = {
 // NOTIFICATION
 const notification = {
     title: 'Thông báo',
+    comment: ' đã bình luận bài của bạn',
+    follow: ' bắt đầu theo dõi bạn',
+    likePost: ' thích bài đăng của bạn',
+    friendPostNew: ' vừa đăng một bài mới',
 };
 
 // ALERT

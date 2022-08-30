@@ -6,7 +6,7 @@ import Redux from 'hook/useRedux';
 import {useSocketChatTagBubble} from 'hook/useSocketIO';
 import {MESS_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
-import React, {memo, useEffect} from 'react';
+import React, {memo, useCallback, useEffect} from 'react';
 import {Platform, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {isTimeBefore} from 'utility/format';
@@ -82,9 +82,9 @@ const RenderMessages = () => {
      * Render view
      */
 
-    const renderChatTag = (item: TypeChatTagResponse) => {
-        return <ChatTag key={item?.id} item={item} onGoToChat={onGoToChat} />;
-    };
+    const renderChatTag = useCallback((item: TypeChatTagResponse) => {
+        return <ChatTag item={item} onGoToChat={onGoToChat} />;
+    }, []);
 
     return (
         <StyleList
@@ -119,7 +119,7 @@ const MessScreen = () => {
             <View
                 style={[
                     styles.headerView,
-                    {borderBottomColor: theme.borderColor},
+                    {borderBottomColor: theme.holderColor},
                 ]}>
                 <StyleText
                     i18Text="mess.messScreen.headerTitle"
@@ -140,14 +140,14 @@ const styles = ScaledSheet.create({
     },
     headerView: {
         paddingHorizontal: '30@s',
-        paddingVertical: '10@vs',
+        paddingVertical: '5@vs',
         borderBottomWidth: Platform.select({
             ios: '0.25@ms',
             android: '0.5@ms',
         }),
     },
     textTitle: {
-        fontSize: '18@ms',
+        fontSize: '25@ms',
         fontWeight: 'bold',
     },
     contentList: {
