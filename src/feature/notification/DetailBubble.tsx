@@ -28,7 +28,7 @@ import StyleMoreText from 'components/StyleMoreText';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
-import {appAlert, showSwipeImages} from 'navigation/NavigationService';
+import {appAlert} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {ScrollView, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -54,13 +54,6 @@ interface Props {
         };
     };
 }
-
-const onSeeDetailImage = (images: Array<string>) => {
-    showSwipeImages({
-        listImages: images.map(item => ({url: item})),
-        allowSaveImage: true,
-    });
-};
 
 const DetailBubble = ({route}: Props) => {
     const {bubbleId, displayComment, displayLike} = route.params;
@@ -490,11 +483,8 @@ const DetailBubble = ({route}: Props) => {
                     onDoublePress={() => {
                         if (!bubble?.isLiked) {
                             onHandleLike();
-                        } else {
-                            onSeeDetailImage(bubble?.images);
                         }
                     }}
-                    containerStyle={styles.imageView}
                 />
                 {Footer()}
             </ScrollView>

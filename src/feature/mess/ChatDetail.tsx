@@ -11,12 +11,12 @@ import ModalPickImage from 'feature/mess/components/ModalPickImage';
 import Redux from 'hook/useRedux';
 import {socketUnTyping, useSocketChatDetail} from 'hook/useSocketIO';
 import {MESS_ROUTE} from 'navigation/config/routes';
-import {navigate, showSwipeImages} from 'navigation/NavigationService';
+import {navigate} from 'navigation/NavigationService';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {FlatList, Keyboard, TextInput, View} from 'react-native';
+import {FlatList, TextInput, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
-import {chooseColorGradient, isIOS} from 'utility/assistant';
+import {chooseColorGradient} from 'utility/assistant';
 import {isTimeBefore, isTimeEqual} from 'utility/format';
 import HeaderChat from './components/HeaderChat';
 import ItemMessage from './components/ItemMessage';
@@ -40,26 +40,6 @@ export interface TypeSeeDetailImage {
 
 const initHeightModal = ((Metrics.width - 6) * 2) / 3;
 
-const onSeeDetailImage = (params: TypeSeeDetailImage) => {
-    const {listImages, index, inputRef} = params;
-    if (inputRef.current?.isFocused() && !isIOS) {
-        Keyboard.dismiss();
-        const x = setTimeout(() => {
-            showSwipeImages({
-                listImages,
-                initIndex: index,
-            });
-        }, 100);
-        return () => clearTimeout(x);
-    }
-
-    showSwipeImages({
-        listImages,
-        initIndex: index,
-    });
-    return () => null;
-};
-
 const RenderItemMessage = (params: {
     item: TypeChatMessageResponse;
     index: number;
@@ -68,7 +48,6 @@ const RenderItemMessage = (params: {
     chatColor: Array<string>;
     partnerAvatar: string;
     messageIdSeen: string;
-    inputRef: any;
 }) => {
     const {
         item,
@@ -76,7 +55,6 @@ const RenderItemMessage = (params: {
         messages,
         deleteMessage,
         chatColor,
-        inputRef,
         messageIdSeen,
         partnerAvatar,
     } = params;
@@ -95,9 +73,6 @@ const RenderItemMessage = (params: {
             onDeleteMessage={deleteMessage}
             // listMessagesLength={messages.length}
             chatColor={chatColor}
-            onSeeDetailImage={(paramsDetail: any) =>
-                onSeeDetailImage({...paramsDetail, inputRef})
-            }
             partnerAvatar={partnerAvatar}
         />
     );
@@ -334,7 +309,6 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                         RenderItemMessage({
                             item,
                             index,
-                            inputRef,
                             messages,
                             deleteMessage,
                             chatColor,

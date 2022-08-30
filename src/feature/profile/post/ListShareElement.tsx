@@ -27,14 +27,13 @@ import {
     appAlertYesNo,
     goBack,
     navigate,
-    showSwipeImages,
 } from 'navigation/NavigationService';
 import React, {Component} from 'react';
 import {Animated, FlatList, StyleProp, ViewStyle} from 'react-native';
 import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
 import {DefaultTransitionSpec} from 'utility/animation';
-import {logger} from 'utility/assistant';
+import {logger, seeDetailImage} from 'utility/assistant';
 
 interface Props {
     title: string;
@@ -228,7 +227,7 @@ export default class ListShareElement extends Component<Props, States> {
         return (
             <Bubble
                 item={item}
-                isRectangle
+                // isRectangle
                 onShowMoreOption={value => this.showOptions(value)}
                 onShowModalComment={(post, type) =>
                     this.showModalComment(post, type)
@@ -250,13 +249,10 @@ export default class ListShareElement extends Component<Props, States> {
                             text: 'discovery.seeDetailImage',
                             action: () => {
                                 if (postModal?.images.length) {
-                                    showSwipeImages({
-                                        listImages: postModal.images.map(
-                                            item => ({
-                                                url: item,
-                                            }),
+                                    seeDetailImage({
+                                        images: postModal.images.map(
+                                            url => url,
                                         ),
-                                        allowSaveImage: false,
                                     });
                                 }
                             },
@@ -299,13 +295,10 @@ export default class ListShareElement extends Component<Props, States> {
                             text: 'discovery.seeDetailImage',
                             action: () => {
                                 if (postModal?.images.length) {
-                                    showSwipeImages({
-                                        listImages: postModal.images.map(
-                                            item => ({
-                                                url: item,
-                                            }),
+                                    seeDetailImage({
+                                        images: postModal.images.map(
+                                            url => url,
                                         ),
-                                        allowSaveImage: false,
                                     });
                                 }
                             },

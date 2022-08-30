@@ -15,12 +15,7 @@ import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
 import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
-import {
-    appAlert,
-    goBack,
-    navigate,
-    showSwipeImages,
-} from 'navigation/NavigationService';
+import {appAlert, goBack, navigate} from 'navigation/NavigationService';
 import React, {memo, useEffect, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import {Linking, View} from 'react-native';
@@ -46,13 +41,6 @@ interface Props {
     onShowModalComment(post: TypeBubblePalace, type: 'comment' | 'like'): void;
     onShowModalShare(item: any): void;
 }
-
-const onSeeDetailImage = (images: Array<string>) => {
-    showSwipeImages({
-        listImages: images.map(item => ({url: item})),
-        allowSaveImage: true,
-    });
-};
 
 const onHandleLike = async (params: {
     isModeExp: boolean;
@@ -512,7 +500,7 @@ const Bubble = (props: Props) => {
                             postId: item.id,
                         });
                     } else {
-                        onSeeDetailImage(item.images);
+                        // onSeeDetailImage(item.images);
                     }
                 }}
                 containerStyle={styles.imageView}

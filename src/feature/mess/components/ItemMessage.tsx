@@ -12,9 +12,9 @@ import {Animated, Keyboard, Text, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {moderateScale, scale, ScaledSheet} from 'react-native-size-matters';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {seeDetailImage} from 'utility/assistant';
 import {formatDateMessage} from 'utility/format';
 import {checkIsSingleEmoji} from 'utility/validate';
-import {TypeSeeDetailImage} from '../ChatDetail';
 import DatetimeMessage from './DatetimeMessage';
 import MessageImage from './MessageImage';
 
@@ -27,7 +27,6 @@ interface Props {
     partnerAvatar: string;
     onDeleteMessage(idMessage: string): Promise<void>;
     // listMessagesLength: number;
-    onSeeDetailImage(params: TypeSeeDetailImage): void;
 }
 
 const ItemMessage = (props: Props) => {
@@ -38,7 +37,6 @@ const ItemMessage = (props: Props) => {
         displaySeenAvatar,
         onDeleteMessage,
         chatColor,
-        onSeeDetailImage,
         partnerAvatar,
     } = props;
     const theme = Redux.getTheme();
@@ -80,10 +78,10 @@ const ItemMessage = (props: Props) => {
             // message image
             if (isMessageImage) {
                 if (typeof itemMessage.content === 'object') {
-                    const listImages = itemMessage.content.map?.(item => ({
-                        url: item,
-                    }));
-                    onSeeDetailImage({listImages, index});
+                    seeDetailImage({
+                        images: itemMessage.content.map(url => url),
+                        initIndex: index,
+                    });
                 }
             }
             // message text

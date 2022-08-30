@@ -8,7 +8,8 @@ import {
 } from 'react-native';
 
 interface Props extends ViewProps {
-    delay?: number;
+    maxDelay?: number;
+    minDelay?: number;
     radius?: number;
     onDoubleClick?(): any;
     onLongPress?(): void;
@@ -29,9 +30,9 @@ class StyleTouchHaveDouble extends Component<Props> {
     isDoubleTap = (currentTouchTimeStamp: any) => {
         const {prevTouchTimeStamp} = this.prevTouchInfo;
         const dt = currentTouchTimeStamp - prevTouchTimeStamp;
-        const {delay = 210} = this.props;
+        const {maxDelay = 210, minDelay = 70} = this.props;
 
-        return dt < delay;
+        return dt < maxDelay && dt > minDelay;
     };
 
     handlePanResponderGrant = () => {
