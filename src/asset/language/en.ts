@@ -135,6 +135,7 @@ const discovery = {
     },
     report: {
         title: 'Report',
+        reportPerson: 'Report {{name}}',
         chooseReason: '※ Choose a reason for report this user:',
         offensiveLanguage: 'Profanity, offensive language',
         dangerousAction: 'Dangerous behavior that threatens me or peole',

@@ -143,6 +143,7 @@ export enum TYPE_BUBBLE_PALACE_ACTION {
     createNewPost = 0,
     editPostFromProfile = 1,
     scrollToTopDiscovery = 2,
+    scrollToTopMyProfile = 3,
 }
 
 export enum TYPE_SOCIAL_LOGIN {

@@ -11,7 +11,7 @@ import {
     TextInput,
     ViewStyle,
 } from 'react-native';
-import {ScaledSheet} from 'react-native-size-matters';
+import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import StyleList from './base/StyleList';
 import InputComment from './common/InputComment';
 import StyleKeyboardAwareView from './StyleKeyboardAwareView';
@@ -24,13 +24,15 @@ interface Props {
     extraHeight?: number;
 }
 
+const defaultExtraHeight = verticalScale(7);
+
 const ListComments = (props: Props) => {
     const {
         bubbleFocusing,
         setTotalComments,
         increaseTotalComments,
         inputCommentContainerStyle,
-        extraHeight = 7,
+        extraHeight = defaultExtraHeight,
     } = props;
     const listCommentRef = useRef<FlatList>(null);
     const inputRef = useRef<TextInput>(null);
@@ -43,7 +45,7 @@ const ListComments = (props: Props) => {
     const [personReplied, setPersonReplied] = useState('');
     const [commentReplied, setCommentReplied] = useState('');
 
-    const {list, loading, refreshing, onRefresh} = useSocketComment({
+    const {list, refreshing, onRefresh} = useSocketComment({
         bubbleFocusingId: bubbleFocusing.id,
         setTotalComments,
         increaseTotalComments,
@@ -77,16 +79,19 @@ const ListComments = (props: Props) => {
         });
     };
 
-    const onPresReply = (commentId: string, _personReplied: string) => {
-        setCommentReplied(commentId);
-        setPersonReplied(_personReplied);
-        inputRef.current?.focus();
-    };
+    const onPresReply = useCallback(
+        (commentId: string, _personReplied: string) => {
+            setCommentReplied(commentId);
+            setPersonReplied(_personReplied);
+            inputRef.current?.focus();
+        },
+        [],
+    );
 
-    const onDeleteReply = () => {
+    const onDeleteReply = useCallback(() => {
         setCommentReplied('');
         setPersonReplied('');
-    };
+    }, []);
 
     const RenderItemComment = useCallback((item: TypeCommentResponse) => {
         return (
@@ -105,18 +110,16 @@ const ListComments = (props: Props) => {
                 {borderRightColor: theme.holderColor},
             ]}
             extraHeight={extraHeight}>
-            {!loading && (
-                <StyleList
-                    ref={listCommentRef}
-                    style={styles.listCommentBox}
-                    data={list}
-                    renderItem={({item}) => RenderItemComment(item)}
-                    keyExtractor={(_, index) => String(index)}
-                    contentContainerStyle={{paddingBottom: 100}}
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                />
-            )}
+            <StyleList
+                ref={listCommentRef}
+                style={styles.listCommentBox}
+                data={list}
+                renderItem={({item}) => RenderItemComment(item)}
+                keyExtractor={(_, index) => String(index)}
+                contentContainerStyle={{paddingBottom: 100}}
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+            />
 
             <InputComment
                 ref={inputRef}

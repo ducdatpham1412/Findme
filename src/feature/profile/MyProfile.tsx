@@ -1,3 +1,4 @@
+import {useIsFocused} from '@react-navigation/native';
 import {TypeBubblePalace} from 'api/interface';
 import {
     apiGetListPost,
@@ -125,6 +126,7 @@ const ProfileEnjoy = ({routeName}: ChildrenProps) => {
  */
 let listShareElement: Array<TypeBubblePalace> = [];
 let tabIndexRef = 0;
+let checkIsFocus = true;
 
 const safeLoadMoreStyle: any = {
     overflow: 'hidden',
@@ -136,6 +138,8 @@ const safeLoadMoreStyle: any = {
 };
 
 const ProfileAccount = ({routeName}: ChildrenProps) => {
+    const isFocused = useIsFocused();
+
     const {profile} = Redux.getPassport();
     const bubblePalaceAction = Redux.getBubblePalaceAction();
     const theme = Redux.getTheme();
@@ -167,6 +171,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     const postLikedRef = useRef<ListShareElement>(null);
     const postSavedRef = useRef<ListShareElement>(null);
     const tabViewRef = useRef<StyleTabView>(null);
+    const scrollRef = useRef<ScrollView>(null);
 
     const [tabIndex, setTabIndex] = useState(0);
     const [bubbleFocusing, setBubbleFocusing] = useState<TypeBubblePalace>();
@@ -201,6 +206,49 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                     };
                 }),
             );
+            Redux.setBubblePalaceAction({
+                action: TYPE_BUBBLE_PALACE_ACTION.null,
+                payload: null,
+            });
+        }
+    }, [bubblePalaceAction]);
+
+    useEffect(() => {
+        let x: any;
+        if (!isFocused) {
+            checkIsFocus = false;
+        } else {
+            x = setTimeout(() => {
+                checkIsFocus = true;
+            }, 200);
+        }
+        return () => {
+            clearTimeout(x);
+        };
+    }, [isFocused]);
+
+    useEffect(() => {
+        if (
+            checkIsFocus &&
+            bubblePalaceAction.action ===
+                TYPE_BUBBLE_PALACE_ACTION.scrollToTopMyProfile
+        ) {
+            if (myPostRef.current?.isShowing()) {
+                myPostRef.current?.hide();
+            } else if (postLikedRef.current?.isShowing()) {
+                postLikedRef.current?.hide();
+            } else if (postSavedRef.current?.isShowing()) {
+                postSavedRef.current?.hide();
+            } else {
+                scrollRef.current?.scrollTo({
+                    y: 0,
+                    animated: true,
+                });
+            }
+            Redux.setBubblePalaceAction({
+                action: TYPE_BUBBLE_PALACE_ACTION.null,
+                payload: null,
+            });
         }
     }, [bubblePalaceAction]);
 
@@ -223,9 +271,9 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     /**
      * Functions
      */
-    const onShowOption = () => {
+    const onShowOption = useCallback(() => {
         optionRef.current.show();
-    };
+    }, []);
 
     const onGoToDetailPost = (bubbleId: string) => {
         const initIndex = listShareElement.findIndex(
@@ -313,6 +361,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 hasGuideButton
             />
             <ScrollView
+                ref={scrollRef}
                 stickyHeaderIndices={[1]}
                 onMomentumScrollEnd={({nativeEvent}) => {
                     checkScrollEnd(nativeEvent);

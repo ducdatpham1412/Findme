@@ -416,7 +416,7 @@ export interface TypeParamsPaging {
 }
 
 export interface TypeReportUserRequest {
-    reason: string;
+    reason: number;
     description: string;
     listImages: Array<string>;
 }

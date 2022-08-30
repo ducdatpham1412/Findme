@@ -138,6 +138,7 @@ const discovery = {
     },
     report: {
         title: 'Tố cáo',
+        reportPerson: 'Tố cáo {{name}}',
         chooseReason: '※ Chọn một lý do để tố cáo người dùng này:',
         offensiveLanguage: 'Ngôn từ tục tĩu, gây xúc phạm',
         dangerousAction: 'Hành vi nguy hiểm, đe doạ tới tôi hoặc mọi người',
