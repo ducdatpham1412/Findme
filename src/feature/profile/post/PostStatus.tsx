@@ -8,6 +8,7 @@ import {StyleProp, View, ViewStyle} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {moderateScale, scale, ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface Props {
     itemPost: TypeBubblePalace;
@@ -44,6 +45,12 @@ const PostStatus = (props: Props) => {
                         customStyle={styles.textDraft}
                     />
                 </View>
+            )}
+            {itemPost.images.length >= 2 && (
+                <MaterialCommunityIcons
+                    name="file-multiple"
+                    style={styles.iconMultiPage}
+                />
             )}
         </StyleTouchable>
     );
@@ -84,6 +91,13 @@ const styles = ScaledSheet.create({
     textDraft: {
         fontSize: '14@ms',
         color: Theme.common.white,
+    },
+    iconMultiPage: {
+        position: 'absolute',
+        fontSize: '17@ms',
+        color: Theme.common.white,
+        right: '3@ms',
+        top: '3@ms',
     },
 });
 

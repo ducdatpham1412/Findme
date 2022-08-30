@@ -72,10 +72,12 @@ const ScrollSyncSizeImage = (props: Props) => {
 
     const translateXIndicator = useAnimatedValue(0);
     translateX.addListener(({value}) => {
-        const newRatio = -value / layOutWidth;
-        translateXIndicator.setValue(
-            newRatio * (indicatorWidth + marginIndicatorPoint),
-        );
+        if (layOutWidth !== 0) {
+            const newTranslateX =
+                (-value / layOutWidth) *
+                (indicatorWidth + marginIndicatorPoint);
+            translateXIndicator.setValue(newTranslateX);
+        }
     });
 
     const jumpToIndex = (__index: number) => {
