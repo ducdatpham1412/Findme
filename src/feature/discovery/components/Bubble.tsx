@@ -224,7 +224,7 @@ const Bubble = (props: Props) => {
                     </StyleTouchable>
                 </View>
 
-                {item.location && (
+                {!!item.location && (
                     <View style={styles.locationBox}>
                         <Ionicons
                             name="ios-location-sharp"
