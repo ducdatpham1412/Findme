@@ -1,7 +1,6 @@
 import {TypeFollowResponse} from 'api/interface';
 import {apiFollowUser} from 'api/module';
 import {RELATIONSHIP} from 'asset/enum';
-import Images from 'asset/img/images';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import {appAlert} from 'navigation/NavigationService';
@@ -41,7 +40,6 @@ const ItemFollow = (props: Props) => {
             <StyleImage
                 source={{uri: item.avatar}}
                 customStyle={styles.avatar}
-                defaultSource={Images.images.defaultAvatar}
             />
 
             <View style={styles.nameDescriptionView}>

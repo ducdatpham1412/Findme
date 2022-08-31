@@ -1,6 +1,5 @@
 import {TypeChatMessageResponse} from 'api/interface';
 import {MESSAGE_TYPE, RELATIONSHIP} from 'asset/enum';
-import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {DELAY_LONG_PRESS} from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
@@ -149,7 +148,6 @@ const ItemMessage = (props: Props) => {
                 <StyleImage
                     source={{uri: partnerAvatar}}
                     customStyle={styles.avatarPartnerView}
-                    defaultSource={Images.images.defaultAvatar}
                 />
             </View>
         );
@@ -164,7 +162,6 @@ const ItemMessage = (props: Props) => {
                 <StyleImage
                     source={{uri: partnerAvatar}}
                     customStyle={styles.seenAvatar}
-                    defaultSource={Images.images.defaultAvatar}
                 />
             </View>
         );

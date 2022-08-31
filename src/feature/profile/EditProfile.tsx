@@ -1,6 +1,5 @@
 import {apiEditProfile} from 'api/module';
 import FindmeStore from 'app-redux/store';
-import Images from 'asset/img/images';
 import {AVATAR_SIZE} from 'asset/standardValue';
 import {
     StyleButton,
@@ -130,7 +129,6 @@ const EditProfile = () => {
                         <StyleImage
                             source={{uri: avatar}}
                             customStyle={styles.avatarImg}
-                            defaultSource={Images.images.defaultAvatar}
                         />
                     </StyleTouchable>
 

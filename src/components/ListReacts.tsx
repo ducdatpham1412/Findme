@@ -1,7 +1,6 @@
 import {TypeGetLikePostsResponse} from 'api/interface';
 import {apiFollowUser, apiGetListReactsPost} from 'api/module';
 import {REACT, RELATIONSHIP} from 'asset/enum';
-import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
@@ -79,7 +78,6 @@ const ListReacts = (props: Props) => {
                             <StyleImage
                                 source={{uri: item.creatorAvatar}}
                                 customStyle={styles.avatar}
-                                defaultSource={Images.images.defaultAvatar}
                             />
                             <StyleText
                                 originValue={item.creatorName}

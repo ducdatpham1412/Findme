@@ -187,7 +187,6 @@ const TabNavigator = (props: any) => {
                 <StyleImage
                     source={{uri: avatar}}
                     customStyle={styles.profile}
-                    defaultSource={Images.images.defaultAvatar}
                 />
             </StyleTouchable>
         );

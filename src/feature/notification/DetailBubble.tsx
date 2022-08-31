@@ -214,7 +214,6 @@ const DetailBubble = ({route}: Props) => {
                         <StyleImage
                             source={{uri: bubble?.creatorAvatar}}
                             customStyle={styles.avatar}
-                            defaultSource={Images.images.defaultAvatar}
                         />
                     </StyleTouchable>
 

@@ -2,6 +2,7 @@ import {TypeCommentResponse} from 'api/interface';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import React, {memo} from 'react';
+import isEqual from 'react-fast-compare';
 import {View} from 'react-native';
 import {
     moderateScale,
@@ -9,10 +10,8 @@ import {
     ScaledSheet,
     verticalScale,
 } from 'react-native-size-matters';
-import {formatFromNow} from 'utility/format';
-import isEqual from 'react-fast-compare';
-import Images from 'asset/img/images';
 import {onGoToProfile} from 'utility/assistant';
+import {formatFromNow} from 'utility/format';
 
 interface Props {
     item: TypeCommentResponse;
@@ -124,7 +123,6 @@ const ItemComment = (props: Props) => {
                     <StyleImage
                         source={{uri: item.creatorAvatar}}
                         customStyle={styles.avatar}
-                        defaultSource={Images.images.defaultAvatar}
                     />
                 </StyleTouchable>
                 {RenderNameAndContent()}
