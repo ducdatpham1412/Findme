@@ -27,6 +27,16 @@ export default class HeaderFilterTopic extends Component<Props, States> {
         tempListTopics: this.props.listTopics,
     };
 
+    turnOn = Animated.spring(this.aim, {
+        toValue: 1,
+        useNativeDriver: true,
+    });
+
+    turnOff = Animated.spring(this.aim, {
+        toValue: 0,
+        useNativeDriver: true,
+    });
+
     shouldComponentUpdate(nextProps: Props, nextStates: States) {
         if (!isEqual(nextStates, this.state)) {
             return true;
@@ -44,17 +54,13 @@ export default class HeaderFilterTopic extends Component<Props, States> {
     }
 
     show() {
-        Animated.spring(this.aim, {
-            toValue: 1,
-            useNativeDriver: true,
-        }).start();
+        this.turnOn.stop();
+        this.turnOn.start();
     }
 
     hide() {
-        Animated.spring(this.aim, {
-            toValue: 0,
-            useNativeDriver: true,
-        }).start();
+        this.turnOff.stop();
+        this.turnOff.start();
     }
 
     private onCancel() {

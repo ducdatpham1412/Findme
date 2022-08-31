@@ -1,5 +1,5 @@
 import CameraRoll from '@react-native-community/cameraroll';
-import {apiUploadImage} from 'api/module';
+import {apiUploadFile} from 'api/module';
 import ImagePicker from 'react-native-image-crop-picker';
 import I18Next from 'utility/I18Next';
 import {checkPhoto} from './permission/permission';
@@ -37,7 +37,6 @@ const ImageUploader = {
             compressImageMaxHeight: params?.maxHeight || MAX_HEIGHT,
             compressImageQuality: 1,
         }),
-    // crop = true, multiple = false, maxFiles = 1
     chooseImageFromLibrary: (params?: ImagePickerParamsType) =>
         ImagePicker.openPicker({
             mediaType: 'photo',
@@ -54,6 +53,11 @@ const ImageUploader = {
             compressImageMaxHeight: params?.maxHeight || MAX_HEIGHT,
             compressImageQuality: 1,
         }),
+    chooseVideoFromLibrary: () =>
+        ImagePicker.openPicker({
+            mediaType: 'video',
+            maxFiles: 1,
+        }),
 
     readImageFromLibrary: async (params: ImageReadLibraryType) => {
         await checkPhoto();
@@ -67,47 +71,36 @@ const ImageUploader = {
         return res;
     },
 
-    // for upload only 1 image, return one link image
-    upLoad: async (
-        localPath: string,
-        quality: number | undefined = undefined,
-    ) => {
+    upLoad: async (path: string, quality: number | undefined = undefined) => {
         const payload = new FormData();
-
         const formatImage = {
-            uri: localPath,
-            type: 'image/jpeg',
-            name: 'image.jpg',
-            filename: 'fileName.jpg',
+            uri: path,
+            // type: 'image/jpeg',
+            name: 'file',
         };
-
-        payload.append('image', formatImage);
-        // send to api upload to get uri image
-        const uriImg = await apiUploadImage(payload, quality);
+        payload.append('file', formatImage);
+        const uriImg = await apiUploadFile(payload, quality);
         if (uriImg?.data?.length > 0) {
             return uriImg?.data[0];
         }
         return null;
     },
 
-    // for upload many image, return array of link image
     upLoadManyImg: async (
-        arrLocalPath: Array<string>,
+        arrPath: Array<string>,
         quality: number | undefined = undefined,
     ): Promise<Array<string>> => {
         const payload = new FormData();
 
-        arrLocalPath.forEach((path: any) => {
+        arrPath.forEach((path: any) => {
             const formatImage: any = {
                 uri: path,
-                type: 'image/jpeg',
-                name: 'image.jpg',
-                filename: 'fileName.jpg',
+                // type: 'image/jpeg',
+                name: 'file',
             };
-            payload.append('image', formatImage);
+            payload.append('file', formatImage);
         });
-        // send to api upload to get uri image
-        const uriImg = await apiUploadImage(payload, quality);
+        const uriImg = await apiUploadFile(payload, quality);
         if (uriImg?.data.length > 0) {
             return uriImg?.data;
         }

@@ -86,6 +86,7 @@ const DiscoveryScreen = () => {
         TOPIC.cuisine,
         TOPIC.shopping,
     ]);
+    const [postIdFocusing, setPostIdFocusing] = useState('');
 
     const {
         list,
@@ -213,18 +214,23 @@ const DiscoveryScreen = () => {
     /**
      * Render views
      */
-    const RenderItemBubble = useCallback((item: TypeBubblePalace) => {
-        return (
-            <Bubble
-                item={item}
-                onShowMoreOption={onShowOptions}
-                onShowModalComment={(post, type) =>
-                    onShowModalComment(post, type)
-                }
-                onShowModalShare={post => onShowModalShare(post)}
-            />
-        );
-    }, []);
+    const RenderItemBubble = useCallback(
+        (item: TypeBubblePalace) => {
+            return (
+                <Bubble
+                    item={item}
+                    onShowMoreOption={onShowOptions}
+                    onShowModalComment={(post, type) =>
+                        onShowModalComment(post, type)
+                    }
+                    onShowModalShare={post => onShowModalShare(post)}
+                    isFocusing={postIdFocusing === item.id}
+                    onChangePostIdFocusing={postId => setPostIdFocusing(postId)}
+                />
+            );
+        },
+        [postIdFocusing],
+    );
 
     const EmptyView = () => {
         if (loading) {

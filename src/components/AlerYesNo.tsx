@@ -108,7 +108,7 @@ const AlertYesNo = ({route}: AlertConfirmChangeProps) => {
                                 styles.buttonElement,
                                 {
                                     backgroundColor: theme.borderColor,
-                                    opacity: 0.6,
+                                    opacity: 0.7,
                                 },
                             ]}
                             onPress={agreeChange}>

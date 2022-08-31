@@ -1,6 +1,6 @@
 import {
-    TypeCreatePostRequest,
     TypeBubblePalace,
+    TypeCreatePostRequest,
     TypeEditPostRequest,
 } from 'api/interface';
 import {apiCreatePost, apiEditPost} from 'api/module';
@@ -41,6 +41,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {onGoToSignUp} from 'utility/assistant';
 import ImageUploader from 'utility/ImageUploader';
 import ItemToolCreatePost from './components/ItemToolCreatePost';
+import PreviewVideo from './components/PreviewVideo';
 import ModalAddLink from './post/ModalAddLink';
 import ModalCheckIn from './post/ModalCheckIn';
 import ModalFeeling from './post/ModalFeeling';
@@ -52,6 +53,7 @@ interface Props {
         params: {
             itemNew?: {
                 images: Array<string>;
+                isVideo: boolean;
             };
             itemEdit?: TypeBubblePalace;
             itemDraft?: TypeBubblePalace;
@@ -413,7 +415,9 @@ const CreatePostPreview = ({route}: Props) => {
                     <StyleTouchable
                         customStyle={[
                             styles.postBox,
-                            {borderColor: theme.highlightColor},
+                            {
+                                borderColor: theme.highlightColor,
+                            },
                         ]}
                         onPress={() => {
                             if (itemDraft) {
@@ -436,7 +440,9 @@ const CreatePostPreview = ({route}: Props) => {
                     <StyleTouchable
                         customStyle={[
                             styles.draftBox,
-                            {borderColor: theme.borderColor},
+                            {
+                                borderColor: theme.borderColor,
+                            },
                         ]}
                         onPress={() => onConfirmPost(true)}>
                         <StyleText
@@ -525,9 +531,10 @@ const CreatePostPreview = ({route}: Props) => {
     };
 
     const ImagePreview = useMemo(() => {
-        return (
-            <ScrollSyncSizeImage images={images} syncWidth={Metrics.width} />
-        );
+        if (itemNew?.isVideo) {
+            return <PreviewVideo uri={images[0]} />;
+        }
+        return <ScrollSyncSizeImage images={images} syncWidth={screenWidth} />;
     }, []);
 
     const StarLink = () => {
@@ -841,9 +848,9 @@ const styles = ScaledSheet.create({
             ios: '0.5@ms',
             android: '1@ms',
         }),
-        paddingHorizontal: '15@s',
+        paddingHorizontal: '25@s',
         paddingVertical: '3@vs',
-        borderRadius: '5@ms',
+        borderRadius: '8@ms',
     },
     textPost: {
         fontSize: '14@ms',
@@ -854,10 +861,10 @@ const styles = ScaledSheet.create({
             ios: '0.5@ms',
             android: '1@ms',
         }),
-        paddingHorizontal: '10@s',
+        paddingHorizontal: '15@s',
         paddingVertical: '3@vs',
-        borderRadius: '5@ms',
-        marginRight: '7@s',
+        borderRadius: '8@ms',
+        marginRight: '10@s',
     },
     textDraft: {
         fontSize: '14@ms',

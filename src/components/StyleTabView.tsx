@@ -28,6 +28,7 @@ interface Props {
     children: ReactNode;
     initIndex?: number;
     onFirstNavigateToIndex?(value: number): void;
+    onChangeTabIndex?(index: number): void;
     onScroll?(e: TypeNativeEvent): void;
     containerStyle?: StyleProp<ViewStyle>;
 }
@@ -116,6 +117,7 @@ class StyleTabView extends Component<Props, States> {
                     this.props.onFirstNavigateToIndex?.(index);
                     this.listCheckLazyRef[index] = true;
                 }
+                this.props.onChangeTabIndex?.(index);
             }
         });
     };

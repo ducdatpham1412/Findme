@@ -77,7 +77,7 @@ const Alert = ({route}: Props) => {
                             styles.buttonElement,
                             {
                                 backgroundColor: theme.borderColor,
-                                opacity: moreNotice ? 0.6 : 1,
+                                opacity: moreNotice ? 0.7 : 1,
                             },
                         ]}
                         onPress={actionClickOk || goBack}>

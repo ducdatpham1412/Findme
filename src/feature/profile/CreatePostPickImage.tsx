@@ -1,22 +1,34 @@
+import {useIsFocused} from '@react-navigation/native';
 import {Metrics} from 'asset/metrics';
 import {MAX_NUMBER_IMAGES_POST} from 'asset/standardValue';
 import {StyleText, StyleTouchable} from 'components/base';
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
+import StyleTabView from 'components/StyleTabView';
 import ModalPickImage from 'feature/mess/components/ModalPickImage';
 import Redux from 'hook/useRedux';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
 import {goBack, navigate} from 'navigation/NavigationService';
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Platform, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {chooseImageFromCamera} from 'utility/assistant';
+import Video from 'react-native-video';
+import {chooseImageFromCamera, logger} from 'utility/assistant';
+import ImageUploader from 'utility/ImageUploader';
 
-const CreatPostPickImage = () => {
+const screenWidth = Metrics.width;
+
+const CreatePostPickImage = () => {
     const theme = Redux.getTheme();
+    const tabPickRef = useRef<StyleTabView>(null);
+    const isFocused = useIsFocused();
+
     const [images, setImages] = useState<Array<string>>([]);
     const [indexScroll, setIndexScroll] = useState(0);
+    const [video, setVideo] = useState('');
+    const [tabIndex, setTabIndex] = useState(0);
 
     const onChooseImage = (url: string) => {
         if (images.length === MAX_NUMBER_IMAGES_POST) {
@@ -35,15 +47,42 @@ const CreatPostPickImage = () => {
     };
 
     const onChooseFromCamera = async () => {
+        if (tabIndex === 1) {
+            tabPickRef.current?.navigateToIndex(0);
+        }
         await chooseImageFromCamera((path: string) =>
             setImages(images.concat(path)),
         );
     };
 
+    const onChooseVideo = async () => {
+        if (tabIndex === 0) {
+            if (!video) {
+                try {
+                    const res = await ImageUploader.chooseVideoFromLibrary();
+                    tabPickRef.current?.navigateToIndex(1);
+                    setVideo(res.path);
+                } catch (err) {
+                    logger(err);
+                }
+            } else {
+                tabPickRef.current?.navigateToIndex(1);
+            }
+        } else {
+            try {
+                const res = await ImageUploader.chooseVideoFromLibrary();
+                setVideo(res.path);
+            } catch (err) {
+                logger(err);
+            }
+        }
+    };
+
     const onNavigatePreview = () => {
         navigate(PROFILE_ROUTE.createPostPreview, {
             itemNew: {
-                images,
+                images: tabIndex === 0 ? images : [video],
+                isVideo: tabIndex === 1,
             },
         });
     };
@@ -86,6 +125,29 @@ const CreatPostPickImage = () => {
     };
 
     const ImagePreview = () => {
+        // const tempVideoLink =
+        //     'https://commondatastorage.googleapis.com/gtv-video-bucket/sample/BigBuckBunny.mp4';
+        if (tabIndex === 1) {
+            if (!video) {
+                return null;
+            }
+            return (
+                <Video
+                    source={{
+                        uri: video,
+                    }}
+                    style={{
+                        width: screenWidth,
+                        minHeight: '60%',
+                        maxHeight: '80%',
+                    }}
+                    repeat
+                    controls
+                    muted={!isFocused}
+                    paused={!isFocused}
+                />
+            );
+        }
         return (
             <ScrollSyncSizeImage
                 images={images}
@@ -106,17 +168,52 @@ const CreatPostPickImage = () => {
                         borderColor: theme.holderColor,
                     },
                 ]}>
-                <StyleText
-                    originValue={`${indexScroll + 1} / ${images.length}`}
-                    customStyle={[styles.indexText, {color: theme.textColor}]}
-                />
+                <StyleTouchable
+                    customStyle={styles.touchImage}
+                    onPress={() => tabPickRef.current?.navigateToIndex(0)}
+                    hitSlop={15}>
+                    <FontAwesome
+                        name="image"
+                        style={[
+                            styles.iconImage,
+                            {
+                                color: theme.textColor,
+                            },
+                        ]}
+                    />
+                </StyleTouchable>
+                <StyleTouchable
+                    customStyle={styles.touchCamera}
+                    onPress={onChooseFromCamera}
+                    hitSlop={15}>
+                    <Ionicons
+                        name="camera-outline"
+                        style={[
+                            styles.iconCamera,
+                            {
+                                color: theme.textColor,
+                            },
+                        ]}
+                    />
+                </StyleTouchable>
+
+                {tabIndex === 0 && (
+                    <StyleText
+                        originValue={`${indexScroll + 1} / ${images.length}`}
+                        customStyle={[
+                            styles.indexText,
+                            {color: theme.textColor},
+                        ]}
+                    />
+                )}
+
                 <StyleTouchable
                     customStyle={[
-                        styles.iconCameraTouch,
+                        styles.videoTouch,
                         {borderColor: theme.textColor},
                     ]}
                     hitSlop={10}
-                    onPress={onChooseFromCamera}>
+                    onPress={onChooseVideo}>
                     <View
                         style={[
                             styles.spaceBackground,
@@ -124,26 +221,16 @@ const CreatPostPickImage = () => {
                         ]}
                     />
                     <Ionicons
-                        name="camera-outline"
+                        name="ios-videocam-outline"
                         style={[
-                            styles.iconCamera,
-                            {color: theme.textHightLight},
+                            styles.iconVideo,
+                            {
+                                color: theme.textHightLight,
+                            },
                         ]}
                     />
                 </StyleTouchable>
             </View>
-        );
-    };
-
-    const ModalImage = () => {
-        return (
-            <ModalPickImage
-                images={images}
-                onChooseImage={onChooseImage}
-                numberColumns={4}
-                containerStyle={styles.modalPickImageView}
-                initIndexImage={0}
-            />
         );
     };
 
@@ -156,7 +243,21 @@ const CreatPostPickImage = () => {
             {Header()}
             {ImagePreview()}
             {Tool()}
-            {ModalImage()}
+            <StyleTabView
+                ref={tabPickRef}
+                containerStyle={styles.tabView}
+                onChangeTabIndex={index => {
+                    setTabIndex(index);
+                }}>
+                <ModalPickImage
+                    images={images}
+                    onChooseImage={onChooseImage}
+                    numberColumns={4}
+                    containerStyle={styles.modalPickImageView}
+                    initIndexImage={0}
+                />
+                <View />
+            </StyleTabView>
         </View>
     );
 };
@@ -215,7 +316,21 @@ const styles = ScaledSheet.create({
             android: '0.5@ms',
         }),
     },
-    iconCameraTouch: {
+    touchImage: {
+        position: 'absolute',
+        left: '20@s',
+    },
+    iconImage: {
+        fontSize: '13@ms',
+    },
+    touchCamera: {
+        position: 'absolute',
+        left: '60@s',
+    },
+    iconCamera: {
+        fontSize: '16.5@ms',
+    },
+    videoTouch: {
         position: 'absolute',
         right: '10@s',
         width: '25@ms',
@@ -235,17 +350,20 @@ const styles = ScaledSheet.create({
         borderRadius: 20,
         opacity: 0.9,
     },
-    iconCamera: {
+    iconVideo: {
         fontSize: '14@ms',
     },
     indexText: {
         fontSize: '10@ms',
     },
     // modal pick image view
+    tabView: {
+        flex: 1,
+    },
     modalPickImageView: {
         height: undefined,
         flex: 1,
     },
 });
 
-export default CreatPostPickImage;
+export default CreatePostPickImage;

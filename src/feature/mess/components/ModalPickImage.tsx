@@ -1,4 +1,5 @@
 /* eslint-disable no-underscore-dangle */
+import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {TypeTheme} from 'asset/theme/Theme';
 import {StyleImage, StyleTouchable} from 'components/base';
@@ -6,7 +7,7 @@ import StyleList from 'components/base/StyleList';
 import Redux from 'hook/useRedux';
 import React, {useEffect, useState} from 'react';
 import {Platform, StyleProp, View, ViewStyle} from 'react-native';
-import {ScaledSheet} from 'react-native-size-matters';
+import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {isIOS} from 'utility/assistant';
 import ImageUploader from 'utility/ImageUploader';
@@ -40,7 +41,11 @@ const RenderImage = (params: RenderImageParams) => {
         <StyleTouchable
             onPress={() => onChooseImage(item)}
             customStyle={[styles.imageBox, {width: size, height: size}]}>
-            <StyleImage source={{uri: item}} style={styles.image} />
+            <StyleImage
+                source={{uri: item}}
+                style={styles.image}
+                defaultSource={Images.images.defaultImage}
+            />
 
             {isChosen && (
                 <View
@@ -175,7 +180,7 @@ const styles = ScaledSheet.create({
         fontSize: '60@ms',
     },
     contentContainer: {
-        paddingBottom: '20@vs',
+        paddingBottom: Metrics.safeBottomPadding + verticalScale(10),
     },
 });
 

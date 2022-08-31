@@ -12,6 +12,7 @@ import {
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
+import VideoBubble from 'components/common/VideoBubble';
 import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
@@ -32,14 +33,16 @@ import {
     onGoToSignUp,
 } from 'utility/assistant';
 import {formatFromNow} from 'utility/format';
+import {checkIsVideo} from 'utility/validate';
 import {TypeMoreOptionsMe, TypeShowMoreOptions} from '../DiscoveryScreen';
 
 interface Props {
     item: TypeBubblePalace;
-    isRectangle?: boolean;
     onShowMoreOption(params: TypeShowMoreOptions & TypeMoreOptionsMe): void;
     onShowModalComment(post: TypeBubblePalace, type: 'comment' | 'like'): void;
     onShowModalShare(item: any): void;
+    isFocusing: boolean;
+    onChangePostIdFocusing(postId: string): void;
 }
 
 const onHandleLike = async (params: {
@@ -125,13 +128,16 @@ const onOpenLink = (link: string) => {
     }
 };
 
+const screenWidth = Metrics.width;
+
 const Bubble = (props: Props) => {
     const {
         item,
         onShowMoreOption,
         onShowModalComment,
         onShowModalShare,
-        isRectangle = false,
+        isFocusing = false,
+        onChangePostIdFocusing,
     } = props;
     const isModeExp = Redux.getModeExp();
     const theme = Redux.getTheme();
@@ -476,18 +482,38 @@ const Bubble = (props: Props) => {
         );
     };
 
-    return (
-        <View
-            style={[
-                styles.container,
-                {backgroundColor: theme.backgroundColor},
-            ]}>
-            {Header()}
+    const ImagePreview = () => {
+        if (!item.images[0]) {
+            return null;
+        }
+        const isVideo = checkIsVideo(item.images[0]);
+        if (!isVideo) {
+            return (
+                <ScrollSyncSizeImage
+                    images={item.images}
+                    syncWidth={screenWidth}
+                    onDoublePress={() => {
+                        if (!isLiked) {
+                            onHandleLike({
+                                isModeExp,
+                                isLiked,
+                                setIsLiked,
+                                totalLikes,
+                                setTotalLikes,
+                                postId: item.id,
+                            });
+                        } else {
+                            // onSeeDetailImage(item.images);
+                        }
+                    }}
+                    containerStyle={styles.imageView}
+                />
+            );
+        }
 
-            <ScrollSyncSizeImage
-                images={item.images}
-                isRectangle={isRectangle}
-                syncWidth={Metrics.width}
+        return (
+            <VideoBubble
+                source={{uri: item.images[0]}}
                 onDoublePress={() => {
                     if (!isLiked) {
                         onHandleLike({
@@ -502,8 +528,17 @@ const Bubble = (props: Props) => {
                         // onSeeDetailImage(item.images);
                     }
                 }}
-                containerStyle={styles.imageView}
+                paused={!isFocusing}
             />
+        );
+    };
+
+    return (
+        <View
+            style={[styles.container, {backgroundColor: theme.backgroundColor}]}
+            onTouchEnd={() => onChangePostIdFocusing(item.id)}>
+            {Header()}
+            {ImagePreview()}
             {StarLink()}
             {Footer()}
         </View>
@@ -693,7 +728,10 @@ const styles = ScaledSheet.create({
 });
 
 export default memo(Bubble, (preProps: Props, nextProps: any) => {
-    if (!isEqual(preProps.item, nextProps.item)) {
+    if (
+        !isEqual(preProps.item, nextProps.item) ||
+        nextProps.isFocusing !== preProps.isFocusing
+    ) {
         return false;
     }
     return true;
