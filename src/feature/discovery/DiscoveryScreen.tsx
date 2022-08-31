@@ -23,18 +23,13 @@ import LoadingScreen from 'components/LoadingScreen';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
-import {
-    appAlert,
-    goBack,
-    navigate,
-    showSwipeImages,
-} from 'navigation/NavigationService';
+import {appAlert, goBack, navigate} from 'navigation/NavigationService';
 import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
-import {onGoToSignUp} from 'utility/assistant';
+import {onGoToSignUp, seeDetailImage} from 'utility/assistant';
 import {useNotification} from 'utility/notification';
 import Bubble from './components/Bubble';
 import HeaderDoffy, {headerDoffyHeight} from './components/HeaderDoffy';
@@ -321,13 +316,10 @@ const DiscoveryScreen = () => {
                     {
                         text: 'discovery.seeDetailImage',
                         action: () => {
-                            showSwipeImages({
-                                listImages: modalOptions.imageWantToSee.map(
-                                    item => ({
-                                        url: item,
-                                    }),
+                            seeDetailImage({
+                                images: modalOptions.imageWantToSee.map(
+                                    url => url,
                                 ),
-                                allowSaveImage: false,
                             });
                         },
                     },

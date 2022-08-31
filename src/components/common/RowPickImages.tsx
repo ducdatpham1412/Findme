@@ -1,6 +1,5 @@
 import {StyleImage, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
-import {showSwipeImages} from 'navigation/NavigationService';
 import React, {memo, useCallback, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleProp, View, ViewStyle} from 'react-native';
@@ -12,6 +11,7 @@ import {
     chooseImageFromCamera,
     chooseImageFromLibrary,
     optionsImagePicker,
+    seeDetailImage,
 } from 'utility/assistant';
 
 interface Props {
@@ -77,16 +77,6 @@ const RowPickImages = (props: Props) => {
         [listImages],
     );
 
-    const onSeeDetailImage = useCallback(
-        (index: number) => {
-            showSwipeImages({
-                listImages: listImages.map(item => ({url: item})),
-                initIndex: index,
-            });
-        },
-        [listImages],
-    );
-
     return (
         <View
             style={[styles.container, containerStyle]}
@@ -125,7 +115,12 @@ const RowPickImages = (props: Props) => {
                             {listImages[index] ? (
                                 <StyleTouchable
                                     customStyle={styles.touchImage}
-                                    onPress={() => onSeeDetailImage(index)}>
+                                    onPress={() =>
+                                        seeDetailImage({
+                                            images: listImages.map(url => url),
+                                            initIndex: index,
+                                        })
+                                    }>
                                     <StyleImage
                                         source={{uri: listImages[index]}}
                                         customStyle={styles.image}

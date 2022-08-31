@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {Component} from 'react';
 import {Image, ImageStyle, StyleProp} from 'react-native';
 import {StyleImage} from './base';
 
@@ -7,32 +7,41 @@ interface Props {
     customStyle?: StyleProp<ImageStyle>;
 }
 
-const AutoHeightImage = (props: Props) => {
-    const {uri, customStyle} = props;
+interface States {
+    ratio: number;
+    checkWidth: number;
+}
 
-    const [ratio, setRatio] = useState(0);
-    const [checkWidth, setCheckWidth] = useState(0);
-    const [checkHeight, setCheckHeight] = useState(0);
+class AutoHeightImage extends Component<Props, States> {
+    state: States = {
+        ratio: 0,
+        checkWidth: 0,
+    };
 
-    useEffect(() => {
-        Image.getSize(uri, (width, height) => {
-            setRatio(height / width);
+    constructor(props: Props) {
+        super(props);
+        Image.getSize(this.props.uri, (width, height) => {
+            this.setState({
+                ratio: height / width,
+            });
         });
-    }, [uri]);
+    }
 
-    useEffect(() => {
-        if (checkWidth && ratio) {
-            setCheckHeight(ratio * checkWidth);
-        }
-    }, [checkWidth, ratio]);
+    render() {
+        const {uri, customStyle} = this.props;
+        const {ratio, checkWidth} = this.state;
+        const checkHeight = checkWidth * ratio;
 
-    return (
-        <StyleImage
-            source={{uri}}
-            customStyle={[{height: checkHeight}, customStyle]}
-            onLayout={e => setCheckWidth(e.nativeEvent.layout.width)}
-        />
-    );
-};
+        return (
+            <StyleImage
+                source={{uri}}
+                customStyle={[{height: checkHeight}, customStyle]}
+                onLayout={e =>
+                    this.setState({checkWidth: e.nativeEvent.layout.width})
+                }
+            />
+        );
+    }
+}
 
 export default AutoHeightImage;

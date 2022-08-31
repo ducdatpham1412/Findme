@@ -24,7 +24,7 @@ import ROOT_SCREEN, {
     PROFILE_ROUTE,
     SETTING_ROUTE,
 } from 'navigation/config/routes';
-import {navigate, push} from 'navigation/NavigationService';
+import {navigate, push, showSwipeImages} from 'navigation/NavigationService';
 import {useState} from 'react';
 import {DevSettings, NativeScrollEvent, Platform} from 'react-native';
 import {verticalScale} from 'react-native-size-matters';
@@ -479,4 +479,16 @@ export const chooseTextNotification = (type: number): I18Normalize => {
         default:
             return 'common.null';
     }
+};
+
+export const seeDetailImage = (params: {
+    images: Array<string>;
+    initIndex?: number;
+}) => {
+    const {images, initIndex = 0} = params;
+    showSwipeImages({
+        listImages: images.map(item => ({url: item})),
+        initIndex,
+        allowSaveImage: true,
+    });
 };

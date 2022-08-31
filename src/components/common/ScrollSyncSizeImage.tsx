@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import Theme from 'asset/theme/Theme';
-import {StyleImage} from 'components/base';
 import StyleTouchHaveDouble from 'components/base/StyleTouchHaveDouble';
+import PinchImage from 'components/PinchImage';
 import React, {useEffect, useRef, useState} from 'react';
 import {
     Animated,
@@ -48,6 +48,7 @@ const ScrollSyncSizeImage = (props: Props) => {
     } = props;
 
     const currentIndexRef = useRef(0);
+    const numberTabsRef = useRef(0);
 
     const [ratio, setRatio] = useState(0);
 
@@ -80,6 +81,10 @@ const ScrollSyncSizeImage = (props: Props) => {
         }
     });
 
+    useEffect(() => {
+        numberTabsRef.current = numberTabs;
+    }, [numberTabs]);
+
     const jumpToIndex = (__index: number) => {
         onChangeIndex?.(__index);
         const offset = -__index * syncWidth;
@@ -103,11 +108,12 @@ const ScrollSyncSizeImage = (props: Props) => {
         gestureState: PanResponderGestureState,
     ) => {
         const diffX = I18nManager.isRTL ? -gestureState.dx : gestureState.dx;
+
         const check =
             isMovingHorizontally(event, gestureState) &&
             ((diffX >= DEAD_ZONE && currentIndexRef.current > 0) ||
                 (diffX <= -DEAD_ZONE &&
-                    currentIndexRef.current < numberTabs - 1));
+                    currentIndexRef.current < numberTabsRef.current - 1));
         return check;
     };
 
@@ -127,7 +133,7 @@ const ScrollSyncSizeImage = (props: Props) => {
 
         if (
             (diffX > 0 && currentIndexRef.current <= 0) ||
-            (diffX < 0 && currentIndexRef.current >= numberTabs - 1)
+            (diffX < 0 && currentIndexRef.current >= numberTabsRef.current - 1)
         ) {
             return;
         }
@@ -161,7 +167,7 @@ const ScrollSyncSizeImage = (props: Props) => {
                             : currentIndex -
                                   gestureState.dx / Math.abs(gestureState.dx),
                     ),
-                    numberTabs - 1,
+                    numberTabsRef.current - 1,
                 ),
             );
 
@@ -175,15 +181,17 @@ const ScrollSyncSizeImage = (props: Props) => {
         jumpToIndex(nextIndex);
     };
 
-    const panResponder = PanResponder.create({
-        onMoveShouldSetPanResponder: canMoveScreen,
-        onMoveShouldSetPanResponderCapture: canMoveScreen,
-        onPanResponderGrant: startGesture,
-        onPanResponderMove: respondToGesture,
-        onPanResponderTerminate: finishGesture,
-        onPanResponderRelease: finishGesture,
-        onPanResponderTerminationRequest: () => true,
-    });
+    const panResponder = useRef(
+        PanResponder.create({
+            onMoveShouldSetPanResponder: canMoveScreen,
+            onMoveShouldSetPanResponderCapture: canMoveScreen,
+            onPanResponderGrant: startGesture,
+            onPanResponderMove: respondToGesture,
+            onPanResponderTerminate: finishGesture,
+            onPanResponderRelease: finishGesture,
+            onPanResponderTerminationRequest: () => true,
+        }),
+    ).current;
 
     useEffect(() => {
         let isSubscribe = true;
@@ -235,12 +243,15 @@ const ScrollSyncSizeImage = (props: Props) => {
                 }}
                 {...panResponder.panHandlers}>
                 {images.map(url => (
-                    <StyleImage
+                    <PinchImage
                         key={url}
-                        source={{uri: url}}
-                        customStyle={{
+                        containerStyle={{
                             width: syncWidth,
                             height,
+                        }}
+                        imageProps={{
+                            source: {uri: url},
+                            style: styles.image,
                         }}
                     />
                 ))}
@@ -286,6 +297,10 @@ const styles = ScaledSheet.create({
         borderRadius: 10,
         position: 'absolute',
         backgroundColor: Theme.common.gradientTabBar1,
+    },
+    image: {
+        width: '100%',
+        height: '100%',
     },
 });
 

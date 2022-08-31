@@ -13,15 +13,15 @@ import StyleActionSheet from 'components/common/StyleActionSheet';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
-import {
-    appAlert,
-    navigate,
-    showSwipeImages,
-} from 'navigation/NavigationService';
+import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {useMemo, useRef, useState} from 'react';
 import {Platform, TextInput, View} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
-import {chooseImageFromCamera, chooseImageFromLibrary} from 'utility/assistant';
+import {
+    chooseImageFromCamera,
+    chooseImageFromLibrary,
+    seeDetailImage,
+} from 'utility/assistant';
 import ImageUploader from 'utility/ImageUploader';
 import BtnPenEdit from './components/BtnPenEdit';
 
@@ -107,14 +107,6 @@ const EditProfile = () => {
         }
     };
 
-    const onSeeDetailAvatar = () => {
-        if (avatar) {
-            showSwipeImages({
-                listImages: [{url: avatar}],
-            });
-        }
-    };
-
     return (
         <>
             <StyleHeader title="profile.component.infoProfile.editProfile" />
@@ -128,7 +120,13 @@ const EditProfile = () => {
                                 backgroundColor: theme.backgroundColor,
                             },
                         ]}
-                        onPress={onSeeDetailAvatar}>
+                        onPress={() => {
+                            if (avatar) {
+                                seeDetailImage({
+                                    images: [avatar],
+                                });
+                            }
+                        }}>
                         <StyleImage
                             source={{uri: avatar}}
                             customStyle={styles.avatarImg}
