@@ -1,5 +1,4 @@
 import {TypeInteractBubble} from 'api/interface';
-import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {
     StyleImage,
@@ -90,7 +89,6 @@ const InteractBubble = ({route}: Props) => {
                         styles.avatar,
                         {borderColor: theme.highlightColor},
                     ]}
-                    defaultSource={Images.images.defaultAvatar}
                 />
                 <StyleText
                     originValue={name}

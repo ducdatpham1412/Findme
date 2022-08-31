@@ -12,7 +12,7 @@ const StyleImage = (props: StyleImageProps) => {
     return (
         <Image
             style={customStyle}
-            defaultSource={Images.images.defaultImage}
+            defaultSource={Images.images.defaultAvatar}
             {...props}
         />
     );

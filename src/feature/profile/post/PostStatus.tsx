@@ -1,4 +1,5 @@
 import {TypeBubblePalace} from 'api/interface';
+import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
@@ -27,7 +28,11 @@ const PostStatus = (props: Props) => {
             customStyle={[styles.container, containerStyle]}
             onPress={() => onGoToDetailPost(itemPost.id)}
             activeOpacity={0.95}>
-            <StyleImage source={{uri: imageUrl}} customStyle={styles.image} />
+            <StyleImage
+                source={{uri: imageUrl}}
+                customStyle={styles.image}
+                defaultSource={Images.images.defaultImage}
+            />
             <LinearGradient
                 colors={[
                     Theme.common.gradientTabBar1,

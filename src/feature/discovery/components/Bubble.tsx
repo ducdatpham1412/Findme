@@ -158,7 +158,6 @@ const Bubble = (props: Props) => {
                         <StyleImage
                             source={{uri: item.creatorAvatar}}
                             customStyle={styles.avatar}
-                            defaultSource={Images.images.defaultAvatar}
                         />
                     </StyleTouchable>
 

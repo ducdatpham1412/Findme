@@ -1,4 +1,3 @@
-import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {
     StyleImage,
@@ -48,11 +47,7 @@ const InputComment = (props: Props, inputRef: any) => {
 
     const RenderAvatar = useMemo(() => {
         return (
-            <StyleImage
-                source={{uri: avatar}}
-                customStyle={styles.avatar}
-                defaultSource={Images.images.defaultAvatar}
-            />
+            <StyleImage source={{uri: avatar}} customStyle={styles.avatar} />
         );
     }, []);
 

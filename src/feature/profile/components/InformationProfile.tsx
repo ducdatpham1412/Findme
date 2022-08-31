@@ -1,6 +1,5 @@
 import {TypeGetProfileResponse} from 'api/interface';
 import {TYPE_FOLLOW} from 'asset/enum';
-import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
@@ -138,7 +137,6 @@ const InformationProfile = (props: Props) => {
                 <StyleImage
                     source={{uri: avatar}}
                     customStyle={styles.avatarHeader}
-                    defaultSource={Images.images.defaultAvatar}
                 />
 
                 <View style={styles.boxNameAndDescription}>
