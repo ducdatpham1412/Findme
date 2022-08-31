@@ -328,7 +328,7 @@ export default class ListShareElement extends Component<Props, States> {
                         },
                         containerStyle,
                     ]}>
-                    {isSaveTop && <ViewSafeTopPadding />}
+                    {!!isSaveTop && <ViewSafeTopPadding />}
                     <StyleHeader onGoBack={() => this.hide()} title={title} />
                     <StyleList
                         ref={this.listRef}
