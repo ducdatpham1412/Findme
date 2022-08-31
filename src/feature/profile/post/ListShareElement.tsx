@@ -15,6 +15,7 @@ import {
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import {TypeModalCommentPost} from 'components/ModalCommentLike';
+import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import Bubble from 'feature/discovery/components/Bubble';
 import {
     TypeMoreOptionsMe,
@@ -40,6 +41,7 @@ interface Props {
     listPaging: any;
     containerStyle?: StyleProp<ViewStyle>;
     onShowModalComment(params: TypeModalCommentPost): void;
+    isSaveTop?: boolean;
 }
 
 interface States {
@@ -238,7 +240,7 @@ export default class ListShareElement extends Component<Props, States> {
     };
 
     render() {
-        const {listPaging, containerStyle, title} = this.props;
+        const {listPaging, containerStyle, title, isSaveTop} = this.props;
 
         const MyModalOption = () => {
             return (
@@ -326,6 +328,7 @@ export default class ListShareElement extends Component<Props, States> {
                         },
                         containerStyle,
                     ]}>
+                    {isSaveTop && <ViewSafeTopPadding />}
                     <StyleHeader onGoBack={() => this.hide()} title={title} />
                     <StyleList
                         ref={this.listRef}

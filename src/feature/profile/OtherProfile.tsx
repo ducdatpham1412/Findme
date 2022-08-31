@@ -326,6 +326,7 @@ const OtherProfile = ({route}: Props) => {
                 onShowModalComment={params => {
                     modalRef.current?.show(params);
                 }}
+                isSaveTop
             />
 
             <ModalCommentLike
