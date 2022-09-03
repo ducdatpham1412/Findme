@@ -45,11 +45,12 @@ interface Props {
 }
 
 interface States {
-    bubbleFocusing: undefined | TypeBubblePalace;
+    postIdFocusing: string;
 }
 
 interface TypeShow {
     index: number;
+    postId: string;
 }
 
 let postModal: TypeBubblePalace;
@@ -74,7 +75,7 @@ export default class ListShareElement extends Component<Props, States> {
     friendOptionRef = React.createRef<any>();
 
     state: States = {
-        bubbleFocusing: undefined,
+        postIdFocusing: '',
     };
 
     // When press "Go to detail post in ProfileScreen",
@@ -101,7 +102,11 @@ export default class ListShareElement extends Component<Props, States> {
             toValue: 1,
             duration: 350,
             useNativeDriver: false,
-        }).start();
+        }).start(() => {
+            this.setState({
+                postIdFocusing: params.postId,
+            });
+        });
     }
 
     hide() {
@@ -229,12 +234,15 @@ export default class ListShareElement extends Component<Props, States> {
         return (
             <Bubble
                 item={item}
-                // isRectangle
                 onShowMoreOption={value => this.showOptions(value)}
                 onShowModalComment={(post, type) =>
                     this.showModalComment(post, type)
                 }
                 onShowModalShare={post => this.showModalShare(post)}
+                isFocusing={this.state.postIdFocusing === item.id}
+                onChangePostIdFocusing={postId =>
+                    this.setState({postIdFocusing: postId})
+                }
             />
         );
     };

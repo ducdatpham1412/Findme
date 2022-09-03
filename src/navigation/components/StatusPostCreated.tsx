@@ -1,7 +1,7 @@
 import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
-import {PROFILE_ROUTE} from 'navigation/config/routes';
+import {MAIN_SCREEN, PROFILE_ROUTE} from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
 import React from 'react';
 import {View} from 'react-native';
@@ -26,7 +26,9 @@ const StatusPostCreated = () => {
     };
     const onGoToPost = () => {
         if (status === 'success') {
-            navigate(PROFILE_ROUTE.myProfile);
+            navigate(MAIN_SCREEN.profileRoute, {
+                screen: PROFILE_ROUTE.myProfile,
+            });
         } else if (status === 'error') {
             navigate(PROFILE_ROUTE.createPostPreview, {
                 itemError: data,

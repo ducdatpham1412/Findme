@@ -10,6 +10,9 @@ import LinearGradient from 'react-native-linear-gradient';
 import {moderateScale, scale, ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {checkIsVideo} from 'utility/validate';
+import Entypo from 'react-native-vector-icons/Entypo';
+import Video from 'react-native-video';
 
 interface Props {
     itemPost: TypeBubblePalace;
@@ -19,20 +22,38 @@ interface Props {
 
 const PostStatus = (props: Props) => {
     const {itemPost, onGoToDetailPost, containerStyle} = props;
-    const imageUrl = itemPost.images[0] || '';
-
+    const firstPostUrl = itemPost.images[0] || '';
     const arrayStars = Array(itemPost.stars).fill(0);
+    const isVideo = checkIsVideo(firstPostUrl);
+
+    const ImagePreview = () => {
+        if (!isVideo) {
+            return (
+                <StyleImage
+                    source={{uri: firstPostUrl}}
+                    customStyle={styles.image}
+                    defaultSource={Images.images.defaultImage}
+                />
+            );
+        }
+
+        return (
+            <Video
+                source={{uri: firstPostUrl}}
+                style={styles.video}
+                resizeMode="cover"
+                paused
+                currentTime={2}
+            />
+        );
+    };
 
     return (
         <StyleTouchable
             customStyle={[styles.container, containerStyle]}
             onPress={() => onGoToDetailPost(itemPost.id)}
             activeOpacity={0.95}>
-            <StyleImage
-                source={{uri: imageUrl}}
-                customStyle={styles.image}
-                defaultSource={Images.images.defaultImage}
-            />
+            {ImagePreview()}
             <LinearGradient
                 colors={[
                     Theme.common.gradientTabBar1,
@@ -56,6 +77,9 @@ const PostStatus = (props: Props) => {
                     name="file-multiple"
                     style={styles.iconMultiPage}
                 />
+            )}
+            {isVideo && (
+                <Entypo name="video-camera" style={styles.iconMultiPage} />
             )}
         </StyleTouchable>
     );
@@ -103,6 +127,10 @@ const styles = ScaledSheet.create({
         color: Theme.common.white,
         right: '3@ms',
         top: '3@ms',
+    },
+    video: {
+        width: '100%',
+        height: '100%',
     },
 });
 

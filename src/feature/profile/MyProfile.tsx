@@ -282,14 +282,17 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
         if (tabIndexRef === 0) {
             myPostRef.current?.show({
                 index: initIndex === -1 ? 0 : initIndex,
+                postId: bubbleId,
             });
         } else if (tabIndexRef === 1) {
             postLikedRef.current?.show({
                 index: initIndex === -1 ? 0 : initIndex,
+                postId: bubbleId,
             });
         } else if (tabIndexRef === 2) {
             postSavedRef.current?.show({
                 index: initIndex === -1 ? 0 : initIndex,
+                postId: bubbleId,
             });
         }
     };

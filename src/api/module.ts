@@ -112,8 +112,8 @@ export const apiGetResource = (): Promise<TypeResourceResponse> => {
     return request.get('/common/get-resource');
 };
 
-export const apiUploadImage = (formData: any, quality?: number) =>
-    request.post('/common/upload-image', formData, {
+export const apiUploadFile = (formData: any, quality?: number) =>
+    request.post('/common/upload-file', formData, {
         params: {
             quality: quality || undefined,
         },

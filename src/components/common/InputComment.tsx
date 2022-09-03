@@ -111,6 +111,7 @@ const InputComment = (props: Props, inputRef: any) => {
                     styles.container,
                     {
                         backgroundColor: theme.backgroundColor,
+                        shadowColor: theme.textColor,
                     },
                     containerStyle,
                 ]}>
@@ -157,6 +158,12 @@ const styles = ScaledSheet.create({
         paddingHorizontal: '12@s',
         paddingTop: '10@ms',
         paddingBottom: verticalScale(7) + Metrics.safeBottomPadding,
+        shadowOpacity: 0.1,
+        shadowOffset: {
+            width: 0,
+            height: 15,
+        },
+        shadowRadius: 20,
     },
     replyView: {
         width: '100%',

@@ -30,7 +30,6 @@ interface Props {
     onDoublePress?(): void;
     index?: number;
     onChangeIndex?(value: number): void;
-    isRectangle?: boolean;
 }
 
 const indicatorPointWidth = scale(10);
@@ -44,7 +43,6 @@ const ScrollSyncSizeImage = (props: Props) => {
         onDoublePress,
         index,
         onChangeIndex,
-        isRectangle,
     } = props;
 
     const currentIndexRef = useRef(0);
@@ -195,10 +193,7 @@ const ScrollSyncSizeImage = (props: Props) => {
 
     useEffect(() => {
         let isSubscribe = true;
-
-        if (isRectangle && isSubscribe) {
-            setRatio(1);
-        } else if (images[0]) {
+        if (images[0]) {
             Image.getSize(
                 images[0],
                 (w, h) => {

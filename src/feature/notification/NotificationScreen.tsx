@@ -7,7 +7,7 @@ import Redux from 'hook/useRedux';
 import {useSocketNotification} from 'hook/useSocketIO';
 import ROOT_SCREEN, {MAIN_SCREEN} from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
-import React from 'react';
+import React, {useCallback} from 'react';
 import {Platform, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {logger} from 'utility/assistant';
@@ -95,14 +95,14 @@ const NotificationAccount = () => {
         }
     };
 
-    const renderItem = (item: TypeNotificationResponse) => {
+    const renderItem = useCallback((item: TypeNotificationResponse) => {
         return (
             <ItemNotification
                 item={item}
                 onGoToDetailNotification={onGoToDetailNotification}
             />
         );
-    };
+    }, []);
 
     return (
         <View

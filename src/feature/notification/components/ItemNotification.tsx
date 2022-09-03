@@ -1,4 +1,5 @@
 import {TypeNotificationResponse} from 'api/interface';
+import Images from 'asset/img/images';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import React from 'react';
@@ -48,11 +49,12 @@ const ItemNotification = (props: Props) => {
                 </StyleText>
             </View>
 
-            {item.image && (
+            {!!item.image && (
                 <View style={styles.imageView}>
                     <StyleImage
                         source={{uri: item.image}}
                         customStyle={styles.image}
+                        defaultSource={Images.images.defaultImage}
                     />
                 </View>
             )}
