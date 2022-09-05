@@ -119,6 +119,9 @@ export default class ListShareElement extends Component<Props, States> {
             }),
         ]).start(() => {
             this.enableHearingScrollEvent = true;
+            this.setState({
+                postIdFocusing: '',
+            });
         });
     }
 
