@@ -105,8 +105,8 @@ export const checkIsSingleEmoji = (str: string) => {
 export const checkIsVideo = (fileName: string) => {
     const temp = fileName.split('.');
     const typeFile = temp[temp.length - 1];
-    if (['jpeg', 'jpg', 'png'].includes(typeFile)) {
-        return false;
+    if (['mp4', 'mov', 'MOV'].includes(typeFile)) {
+        return true;
     }
-    return true;
+    return false;
 };
