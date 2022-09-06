@@ -14,7 +14,7 @@
 		2FC3B2E16841A16690866FD2 /* libPods-Findme-FindmeTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D889B8366844D5BBBE2112E6 /* libPods-Findme-FindmeTests.a */; };
 		6CF061F3285D814000B1A44B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6CF061F2285D814000B1A44B /* GoogleService-Info.plist */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		8703A14A9AE76DCE95D981F0 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		8703A14A9AE76DCE95D981F0 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		B7E424CF6AC8CF7FDDDD169A /* libPods-Findme.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F06E9410E771B3FF4D8A898E /* libPods-Findme.a */; };
 		CE8EFD9C2759FACC00D9549E /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = CE8EFD9B2759FACC00D9549E /* Config.xcconfig */; };
 		CE8EFD9D2759FACC00D9549E /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = CE8EFD9B2759FACC00D9549E /* Config.xcconfig */; };
@@ -80,7 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8703A14A9AE76DCE95D981F0 /* BuildFile in Frameworks */,
+				8703A14A9AE76DCE95D981F0 /* (null) in Frameworks */,
 				2FC3B2E16841A16690866FD2 /* libPods-Findme-FindmeTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -590,8 +590,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Findme/Findme.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = M2AG54A2UF;
 				ENABLE_BITCODE = NO;
@@ -607,7 +607,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.doffy.ios.production;
 				PRODUCT_NAME = Findme;
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = Doffy_Production;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -622,8 +622,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Findme/Findme.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = M2AG54A2UF;
 				INFOPLIST_FILE = Findme/Info.plist;
@@ -638,7 +638,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.doffy.ios.production;
 				PRODUCT_NAME = Findme;
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = Doffy_Production;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";

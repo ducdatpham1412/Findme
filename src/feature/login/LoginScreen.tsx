@@ -4,7 +4,7 @@ import {
     statusCodes,
 } from '@react-native-google-signin/google-signin';
 import {useIsFocused} from '@react-navigation/native';
-import {SIGN_UP_TYPE, TYPE_SOCIAL_LOGIN} from 'asset/enum';
+import {TYPE_SOCIAL_LOGIN} from 'asset/enum';
 import Images from 'asset/img/images';
 import Theme from 'asset/theme/Theme';
 import {
@@ -21,6 +21,7 @@ import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
+import {isIOS} from 'utility/assistant';
 import FindmeAsyncStorage from 'utility/FindmeAsyncStorage';
 import AuthenticateService from 'utility/login/loginService';
 import ListSaveAcc from './components/ListSaveAcc';
@@ -187,14 +188,16 @@ const LoginScreen = () => {
                     customStyle={styles.textOrSignIn}
                 />
                 <View style={styles.signUpBox}>
-                    <StyleTouchable onPress={onSignInWithApple}>
-                        <StyleImage
-                            source={Images.icons.apple}
-                            customStyle={styles.iconSignIn}
-                        />
-                    </StyleTouchable>
+                    {isIOS && (
+                        <StyleTouchable onPress={onSignInWithApple}>
+                            <StyleImage
+                                source={Images.icons.apple}
+                                customStyle={styles.iconSignIn}
+                            />
+                        </StyleTouchable>
+                    )}
 
-                    <StyleTouchable
+                    {/* <StyleTouchable
                         onPress={() => {
                             navigate(LOGIN_ROUTE.signUpForm, {
                                 typeSignUp: SIGN_UP_TYPE.email,
@@ -204,7 +207,7 @@ const LoginScreen = () => {
                             source={Images.icons.facebook}
                             customStyle={styles.iconSignIn}
                         />
-                    </StyleTouchable>
+                    </StyleTouchable> */}
 
                     <StyleTouchable onPress={signInWithGoogle}>
                         <StyleImage

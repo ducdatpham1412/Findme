@@ -2,10 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>FirebaseDynamicLinksCustomDomains</key>
-    <array>
-        <string>https://www.doffy.xyz</string>
-    </array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -47,6 +43,10 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>RNC_IOS_APP_BUILD_CODE</string>
+	<key>FirebaseDynamicLinksCustomDomains</key>
+	<array>
+		<string>https://www.doffy.xyz</string>
+	</array>
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 	<key>LSRequiresIPhoneOS</key>
@@ -68,6 +68,10 @@
 	<string>Photo add only permission</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Photo library permission</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+	<string>This application want to know your location</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone permission</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
