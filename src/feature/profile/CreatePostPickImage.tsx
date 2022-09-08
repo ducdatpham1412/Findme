@@ -125,14 +125,13 @@ const CreatePostPickImage = () => {
     };
 
     const ImagePreview = () => {
-        // const tempVideoLink =
-        //     'https://commondatastorage.googleapis.com/gtv-video-bucket/sample/BigBuckBunny.mp4';
         if (tabIndex === 1) {
             if (!video) {
                 return null;
             }
             return (
                 <Video
+                    key={video}
                     source={{
                         uri: video,
                     }}

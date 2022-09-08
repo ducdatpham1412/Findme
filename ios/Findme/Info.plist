@@ -64,14 +64,14 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera permission</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This application want to know your location</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone permission</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Photo add only permission</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Photo library permission</string>
-    <key>NSLocationWhenInUseUsageDescription</key>
-	<string>This application want to know your location</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Microphone permission</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
