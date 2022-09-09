@@ -171,6 +171,7 @@ const OtherProfile = ({route}: Props) => {
         const initIndex = listPosts.findIndex(item => item.id === bubbleId);
         shareRef.current?.show({
             index: initIndex === -1 ? 0 : initIndex,
+            postId: bubbleId,
         });
     };
 
@@ -218,9 +219,7 @@ const OtherProfile = ({route}: Props) => {
                                             color: isFollowing
                                                 ? theme.textColor
                                                 : theme.highlightColor,
-                                            fontWeight: isFollowing
-                                                ? 'normal'
-                                                : 'bold',
+                                            fontWeight: 'bold',
                                         },
                                     ]}
                                 />
@@ -273,6 +272,7 @@ const OtherProfile = ({route}: Props) => {
                         {backgroundColor: theme.backgroundColor},
                     ]}
                 />
+                <ViewSafeTopPadding />
                 <SearchAndSetting
                     onShowOptions={onShowOption}
                     hasSettingBtn={false}
