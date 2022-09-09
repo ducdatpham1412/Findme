@@ -1,6 +1,7 @@
 import {TypeNotificationResponse} from 'api/interface';
 import {apiReadNotification} from 'api/module';
 import {TYPE_FOLLOW, TYPE_NOTIFICATION} from 'asset/enum';
+import {Metrics} from 'asset/metrics';
 import {StyleText} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import Redux from 'hook/useRedux';
@@ -117,7 +118,10 @@ const NotificationAccount = () => {
                 ]}>
                 <StyleText
                     i18Text="notification.title"
-                    customStyle={[styles.textTitle, {color: theme.borderColor}]}
+                    customStyle={[
+                        styles.textTitle,
+                        {color: theme.textHightLight},
+                    ]}
                 />
             </View>
 
@@ -151,6 +155,7 @@ const NotificationScreen = () => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
+        paddingTop: Metrics.safeTopPadding,
     },
     titleView: {
         paddingVertical: '5@vs',

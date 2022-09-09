@@ -1,21 +1,12 @@
 /* eslint-disable no-shadow */
-/* eslint-disable react/jsx-key */
-import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeBubblePalace} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {
     apiGetListBubbleActive,
     apiGetListBubbleActiveOfUserEnjoy,
 } from 'api/module';
-import {TOPIC, TYPE_BUBBLE_PALACE_ACTION, TYPE_DYNAMIC_LINK} from 'asset/enum';
+import {TOPIC, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
-import {
-    ANDROID_APP_LINK,
-    DYNAMIC_LINK_ANDROID,
-    DYNAMIC_LINK_IOS,
-    DYNAMIC_LINK_SHARE,
-    LANDING_PAGE_URL,
-} from 'asset/standardValue';
 import {StyleIcon} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
@@ -27,7 +18,6 @@ import {appAlert, goBack, navigate} from 'navigation/NavigationService';
 import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
-import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
 import {onGoToSignUp, seeDetailImage} from 'utility/assistant';
 import {useNotification} from 'utility/notification';
@@ -160,57 +150,6 @@ const DiscoveryScreen = () => {
         optionsRef.current?.show();
     }, []);
 
-    const onShowModalShare = async (item: TypeBubblePalace) => {
-        try {
-            const link = await dynamicLinks().buildShortLink({
-                link: `${item?.images?.[0] || LANDING_PAGE_URL}?type=${
-                    TYPE_DYNAMIC_LINK.post
-                }&post_id=${item.id}`,
-                domainUriPrefix: DYNAMIC_LINK_SHARE,
-                ios: {
-                    bundleId: DYNAMIC_LINK_IOS,
-                    appStoreId: '570060128',
-                },
-                android: {
-                    packageName: DYNAMIC_LINK_ANDROID,
-                    fallbackUrl: ANDROID_APP_LINK,
-                },
-                analytics: {
-                    campaign: 'banner',
-                },
-            });
-
-            // const imagePath: any = null;
-            // let base64Data = '';
-            // if (isIOS) {
-            //     const resp = await RNFetchBlob.config({
-            //         fileCache: true,
-            //     }).fetch('GET', item.images[0]);
-            //     base64Data = await resp.readFile('base64');
-            // } else {
-            //     base64Data = await RNFetchBlob.fs.readFile(
-            //         item.images[0],
-            //         'base64',
-            //     );
-            // }
-            // const base64Image = `data:image/png;base64,${base64Data}`;
-            // await Share.open({
-            //     title: 'Title',
-            //     url: base64Image,
-            //     message: link,
-            //     subject: 'Subject',
-            // });
-            // return RNFetchBlob.fs.unlink(imagePath);
-
-            Share.open({
-                message: 'Doffy share',
-                url: link,
-            });
-        } catch (err) {
-            appAlert(err);
-        }
-    };
-
     /**
      * Render views
      */
@@ -223,7 +162,6 @@ const DiscoveryScreen = () => {
                     onShowModalComment={(post, type) =>
                         onShowModalComment(post, type)
                     }
-                    onShowModalShare={post => onShowModalShare(post)}
                     isFocusing={postIdFocusing === item.id}
                     onChangePostIdFocusing={postId => setPostIdFocusing(postId)}
                 />

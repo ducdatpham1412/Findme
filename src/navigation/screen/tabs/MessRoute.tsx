@@ -2,6 +2,7 @@ import {
     CardStyleInterpolators,
     createStackNavigator,
 } from '@react-navigation/stack';
+import {Metrics} from 'asset/metrics';
 import MessScreen from 'feature/mess/MessScreen';
 import Redux from 'hook/useRedux';
 import {MESS_ROUTE} from 'navigation/config/routes';
@@ -23,6 +24,7 @@ const MessRoute = () => {
                 cardStyle: [
                     {
                         backgroundColor: theme.backgroundColor,
+                        paddingTop: Metrics.safeTopPadding,
                     },
                 ],
                 headerShown: false,

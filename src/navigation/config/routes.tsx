@@ -39,6 +39,7 @@ const LOGIN_ROUTE = {
 };
 const MAIN_SCREEN = {
     discoveryRoute: '@MAIN_SCREEN/discoveryRoute',
+    reputation: '@MAIN_SCREEN/reputation',
     profileRoute: '@MAIN_SCREEN/profileRoute',
     settingRoute: '@MAIN_SCREEN/settingRoute',
     messRoute: '@MAIN_SCREEN/messRoute',

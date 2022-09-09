@@ -34,6 +34,7 @@ import {
     TypeResourceResponse,
     TypeUpdateMyBubblesRequest,
 } from './interface';
+import {TypeGetTopReviewerResponse} from './interface/reputation';
 import request from './request';
 
 // OTP
@@ -419,4 +420,12 @@ export const apiGetListNotifications = ({params}: TypeParamsPaging) => {
 
 export const apiReadNotification = (idNotification: string) => {
     return request.put(`/common/read-notification/${idNotification}`);
+};
+
+// REPUTATION
+export const apiGetTopReviewers = (): Promise<{
+    success: boolean;
+    data: TypeGetTopReviewerResponse;
+}> => {
+    return request.get('/common/get-top-reputations');
 };

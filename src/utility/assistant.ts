@@ -21,6 +21,7 @@ import {LIST_TOPICS, PRIVATE_AVATAR} from 'asset/standardValue';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {
     LOGIN_ROUTE,
+    MAIN_SCREEN,
     PROFILE_ROUTE,
     SETTING_ROUTE,
 } from 'navigation/config/routes';
@@ -453,12 +454,12 @@ export const fakeBubbleFocusing: TypeBubblePalace = {
 export const onGoToProfile = (userId: number) => {
     const myId = FindmeStore.getState().accountSlice.passport.profile.id;
     if (userId === myId) {
-        // navigate(MAIN_SCREEN.profileRoute, {
-        //     screen: PROFILE_ROUTE.myProfile,
-        // });
-        push(ROOT_SCREEN.otherProfile, {
-            id: userId,
+        navigate(MAIN_SCREEN.profileRoute, {
+            screen: PROFILE_ROUTE.myProfile,
         });
+        // push(ROOT_SCREEN.otherProfile, {
+        //     id: userId,
+        // });
     } else {
         push(ROOT_SCREEN.otherProfile, {
             id: userId,

@@ -160,6 +160,12 @@ const discovery = {
     chooseTopic: 'Topic you like',
 };
 
+// REPUTATION
+const reputation = {
+    topReviewer: 'Top reviewers',
+    yourRank: 'Your rank: {{value}}',
+};
+
 // MESS ROUTE
 const mess = {
     component: {},
@@ -376,6 +382,7 @@ const en = {
     profile,
     setting,
     notification,
+    reputation,
 };
 
 export default en;

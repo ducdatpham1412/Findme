@@ -7,20 +7,17 @@ import ModalCommentLike, {
     TypeModalCommentPost,
 } from 'components/ModalCommentLike';
 import NotificationScreen from 'feature/notification/NotificationScreen';
+import ReputationScreen from 'feature/reputation/ReputationScreen';
 import Redux from 'hook/useRedux';
 import TabNavigator from 'navigation/components/TabNavigator';
 import {MAIN_SCREEN} from 'navigation/config/routes';
 import React from 'react';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {View} from 'react-native';
 import DiscoveryRoute from './tabs/DiscoveryRoute';
 import MessRoute from './tabs/MessRoute';
 import ProfileRoute from './tabs/ProfileRoute';
 
 const BottomTab = createBottomTabNavigator();
-
-const NullTab = () => {
-    return null;
-};
 
 const modalRef = React.createRef<ModalCommentLike>();
 
@@ -33,13 +30,12 @@ const MainTabs: React.FunctionComponent = () => {
     const theme = Redux.getTheme();
 
     return (
-        <SafeAreaView
+        <View
             style={{
                 flex: 1,
                 overflow: 'visible',
                 backgroundColor: theme.backgroundColor,
-            }}
-            edges={['top']}>
+            }}>
             <BottomTab.Navigator
                 tabBar={(props: BottomTabBarProps) => (
                     <TabNavigator {...props} />
@@ -63,7 +59,10 @@ const MainTabs: React.FunctionComponent = () => {
                     }}
                 />
 
-                <BottomTab.Screen name={'null'} component={NullTab} />
+                <BottomTab.Screen
+                    name={MAIN_SCREEN.reputation}
+                    component={ReputationScreen}
+                />
 
                 <BottomTab.Screen
                     name={MAIN_SCREEN.notificationRoute}
@@ -97,7 +96,7 @@ const MainTabs: React.FunctionComponent = () => {
                     });
                 }}
             />
-        </SafeAreaView>
+        </View>
     );
 };
 
