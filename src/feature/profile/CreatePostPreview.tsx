@@ -11,6 +11,7 @@ import {LIST_FEELINGS, LIST_TOPICS, NUMBER_STARS} from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
+import LoadingScreen from 'components/LoadingScreen';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
 import {
@@ -110,6 +111,8 @@ const CreatePostPreview = ({route}: Props) => {
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
     const token = Redux.getToken();
+    const isLoading = Redux.getIsLoading();
+
     const translateXTool = useRef(new Animated.Value(0)).current;
     const scaleStars = useRef(new Animated.Value(1)).current;
     const translateXStars = useRef(new Animated.Value(0)).current;
@@ -747,6 +750,7 @@ const CreatePostPreview = ({route}: Props) => {
 
                 {StarLink()}
                 {ModalVertical()}
+                {isLoading && <LoadingScreen />}
             </ScrollView>
 
             {ToolHorizontal()}

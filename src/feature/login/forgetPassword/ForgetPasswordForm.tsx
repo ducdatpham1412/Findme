@@ -3,6 +3,7 @@ import {apiResetPassword} from 'api/module';
 import {standValue} from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
 import {StyleButton, StyleContainer, StyleInputForm} from 'components/base';
+import LoadingScreen from 'components/LoadingScreen';
 import Redux from 'hook/useRedux';
 import {LOGIN_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
@@ -18,6 +19,7 @@ import BackgroundAuthen from '../components/BackgroundAuthen';
 const ForgetPasswordForm = ({route}: any) => {
     const {username} = route.params;
     const insets = useSafeAreaInsets();
+    const isLoading = Redux.getIsLoading();
 
     const newRef = useRef<TextInput>(null);
     const confirmRef = useRef<TextInput>(null);
@@ -106,6 +108,8 @@ const ForgetPasswordForm = ({route}: any) => {
                 disable={!isValid}
                 onPress={handleSubmit(submitChangePass)}
             />
+
+            {isLoading && <LoadingScreen />}
         </StyleContainer>
     );
 };

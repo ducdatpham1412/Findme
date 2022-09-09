@@ -15,12 +15,13 @@ import {
     StyleText,
     StyleTouchable,
 } from 'components/base';
+import LoadingScreen from 'components/LoadingScreen';
 import useCountdown from 'hook/useCountdown';
 import Redux from 'hook/useRedux';
 import {LOGIN_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {Keyboard, Text, TextInput, View} from 'react-native';
+import {Vibration, Keyboard, Text, TextInput, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {
     CodeField,
@@ -61,6 +62,7 @@ const SendOTP = ({route}: any) => {
 
     const insets = useSafeAreaInsets();
     const isFocusedScreen = useIsFocused();
+    const isLoading = Redux.getIsLoading();
     const [isAnimation, setIsAnimation] = useState(false);
 
     const {countdown, resetCountdown, clearCountdown} = useCountdown(
@@ -93,6 +95,7 @@ const SendOTP = ({route}: any) => {
     }, [code]);
 
     const handleWrongOtp = () => {
+        Vibration.vibrate();
         setIsAnimation(true);
         setCode('');
     };
@@ -251,14 +254,14 @@ const SendOTP = ({route}: any) => {
                     )}
                 />
             </Animatable.View>
-            {/* Button confirm */}
+
             <StyleButton
                 title="login.component.sendOTP.confirmButton"
                 onPress={onPressConfirm}
                 containerStyle={styles.confirmButton}
                 disable={code.length !== standValue.OTP_LENGTH}
             />
-            {/* Send again */}
+
             <StyleTouchable
                 customStyle={styles.buttonSendAgain}
                 disable={countdown > 0}
@@ -269,6 +272,7 @@ const SendOTP = ({route}: any) => {
                     customStyle={[styles.titleSendAgain]}
                 />
             </StyleTouchable>
+            {isLoading && <LoadingScreen />}
         </StyleContainer>
     );
 };

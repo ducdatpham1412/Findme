@@ -12,6 +12,7 @@ import {StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import NoData from 'components/common/NoData';
 import StyleActionSheet from 'components/common/StyleActionSheet';
+import LoadingScreen from 'components/LoadingScreen';
 import ModalCommentLike from 'components/ModalCommentLike';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import usePaging from 'hook/usePaging';
@@ -52,6 +53,7 @@ const OtherProfile = ({route}: Props) => {
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
     const myId = Redux.getPassport().profile.id;
+    const isLoading = Redux.getIsLoading();
 
     const modalRef = useRef<ModalCommentLike>(null);
     const optionsRef = useRef<any>(null);
@@ -300,21 +302,24 @@ const OtherProfile = ({route}: Props) => {
                 onGoBack={onGoBack}
             />
 
-            <StyleList
-                data={list}
-                renderItem={({item}) => RenderItemPost(item)}
-                ListHeaderComponent={HeaderComponent()}
-                ListEmptyComponent={() => null}
-                style={styles.body}
-                contentContainerStyle={styles.contentContainer}
-                refreshing={refreshing}
-                onRefresh={onRefreshPage}
-                onLoadMore={onLoadMore}
-                numColumns={3}
-                onScrollBeginDrag={() => {
-                    shareRef.current?.scrollToNearingEnd();
-                }}
-            />
+            <View style={{flex: 1}}>
+                <StyleList
+                    data={list}
+                    renderItem={({item}) => RenderItemPost(item)}
+                    ListHeaderComponent={HeaderComponent()}
+                    ListEmptyComponent={() => null}
+                    style={styles.body}
+                    contentContainerStyle={styles.contentContainer}
+                    refreshing={refreshing}
+                    onRefresh={onRefreshPage}
+                    onLoadMore={onLoadMore}
+                    numColumns={3}
+                    onScrollBeginDrag={() => {
+                        shareRef.current?.scrollToNearingEnd();
+                    }}
+                />
+                {isLoading && <LoadingScreen />}
+            </View>
 
             <ListShareElement
                 ref={shareRef}

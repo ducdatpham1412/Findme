@@ -3,6 +3,7 @@ import {TYPE_OTP} from 'asset/enum';
 import Theme from 'asset/theme/Theme';
 import {StyleButton, StyleContainer} from 'components/base';
 import InputBox from 'components/common/InputBox';
+import LoadingScreen from 'components/LoadingScreen';
 import Redux from 'hook/useRedux';
 import {LOGIN_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
@@ -66,6 +67,7 @@ const EnterUsername = () => {
 
 const ForgetPasswordType = () => {
     const insets = useSafeAreaInsets();
+    const isLoading = Redux.getIsLoading();
 
     return (
         <StyleContainer
@@ -82,6 +84,7 @@ const ForgetPasswordType = () => {
                 titleStyle: {color: Theme.common.white},
             }}>
             {<EnterUsername />}
+            {isLoading && <LoadingScreen />}
         </StyleContainer>
     );
 };

@@ -9,6 +9,7 @@ import {
     StyleIcon,
     StyleText,
 } from 'components/base';
+import LoadingScreen from 'components/LoadingScreen';
 import Redux from 'hook/useRedux';
 import {LOGIN_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
@@ -26,6 +27,8 @@ interface Props {
 }
 
 const ConfirmOpenAccount = ({route}: Props) => {
+    const isLoading = Redux.getIsLoading();
+
     const onOpenAccount = async () => {
         try {
             Redux.setIsLoading(true);
@@ -84,6 +87,8 @@ const ConfirmOpenAccount = ({route}: Props) => {
                 containerStyle={styles.buttonDelete}
                 onPress={onOpenAccount}
             />
+
+            {isLoading && <LoadingScreen />}
         </StyleContainer>
     );
 };

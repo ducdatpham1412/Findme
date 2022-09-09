@@ -8,6 +8,7 @@ import {
     StyleTouchable,
 } from 'components/base';
 import RowPickImages from 'components/common/RowPickImages';
+import LoadingScreen from 'components/LoadingScreen';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
@@ -32,7 +33,7 @@ const ReportUser = ({route}: Props) => {
     const {idUser, nameUser = ''} = route.params;
 
     const theme = Redux.getTheme();
-
+    const isLoading = Redux.getIsLoading();
     const inputDescriptionRef = useRef<TextInput>(null);
 
     const [reasonReport, setReasonReport] = useState<{
@@ -202,6 +203,8 @@ const ReportUser = ({route}: Props) => {
                     disable={!reasonReport}
                     onPress={onSubmitReport}
                 />
+
+                {isLoading && <LoadingScreen />}
             </StyleContainer>
         </>
     );

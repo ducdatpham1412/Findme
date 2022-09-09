@@ -428,6 +428,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
                     name={conversationName}
                     onPressName={onNavigateToMessSetting}
                     onGoToSetting={onNavigateToMessSetting}
+                    holderColor={theme.holderColor}
                 />
                 {RenderListMessage()}
                 {RenderImagePreview()}

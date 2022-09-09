@@ -15,6 +15,7 @@ interface Props {
     name: string;
     onPressName(): void;
     onGoToSetting(): void;
+    holderColor: string;
 }
 
 const HeaderChat = (props: Props) => {
@@ -26,10 +27,11 @@ const HeaderChat = (props: Props) => {
         onPressName,
         borderMessRoute,
         onGoToSetting,
+        holderColor,
     } = props;
 
     return (
-        <View style={[styles.container, {borderBottomColor: borderMessRoute}]}>
+        <View style={[styles.container, {borderBottomColor: holderColor}]}>
             <StyleTouchable
                 customStyle={styles.headerLeftView}
                 onPress={() => {
@@ -74,7 +76,7 @@ const HeaderChat = (props: Props) => {
                 onPress={onPressName}
                 customStyle={{maxWidth: '50%'}}>
                 <StyleText
-                    i18Text={name}
+                    originValue={name}
                     customStyle={[styles.textName, {color: borderMessRoute}]}
                     numberOfLines={1}
                 />

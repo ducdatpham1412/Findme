@@ -220,10 +220,8 @@ const UserInput = (props: UserInputProps, inputRef: any) => {
 
     return (
         <View style={styles.container}>
-            {/* Tool view, choose camera or photo */}
             {RenderImgTool}
 
-            {/* Enter text message */}
             <Animated.View
                 style={[
                     styles.inputView,
@@ -236,7 +234,7 @@ const UserInput = (props: UserInputProps, inputRef: any) => {
                     ref={inputRef}
                     value={text}
                     onChangeText={onChangeText}
-                    style={[styles.input, {color: theme.textColor}]}
+                    style={[styles.input, {color: theme.textHightLight}]}
                     multiline
                     returnKeyType="default"
                     onPressOut={() => {
@@ -262,7 +260,6 @@ const UserInput = (props: UserInputProps, inputRef: any) => {
                 />
             </Animated.View>
 
-            {/* Button send message */}
             <StyleTouchable
                 customStyle={styles.emojiView}
                 onPress={onSendMessage}
@@ -313,7 +310,7 @@ const styles = ScaledSheet.create({
     input: {
         width: '100%',
         color: 'white',
-        fontSize: '16@ms',
+        fontSize: '15@ms',
         paddingVertical: 0,
     },
     sendIcon: {

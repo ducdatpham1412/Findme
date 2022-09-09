@@ -39,7 +39,7 @@ const ItemMessage = (props: Props) => {
         partnerAvatar,
     } = props;
     const theme = Redux.getTheme();
-    let x: any;
+    const x = useRef<any>(null);
 
     const isMyMessage = itemMessage.relationship === RELATIONSHIP.self;
     const displayAvatar = isMyMessage
@@ -90,7 +90,7 @@ const ItemMessage = (props: Props) => {
                 setMostHeightDateTime(!mostHeightDateTime);
             }
         } else {
-            clearTimeout(x);
+            clearTimeout(x.current);
             Animated.timing(pan, {
                 toValue: 0,
                 useNativeDriver: true,
@@ -99,20 +99,20 @@ const ItemMessage = (props: Props) => {
     };
 
     const onLongPressMessage = () => {
-        clearTimeout(x);
+        clearTimeout(x.current);
         setIsDisplayingOption(true);
         Animated.spring(pan, {
             toValue: isMyMessage ? -scale(40) : scale(40),
             useNativeDriver: true,
         }).start(() => {
-            x = setTimeout(() => {
+            x.current = setTimeout(() => {
                 Animated.timing(pan, {
                     toValue: 0,
                     useNativeDriver: true,
                 }).start();
             }, 2000);
         });
-        return () => clearTimeout(x);
+        return () => clearTimeout(x.current);
     };
 
     /**
@@ -415,8 +415,8 @@ const styles = ScaledSheet.create({
         minWidth: '20%',
     },
     messageText: {
-        fontSize: '13.5@ms',
-        marginVertical: '10@ms',
+        fontSize: '15@ms',
+        marginVertical: '8.5@ms',
     },
     dateText: {
         alignSelf: 'center',

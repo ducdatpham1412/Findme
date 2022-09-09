@@ -1,6 +1,6 @@
 import {TOPIC} from 'asset/enum';
 import Images from 'asset/img/images';
-import Theme, {TypeTheme} from 'asset/theme/Theme';
+import {TypeTheme} from 'asset/theme/Theme';
 import {StyleText, StyleTouchable} from 'components/base';
 import React, {Component} from 'react';
 import isEqual from 'react-fast-compare';
@@ -76,13 +76,6 @@ export default class HeaderFilterTopic extends Component<Props, States> {
     }
 
     private onChooseTopic(topic: number) {
-        if (this.state.tempListTopics.length === 3) {
-            this.setState({
-                tempListTopics: [topic],
-            });
-            return;
-        }
-
         let temp = [];
         if (this.state.tempListTopics.includes(topic)) {
             temp = this.state.tempListTopics.filter(item => item !== topic);
@@ -90,17 +83,12 @@ export default class HeaderFilterTopic extends Component<Props, States> {
             temp = this.state.tempListTopics.concat(topic);
         }
 
-        const final = temp.length
-            ? temp
-            : [TOPIC.travel, TOPIC.cuisine, TOPIC.shopping];
-        this.setState({
-            tempListTopics: final,
-        });
-    }
+        if (!temp.length) {
+            return;
+        }
 
-    private onChooseAll() {
         this.setState({
-            tempListTopics: [TOPIC.travel, TOPIC.cuisine, TOPIC.shopping],
+            tempListTopics: temp,
         });
     }
 
@@ -117,12 +105,8 @@ export default class HeaderFilterTopic extends Component<Props, States> {
             outputRange: [0.3, 1],
         });
 
-        const isChosenAll = tempListTopics.length === 3;
-        const isTravel = tempListTopics.includes(TOPIC.travel) && !isChosenAll;
-        const isCuisine =
-            tempListTopics.includes(TOPIC.cuisine) && !isChosenAll;
-        const isShopping =
-            tempListTopics.includes(TOPIC.shopping) && !isChosenAll;
+        const isTravel = tempListTopics.includes(TOPIC.travel);
+        const isCuisine = tempListTopics.includes(TOPIC.cuisine);
 
         return (
             <Animated.View
@@ -139,58 +123,36 @@ export default class HeaderFilterTopic extends Component<Props, States> {
                     customStyle={[styles.title, {color: theme.textColor}]}
                 />
 
-                <View style={styles.topicView}>
-                    <View
-                        style={[
-                            styles.allTopicBox,
-                            {borderRightColor: theme.borderColor},
-                        ]}>
-                        <ItemFilterTopic
-                            isChosen={isChosenAll}
-                            icon={Images.icons.category}
-                            iconStyle={{
-                                tintColor: Theme.common.gradientTabBar2,
-                            }}
-                            title="discovery.all"
-                            onPressTopic={() => this.onChooseAll()}
-                        />
-                    </View>
-
-                    <View style={styles.threeTopicBox}>
-                        <ItemFilterTopic
-                            isChosen={isTravel}
-                            icon={Images.icons.travel}
-                            title="profile.post.travel"
-                            onPressTopic={() =>
-                                this.onChooseTopic(TOPIC.travel)
-                            }
-                        />
-                        <ItemFilterTopic
-                            isChosen={isCuisine}
-                            icon={Images.icons.cuisine}
-                            title="profile.post.cuisine"
-                            onPressTopic={() =>
-                                this.onChooseTopic(TOPIC.cuisine)
-                            }
-                        />
-                        <ItemFilterTopic
-                            isChosen={isShopping}
-                            icon={Images.icons.shopping}
-                            title="profile.post.shopping"
-                            onPressTopic={() =>
-                                this.onChooseTopic(TOPIC.shopping)
-                            }
-                        />
-                    </View>
+                <View
+                    style={[
+                        styles.topicView,
+                        {borderTopColor: theme.holderColor},
+                    ]}>
+                    <ItemFilterTopic
+                        isChosen={isTravel}
+                        icon={Images.icons.travel}
+                        title="profile.post.travel"
+                        onPressTopic={() => this.onChooseTopic(TOPIC.travel)}
+                    />
+                    <ItemFilterTopic
+                        isChosen={isCuisine}
+                        icon={Images.icons.cuisine}
+                        title="profile.post.cuisine"
+                        onPressTopic={() => this.onChooseTopic(TOPIC.cuisine)}
+                    />
                 </View>
 
-                <View style={styles.footerView}>
+                <View
+                    style={[
+                        styles.footerView,
+                        {borderTopColor: theme.holderColorLighter},
+                    ]}>
                     <StyleTouchable
                         customStyle={[
                             styles.buttonTouch,
                             {
-                                borderRightWidth: 1,
-                                borderRightColor: theme.borderColor,
+                                borderRightWidth: 0.5,
+                                borderRightColor: theme.holderColorLighter,
                             },
                         ]}
                         onPress={() => this.onCancel()}>
@@ -229,8 +191,8 @@ const styles = ScaledSheet.create({
         width: '100%',
         height: containerHeight,
         backgroundColor: 'red',
-        borderBottomRightRadius: '10@ms',
-        borderBottomLeftRadius: '10@ms',
+        borderBottomRightRadius: '15@ms',
+        borderBottomLeftRadius: '15@ms',
     },
     title: {
         fontSize: '14@ms',
@@ -243,23 +205,20 @@ const styles = ScaledSheet.create({
         justifyContent: 'space-evenly',
         marginTop: '10@vs',
         paddingVertical: '10@vs',
-    },
-    allTopicBox: {
-        width: '30%',
-        height: '100%',
-        borderRightWidth: Platform.select({
+        paddingHorizontal: '20@s',
+        borderTopWidth: Platform.select({
             ios: '0.25@ms',
             android: '0.5@ms',
         }),
-    },
-    threeTopicBox: {
-        flex: 1,
-        flexDirection: 'row',
     },
     footerView: {
         width: '100%',
         flexDirection: 'row',
         paddingVertical: '15@vs',
+        borderTopWidth: Platform.select({
+            ios: '0.25@ms',
+            android: '0.5@ms',
+        }),
     },
     buttonTouch: {
         flex: 1,
