@@ -109,7 +109,7 @@ const ReputationScreen = () => {
                 <StyleText
                     i18Text="reputation.yourRank"
                     i18Params={{
-                        value: 10,
+                        value: data.myIndex,
                     }}
                     customStyle={styles.textRank}
                 />

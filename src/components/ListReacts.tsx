@@ -63,7 +63,9 @@ const ListReacts = (props: Props) => {
 
     return (
         <View style={[styles.container]}>
-            <ScrollView contentContainerStyle={styles.contentContainer}>
+            <ScrollView
+                contentContainerStyle={styles.contentContainer}
+                showsVerticalScrollIndicator={false}>
                 {list.map((item: TypeGetLikePostsResponse) => {
                     const isBlock = item?.relationship === RELATIONSHIP.block;
                     const notFollowing =
