@@ -1,8 +1,10 @@
 import Images from 'asset/img/images';
 import Theme, {TypeTheme} from 'asset/theme/Theme';
 import {StyleIcon, StyleText, StyleTouchable} from 'components/base';
+import {MAIN_SCREEN} from 'navigation/config/routes';
+import {navigate} from 'navigation/NavigationService';
 import React, {Component} from 'react';
-import {Animated, Platform} from 'react-native';
+import {Animated, Platform, View} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 
 export const headerDoffyHeight = verticalScale(40);
@@ -55,13 +57,25 @@ export class HeaderDoffy extends Component<Props> {
                     },
                 ]}>
                 <StyleText originValue="DOFFY" customStyle={styles.doffyText} />
-                <StyleTouchable onPress={onPressFilter} hitSlop={10}>
-                    <StyleIcon
-                        source={Images.icons.category}
-                        customStyle={styles.iconCategory}
-                        size={18}
-                    />
-                </StyleTouchable>
+                <View style={styles.toolRightView}>
+                    <StyleTouchable
+                        onPress={() => navigate(MAIN_SCREEN.reputation)}
+                        hitSlop={10}
+                        customStyle={styles.messageBox}>
+                        <StyleIcon
+                            source={Images.icons.reputation}
+                            customStyle={styles.iconCategory}
+                            size={23}
+                        />
+                    </StyleTouchable>
+                    <StyleTouchable onPress={onPressFilter} hitSlop={10}>
+                        <StyleIcon
+                            source={Images.icons.category}
+                            customStyle={styles.iconCategory}
+                            size={18}
+                        />
+                    </StyleTouchable>
+                </View>
             </Animated.View>
         );
     }
@@ -85,6 +99,17 @@ const styles = ScaledSheet.create({
         fontSize: '18@ms',
         fontWeight: 'bold',
         color: Theme.common.gradientTabBar1,
+    },
+    toolRightView: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: '100%',
+    },
+    messageBox: {
+        marginRight: '15@s',
+        height: '100%',
+        justifyContent: 'center',
+        paddingHorizontal: '10@ms',
     },
     iconCategory: {
         tintColor: Theme.common.gradientTabBar2,

@@ -1,4 +1,5 @@
 import {createStackNavigator} from '@react-navigation/stack';
+import {Metrics} from 'asset/metrics';
 import EditProfile from 'feature/profile/EditProfile';
 import MyProfile from 'feature/profile/MyProfile';
 import Redux from 'hook/useRedux';
@@ -17,6 +18,7 @@ const ProfileRoute = () => {
                     headerShown: false,
                     cardStyle: {
                         backgroundColor: theme.backgroundColor,
+                        paddingTop: Metrics.safeTopPadding,
                     },
                 }}>
                 <ProfileStack.Screen

@@ -163,6 +163,12 @@ const discovery = {
     chooseTopic: 'Chủ đề yêu thích',
 };
 
+// REPUTATION
+const reputation = {
+    topReviewer: 'Top reviewers',
+    yourRank: 'Thứ hạng của bạn: {{value}}',
+};
+
 // PROFILE SCREEN
 const profile = {
     component: {
@@ -382,5 +388,6 @@ const vi = {
     profile,
     setting,
     notification,
+    reputation,
 };
 export default vi;

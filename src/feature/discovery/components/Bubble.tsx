@@ -34,13 +34,22 @@ import {
 } from 'utility/assistant';
 import {formatFromNow} from 'utility/format';
 import {checkIsVideo} from 'utility/validate';
+import Share from 'react-native-share';
+import {TYPE_DYNAMIC_LINK} from 'asset/enum';
+import dynamicLinks from '@react-native-firebase/dynamic-links';
+import {
+    ANDROID_APP_LINK,
+    DYNAMIC_LINK_ANDROID,
+    DYNAMIC_LINK_IOS,
+    DYNAMIC_LINK_SHARE,
+    LANDING_PAGE_URL,
+} from 'asset/standardValue';
 import {TypeMoreOptionsMe, TypeShowMoreOptions} from '../DiscoveryScreen';
 
 interface Props {
     item: TypeBubblePalace;
     onShowMoreOption(params: TypeShowMoreOptions & TypeMoreOptionsMe): void;
     onShowModalComment(post: TypeBubblePalace, type: 'comment' | 'like'): void;
-    onShowModalShare(item: any): void;
     isFocusing: boolean;
     onChangePostIdFocusing(postId: string): void;
 }
@@ -128,6 +137,63 @@ const onOpenLink = (link: string) => {
     }
 };
 
+const onShowModalShare = async (
+    item: TypeBubblePalace,
+    setDisableShare: Function,
+) => {
+    try {
+        setDisableShare(true);
+        const link = await dynamicLinks().buildShortLink({
+            link: `${item?.images?.[0] || LANDING_PAGE_URL}?type=${
+                TYPE_DYNAMIC_LINK.post
+            }&post_id=${item.id}`,
+            domainUriPrefix: DYNAMIC_LINK_SHARE,
+            ios: {
+                bundleId: DYNAMIC_LINK_IOS,
+                appStoreId: '570060128',
+            },
+            android: {
+                packageName: DYNAMIC_LINK_ANDROID,
+                fallbackUrl: ANDROID_APP_LINK,
+            },
+            analytics: {
+                campaign: 'banner',
+            },
+        });
+
+        // const imagePath: any = null;
+        // let base64Data = '';
+        // if (isIOS) {
+        //     const resp = await RNFetchBlob.config({
+        //         fileCache: true,
+        //     }).fetch('GET', item.images[0]);
+        //     base64Data = await resp.readFile('base64');
+        // } else {
+        //     base64Data = await RNFetchBlob.fs.readFile(
+        //         item.images[0],
+        //         'base64',
+        //     );
+        // }
+        // const base64Image = `data:image/png;base64,${base64Data}`;
+        // await Share.open({
+        //     title: 'Title',
+        //     url: base64Image,
+        //     message: link,
+        //     subject: 'Subject',
+        // });
+        // return RNFetchBlob.fs.unlink(imagePath);
+
+        Share.open({
+            message: 'Doffy share',
+            url: link,
+        });
+    } catch (err) {
+        appAlert(err);
+    } finally {
+        setDisableShare(false);
+    }
+};
+
 const screenWidth = Metrics.width;
 
 const Bubble = (props: Props) => {
@@ -135,7 +201,6 @@ const Bubble = (props: Props) => {
         item,
         onShowMoreOption,
         onShowModalComment,
-        onShowModalShare,
         isFocusing = false,
         onChangePostIdFocusing,
     } = props;
@@ -144,6 +209,7 @@ const Bubble = (props: Props) => {
 
     const [isLiked, setIsLiked] = useState(item.isLiked);
     const [totalLikes, setTotalLikes] = useState(item.totalLikes);
+    const [disableShare, setDisableShare] = useState(false);
     const [isSaved, setIsSaved] = useState(item.isSaved);
 
     useEffect(() => {
@@ -390,7 +456,8 @@ const Bubble = (props: Props) => {
 
                     <StyleTouchable
                         customStyle={styles.iconComment}
-                        onPress={() => onShowModalShare(item)}>
+                        onPress={() => onShowModalShare(item, setDisableShare)}
+                        disable={disableShare}>
                         <StyleIcon
                             source={Images.icons.share}
                             size={21}

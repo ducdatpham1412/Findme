@@ -25,9 +25,8 @@ export const tabBarViewHeight = tabBarHeight + safeBottomHeight + addMoreHeight;
 
 const TabNavigator = (props: any) => {
     const theme = Redux.getTheme();
-
-    const numberNewMessages = Redux.getNumberNewMessages();
     const numberNewNotifications = Redux.getNumberNewNotifications();
+    const numberNewMessages = Redux.getNumberNewMessages();
     const {avatar} = Redux.getPassport().profile;
 
     // for animation all tab bar
@@ -71,9 +70,9 @@ const TabNavigator = (props: any) => {
             toValue: indicatorWidth * tabIndexFocus,
             useNativeDriver: true,
         }).start();
-        if (tabIndexFocus === 4) {
+        if (tabIndexFocus === 4 || tabIndexFocus === 2) {
             Animated.spring(scale, {
-                toValue: 0.3,
+                toValue: 0,
                 useNativeDriver: true,
             }).start();
         } else {
@@ -366,11 +365,6 @@ const styles = ScaledSheet.create({
     textNewMessages: {
         fontSize: '8@ms',
         color: 'white',
-    },
-    zoomPhoto: {
-        position: 'absolute',
-        width: '60%',
-        height: '60%',
     },
     // tabBar indicator
     indicatorView: {

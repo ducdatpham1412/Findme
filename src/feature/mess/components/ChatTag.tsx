@@ -137,7 +137,7 @@ const ChatTag = (props: Props) => {
             customStyle={[
                 styles.container,
                 {
-                    borderBottomColor: theme.borderColor,
+                    borderBottomColor: theme.holderColor,
                 },
             ]}
             onPress={() => onGoToChat(item)}>

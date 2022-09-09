@@ -41,6 +41,7 @@ const Images = {
         travel: require('./ic_travel.png'),
         cuisine: require('./ic_cuisine.png'),
         shopping: require('./ic_shopping.png'),
+        reputation: require('./ic_reputation.png'),
     },
     images: {
         logo: require('./img_logo.png'),
