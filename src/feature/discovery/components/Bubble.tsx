@@ -233,7 +233,7 @@ const Bubble = (props: Props) => {
                         />
                     </StyleTouchable>
 
-                    {!!item.feeling && (
+                    {item.feeling !== null && (
                         <StyleIcon
                             source={chooseIconFeeling(item.feeling)}
                             customStyle={styles.feeling}

@@ -16,7 +16,7 @@ import {PROFILE_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {useMemo, useRef, useState} from 'react';
 import {Platform, TextInput, View} from 'react-native';
-import {ScaledSheet, verticalScale} from 'react-native-size-matters';
+import {ScaledSheet} from 'react-native-size-matters';
 import {
     chooseImageFromCamera,
     chooseImageFromLibrary,
@@ -43,7 +43,7 @@ const EditProfile = () => {
             {
                 text: 'common.chooseFromCamera',
                 action: async () =>
-                    chooseImageFromCamera(setAvatar, {
+                    chooseImageFromCamera((path: string) => setAvatar(path), {
                         maxWidth: AVATAR_SIZE.width,
                         maxHeight: AVATAR_SIZE.height,
                     }),
@@ -51,10 +51,15 @@ const EditProfile = () => {
             {
                 text: 'common.chooseFromLibrary',
                 action: async () =>
-                    chooseImageFromLibrary(setAvatar, {
-                        maxWidth: AVATAR_SIZE.width,
-                        maxHeight: AVATAR_SIZE.height,
-                    }),
+                    chooseImageFromLibrary(
+                        (path: string) => {
+                            setAvatar(path);
+                        },
+                        {
+                            maxWidth: AVATAR_SIZE.width,
+                            maxHeight: AVATAR_SIZE.height,
+                        },
+                    ),
             },
             {
                 text: 'profile.removeAvatar',
@@ -71,14 +76,18 @@ const EditProfile = () => {
         try {
             Redux.setIsLoading(true);
             const {modeExp} = FindmeStore.getState().accountSlice;
-            // update in server
-            if (!modeExp) {
-                const newAvatar =
-                    avatar === profile.avatar
-                        ? undefined
-                        : avatar !== ''
-                        ? await ImageUploader.upLoad(avatar, 1000)
-                        : '';
+            const {token} = FindmeStore.getState().logicSlice;
+
+            if (!modeExp && token) {
+                let newAvatar;
+                if (avatar !== profile.avatar) {
+                    if (avatar === '') {
+                        newAvatar = '';
+                    } else {
+                        newAvatar = await ImageUploader.upLoad(avatar, 1000);
+                    }
+                }
+
                 const newName = name === profile.name ? undefined : name;
                 const newDescription =
                     description === profile.description
@@ -92,12 +101,10 @@ const EditProfile = () => {
                 });
             }
 
-            // update in local
             Redux.updatePassport({
                 profile: {avatar: avatar || '', name, description},
             });
 
-            // alert success and comeback
             appAlert('alert.successUpdatePro', {
                 actionClickOk: () => navigate(PROFILE_ROUTE.myProfile),
             });
@@ -127,7 +134,8 @@ const EditProfile = () => {
                                     images: [avatar],
                                 });
                             }
-                        }}>
+                        }}
+                        onLongPress={() => actionRef.current.show()}>
                         <StyleImage
                             source={{uri: avatar}}
                             customStyle={styles.avatarImg}
@@ -145,7 +153,6 @@ const EditProfile = () => {
                     />
                 </View>
 
-                {/* Name */}
                 <View style={styles.nameBox}>
                     <StyleInput
                         value={name}
@@ -156,7 +163,6 @@ const EditProfile = () => {
                     />
                 </View>
 
-                {/* Description */}
                 <StyleTouchable
                     customStyle={[
                         styles.descriptionBox,
@@ -178,15 +184,12 @@ const EditProfile = () => {
                     />
                 </StyleTouchable>
 
-                {/* Button update */}
                 <StyleButton
                     title="profile.edit.confirmButton"
                     containerStyle={styles.saveBtnView}
                     onPress={onSaveChange}
                     disable={disableButton}
                 />
-
-                <View style={{height: verticalScale(200)}} />
 
                 {isLoading && <LoadingScreen />}
             </StyleContainer>

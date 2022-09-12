@@ -203,7 +203,7 @@ const styles = ScaledSheet.create({
     avatar: {
         width: '40@s',
         height: '40@s',
-        marginLeft: '15@s',
+        marginLeft: '8@vs',
         marginVertical: '5@vs',
         borderRadius: '20@s',
     },
@@ -221,7 +221,7 @@ const styles = ScaledSheet.create({
         color: Theme.common.white,
     },
     rightBox: {
-        marginRight: '15@s',
+        marginRight: '8@vs',
         width: '30@s',
         height: '30@s',
         borderWidth: '1@ms',
