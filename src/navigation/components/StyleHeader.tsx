@@ -34,7 +34,7 @@ const StyleHeader = (props: StyleHeaderProps) => {
                 styles.container,
                 {
                     backgroundColor: theme.backgroundColor,
-                    borderBottomColor: theme.borderColor,
+                    borderBottomColor: theme.holderColor,
                 },
                 containerStyle,
             ]}>

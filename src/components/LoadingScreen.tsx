@@ -1,5 +1,4 @@
 import Images from 'asset/img/images';
-import {Metrics} from 'asset/metrics';
 import Redux from 'hook/useRedux';
 import React, {useEffect, useRef} from 'react';
 import {Animated, Easing, StyleSheet, View} from 'react-native';
@@ -62,9 +61,7 @@ const LoadingScreen = (props: Props) => {
 
 const styles = StyleSheet.create({
     container: {
-        position: 'absolute',
-        width: Metrics.width,
-        height: Metrics.height,
+        ...StyleSheet.absoluteFillObject,
         alignItems: 'center',
         justifyContent: 'center',
     },

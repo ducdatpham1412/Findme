@@ -33,9 +33,9 @@ const ItemFilterTopic = (props: Props) => {
             <Animated.View
                 style={[
                     styles.container,
-                    {transform: [{scale}], opacity: isChosen ? 1 : 0.65},
+                    {transform: [{scale}], opacity: isChosen ? 1 : 0.8},
                 ]}>
-                <StyleIcon source={icon} size={50} customStyle={iconStyle} />
+                <StyleIcon source={icon} size={40} customStyle={iconStyle} />
                 <StyleText
                     i18Text={title}
                     customStyle={[styles.title, {color: theme.textColor}]}

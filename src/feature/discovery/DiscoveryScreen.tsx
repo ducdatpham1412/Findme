@@ -74,7 +74,6 @@ const DiscoveryScreen = () => {
     const [listTopics, setListTopics] = useState<Array<number>>([
         TOPIC.travel,
         TOPIC.cuisine,
-        TOPIC.shopping,
     ]);
     const [postIdFocusing, setPostIdFocusing] = useState('');
 
@@ -101,7 +100,7 @@ const DiscoveryScreen = () => {
             animated: false,
         });
         const paramsTopic =
-            listTopics.length === 3 ? undefined : `[${String(listTopics)}]`;
+            listTopics.length === 2 ? undefined : `[${String(listTopics)}]`;
         setParams({
             take: 30,
             listTopics: paramsTopic,

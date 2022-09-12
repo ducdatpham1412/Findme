@@ -4,19 +4,37 @@ import {
     TypeItemTopReviewer,
 } from 'api/interface/reputation';
 import {apiGetTopReviewers} from 'api/module';
+import FindmeStore from 'app-redux/store';
 import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import AvatarBackground from 'feature/profile/components/AvatarBackground';
 import Redux from 'hook/useRedux';
-import {appAlert} from 'navigation/NavigationService';
+import {appAlert, goBack} from 'navigation/NavigationService';
 import React, {useEffect, useState} from 'react';
 import {Platform, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {ScaledSheet} from 'react-native-size-matters';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import {onGoToProfile} from 'utility/assistant';
+import {onGoToProfile, onGoToSignUp} from 'utility/assistant';
+
+const checkAndToToProfile = (userId: number) => {
+    const {token} = FindmeStore.getState().logicSlice;
+    const isModeExp = FindmeStore.getState().accountSlice.modeExp;
+
+    if (token && !isModeExp) {
+        onGoToProfile(userId);
+    } else {
+        appAlert('discovery.bubble.goToSignUp', {
+            moreNotice: 'common.letGo',
+            moreAction: () => {
+                goBack();
+                onGoToSignUp();
+            },
+        });
+    }
+};
 
 const renderItem = (
     item: TypeItemTopReviewer,
@@ -39,7 +57,7 @@ const renderItem = (
     return (
         <StyleTouchable
             customStyle={styles.itemContainer}
-            onPress={() => onGoToProfile(item.creator)}>
+            onPress={() => checkAndToToProfile(item.creator)}>
             <LinearGradient
                 style={styles.gradientBackground}
                 colors={gradientColor}
@@ -109,7 +127,7 @@ const ReputationScreen = () => {
                 <StyleText
                     i18Text="reputation.yourRank"
                     i18Params={{
-                        value: 10,
+                        value: data.myIndex,
                     }}
                     customStyle={styles.textRank}
                 />
@@ -133,6 +151,7 @@ const ReputationScreen = () => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
+        backgroundColor: Theme.darkTheme.backgroundColor,
     },
     headerView: {
         width: '100%',

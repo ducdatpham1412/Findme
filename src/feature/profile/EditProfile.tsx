@@ -9,6 +9,7 @@ import {
     StyleTouchable,
 } from 'components/base';
 import StyleActionSheet from 'components/common/StyleActionSheet';
+import LoadingScreen from 'components/LoadingScreen';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
@@ -27,6 +28,7 @@ import BtnPenEdit from './components/BtnPenEdit';
 const EditProfile = () => {
     const {profile} = Redux.getPassport();
     const theme = Redux.getTheme();
+    const isLoading = Redux.getIsLoading();
 
     const inputDescriptionRef = useRef<TextInput>(null);
     const actionRef = useRef<any>(null);
@@ -185,6 +187,8 @@ const EditProfile = () => {
                 />
 
                 <View style={{height: verticalScale(200)}} />
+
+                {isLoading && <LoadingScreen />}
             </StyleContainer>
         </>
     );

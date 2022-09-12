@@ -24,7 +24,7 @@ const ItemSetting = (props: Props) => {
         <StyleTouchable
             customStyle={[
                 styles.container,
-                {borderBottomColor: theme.borderColor},
+                {borderBottomColor: theme.holderColorLighter},
             ]}
             onPress={onPress}>
             <View style={styles.iconLeftView}>{iconLeft}</View>

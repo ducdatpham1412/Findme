@@ -22,7 +22,7 @@ const ItemSettingSwitch = (props: Props) => {
             customStyle={[
                 styles.container,
                 {
-                    borderBottomColor: theme.borderColor,
+                    borderBottomColor: theme.holderColorLighter,
                 },
             ]}>
             <View style={styles.iconLeftView}>{iconLeft}</View>

@@ -10,7 +10,6 @@ import Alert from 'components/Alert';
 import AlertYesNo from 'components/AlerYesNo';
 import StylePicker from 'components/base/picker/StylePicker';
 import Modalize from 'components/common/useModalize';
-import LoadingScreen from 'components/LoadingScreen';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
 import TabBarProvider from 'navigation/config/TabBarProvider';
@@ -44,7 +43,6 @@ const NullNode = () => {
 };
 
 const RootScreen = () => {
-    const isLoading = Redux.getIsLoading();
     const theme = Redux.getTheme();
 
     const isModeExp = Redux.getModeExp();
@@ -168,9 +166,6 @@ const RootScreen = () => {
                         }}
                     />
                 </RootStack.Navigator>
-
-                {/* For loading all app */}
-                {isLoading && <LoadingScreen />}
 
                 <DynamicLink />
             </TabBarProvider>

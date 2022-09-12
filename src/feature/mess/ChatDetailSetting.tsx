@@ -221,7 +221,7 @@ const ChatDetailSetting = ({route}: Props) => {
         );
     };
 
-    const ModalChangeTheme = useMemo(() => {
+    const ModalChangeTheme = () => {
         return (
             <Modalize
                 ref={modalizeThemeRef}
@@ -256,7 +256,7 @@ const ChatDetailSetting = ({route}: Props) => {
                 </ScrollView>
             </Modalize>
         );
-    }, []);
+    };
 
     const ModalEditConversationName = () => {
         const onCancel = () => {
@@ -329,14 +329,14 @@ const ChatDetailSetting = ({route}: Props) => {
                     <View
                         style={[
                             styles.buttonView,
-                            {borderTopColor: theme.borderColor},
+                            {borderTopColor: theme.holderColorLighter},
                         ]}>
                         <StyleTouchable
                             customStyle={[
                                 styles.buttonBox,
                                 {
                                     borderRightWidth: 0.5,
-                                    borderRightColor: theme.borderColor,
+                                    borderRightColor: theme.holderColorLighter,
                                 },
                             ]}
                             onPress={onCancel}>
@@ -456,7 +456,7 @@ const ChatDetailSetting = ({route}: Props) => {
                 )}
             </ScrollView>
 
-            {ModalChangeTheme}
+            {ModalChangeTheme()}
             {ModalEditConversationName()}
         </View>
     );

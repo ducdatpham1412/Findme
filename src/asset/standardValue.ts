@@ -133,9 +133,9 @@ export const LIST_TOPICS: Array<{
         text: 'profile.post.cuisine',
         icon: Images.icons.cuisine,
     },
-    {
-        id: TOPIC.shopping,
-        text: 'profile.post.shopping',
-        icon: Images.icons.shopping,
-    },
+    // {
+    //     id: TOPIC.shopping,
+    //     text: 'profile.post.shopping',
+    //     icon: Images.icons.shopping,
+    // },
 ];
