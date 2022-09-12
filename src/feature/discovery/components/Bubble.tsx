@@ -1,5 +1,11 @@
 import {TypeBubblePalace} from 'api/interface';
-import {apiLikePost, apiSavePost, apiUnLikePost, apiUnSavePost} from 'api/post';
+import {
+    apiLikePost,
+    apiSavePost,
+    apiUnArchivePost,
+    apiUnLikePost,
+    apiUnSavePost,
+} from 'api/post';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
@@ -35,7 +41,7 @@ import {
 import {formatFromNow} from 'utility/format';
 import {checkIsVideo} from 'utility/validate';
 import Share from 'react-native-share';
-import {TYPE_DYNAMIC_LINK} from 'asset/enum';
+import {TYPE_BUBBLE_PALACE_ACTION, TYPE_DYNAMIC_LINK} from 'asset/enum';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {
     ANDROID_APP_LINK,
@@ -127,6 +133,21 @@ const onGoToPublicDraft = (item: TypeBubblePalace) => {
     navigate(PROFILE_ROUTE.createPostPreview, {
         itemDraft: item,
     });
+};
+
+const onUnArchivePost = async (post: TypeBubblePalace) => {
+    try {
+        await apiUnArchivePost(post.id);
+        Redux.setBubblePalaceAction({
+            action: TYPE_BUBBLE_PALACE_ACTION.unArchivePost,
+            payload: {
+                ...post,
+                isArchived: false,
+            },
+        });
+    } catch (err) {
+        appAlert(err);
+    }
 };
 
 const onOpenLink = (link: string) => {
@@ -395,6 +416,27 @@ const Bubble = (props: Props) => {
                         onPress={() => onGoToPublicDraft(item)}>
                         <StyleText
                             i18Text="profile.goToPost"
+                            customStyle={[
+                                styles.textGoToPost,
+                                {color: theme.textHightLight},
+                            ]}
+                        />
+                    </StyleTouchable>
+                </View>
+            );
+        }
+
+        if (item.isArchived) {
+            return (
+                <View style={styles.footerView}>
+                    <StyleTouchable
+                        customStyle={[
+                            styles.goToPostBox,
+                            {backgroundColor: theme.backgroundButtonColor},
+                        ]}
+                        onPress={() => onUnArchivePost(item)}>
+                        <StyleText
+                            i18Text="profile.post.unArchive"
                             customStyle={[
                                 styles.textGoToPost,
                                 {color: theme.textHightLight},

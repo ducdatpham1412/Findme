@@ -1,6 +1,13 @@
+import Theme from 'asset/theme/Theme';
 import Redux from 'hook/useRedux';
 import React, {forwardRef, useRef} from 'react';
-import {FlatList, FlatListProps, RefreshControl, View} from 'react-native';
+import {
+    ActivityIndicator,
+    FlatList,
+    FlatListProps,
+    RefreshControl,
+    View,
+} from 'react-native';
 import StyleText from './StyleText';
 
 interface StyleListProps extends FlatListProps<any> {
@@ -15,7 +22,7 @@ interface StyleListProps extends FlatListProps<any> {
 }
 
 const StyleList = (props: StyleListProps, ref: any) => {
-    const {data, refreshing, onRefresh, onLoadMore, loadingMore} = props;
+    const {refreshing, onRefresh, onLoadMore, loadingMore} = props;
     const theme = Redux.getTheme();
 
     const listRef = useRef<FlatList>(null);
@@ -33,15 +40,18 @@ const StyleList = (props: StyleListProps, ref: any) => {
 
     // render_view
     const renderFooterView = () => {
-        if (data && data.length > 0 && loadingMore) {
+        if (loadingMore) {
             return (
                 <View
                     style={{
                         width: '100%',
-                        alignItems: 'center',
-                        marginVertical: '7@vs',
-                    }}
-                />
+                        marginVertical: 20,
+                    }}>
+                    <ActivityIndicator
+                        size="small"
+                        color={Theme.common.gradientTabBar1}
+                    />
+                </View>
             );
         }
         return null;

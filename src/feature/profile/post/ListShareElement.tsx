@@ -1,17 +1,10 @@
 /* eslint-disable no-underscore-dangle */
-import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeBubblePalace} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {apiDeletePost} from 'api/module';
+import {apiArchivePost} from 'api/post';
 import FindmeStore from 'app-redux/store';
-import {TYPE_DYNAMIC_LINK} from 'asset/enum';
-import {
-    ANDROID_APP_LINK,
-    DYNAMIC_LINK_ANDROID,
-    DYNAMIC_LINK_IOS,
-    DYNAMIC_LINK_SHARE,
-    LANDING_PAGE_URL,
-} from 'asset/standardValue';
+import {TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import {TypeModalCommentPost} from 'components/ModalCommentLike';
@@ -21,6 +14,7 @@ import {
     TypeMoreOptionsMe,
     TypeShowMoreOptions,
 } from 'feature/discovery/DiscoveryScreen';
+import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {
@@ -31,7 +25,6 @@ import {
 } from 'navigation/NavigationService';
 import React, {Component} from 'react';
 import {Animated, FlatList, StyleProp, ViewStyle} from 'react-native';
-import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
 import {DefaultTransitionSpec} from 'utility/animation';
 import {logger, seeDetailImage} from 'utility/assistant';
@@ -63,6 +56,21 @@ const onGoToEditPost = () => {
     }
 };
 
+const onArchivePost = async (post: TypeBubblePalace) => {
+    try {
+        await apiArchivePost(post.id);
+        Redux.setBubblePalaceAction({
+            action: TYPE_BUBBLE_PALACE_ACTION.archivePost,
+            payload: {
+                ...post,
+                isArchived: true,
+            },
+        });
+    } catch (err) {
+        appAlert(err);
+    }
+};
+
 export default class ListShareElement extends Component<Props, States> {
     pan = new Animated.ValueXY();
 
@@ -71,6 +79,8 @@ export default class ListShareElement extends Component<Props, States> {
     listRef = React.createRef<FlatList>();
 
     myOptionRef = React.createRef<any>();
+
+    draftOptionRef = React.createRef<any>();
 
     friendOptionRef = React.createRef<any>();
 
@@ -162,10 +172,14 @@ export default class ListShareElement extends Component<Props, States> {
     }
 
     private showOptions(params: TypeShowMoreOptions & TypeMoreOptionsMe) {
-        postModal = params.postModal;
         const {id} = FindmeStore.getState().accountSlice.passport.profile;
+        postModal = params.postModal;
         if (postModal.creator === id) {
-            this.myOptionRef.current?.show();
+            if (postModal.isDraft || postModal.isArchived) {
+                this.draftOptionRef.current?.show();
+            } else {
+                this.myOptionRef.current?.show();
+            }
         } else {
             this.friendOptionRef.current?.show();
         }
@@ -182,57 +196,6 @@ export default class ListShareElement extends Component<Props, States> {
         });
     }
 
-    private async showModalShare(post: TypeBubblePalace) {
-        try {
-            const link = await dynamicLinks().buildShortLink({
-                link: `${post?.images?.[0] || LANDING_PAGE_URL}?type=${
-                    TYPE_DYNAMIC_LINK.post
-                }&post_id=${post.id}`,
-                domainUriPrefix: DYNAMIC_LINK_SHARE,
-                ios: {
-                    bundleId: DYNAMIC_LINK_IOS,
-                    appStoreId: '570060128',
-                },
-                android: {
-                    packageName: DYNAMIC_LINK_ANDROID,
-                    fallbackUrl: ANDROID_APP_LINK,
-                },
-                analytics: {
-                    campaign: 'banner',
-                },
-            });
-
-            // const imagePath: any = null;
-            // let base64Data = '';
-            // if (isIOS) {
-            //     const resp = await RNFetchBlob.config({
-            //         fileCache: true,
-            //     }).fetch('GET', item.images[0]);
-            //     base64Data = await resp.readFile('base64');
-            // } else {
-            //     base64Data = await RNFetchBlob.fs.readFile(
-            //         item.images[0],
-            //         'base64',
-            //     );
-            // }
-            // const base64Image = `data:image/png;base64,${base64Data}`;
-            // await Share.open({
-            //     title: 'Title',
-            //     url: base64Image,
-            //     message: link,
-            //     subject: 'Subject',
-            // });
-            // return RNFetchBlob.fs.unlink(imagePath);
-
-            Share.open({
-                message: 'Doffy share',
-                url: link,
-            });
-        } catch (err) {
-            appAlert(err);
-        }
-    }
-
     RenderItemBubble = (item: TypeBubblePalace) => {
         return (
             <Bubble
@@ -241,7 +204,6 @@ export default class ListShareElement extends Component<Props, States> {
                 onShowModalComment={(post, type) =>
                     this.showModalComment(post, type)
                 }
-                onShowModalShare={post => this.showModalShare(post)}
                 isFocusing={this.state.postIdFocusing === item.id}
                 onChangePostIdFocusing={postId =>
                     this.setState({postIdFocusing: postId})
@@ -271,7 +233,49 @@ export default class ListShareElement extends Component<Props, States> {
                             },
                         },
                         {
-                            text: 'profile.post.editPost',
+                            text: 'profile.post.edit',
+                            action: onGoToEditPost,
+                        },
+                        {
+                            text: 'profile.post.archive',
+                            action: () => onArchivePost(postModal),
+                        },
+                        {
+                            text: 'profile.post.delete',
+                            action: () => {
+                                if (postModal?.id) {
+                                    this.onDeletePost(postModal.id);
+                                }
+                            },
+                        },
+                        {
+                            text: 'common.cancel',
+                            action: () => null,
+                        },
+                    ]}
+                />
+            );
+        };
+
+        const DraftOption = () => {
+            return (
+                <StyleActionSheet
+                    ref={this.draftOptionRef}
+                    listTextAndAction={[
+                        {
+                            text: 'discovery.seeDetailImage',
+                            action: () => {
+                                if (postModal?.images.length) {
+                                    seeDetailImage({
+                                        images: postModal.images.map(
+                                            url => url,
+                                        ),
+                                    });
+                                }
+                            },
+                        },
+                        {
+                            text: 'profile.post.edit',
                             action: onGoToEditPost,
                         },
                         {
@@ -366,6 +370,7 @@ export default class ListShareElement extends Component<Props, States> {
                 </Animated.View>
 
                 {MyModalOption()}
+                {DraftOption()}
                 {FriendModalOptions()}
             </>
         );

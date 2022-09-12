@@ -5,6 +5,7 @@ import {View} from 'react-native';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Feather from 'react-native-vector-icons/Feather';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface Props {
     index: number;
@@ -20,6 +21,7 @@ const ToolProfile = (props: Props) => {
     const isInMyPosts = index === 0;
     const isPostsLiked = index === 1;
     const isPostsSaved = index === 2;
+    const isPostArchive = index === 3;
 
     return (
         <View style={styles.container}>
@@ -73,6 +75,21 @@ const ToolProfile = (props: Props) => {
                     ]}
                 />
             </StyleTouchable>
+
+            <StyleTouchable
+                customStyle={styles.buttonBox}
+                onPress={() => onChangeTab(3)}>
+                <Ionicons
+                    name="ios-timer-outline"
+                    style={[
+                        styles.iconArchive,
+                        {
+                            color: theme.textHightLight,
+                            opacity: isPostArchive ? 1 : unFocusOpacity,
+                        },
+                    ]}
+                />
+            </StyleTouchable>
         </View>
     );
 };
@@ -103,6 +120,9 @@ const styles = ScaledSheet.create({
     },
     iconBookMark: {
         fontSize: '18@ms',
+    },
+    iconArchive: {
+        fontSize: '20@ms',
     },
 });
 

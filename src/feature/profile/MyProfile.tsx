@@ -2,6 +2,7 @@ import {useIsFocused} from '@react-navigation/native';
 import {TypeBubblePalace} from 'api/interface';
 import {
     apiGetListPost,
+    apiGetListPostsArchived,
     apiGetListPostsLiked,
     apiGetListPostsSaved,
     apiGetProfile,
@@ -22,6 +23,7 @@ import {tabBarViewHeight} from 'navigation/components/TabNavigator';
 import {appAlert} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
+    ActivityIndicator,
     Animated,
     NativeScrollEvent,
     Platform,
@@ -127,6 +129,7 @@ const ProfileEnjoy = ({routeName}: ChildrenProps) => {
 let listShareElement: Array<TypeBubblePalace> = [];
 let tabIndexRef = 0;
 let checkIsFocus = true;
+const listCheckTabLazy = [true, false, false, false];
 
 const safeLoadMoreStyle: any = {
     overflow: 'hidden',
@@ -135,6 +138,14 @@ const safeLoadMoreStyle: any = {
         tabBarViewHeight -
         toolProfileHeight -
         searchSettingHeight, // check to remove this
+};
+
+const LoadingMoreIndicator = ({color}: any) => {
+    return (
+        <View style={styles.loadingMoreView}>
+            <ActivityIndicator color={color} />
+        </View>
+    );
 };
 
 const ProfileAccount = ({routeName}: ChildrenProps) => {
@@ -164,12 +175,17 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
         request: apiGetListPostsSaved,
         isInitNotRunRequest: true,
     });
+    const postArchivedPaging = usePaging({
+        request: apiGetListPostsArchived,
+        isInitNotRunRequest: true,
+    });
 
     const translateXIndicator = useRef(new Animated.Value(0)).current;
     const optionRef = useRef<any>(null);
     const myPostRef = useRef<ListShareElement>(null);
     const postLikedRef = useRef<ListShareElement>(null);
     const postSavedRef = useRef<ListShareElement>(null);
+    const postArchivedRef = useRef<ListShareElement>(null);
     const tabViewRef = useRef<StyleTabView>(null);
     const scrollRef = useRef<ScrollView>(null);
 
@@ -178,6 +194,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     const isFocusMyPost = tabIndex === 0;
     const isFocusPostLiked = tabIndex === 1;
     const isFocusPostSaved = tabIndex === 2;
+    const isFocusPostArchived = tabIndex === 3;
 
     useEffect(() => {
         if (
@@ -249,6 +266,73 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 action: TYPE_BUBBLE_PALACE_ACTION.null,
                 payload: null,
             });
+        } else if (
+            bubblePalaceAction.action === TYPE_BUBBLE_PALACE_ACTION.archivePost
+        ) {
+            const postArchived: TypeBubblePalace = bubblePalaceAction.payload;
+
+            myPostsPaging.setList(preValue =>
+                preValue.filter(item => {
+                    if (item.id !== postArchived.id) {
+                        return true;
+                    }
+                    return false;
+                }),
+            );
+
+            if (listCheckTabLazy[3]) {
+                postArchivedPaging.setList(preValue =>
+                    [postArchived].concat(preValue),
+                );
+            }
+            if (listCheckTabLazy[1]) {
+                postsLikedPaging.setList(preValue =>
+                    preValue.filter(item => {
+                        if (item.id !== postArchived.id) {
+                            return true;
+                        }
+                        return false;
+                    }),
+                );
+            }
+            if (listCheckTabLazy[2]) {
+                postsSavedPaging.setList(preValue =>
+                    preValue.filter(item => {
+                        if (item.id !== postArchived.id) {
+                            return true;
+                        }
+                        return false;
+                    }),
+                );
+            }
+
+            Redux.setBubblePalaceAction({
+                action: TYPE_BUBBLE_PALACE_ACTION.null,
+                payload: null,
+            });
+        } else if (
+            bubblePalaceAction.action ===
+            TYPE_BUBBLE_PALACE_ACTION.unArchivePost
+        ) {
+            const archivedPost: TypeBubblePalace = bubblePalaceAction.payload;
+            postArchivedPaging.setList(preValue =>
+                preValue.filter(item => item.id !== archivedPost.id),
+            );
+            myPostsPaging.setList(preValue => [archivedPost].concat(preValue));
+            if (archivedPost.isLiked) {
+                postsLikedPaging.setList(preValue =>
+                    [archivedPost].concat(preValue),
+                );
+            }
+            if (archivedPost.isSaved) {
+                postsSavedPaging.setList(preValue =>
+                    [archivedPost].concat(preValue),
+                );
+            }
+            Redux.setBubblePalaceAction({
+                action: TYPE_BUBBLE_PALACE_ACTION.null,
+                payload: null,
+            });
         }
     }, [bubblePalaceAction]);
 
@@ -259,6 +343,8 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             listShareElement = postsLikedPaging.list;
         } else if (tabIndex === 2) {
             listShareElement = postsSavedPaging.list;
+        } else if (tabIndex === 3) {
+            listShareElement = postArchivedPaging.list;
         }
         tabIndexRef = tabIndex;
     }, [
@@ -266,6 +352,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
         myPostsPaging.list,
         postsLikedPaging.list,
         postsSavedPaging.list,
+        postArchivedPaging.list,
     ]);
 
     /**
@@ -294,6 +381,11 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 index: initIndex === -1 ? 0 : initIndex,
                 postId: bubbleId,
             });
+        } else if (tabIndexRef === 3) {
+            postArchivedRef.current?.show({
+                index: initIndex === -1 ? 0 : initIndex,
+                postId: bubbleId,
+            });
         }
     };
 
@@ -303,19 +395,22 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             Redux.updatePassport({
                 profile: res.data,
             });
+
             if (isFocusMyPost) {
                 myPostsPaging.onRefresh();
             } else if (isFocusPostLiked) {
                 postsLikedPaging.onRefresh();
             } else if (isFocusPostSaved) {
                 postsSavedPaging.onRefresh();
+            } else if (isFocusPostArchived) {
+                postArchivedPaging.onRefresh();
             }
         } catch (err) {
             appAlert(err);
         }
     };
 
-    const checkScrollEnd = (nativeEvent: NativeScrollEvent) => {
+    const checkScrollEnd = useCallback((nativeEvent: NativeScrollEvent) => {
         if (isScrollCloseToBottom(nativeEvent)) {
             if (isFocusMyPost) {
                 myPostsPaging.onLoadMore();
@@ -323,6 +418,8 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 postsLikedPaging.onLoadMore();
             } else if (isFocusPostSaved) {
                 postsSavedPaging.onLoadMore();
+            } else if (isFocusPostArchived) {
+                postArchivedPaging.onLoadMore();
             }
         }
 
@@ -332,8 +429,10 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             postLikedRef.current?.scrollToNearingEnd();
         } else if (isFocusPostSaved) {
             postSavedRef.current?.scrollToNearingEnd();
+        } else if (isFocusPostArchived) {
+            postArchivedRef.current?.scrollToNearingEnd();
         }
-    };
+    }, []);
 
     /**
      * Render views
@@ -400,7 +499,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                             style={[
                                 styles.indicator,
                                 {
-                                    flex: 1 / 3,
+                                    flex: 1 / 4,
                                     borderTopColor: theme.borderColor,
                                     transform: [
                                         {translateX: translateXIndicator},
@@ -414,10 +513,13 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 <StyleTabView
                     ref={tabViewRef}
                     onFirstNavigateToIndex={index => {
+                        listCheckTabLazy[index] = true;
                         if (index === 1) {
                             postsLikedPaging.onLoadMore();
                         } else if (index === 2) {
                             postsSavedPaging.onLoadMore();
+                        } else if (index === 3) {
+                            postArchivedPaging.onLoadMore();
                         }
                     }}
                     onScroll={e => {
@@ -432,6 +534,11 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                             isFocusMyPost ? {} : safeLoadMoreStyle,
                         ]}>
                         {myPostsPaging.list.map(RenderItemPost)}
+                        {myPostsPaging.loading && (
+                            <LoadingMoreIndicator
+                                color={theme.textHightLight}
+                            />
+                        )}
                     </View>
                     <View
                         style={[
@@ -439,6 +546,11 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                             isFocusPostLiked ? {} : safeLoadMoreStyle,
                         ]}>
                         {postsLikedPaging.list.map(RenderItemPost)}
+                        {postsLikedPaging.loading && (
+                            <LoadingMoreIndicator
+                                color={theme.textHightLight}
+                            />
+                        )}
                     </View>
                     <View
                         style={[
@@ -446,6 +558,23 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                             isFocusPostSaved ? {} : safeLoadMoreStyle,
                         ]}>
                         {postsSavedPaging.list.map(RenderItemPost)}
+                        {postsSavedPaging.loading && (
+                            <LoadingMoreIndicator
+                                color={theme.textHightLight}
+                            />
+                        )}
+                    </View>
+                    <View
+                        style={[
+                            styles.contentContainerPost,
+                            isFocusPostArchived ? {} : safeLoadMoreStyle,
+                        ]}>
+                        {postArchivedPaging.list.map(RenderItemPost)}
+                        {postArchivedPaging.loading && (
+                            <LoadingMoreIndicator
+                                color={theme.textHightLight}
+                            />
+                        )}
                     </View>
                 </StyleTabView>
             </ScrollView>
@@ -474,6 +603,16 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 ref={postSavedRef}
                 title={profile.name}
                 listPaging={postsSavedPaging}
+                containerStyle={{
+                    backgroundColor: theme.backgroundColorSecond,
+                }}
+                onShowModalComment={showModalLikeComment}
+            />
+
+            <ListShareElement
+                ref={postArchivedRef}
+                title={profile.name}
+                listPaging={postArchivedPaging}
                 containerStyle={{
                     backgroundColor: theme.backgroundColorSecond,
                 }}
@@ -594,6 +733,11 @@ const styles = ScaledSheet.create({
             ios: '1@ms',
             android: '2@ms',
         }),
+    },
+    loadingMoreView: {
+        width: '100%',
+        height: 100,
+        justifyContent: 'center',
     },
 });
 

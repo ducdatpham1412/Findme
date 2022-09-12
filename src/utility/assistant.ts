@@ -192,7 +192,7 @@ export const modalizeOptionBubbleGroup = (params: {
 }) => {
     return [
         {
-            text: 'profile.post.editPost',
+            text: 'profile.post.edit',
             action: () => {
                 navigate('profile_create_group', {
                     itemGroupFromEdit: params.itemGroupFromEdit,
@@ -316,7 +316,10 @@ export const modalizeYourProfile = (params: {
     ];
 };
 
-export const modalizeMyProfile = [
+export const modalizeMyProfile: Array<{
+    text: I18Normalize;
+    action: any;
+}> = [
     {
         text: 'profile.modalize.setting',
         action: () => navigate(PROFILE_ROUTE.settingRoute),

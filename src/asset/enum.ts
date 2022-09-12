@@ -144,6 +144,8 @@ export enum TYPE_BUBBLE_PALACE_ACTION {
     editPostFromProfile = 1,
     scrollToTopDiscovery = 2,
     scrollToTopMyProfile = 3,
+    archivePost = 4,
+    unArchivePost = 5,
 }
 
 export enum TYPE_SOCIAL_LOGIN {
@@ -185,4 +187,11 @@ export enum REACT {
     post = 0,
     comment = 1,
     message = 2,
+}
+
+export enum STATUS {
+    notActive = 0,
+    active = 1,
+    draft = 2,
+    archive = 3,
 }
