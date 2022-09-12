@@ -42,7 +42,7 @@ const ChangingPassword = ({isOpening}: Props) => {
 
     useEffect(() => {
         Animated.timing(aim, {
-            toValue: isOpening ? verticalScale(250) : 0,
+            toValue: isOpening ? verticalScale(200) : 0,
             duration: 300,
             useNativeDriver: true,
         }).start();
@@ -119,7 +119,6 @@ const ChangingPassword = ({isOpening}: Props) => {
     return (
         <Animated.View style={[styles.container, {height}]}>
             <FormProvider {...form}>
-                {/* Current password */}
                 <StyleInputForm
                     name="nowPass"
                     placeholder={t('setting.securityAndLogin.nowPass')}
@@ -134,7 +133,6 @@ const ChangingPassword = ({isOpening}: Props) => {
                     secureTextEntry
                 />
 
-                {/* New password */}
                 <StyleInputForm
                     ref={ref_newPassword}
                     name="newPass"
@@ -149,8 +147,6 @@ const ChangingPassword = ({isOpening}: Props) => {
                     onSubmitEditing={() => ref_passwordCf.current.focus()}
                     secureTextEntry
                 />
-
-                {/* Confirm password */}
 
                 <StyleInputForm
                     ref={ref_passwordCf}
@@ -194,12 +190,14 @@ const styles = ScaledSheet.create({
     },
     buttonConfirm: {
         marginVertical: '15@vs',
+        paddingHorizontal: '30@s',
+        paddingVertical: '7@vs',
     },
     textButtonCf: {
-        fontSize: '17@ms',
+        fontSize: '14@ms',
     },
     inputStyle: {
-        fontSize: '17@ms',
+        fontSize: '14@ms',
         paddingHorizontal: '17@s',
     },
 });

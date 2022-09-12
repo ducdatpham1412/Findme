@@ -15,7 +15,6 @@ import {
 } from 'components/base';
 import StyleTouchable from 'components/base/StyleTouchable';
 import InputBox from 'components/common/InputBox';
-import LoadingScreen from 'components/LoadingScreen';
 import Redux from 'hook/useRedux';
 import {LOGIN_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
@@ -88,7 +87,6 @@ const LoginScreen = () => {
     const passRef = useRef<any>(null);
 
     const {username, password} = Redux.getLogin();
-    const isLoading = Redux.getIsLoading();
     const [user, setUser] = useState(username || loginForm?.username);
     const [pass, setPass] = useState(password || loginForm?.password);
     const [isKeepSign, setIsKeepSign] = useState(false);
@@ -245,7 +243,6 @@ const LoginScreen = () => {
                 {ForgotPassword()}
                 {SignInPlatforms()}
             </StyleContainer>
-            {isLoading && <LoadingScreen />}
         </View>
     );
 };

@@ -4,6 +4,8 @@ import {
 } from '@react-navigation/material-top-tabs';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
+import LoadingScreen from 'components/LoadingScreen';
+import Redux from 'hook/useRedux';
 import TopTabNavigator from 'navigation/components/TopTabNavigator';
 import {LOGIN_ROUTE} from 'navigation/config/routes';
 import React from 'react';
@@ -17,6 +19,8 @@ import SignUpForm from './signUp/SignUpForm';
 const TopTab = createMaterialTopTabNavigator();
 
 const Starter = () => {
+    const isLoading = Redux.getIsLoading();
+
     return (
         <View style={styles.container}>
             <BackgroundAuthen />
@@ -53,6 +57,8 @@ const Starter = () => {
                     options={{lazy: true}}
                 />
             </TopTab.Navigator>
+
+            {isLoading && <LoadingScreen />}
         </View>
     );
 };

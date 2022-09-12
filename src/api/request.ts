@@ -110,7 +110,6 @@ request.interceptors.response.use(
             } catch (err) {
                 // handle when refreshing token, refresh is blacked list
                 const temp: any = err;
-                console.log('temp is: ', temp);
                 const _error = temp.response.data;
                 if (_error.errorKey === ERROR_KEY_ENUM.token_blacklisted) {
                     AuthenticateService.logOut({hadRefreshTokenBlacked: true});
