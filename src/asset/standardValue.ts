@@ -48,7 +48,6 @@ export const PRIVACY_URL = 'https://www.doffy.xyz/about-us/policy';
 export const TERMS_URL = 'https://www.doffy.xyz/about-us/terms';
 export const FEEDBACK_URL =
     'https://docs.google.com/forms/d/1Yb-OzSMJbJxG_RZYtPwkKZGjw4AZOsC2IvJlac-1ydI/edit?usp=sharing';
-export const GUIDELINE_URL = 'https://www.doffy.xyz/about-us/guideline';
 export const LANDING_PAGE_URL = 'https://www.doffy.xyz/';
 export const REPORT_REASONS = [
     {
