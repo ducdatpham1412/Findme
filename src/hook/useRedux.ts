@@ -27,6 +27,7 @@ export interface PassportType {
         cover?: string;
         followers?: number;
         followings?: number;
+        reputation?: number;
         listPosts?: Array<any>;
         relationship?: number;
     };
@@ -183,6 +184,9 @@ export const Redux = {
     setPostCreatedHandling: (value: ReduxPostCreatedHandle) => {
         FindmeStore.dispatch(logicSliceAction.setPostCreatedHandling(value));
     },
+    setIsLogOut: (value: boolean) => {
+        FindmeStore.dispatch(logicSliceAction.setIsLogOut(value));
+    },
 
     /**
      *
@@ -212,6 +216,8 @@ export const Redux = {
 
     getModeExp: () =>
         useSelector((state: RootState) => state.accountSlice.modeExp),
+    getIstLogOut: () =>
+        useSelector((state: RootState) => state.logicSlice.isLogOut),
 
     // SET METHOD
     updateLogin: (update: LoginType) => {
@@ -270,6 +276,7 @@ export const Redux = {
             },
         });
         Redux.updateListChatTag([]);
+        Redux.setIsLogOut(true);
     },
 };
 

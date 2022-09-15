@@ -204,6 +204,7 @@ export interface TypeGetProfileResponse {
     cover: string;
     followers: number;
     followings: number;
+    reputations: number;
     relationship: number;
 }
 

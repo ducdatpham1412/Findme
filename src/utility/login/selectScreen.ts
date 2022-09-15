@@ -11,7 +11,6 @@ export const selectIsHaveActiveUser = async () => {
     const handleNotHaveActiveUser = async () => {
         await FindmeAsyncStorage.logOut();
         I18Next.changeLanguage(await FindmeAsyncStorage.getLanguageModeExp());
-        return;
     };
 
     if (activeUser?.token) {

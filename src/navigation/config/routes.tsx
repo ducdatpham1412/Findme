@@ -4,7 +4,6 @@ const ROOT_SCREEN = {
     // others
     alert: '@ROOT_SCREEN/alert',
     alertYesNo: '@ROOT_SCREEN/alertYesNo',
-    modalize: '@ROOT_SCREEN/modalize',
     interactBubble: '@ROOT_SCREEN/interactBubble',
     swipeImages: '@ROOT_SCREEN/swipeImage',
     reportUser: '@ROOT_SCREEN/reportUser',

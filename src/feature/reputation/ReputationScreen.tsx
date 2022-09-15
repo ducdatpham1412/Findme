@@ -73,7 +73,7 @@ const renderItem = (
                     numberOfLines={1}
                 />
                 <StyleText
-                    originValue={`${item.reputation} Trust Point`}
+                    originValue={`${item.reputation} TrustPoint`}
                     customStyle={[styles.textNumberTrust]}
                 />
             </View>
