@@ -14,3 +14,11 @@ export const apiLikePost = (idPost: string) => {
 export const apiUnLikePost = (idPost: string) => {
     return request.put(`/profile/unlike-post/${idPost}`);
 };
+
+export const apiArchivePost = (idPost: string) => {
+    return request.put(`/profile/archive-post/${idPost}`);
+};
+
+export const apiUnArchivePost = (idPost: string) => {
+    return request.put(`/profile/un-archive-post/${idPost}`);
+};

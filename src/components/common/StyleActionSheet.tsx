@@ -1,10 +1,11 @@
 import React, {forwardRef} from 'react';
 import {useTranslation} from 'react-i18next';
 import ActionSheet from 'react-native-actionsheet';
+import {I18Normalize} from 'utility/I18Next';
 
 interface Props {
     listTextAndAction: Array<{
-        text: string;
+        text: I18Normalize;
         action(): void;
     }>;
     cancelButtonIndex?: number;

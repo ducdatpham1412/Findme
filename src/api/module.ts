@@ -401,6 +401,12 @@ export const apiGetListPostsSaved = ({
     });
 };
 
+export const apiGetListPostsArchived = ({params}: TypeParamsPaging) => {
+    return request.get('/profile/list-posts-archived', {
+        params,
+    });
+};
+
 export const apiGetListFollow = ({params}: TypeParamsPaging) => {
     return request.get(`/profile/follow/get-list/${params.userId}`, {
         params: {

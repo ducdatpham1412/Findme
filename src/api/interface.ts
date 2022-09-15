@@ -284,7 +284,8 @@ export interface TypeBubblePalace {
     created: string;
     isLiked: boolean;
     isSaved: boolean;
-    isDraft: boolean;
+    isDraft?: boolean;
+    isArchived?: boolean;
     relationship: number;
 }
 
