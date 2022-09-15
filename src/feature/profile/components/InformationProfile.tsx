@@ -85,7 +85,7 @@ const InformationProfile = (props: Props) => {
                 </StyleTouchable>
 
                 {/* Reputations */}
-                {profile.reputations && (
+                {!!profile.reputations && (
                     <View style={styles.elementFollow}>
                         <StyleText
                             originValue="TrustPoint"

@@ -38,8 +38,6 @@ target 'Findme' do
     target 'FindmeTests' do
         inherit! :complete
         # Pods for testing
-
-    pod 'react-native-video', :path => '../node_modules/react-native-video/react-native-video.podspec'
   end
 
   # Enables Flipper.

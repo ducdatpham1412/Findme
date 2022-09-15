@@ -5,7 +5,6 @@ import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import React, {useEffect, useRef} from 'react';
 import {Animated, View} from 'react-native';
 import {scale, ScaledSheet} from 'react-native-size-matters';
-import {scrollItemHeight} from '../signUp/EditBasicInformation';
 
 const listGender = [
     {
@@ -80,8 +79,9 @@ const GenderSwipe = (props: Props) => {
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
-        height: scrollItemHeight,
+        height: '140@vs',
         alignItems: 'center',
+        justifyContent: 'center',
     },
     title: {
         fontSize: '15@ms',

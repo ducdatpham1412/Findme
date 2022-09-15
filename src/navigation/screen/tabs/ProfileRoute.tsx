@@ -1,12 +1,12 @@
-import {createStackNavigator} from '@react-navigation/stack';
 import {Metrics} from 'asset/metrics';
 import EditProfile from 'feature/profile/EditProfile';
 import MyProfile from 'feature/profile/MyProfile';
 import Redux from 'hook/useRedux';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
 import React from 'react';
+import {createSharedElementStackNavigator} from 'react-navigation-shared-element';
 
-const ProfileStack = createStackNavigator();
+const ProfileStack = createSharedElementStackNavigator();
 
 const ProfileRoute = () => {
     const theme = Redux.getTheme();

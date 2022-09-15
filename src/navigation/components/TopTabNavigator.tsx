@@ -1,4 +1,5 @@
 import {MaterialTopTabBarProps} from '@react-navigation/material-top-tabs';
+import {FONT_SIZE} from 'asset/standardValue';
 import {StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import React, {useState} from 'react';
@@ -128,7 +129,7 @@ const styles = ScaledSheet.create({
         paddingVertical: '10@vs',
     },
     titleText: {
-        fontSize: '15@ms',
+        fontSize: FONT_SIZE.normal,
         fontWeight: 'bold',
     },
 });

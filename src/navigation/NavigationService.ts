@@ -38,6 +38,7 @@ interface TypeAlertYesOrNo {
     headerNode?: ReactNode;
     displayButton?: boolean;
     touchOutBack?: boolean;
+    agreeButtonOpacity?: number;
 }
 
 export interface TypeSwipeImages {
