@@ -23,7 +23,7 @@ export const initialAccountState = {
             cover: 'https://doffy-production.s3.ap-southeast-1.amazonaws.com/image/__admin_logo.png',
             followers: 0,
             followings: 0,
-            reputation: 0,
+            reputations: 0,
             relationship: 0,
         },
         information: {

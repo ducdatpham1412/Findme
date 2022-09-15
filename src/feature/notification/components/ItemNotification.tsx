@@ -1,11 +1,13 @@
 import {TypeNotificationResponse} from 'api/interface';
 import Images from 'asset/img/images';
+import {FONT_SIZE} from 'asset/standardValue';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import React from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {chooseTextNotification, onGoToProfile} from 'utility/assistant';
+import {formatFromNow} from 'utility/format';
 
 interface Props {
     item: TypeNotificationResponse;
@@ -47,6 +49,13 @@ const ItemNotification = (props: Props) => {
                         numberOfLines={2}
                     />
                 </StyleText>
+                <StyleText
+                    originValue={formatFromNow(item.created)}
+                    customStyle={[
+                        styles.textTime,
+                        {color: theme.holderColorLighter},
+                    ]}
+                />
             </View>
 
             {!!item.image && (
@@ -81,7 +90,7 @@ const styles = ScaledSheet.create({
         flex: 1,
     },
     textNotification: {
-        fontSize: '14@ms',
+        fontSize: FONT_SIZE.normal,
     },
     imageView: {
         width: '60@s',
@@ -90,6 +99,10 @@ const styles = ScaledSheet.create({
     image: {
         width: '30@s',
         height: '35@s',
+    },
+    textTime: {
+        fontSize: FONT_SIZE.small,
+        marginTop: '5@vs',
     },
 });
 

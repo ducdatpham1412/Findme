@@ -17,6 +17,7 @@ import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {useMemo, useRef, useState} from 'react';
 import {Platform, TextInput, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
+import {SharedElement} from 'react-navigation-shared-element';
 import {
     chooseImageFromCamera,
     chooseImageFromLibrary,
@@ -118,6 +119,7 @@ const EditProfile = () => {
     return (
         <>
             <StyleHeader title="profile.component.infoProfile.editProfile" />
+
             <StyleContainer scrollEnabled customStyle={styles.container}>
                 <View style={styles.avatarBox}>
                     <StyleTouchable
@@ -136,10 +138,14 @@ const EditProfile = () => {
                             }
                         }}
                         onLongPress={() => actionRef.current.show()}>
-                        <StyleImage
-                            source={{uri: avatar}}
-                            customStyle={styles.avatarImg}
-                        />
+                        <SharedElement
+                            id="avatar_share"
+                            style={styles.avatarImg}>
+                            <StyleImage
+                                source={{uri: avatar}}
+                                customStyle={styles.avatarImg}
+                            />
+                        </SharedElement>
                     </StyleTouchable>
 
                     <BtnPenEdit
@@ -216,7 +222,7 @@ const styles = ScaledSheet.create({
     avatarImg: {
         width: '100%',
         height: '100%',
-        borderRadius: '20@vs',
+        borderRadius: '100@vs',
     },
     btnEditAvatar: {
         width: '27@ms',

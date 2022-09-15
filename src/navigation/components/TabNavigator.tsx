@@ -213,7 +213,11 @@ const TabNavigator = (props: any) => {
                     {numberNewNotifications > 0 && (
                         <View style={styles.newNotificationBox}>
                             <StyleText
-                                originValue={numberNewNotifications}
+                                originValue={
+                                    numberNewNotifications > 99
+                                        ? 99
+                                        : numberNewNotifications
+                                }
                                 customStyle={styles.textNewMessages}
                             />
                         </View>

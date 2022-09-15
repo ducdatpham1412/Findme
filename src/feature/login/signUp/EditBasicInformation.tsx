@@ -85,6 +85,7 @@ const EditBasicInformation = ({route}: Props) => {
                     i18Title: 'alert.wantToSave',
                     agreeChange: () => onEditProfileAndGo(true),
                     refuseChange: () => onEditProfileAndGo(false),
+                    agreeButtonOpacity: 1,
                 });
             }
         }

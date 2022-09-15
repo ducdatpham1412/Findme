@@ -1,3 +1,4 @@
+import {FONT_SIZE} from 'asset/standardValue';
 import {StyleText} from 'components/base';
 import Redux from 'hook/useRedux';
 import {goBack} from 'navigation/NavigationService';
@@ -70,7 +71,7 @@ const styles = ScaledSheet.create({
         }),
     },
     titleText: {
-        fontSize: '17@ms',
+        fontSize: FONT_SIZE.big,
         fontWeight: 'bold',
     },
     headerLeft: {

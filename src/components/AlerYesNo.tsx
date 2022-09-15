@@ -21,6 +21,7 @@ interface AlertConfirmChangeProps {
             headerNode?: ReactNode;
             displayButton?: boolean;
             touchOutBack?: boolean;
+            agreeButtonOpacity?: number;
         };
     };
 }
@@ -37,6 +38,7 @@ const AlertYesNo = ({route}: AlertConfirmChangeProps) => {
         headerNode,
         displayButton = true,
         touchOutBack = true,
+        agreeButtonOpacity = 0.7,
     } = route.params;
     const scale = useRef(new Animated.Value(0)).current;
 
@@ -108,7 +110,7 @@ const AlertYesNo = ({route}: AlertConfirmChangeProps) => {
                                 styles.buttonElement,
                                 {
                                     backgroundColor: theme.borderColor,
-                                    opacity: 0.7,
+                                    opacity: agreeButtonOpacity,
                                 },
                             ]}
                             onPress={agreeChange}>

@@ -1,6 +1,6 @@
 import Redux from 'hook/useRedux';
 import StyleHeader, {StyleHeaderProps} from 'navigation/components/StyleHeader';
-import React, {ReactNode} from 'react';
+import React, {forwardRef, ReactNode} from 'react';
 import {StyleProp, View, ViewStyle} from 'react-native';
 import {
     KeyboardAwareScrollView,
@@ -60,4 +60,4 @@ const StyleContainer = (props: ScrollContainerProps) => {
     );
 };
 
-export default StyleContainer;
+export default forwardRef(StyleContainer);
