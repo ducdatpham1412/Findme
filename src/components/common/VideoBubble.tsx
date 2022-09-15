@@ -21,10 +21,17 @@ const VideoBubble = (props: Props) => {
             <Video
                 style={[styles.container, {height}]}
                 onLoad={e => {
-                    const ratio = e.naturalSize.height / e.naturalSize.width;
+                    let ratio = 1;
+                    if (e.naturalSize.orientation === 'landscape') {
+                        ratio = e.naturalSize.height / e.naturalSize.width;
+                    } else if (e.naturalSize.orientation === 'portrait') {
+                        ratio = e.naturalSize.width / e.naturalSize.height;
+                    }
+                    ratio = ratio > 1.3 ? 1.3 : ratio;
                     setHeight(ratio * screenWidth);
                 }}
                 controls
+                resizeMode="cover"
                 {...props}
             />
         </StyleTouchHaveDouble>
