@@ -1,4 +1,4 @@
-import {GUIDELINE_URL} from 'asset/standardValue';
+import {LANDING_PAGE_URL} from 'asset/standardValue';
 import {StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import HeaderLeftIcon from 'navigation/components/HeaderLeftIcon';
@@ -30,8 +30,8 @@ const SearchAndSetting = (props: Props) => {
 
     const onGoToUserGuide = () => {
         navigate(ROOT_SCREEN.webView, {
-            title: 'setting.userGuide.title',
-            linkWeb: GUIDELINE_URL,
+            title: 'setting.component.typeMainSetting.aboutFindme',
+            linkWeb: LANDING_PAGE_URL,
         });
     };
 
