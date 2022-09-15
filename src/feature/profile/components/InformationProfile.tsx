@@ -1,6 +1,7 @@
 import {TypeGetProfileResponse} from 'api/interface';
 import {TYPE_FOLLOW} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
+import {FONT_SIZE} from 'asset/standardValue';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
@@ -18,7 +19,6 @@ interface Props {
 
 const InformationProfile = (props: Props) => {
     const {profile, routeName, havingEditProfile} = props;
-
     const theme = Redux.getTheme();
     const {name, description, followers, followings, avatar} = profile;
 
@@ -34,32 +34,16 @@ const InformationProfile = (props: Props) => {
     /**
      * Render view
      */
-    const RenderBackground = () => {
+    const Follows = () => {
         return (
             <View
                 style={[
-                    styles.introduceBackground,
-                    {backgroundColor: theme.backgroundColor},
-                ]}
-            />
-        );
-    };
-
-    const RenderIndicator = () => {
-        return (
-            <View
-                style={[
-                    styles.indicatorBox,
-                    {backgroundColor: theme.borderColor},
-                ]}
-            />
-        );
-    };
-
-    const RenderFollow = () => {
-        return (
-            <View
-                style={[styles.followBox, {borderTopColor: theme.holderColor}]}>
+                    styles.followBox,
+                    {
+                        borderTopColor: theme.holderColor,
+                        width: profile.reputations ? '90%' : '70%',
+                    },
+                ]}>
                 {/* Follower */}
                 <StyleTouchable
                     customStyle={styles.elementFollow}
@@ -71,7 +55,6 @@ const InformationProfile = (props: Props) => {
                             {color: theme.borderColor},
                         ]}
                     />
-                    {/* Number follows */}
                     <StyleText
                         originValue={String(followers)}
                         customStyle={[
@@ -92,7 +75,6 @@ const InformationProfile = (props: Props) => {
                             {color: theme.borderColor},
                         ]}
                     />
-                    {/* Number follows */}
                     <StyleText
                         originValue={String(followings)}
                         customStyle={[
@@ -101,11 +83,31 @@ const InformationProfile = (props: Props) => {
                         ]}
                     />
                 </StyleTouchable>
+
+                {/* Reputations */}
+                {profile.reputations && (
+                    <View style={styles.elementFollow}>
+                        <StyleText
+                            originValue="TrustPoint"
+                            customStyle={[
+                                styles.titleFollow,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                        <StyleText
+                            originValue={profile.reputations}
+                            customStyle={[
+                                styles.numberFollow,
+                                {color: theme.textHightLight},
+                            ]}
+                        />
+                    </View>
+                )}
             </View>
         );
     };
 
-    const RenderButtonEditProfile = () => {
+    const ButtonEditProfile = () => {
         if (havingEditProfile) {
             return (
                 <StyleTouchable
@@ -130,9 +132,19 @@ const InformationProfile = (props: Props) => {
     return (
         <View style={styles.container}>
             <View style={styles.introduceView}>
-                {RenderBackground()}
+                <View
+                    style={[
+                        styles.introduceBackground,
+                        {backgroundColor: theme.backgroundColor},
+                    ]}
+                />
 
-                {RenderIndicator()}
+                <View
+                    style={[
+                        styles.indicatorBox,
+                        {backgroundColor: theme.borderColor},
+                    ]}
+                />
 
                 <StyleImage
                     source={{uri: avatar}}
@@ -157,8 +169,8 @@ const InformationProfile = (props: Props) => {
                         />
                     )}
                 </View>
-                {RenderFollow()}
-                {RenderButtonEditProfile()}
+                {Follows()}
+                {ButtonEditProfile()}
             </View>
         </View>
     );
@@ -213,7 +225,7 @@ const styles = ScaledSheet.create({
         marginTop: '5@vs',
     },
     textName: {
-        fontSize: '17@ms',
+        fontSize: FONT_SIZE.big,
         fontWeight: 'bold',
     },
     nameAnonymousBox: {
@@ -222,17 +234,15 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
     },
     textDescription: {
-        fontSize: '13@ms',
+        fontSize: FONT_SIZE.normal,
         marginTop: '15@vs',
     },
     // box follow
     followBox: {
-        width: '70%',
         alignSelf: 'center',
         flexDirection: 'row',
-        paddingVertical: '10@vs',
-        justifyContent: 'center',
-        marginTop: '15@vs',
+        paddingTop: '10@vs',
+        marginVertical: '15@vs',
         borderTopWidth: Platform.select({
             ios: '0.25@ms',
             android: '0.5@ms',
@@ -244,12 +254,12 @@ const styles = ScaledSheet.create({
         justifyContent: 'center',
     },
     titleFollow: {
-        fontSize: '13@ms',
+        fontSize: FONT_SIZE.small,
     },
     numberFollow: {
-        fontSize: '25@ms',
+        fontSize: FONT_SIZE.normal,
         fontWeight: 'bold',
-        marginTop: '5@vs',
+        marginTop: '8@vs',
     },
 });
 

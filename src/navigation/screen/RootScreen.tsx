@@ -9,7 +9,7 @@ import Theme from 'asset/theme/Theme';
 import Alert from 'components/Alert';
 import AlertYesNo from 'components/AlerYesNo';
 import StylePicker from 'components/base/picker/StylePicker';
-import Modalize from 'components/common/useModalize';
+import LoadingScreen from 'components/LoadingScreen';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
 import TabBarProvider from 'navigation/config/TabBarProvider';
@@ -38,15 +38,13 @@ const cardSafe = {
     paddingTop: Metrics.safeTopPadding,
 };
 
-const NullNode = () => {
-    return <></>;
-};
-
 const RootScreen = () => {
     const theme = Redux.getTheme();
 
     const isModeExp = Redux.getModeExp();
     const token = Redux.getToken();
+    // isLogOut to check if token blackListed, set initLoading = false to return LoginRoute, if not it will be stuck in LoadingScreen
+    const isLogOut = Redux.getIstLogOut();
 
     const [initLoading, setInitLoading] = useState(true);
 
@@ -57,19 +55,14 @@ const RootScreen = () => {
         ? 'light-content'
         : 'dark-content';
 
-    const cardStyle = {
-        backgroundColor: theme.backgroundColor,
-        ...cardSafe,
-    };
-
     const initApp = async () => {
         try {
             await selectIsHaveActiveUser();
+            setInitLoading(false);
         } catch (err) {
             logger(err);
         } finally {
             SplashScreen.hide();
-            setInitLoading(false);
         }
     };
 
@@ -90,6 +83,23 @@ const RootScreen = () => {
         checkUpdate();
     }, []);
 
+    useEffect(() => {
+        if (isLogOut) {
+            setInitLoading(false);
+            Redux.setIsLogOut(false);
+        }
+    }, [isLogOut]);
+
+    const choosingRoute = () => {
+        if (initLoading) {
+            return LoadingScreen;
+        }
+        if (isInApp) {
+            return AppStack;
+        }
+        return LoginRoute;
+    };
+
     return (
         <NavigationContainer ref={navigationRef}>
             <TabBarProvider>
@@ -101,13 +111,7 @@ const RootScreen = () => {
                     }}>
                     <RootStack.Screen
                         name="check"
-                        component={
-                            initLoading
-                                ? NullNode
-                                : isInApp
-                                ? AppStack
-                                : LoginRoute
-                        }
+                        component={choosingRoute()}
                     />
 
                     {/* Alert */}
@@ -133,22 +137,17 @@ const RootScreen = () => {
                         component={AlertYesNo}
                     />
 
-                    {/* Modalize */}
-                    <RootStack.Screen
-                        options={{
-                            ...alertOption,
-                            cardStyle,
-                        }}
-                        name={ROOT_SCREEN.modalize}
-                        component={Modalize}
-                    />
-
                     {/* Web view */}
                     <RootStack.Screen
                         name={ROOT_SCREEN.webView}
                         component={WebViewScreen}
                         options={{
-                            cardStyle,
+                            cardStyle: [
+                                {
+                                    backgroundColor: theme.backgroundColor,
+                                },
+                                cardSafe,
+                            ],
                         }}
                     />
 

@@ -139,3 +139,9 @@ export const LIST_TOPICS: Array<{
     //     icon: Images.icons.shopping,
     // },
 ];
+
+export enum FONT_SIZE {
+    big = '17@ms',
+    normal = '14@ms',
+    small = '11@ms',
+}

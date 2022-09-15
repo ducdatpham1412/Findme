@@ -23,6 +23,7 @@ export const initialLogicState = {
     chatTagFocusing: '', // this flag to check if socket do action update chat tag hasNewMessage
 
     bubblePalaceAction: <TypeBubblePalaceAction>{},
+    isLogOut: false,
     borderMessRoute: 'yellow',
 
     bubbleFocusing: <TypeBubblePalace>{},
@@ -88,6 +89,9 @@ const logicSlice = createSlice({
         },
         setPostCreatedHandling: (state, action) => {
             state.postCreatedHandling = action.payload;
+        },
+        setIsLogOut: (state, action) => {
+            state.isLogOut = action.payload;
         },
     },
 });
