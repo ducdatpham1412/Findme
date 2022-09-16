@@ -144,3 +144,5 @@ export enum FONT_SIZE {
     normal = '14@ms',
     small = '11@ms',
 }
+
+export const ratioImageGroupBuying = 0.5; // height / width

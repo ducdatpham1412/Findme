@@ -1,8 +1,13 @@
-import {TypeBubblePalace} from 'api/interface';
+import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
-import {StyleImage, StyleText, StyleTouchable} from 'components/base';
+import {
+    StyleIcon,
+    StyleImage,
+    StyleText,
+    StyleTouchable,
+} from 'components/base';
 import React, {memo} from 'react';
 import isEqual from 'react-fast-compare';
 import {StyleProp, View, ViewStyle} from 'react-native';
@@ -15,15 +20,15 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Video from 'react-native-video';
 
 interface Props {
-    itemPost: TypeBubblePalace;
+    item: TypeBubblePalace & TypeGroupBuying;
     onGoToDetailPost(bubble: string): void;
     containerStyle?: StyleProp<ViewStyle>;
 }
 
 const PostStatus = (props: Props) => {
-    const {itemPost, onGoToDetailPost, containerStyle} = props;
-    const firstPostUrl = itemPost.images[0] || '';
-    const arrayStars = Array(itemPost.stars).fill(0);
+    const {item, onGoToDetailPost, containerStyle} = props;
+    const firstPostUrl = item.images[0] || '';
+    const isPostReview = !!item?.stars;
     const isVideo = checkIsVideo(firstPostUrl);
 
     const ImagePreview = () => {
@@ -51,7 +56,7 @@ const PostStatus = (props: Props) => {
     return (
         <StyleTouchable
             customStyle={[styles.container, containerStyle]}
-            onPress={() => onGoToDetailPost(itemPost.id)}
+            onPress={() => onGoToDetailPost(item.id)}
             activeOpacity={0.95}>
             {ImagePreview()}
             <LinearGradient
@@ -59,12 +64,26 @@ const PostStatus = (props: Props) => {
                     Theme.common.gradientTabBar1,
                     Theme.common.gradientTabBar2,
                 ]}
-                style={styles.starView}>
-                {arrayStars.map((_, index) => (
-                    <AntDesign key={index} name="star" style={styles.star} />
-                ))}
+                style={isPostReview ? styles.starView : styles.groupView}>
+                {isPostReview &&
+                    Array(item.stars)
+                        .fill(0)
+                        .map((_, index) => (
+                            <AntDesign
+                                key={index}
+                                name="star"
+                                style={styles.star}
+                            />
+                        ))}
+                {!isPostReview && (
+                    <StyleIcon
+                        source={Images.icons.createGroup}
+                        size={15}
+                        customStyle={styles.iconGroup}
+                    />
+                )}
             </LinearGradient>
-            {itemPost.isDraft && (
+            {item.isDraft && (
                 <View style={styles.draftView}>
                     <StyleText
                         i18Text="profile.draftPost"
@@ -72,7 +91,7 @@ const PostStatus = (props: Props) => {
                     />
                 </View>
             )}
-            {itemPost.images.length >= 2 && (
+            {item.images.length >= 2 && (
                 <MaterialCommunityIcons
                     name="file-multiple"
                     style={styles.iconMultiPage}
@@ -104,6 +123,14 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         borderRadius: '2@s',
     },
+    groupView: {
+        position: 'absolute',
+        right: '5@s',
+        bottom: '5@s',
+        padding: '5@vs',
+        flexDirection: 'row',
+        borderRadius: '20@s',
+    },
     star: {
         fontSize: '8@ms',
         marginHorizontal: '1@s',
@@ -132,10 +159,13 @@ const styles = ScaledSheet.create({
         width: '100%',
         height: '100%',
     },
+    iconGroup: {
+        tintColor: Theme.common.black,
+    },
 });
 
 export default memo(PostStatus, (preProps: Props, nextProps: any) => {
-    if (!isEqual(preProps.itemPost, nextProps.itemPost)) {
+    if (!isEqual(preProps.item, nextProps.item)) {
         return false;
     }
     return true;

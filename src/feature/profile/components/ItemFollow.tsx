@@ -131,7 +131,7 @@ const styles = ScaledSheet.create({
         paddingVertical: '3@vs',
         alignItems: 'center',
         borderWidth: 1,
-        borderRadius: '5@vs',
+        borderRadius: '5@ms',
     },
     textFollow: {
         fontSize: '11@ms',

@@ -51,8 +51,7 @@ const MAIN_SCREEN = {
  */
 const DISCOVERY_ROUTE = {
     discoveryScreen: '@DISCOVERY_ROUTE/discoveryScreen',
-    listBubbleCouple: '@DISCOVERY_ROUTE/listBubbleCouple',
-    listBubbleGroup: '@DISCOVERY_ROUTE/listBubbleGroup',
+    detailGroupBuying: '@DISCOVERY_ROUTE/detailGroupBuying',
 };
 
 const MESS_ROUTE = {
@@ -68,6 +67,7 @@ const PROFILE_ROUTE = {
     settingRoute: '@PROFILE_ROUTE/settingRoute',
     createPostPreview: '@PROFILE_ROUTE/createPostPreview',
     createPostPickImg: '@PROFILE_ROUTE/createPostPickImg',
+    detailGroupBuying: '@PROFILE_ROUTE/detailGroupBuying',
 };
 /**
  * ||

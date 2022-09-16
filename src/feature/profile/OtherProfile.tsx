@@ -1,4 +1,8 @@
-import {TypeBubblePalace, TypeGetProfileResponse} from 'api/interface';
+import {
+    TypeBubblePalace,
+    TypeGetProfileResponse,
+    TypeGroupBuying,
+} from 'api/interface';
 import {
     apiBlockUser,
     apiFollowUser,
@@ -253,16 +257,19 @@ const OtherProfile = ({route}: Props) => {
         );
     };
 
-    const RenderItemPost = useCallback((item: TypeBubblePalace) => {
-        return (
-            <PostStatus
-                key={item.id}
-                itemPost={item}
-                onGoToDetailPost={onGoToDetailPost}
-                containerStyle={styles.postStatusView}
-            />
-        );
-    }, []);
+    const RenderItemPost = useCallback(
+        (item: TypeBubblePalace & TypeGroupBuying) => {
+            return (
+                <PostStatus
+                    key={item.id}
+                    item={item}
+                    onGoToDetailPost={onGoToDetailPost}
+                    containerStyle={styles.postStatusView}
+                />
+            );
+        },
+        [],
+    );
 
     if (isBlock) {
         return (
@@ -339,7 +346,7 @@ const OtherProfile = ({route}: Props) => {
                 theme={theme}
                 bubbleFocusing={bubbleFocusing || fakeBubbleFocusing}
                 updateBubbleFocusing={value =>
-                    setBubbleFocusing(preValue => ({
+                    setBubbleFocusing((preValue: any) => ({
                         ...preValue,
                         ...value,
                     }))

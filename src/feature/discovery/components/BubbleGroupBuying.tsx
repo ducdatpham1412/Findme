@@ -1,14 +1,4 @@
-import dynamicLinks from '@react-native-firebase/dynamic-links';
-import {TypeBubblePalace} from 'api/interface';
-import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
-import {
-    apiLikePost,
-    apiSavePost,
-    apiUnArchivePost,
-    apiUnLikePost,
-    apiUnSavePost,
-} from 'api/post';
-import {TYPE_BUBBLE_PALACE_ACTION, TYPE_DYNAMIC_LINK} from 'asset/enum';
+import {TypeGroupBuying} from 'api/interface';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {
@@ -16,51 +6,46 @@ import {
     DYNAMIC_LINK_ANDROID,
     DYNAMIC_LINK_IOS,
     DYNAMIC_LINK_SHARE,
+    FONT_SIZE,
     LANDING_PAGE_URL,
+    ratioImageGroupBuying,
 } from 'asset/standardValue';
-import Theme from 'asset/theme/Theme';
 import {
     StyleIcon,
     StyleImage,
     StyleText,
     StyleTouchable,
 } from 'components/base';
+import Redux from 'hook/useRedux';
+import React, {memo, useState} from 'react';
+import isEqual from 'react-fast-compare';
+import {View} from 'react-native';
+import {ScaledSheet} from 'react-native-size-matters';
+import {SharedElement} from 'react-navigation-shared-element';
+import {chooseTextTopic, onGoToProfile, onGoToSignUp} from 'utility/assistant';
+import {formatFromNow} from 'utility/format';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Theme from 'asset/theme/Theme';
+import StyleMoreText from 'components/StyleMoreText';
+import LinearGradient from 'react-native-linear-gradient';
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
-import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
-import VideoBubble from 'components/common/VideoBubble';
-import StyleMoreText from 'components/StyleMoreText';
-import Redux from 'hook/useRedux';
-import {PROFILE_ROUTE} from 'navigation/config/routes';
-import {appAlert, goBack, navigate} from 'navigation/NavigationService';
-import React, {memo, useEffect, useState} from 'react';
-import isEqual from 'react-fast-compare';
-import {Linking, View} from 'react-native';
+import dynamicLinks from '@react-native-firebase/dynamic-links';
+import {TYPE_DYNAMIC_LINK} from 'asset/enum';
+import {appAlert, goBack} from 'navigation/NavigationService';
 import Share from 'react-native-share';
-import {ScaledSheet} from 'react-native-size-matters';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import {
-    chooseIconFeeling,
-    chooseTextTopic,
-    logger,
-    onGoToProfile,
-    onGoToSignUp,
-} from 'utility/assistant';
-import {formatFromNow} from 'utility/format';
-import {checkIsVideo} from 'utility/validate';
+import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
+import {apiLikePost, apiUnLikePost} from 'api/post';
 import {TypeMoreOptionsMe, TypeShowMoreOptions} from '../DiscoveryScreen';
 
 interface Props {
-    item: TypeBubblePalace;
+    item: TypeGroupBuying;
+    onGoToDetailGroupBuying(item: TypeGroupBuying): void;
     onShowMoreOption(params: TypeShowMoreOptions & TypeMoreOptionsMe): void;
     onShowModalComment(
-        post: TypeBubblePalace,
+        post: TypeGroupBuying,
         type: TypeShowModalCommentOrLike,
     ): void;
-    isFocusing: boolean;
-    onChangePostIdFocusing(postId: string): void;
 }
 
 const onHandleLike = async (params: {
@@ -101,75 +86,15 @@ const onHandleLike = async (params: {
     }
 };
 
-const onHandleSave = async (params: {
-    isModeExp: boolean;
-    isSaved: boolean;
-    setIsSaved: Function;
-    postId: string;
-}) => {
-    const {isModeExp, isSaved, setIsSaved, postId} = params;
-    if (!isModeExp) {
-        const currenSaved = isSaved;
-        try {
-            setIsSaved(!currenSaved);
-            if (currenSaved) {
-                await apiUnSavePost(postId);
-            } else {
-                await apiSavePost(postId);
-            }
-        } catch (err) {
-            setIsSaved(currenSaved);
-            appAlert(err);
-        }
-    } else {
-        appAlert('discovery.bubble.goToSignUp', {
-            moreNotice: 'common.letGo',
-            moreAction: () => {
-                goBack();
-                onGoToSignUp();
-            },
-        });
-    }
-};
-
-const onGoToPublicDraft = (item: TypeBubblePalace) => {
-    navigate(PROFILE_ROUTE.createPostPreview, {
-        itemDraft: item,
-    });
-};
-
-const onUnArchivePost = async (post: TypeBubblePalace) => {
-    try {
-        await apiUnArchivePost(post.id);
-        Redux.setBubblePalaceAction({
-            action: TYPE_BUBBLE_PALACE_ACTION.unArchivePost,
-            payload: {
-                ...post,
-                isArchived: false,
-            },
-        });
-    } catch (err) {
-        appAlert(err);
-    }
-};
-
-const onOpenLink = (link: string) => {
-    try {
-        Linking.openURL(link);
-    } catch (err) {
-        logger(err);
-    }
-};
-
 const onShowModalShare = async (
-    item: TypeBubblePalace,
+    item: TypeGroupBuying,
     setDisableShare: Function,
 ) => {
     try {
         setDisableShare(true);
         const link = await dynamicLinks().buildShortLink({
             link: `${item?.images?.[0] || LANDING_PAGE_URL}?type=${
-                TYPE_DYNAMIC_LINK.post
+                TYPE_DYNAMIC_LINK.groupBuying
             }&post_id=${item.id}`,
             domainUriPrefix: DYNAMIC_LINK_SHARE,
             ios: {
@@ -218,32 +143,20 @@ const onShowModalShare = async (
     }
 };
 
-const screenWidth = Metrics.width;
-
-const Bubble = (props: Props) => {
+const BubbleGroupBuying = (props: Props) => {
     const {
         item,
+        onGoToDetailGroupBuying,
         onShowMoreOption,
         onShowModalComment,
-        isFocusing = false,
-        onChangePostIdFocusing,
     } = props;
-    const isModeExp = Redux.getModeExp();
     const theme = Redux.getTheme();
+    const isModeExp = Redux.getModeExp();
 
     const [isLiked, setIsLiked] = useState(item.isLiked);
     const [totalLikes, setTotalLikes] = useState(item.totalLikes);
     const [disableShare, setDisableShare] = useState(false);
-    const [isSaved, setIsSaved] = useState(item.isSaved);
 
-    useEffect(() => {
-        setIsLiked(item.isLiked);
-        setTotalLikes(item.totalLikes);
-    }, [item.isLiked, item.totalLikes]);
-
-    /**
-     * Render view
-     */
     const Header = () => {
         return (
             <View style={styles.headerView}>
@@ -256,14 +169,6 @@ const Bubble = (props: Props) => {
                             customStyle={styles.avatar}
                         />
                     </StyleTouchable>
-
-                    {item.feeling !== null && (
-                        <StyleIcon
-                            source={chooseIconFeeling(item.feeling)}
-                            customStyle={styles.feeling}
-                            size={17}
-                        />
-                    )}
 
                     <View style={styles.nameTime}>
                         <StyleText
@@ -319,7 +224,7 @@ const Bubble = (props: Props) => {
                     </StyleTouchable>
                 </View>
 
-                {!!item.location && (
+                {!!item.creatorLocation && (
                     <View style={styles.locationBox}>
                         <Ionicons
                             name="ios-location-sharp"
@@ -329,7 +234,7 @@ const Bubble = (props: Props) => {
                             ]}
                         />
                         <StyleText
-                            originValue={item.location}
+                            originValue={item.creatorLocation}
                             customStyle={[
                                 styles.textLocation,
                                 {color: theme.highlightColor},
@@ -355,101 +260,58 @@ const Bubble = (props: Props) => {
         );
     };
 
-    const StarLink = () => {
-        const arrayStars = Array(item.stars).fill(0);
+    const PriceAndTotalJoins = () => {
+        const isBiggerThanThree = item.prices.length > 3;
+        const displayPrices = isBiggerThanThree
+            ? item.prices.slice(0, 3)
+            : item.prices;
         return (
-            <View style={styles.starLink}>
-                <View
-                    style={[
-                        styles.starBox,
-                        {backgroundColor: theme.backgroundButtonColor},
-                    ]}>
-                    {arrayStars.map((_, index) => (
-                        <AntDesign
-                            key={index}
-                            name="star"
-                            style={styles.star}
+            <View style={styles.linearOverlay}>
+                <LinearGradient
+                    style={[styles.linearOverlay, {opacity: 0.7}]}
+                    colors={['black', 'transparent']}
+                    start={{x: 0, y: 1}}
+                    end={{x: 0.8, y: 1}}
+                />
+                {displayPrices.map((price, index) => (
+                    <View key={index} style={styles.priceBox}>
+                        <StyleText
+                            originValue={price.number_people}
+                            customStyle={styles.textNumberPeople}
                         />
-                    ))}
-                </View>
-                {item?.link && (
-                    <StyleTouchable
-                        customStyle={styles.linkBox}
-                        onPress={() => onOpenLink(item.link || '')}>
-                        <View
-                            style={[
-                                styles.linkTouch,
-                                {backgroundColor: theme.backgroundButtonColor},
-                            ]}>
-                            <StyleImage
-                                source={Images.icons.house}
-                                customStyle={styles.iconHouse}
-                            />
-
-                            <StyleText
-                                originValue={'See now'}
-                                customStyle={[
-                                    styles.textSeeNow,
-                                    {color: theme.textHightLight},
-                                ]}
-                            />
-                        </View>
-                    </StyleTouchable>
+                        <StyleText originValue="-" customStyle={styles.dash} />
+                        <StyleText
+                            originValue={`${price.value}vnd`}
+                            customStyle={styles.textPrice}
+                        />
+                    </View>
+                ))}
+                {isBiggerThanThree && (
+                    <View style={styles.priceBox}>
+                        <StyleText
+                            originValue="..."
+                            customStyle={styles.textNumberPeople}
+                        />
+                    </View>
                 )}
+                <View style={styles.peopleJoinBox}>
+                    <StyleIcon
+                        source={Images.icons.createGroup}
+                        size={20}
+                        customStyle={styles.iconJoined}
+                    />
+                    {!!item.totalJoins && (
+                        <StyleText
+                            originValue={item.totalJoins}
+                            customStyle={styles.textJoined}
+                        />
+                    )}
+                </View>
             </View>
         );
     };
 
     const Footer = () => {
-        if (item.isDraft) {
-            return (
-                <View style={styles.footerView}>
-                    <StyleText
-                        i18Text="profile.thisPostInDraft"
-                        customStyle={[
-                            styles.textThisPostInDraft,
-                            {color: theme.holderColorLighter},
-                        ]}
-                    />
-                    <StyleTouchable
-                        customStyle={[
-                            styles.goToPostBox,
-                            {backgroundColor: theme.backgroundButtonColor},
-                        ]}
-                        onPress={() => onGoToPublicDraft(item)}>
-                        <StyleText
-                            i18Text="profile.goToPost"
-                            customStyle={[
-                                styles.textGoToPost,
-                                {color: theme.textHightLight},
-                            ]}
-                        />
-                    </StyleTouchable>
-                </View>
-            );
-        }
-
-        if (item.isArchived) {
-            return (
-                <View style={styles.footerView}>
-                    <StyleTouchable
-                        customStyle={[
-                            styles.goToPostBox,
-                            {backgroundColor: theme.backgroundButtonColor},
-                        ]}
-                        onPress={() => onUnArchivePost(item)}>
-                        <StyleText
-                            i18Text="profile.post.unArchive"
-                            customStyle={[
-                                styles.textGoToPost,
-                                {color: theme.textHightLight},
-                            ]}
-                        />
-                    </StyleTouchable>
-                </View>
-            );
-        }
-
         return (
             <View style={styles.footerView}>
                 <View style={styles.likeCommentShareSave}>
@@ -511,32 +373,18 @@ const Bubble = (props: Props) => {
                     </StyleTouchable>
 
                     <StyleTouchable
-                        customStyle={styles.iconSave}
-                        onPress={() =>
-                            onHandleSave({
-                                isModeExp,
-                                isSaved,
-                                setIsSaved,
-                                postId: item.id,
-                            })
-                        }>
-                        {isSaved ? (
-                            <FontAwesome
-                                name="bookmark"
-                                style={[
-                                    styles.save,
-                                    {color: Theme.common.gradientTabBar1},
-                                ]}
-                            />
-                        ) : (
-                            <FontAwesome
-                                name="bookmark-o"
-                                style={[
-                                    styles.save,
-                                    {color: theme.textHightLight},
-                                ]}
-                            />
-                        )}
+                        customStyle={[
+                            styles.joinGroupBuyingBox,
+                            {backgroundColor: theme.backgroundButtonColor},
+                        ]}
+                        onPress={() => onGoToDetailGroupBuying(item)}>
+                        <StyleText
+                            i18Text="discovery.joinGroupBuying"
+                            customStyle={[
+                                styles.textTellJoin,
+                                {color: theme.textHightLight},
+                            ]}
+                        />
                     </StyleTouchable>
                 </View>
 
@@ -594,66 +442,25 @@ const Bubble = (props: Props) => {
         );
     };
 
-    const ImagePreview = () => {
-        if (!item.images[0]) {
-            return null;
-        }
-        const isVideo = checkIsVideo(item.images[0]);
-        if (!isVideo) {
-            return (
-                <ScrollSyncSizeImage
-                    images={item.images}
-                    syncWidth={screenWidth}
-                    onDoublePress={() => {
-                        if (!isLiked) {
-                            onHandleLike({
-                                isModeExp,
-                                isLiked,
-                                setIsLiked,
-                                totalLikes,
-                                setTotalLikes,
-                                postId: item.id,
-                            });
-                        } else {
-                            // onSeeDetailImage(item.images);
-                        }
-                    }}
-                    containerStyle={styles.imageView}
-                />
-            );
-        }
-
-        return (
-            <VideoBubble
-                source={{uri: item.images[0]}}
-                onDoublePress={() => {
-                    if (!isLiked) {
-                        onHandleLike({
-                            isModeExp,
-                            isLiked,
-                            setIsLiked,
-                            totalLikes,
-                            setTotalLikes,
-                            postId: item.id,
-                        });
-                    } else {
-                        // onSeeDetailImage(item.images);
-                    }
-                }}
-                paused={!isFocusing}
-            />
-        );
-    };
-
     return (
-        <View
+        <StyleTouchable
             style={[styles.container, {backgroundColor: theme.backgroundColor}]}
-            onTouchEnd={() => onChangePostIdFocusing(item.id)}>
+            onPress={() => onGoToDetailGroupBuying(item)}>
             {Header()}
-            {ImagePreview()}
-            {StarLink()}
+
+            <SharedElement style={styles.imageView} id="image_group_buying">
+                <StyleImage
+                    source={{
+                        uri: item.images[0],
+                    }}
+                    customStyle={styles.image}
+                    defaultSource={Images.images.defaultImage}
+                />
+                {PriceAndTotalJoins()}
+            </SharedElement>
+
             {Footer()}
-        </View>
+        </StyleTouchable>
     );
 };
 
@@ -662,6 +469,7 @@ const styles = ScaledSheet.create({
         width: '100%',
         marginBottom: '5@vs',
         paddingVertical: '10@vs',
+        alignItems: 'center',
     },
     // header
     headerView: {
@@ -727,47 +535,56 @@ const styles = ScaledSheet.create({
     textCaption: {
         fontSize: '14@ms',
     },
-    // image
+    // image preview
     imageView: {
-        maxHeight: Metrics.width * 1.5,
-    },
-    // star link
-    starLink: {
         width: '100%',
-        flexDirection: 'row',
-        marginTop: '10@vs',
-        paddingHorizontal: '14@s',
-    },
-    starBox: {
-        height: '22@ms',
-        paddingHorizontal: '10@s',
-        flexDirection: 'row',
         alignItems: 'center',
+    },
+    image: {
+        width: Metrics.width,
+        height: Metrics.width * ratioImageGroupBuying,
         borderRadius: '5@ms',
     },
-    star: {
-        fontSize: '14@ms',
-        marginHorizontal: '3@s',
-        color: Theme.common.orange,
+    linearOverlay: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
     },
-    linkBox: {
+    priceBox: {
+        flexDirection: 'row',
         marginLeft: '10@s',
+        marginVertical: '5@vs',
     },
-    linkTouch: {
-        height: '22@ms',
+    textNumberPeople: {
+        width: '35@ms',
+        color: Theme.common.white,
+        fontWeight: 'bold',
+        fontSize: FONT_SIZE.small,
+    },
+    dash: {
+        fontSize: FONT_SIZE.small,
+        color: Theme.common.white,
+    },
+    textPrice: {
+        color: Theme.common.white,
+        fontSize: FONT_SIZE.small,
+        marginLeft: '15@ms',
+    },
+    peopleJoinBox: {
+        position: 'absolute',
+        bottom: '5@vs',
+        left: '10@s',
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: '5@ms',
-        paddingHorizontal: '10@s',
     },
-    iconHouse: {
-        width: '10@ms',
-        height: '10@ms',
+    iconJoined: {
+        tintColor: Theme.common.white,
     },
-    textSeeNow: {
-        fontSize: '10@ms',
+    textJoined: {
+        fontSize: FONT_SIZE.big,
         fontWeight: 'bold',
-        marginLeft: '7@s',
+        color: Theme.common.white,
+        marginLeft: '5@s',
     },
     // footer
     footerView: {
@@ -805,13 +622,6 @@ const styles = ScaledSheet.create({
     iconComment: {
         marginLeft: '20@s',
     },
-    iconSave: {
-        position: 'absolute',
-        right: 0,
-    },
-    save: {
-        fontSize: '24@ms',
-    },
     likeTouch: {
         marginTop: '10@vs',
         width: '100@s',
@@ -828,13 +638,20 @@ const styles = ScaledSheet.create({
         paddingVertical: '5@vs',
         width: '50%',
     },
+    joinGroupBuyingBox: {
+        position: 'absolute',
+        right: 0,
+        paddingHorizontal: '20@s',
+        paddingVertical: '5@vs',
+        borderRadius: '5@ms',
+    },
+    textTellJoin: {
+        fontSize: FONT_SIZE.small,
+    },
 });
 
-export default memo(Bubble, (preProps: Props, nextProps: any) => {
-    if (
-        !isEqual(preProps.item, nextProps.item) ||
-        nextProps.isFocusing !== preProps.isFocusing
-    ) {
+export default memo(BubbleGroupBuying, (preProps: Props, nextProps: any) => {
+    if (!isEqual(preProps.item, nextProps.item)) {
         return false;
     }
     return true;

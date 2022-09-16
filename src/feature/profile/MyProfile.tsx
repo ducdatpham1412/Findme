@@ -1,8 +1,8 @@
 import {useIsFocused} from '@react-navigation/native';
-import {TypeBubblePalace} from 'api/interface';
+import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
 import {
+    apiGetListGBJoined,
     apiGetListPost,
-    apiGetListPostsArchived,
     apiGetListPostsLiked,
     apiGetListPostsSaved,
     apiGetProfile,
@@ -175,8 +175,8 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
         request: apiGetListPostsSaved,
         isInitNotRunRequest: true,
     });
-    const postArchivedPaging = usePaging({
-        request: apiGetListPostsArchived,
+    const gBJoinedPaging = usePaging({
+        request: apiGetListGBJoined,
         isInitNotRunRequest: true,
     });
 
@@ -185,7 +185,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     const myPostRef = useRef<ListShareElement>(null);
     const postLikedRef = useRef<ListShareElement>(null);
     const postSavedRef = useRef<ListShareElement>(null);
-    const postArchivedRef = useRef<ListShareElement>(null);
+    const gBJoinedRef = useRef<ListShareElement>(null);
     const tabViewRef = useRef<StyleTabView>(null);
     const scrollRef = useRef<ScrollView>(null);
 
@@ -281,7 +281,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             );
 
             if (listCheckTabLazy[3]) {
-                postArchivedPaging.setList(preValue =>
+                gBJoinedPaging.setList(preValue =>
                     [postArchived].concat(preValue),
                 );
             }
@@ -315,7 +315,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             TYPE_BUBBLE_PALACE_ACTION.unArchivePost
         ) {
             const archivedPost: TypeBubblePalace = bubblePalaceAction.payload;
-            postArchivedPaging.setList(preValue =>
+            gBJoinedPaging.setList(preValue =>
                 preValue.filter(item => item.id !== archivedPost.id),
             );
             myPostsPaging.setList(preValue => [archivedPost].concat(preValue));
@@ -344,7 +344,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
         } else if (tabIndex === 2) {
             listShareElement = postsSavedPaging.list;
         } else if (tabIndex === 3) {
-            listShareElement = postArchivedPaging.list;
+            listShareElement = gBJoinedPaging.list;
         }
         tabIndexRef = tabIndex;
     }, [
@@ -352,7 +352,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
         myPostsPaging.list,
         postsLikedPaging.list,
         postsSavedPaging.list,
-        postArchivedPaging.list,
+        gBJoinedPaging.list,
     ]);
 
     /**
@@ -382,7 +382,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 postId: bubbleId,
             });
         } else if (tabIndexRef === 3) {
-            postArchivedRef.current?.show({
+            gBJoinedRef.current?.show({
                 index: initIndex === -1 ? 0 : initIndex,
                 postId: bubbleId,
             });
@@ -403,7 +403,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             } else if (isFocusPostSaved) {
                 postsSavedPaging.onRefresh();
             } else if (isFocusPostArchived) {
-                postArchivedPaging.onRefresh();
+                gBJoinedPaging.onRefresh();
             }
         } catch (err) {
             appAlert(err);
@@ -419,7 +419,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             } else if (isFocusPostSaved) {
                 postsSavedPaging.onLoadMore();
             } else if (isFocusPostArchived) {
-                postArchivedPaging.onLoadMore();
+                gBJoinedPaging.onLoadMore();
             }
         }
 
@@ -430,23 +430,26 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
         } else if (isFocusPostSaved) {
             postSavedRef.current?.scrollToNearingEnd();
         } else if (isFocusPostArchived) {
-            postArchivedRef.current?.scrollToNearingEnd();
+            gBJoinedRef.current?.scrollToNearingEnd();
         }
     }, []);
 
     /**
      * Render views
      */
-    const RenderItemPost = useCallback((item: TypeBubblePalace) => {
-        return (
-            <PostStatus
-                key={item.id}
-                itemPost={item}
-                onGoToDetailPost={onGoToDetailPost}
-                containerStyle={styles.itemPostView}
-            />
-        );
-    }, []);
+    const RenderItemPost = useCallback(
+        (item: TypeBubblePalace & TypeGroupBuying) => {
+            return (
+                <PostStatus
+                    key={item.id}
+                    item={item}
+                    onGoToDetailPost={onGoToDetailPost}
+                    containerStyle={styles.itemPostView}
+                />
+            );
+        },
+        [],
+    );
 
     return (
         <View style={{flex: 1}}>
@@ -519,7 +522,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                         } else if (index === 2) {
                             postsSavedPaging.onLoadMore();
                         } else if (index === 3) {
-                            postArchivedPaging.onLoadMore();
+                            gBJoinedPaging.onLoadMore();
                         }
                     }}
                     onScroll={e => {
@@ -569,8 +572,8 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                             styles.contentContainerPost,
                             isFocusPostArchived ? {} : safeLoadMoreStyle,
                         ]}>
-                        {postArchivedPaging.list.map(RenderItemPost)}
-                        {postArchivedPaging.loading && (
+                        {gBJoinedPaging.list.map(RenderItemPost)}
+                        {gBJoinedPaging.loading && (
                             <LoadingMoreIndicator
                                 color={theme.textHightLight}
                             />
@@ -610,9 +613,9 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             />
 
             <ListShareElement
-                ref={postArchivedRef}
+                ref={gBJoinedRef}
                 title={profile.name}
-                listPaging={postArchivedPaging}
+                listPaging={gBJoinedPaging}
                 containerStyle={{
                     backgroundColor: theme.backgroundColorSecond,
                 }}
@@ -624,7 +627,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 theme={theme}
                 bubbleFocusing={bubbleFocusing || fakeBubbleFocusing}
                 updateBubbleFocusing={value => {
-                    setBubbleFocusing(preValue => ({
+                    setBubbleFocusing((preValue: any) => ({
                         ...preValue,
                         ...value,
                     }));
@@ -725,7 +728,6 @@ const styles = ScaledSheet.create({
     indicatorView: {
         width: '100%',
         flexDirection: 'row',
-        height: '2@vs',
     },
     indicator: {
         flex: 1 / 3,

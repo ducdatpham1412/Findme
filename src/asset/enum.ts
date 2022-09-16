@@ -12,7 +12,8 @@ export enum RELATIONSHIP {
     notFollowing = 1,
     following = 2,
     block = 3,
-    friend = 4,
+    joinedBought = 4,
+    joinedNotBought = 5,
     notKnow = 10,
 }
 
@@ -162,6 +163,7 @@ export enum TYPE_OS_LOGIN_SOCIAL {
 export enum TYPE_DYNAMIC_LINK {
     post = 0,
     profile = 1,
+    groupBuying = 2,
 }
 
 export enum CONVERSATION_STATUS {
@@ -194,4 +196,9 @@ export enum STATUS {
     active = 1,
     draft = 2,
     archive = 3,
+}
+
+export enum POST_TYPE {
+    review = 0,
+    groupBuying = 1,
 }

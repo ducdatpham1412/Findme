@@ -5,7 +5,6 @@ import {View} from 'react-native';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Feather from 'react-native-vector-icons/Feather';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface Props {
     index: number;
@@ -49,8 +48,8 @@ const ToolProfile = (props: Props) => {
             <StyleTouchable
                 customStyle={styles.buttonBox}
                 onPress={() => onChangeTab(1)}>
-                <Entypo
-                    name="heart-outlined"
+                <Feather
+                    name="star"
                     style={[
                         styles.icon,
                         {
@@ -79,8 +78,8 @@ const ToolProfile = (props: Props) => {
             <StyleTouchable
                 customStyle={styles.buttonBox}
                 onPress={() => onChangeTab(3)}>
-                <Ionicons
-                    name="ios-timer-outline"
+                <Feather
+                    name="shopping-bag"
                     style={[
                         styles.iconArchive,
                         {
@@ -122,7 +121,7 @@ const styles = ScaledSheet.create({
         fontSize: '18@ms',
     },
     iconArchive: {
-        fontSize: '20@ms',
+        fontSize: '18@ms',
     },
 });
 

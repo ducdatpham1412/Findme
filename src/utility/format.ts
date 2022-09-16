@@ -80,3 +80,7 @@ export const formatDateChatTag = (date: Date | string) => {
     }
     return dayjs(date).format('DD MMM');
 };
+
+export const formatDayGroupBuying = (date: string) => {
+    return dayjs(date).format('dddd, DD/MM/YYYY');
+};

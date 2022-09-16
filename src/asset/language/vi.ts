@@ -156,11 +156,20 @@ const discovery = {
         title: 'Chia sẻ',
     },
     all: 'Tất cả',
-    like: 'Thích',
-    numberLike: '{{value}} lượt thích',
+    like: 'Thả sao',
+    numberLike: '{{value}} sao',
     comment: 'Bình luận',
     numberComments: '{{numberComments}} bình luận',
     chooseTopic: 'Chủ đề yêu thích',
+    applicationPeriod: 'Thời gian áp dụng',
+    groupBuyingPrice: 'Bảng giá mua chung',
+    numberPeople: '{{value}} người',
+    joinGroupBuying: 'Tham gia mua chung',
+    unJoinGroupBuying: 'Rời mua chung',
+    numberPeopleJoin: '{{value}} người đã tham gia mua chung',
+    bought: 'Đã mua',
+    confirmBought: 'Xác nhận đã mua',
+    participators: '{{value}} người tham gia',
 };
 
 // REPUTATION

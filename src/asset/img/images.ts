@@ -42,6 +42,8 @@ const Images = {
         cuisine: require('./ic_cuisine.png'),
         shopping: require('./ic_shopping.png'),
         reputation: require('./ic_reputation.png'),
+        calendar: require('./ic_calendar.png'),
+        dollar: require('./ic_dollar.png'),
     },
     images: {
         logo: require('./img_logo.png'),
@@ -57,8 +59,6 @@ const Images = {
         squirrelEnjoy: require('./img_squirrel_enjoy.png'),
         successful: require('./img_successful.png'),
         // discovery
-        skyCouple: require('./img_sky_couple.png'),
-        skyGroup: require('./img_sky_group.png'),
         defaultImage: require('./img_default_image.png'),
         defaultAvatar: require('./img_default_avatar.png'),
     },
