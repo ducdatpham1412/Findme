@@ -84,3 +84,7 @@ export const formatDateChatTag = (date: Date | string) => {
 export const formatDayGroupBuying = (date: string) => {
     return dayjs(date).format('dddd, DD/MM/YYYY');
 };
+
+export const formatLocaleNumber = (value: string) => {
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};

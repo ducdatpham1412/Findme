@@ -35,8 +35,8 @@ const ProfileRoute = () => {
                 <ProfileStack.Screen
                     name={PROFILE_ROUTE.detailGroupBuying}
                     component={DetailGroupBuying}
-                    sharedElementsConfig={() => {
-                        return ['image_group_buying'];
+                    sharedElementsConfig={route => {
+                        return [`item.group_buying.${route.params.item.id}`];
                     }}
                 />
             </ProfileStack.Navigator>

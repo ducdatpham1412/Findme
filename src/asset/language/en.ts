@@ -162,6 +162,7 @@ const discovery = {
     groupBuyingPrice: 'Group buying prices',
     numberPeople: '{{value}} people',
     joinGroupBuying: 'Join group buying',
+    joined: 'Joined',
     unJoinGroupBuying: 'Leave group buying',
     numberPeopleJoin: '{{value}} people joined group buying',
     bought: 'Bought',

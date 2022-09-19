@@ -16,6 +16,7 @@ export const initialAccountState = {
     passport: {
         profile: {
             id: <any>null,
+            account_type: 0,
             name: 'Name',
             anonymousName: 'Báoẩndanh',
             description: '',

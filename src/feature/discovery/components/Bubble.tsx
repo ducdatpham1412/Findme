@@ -469,6 +469,7 @@ const Bubble = (props: Props) => {
                                     postId: item.id,
                                 })
                             }
+                            touchableStyle={styles.touchIconLike}
                         />
                     ) : (
                         <IconNotLiked
@@ -486,6 +487,7 @@ const Bubble = (props: Props) => {
                                     postId: item.id,
                                 })
                             }
+                            touchableStyle={styles.touchIconLike}
                         />
                     )}
 
@@ -772,7 +774,6 @@ const styles = ScaledSheet.create({
     // footer
     footerView: {
         width: '100%',
-        paddingHorizontal: '15@s',
     },
     textThisPostInDraft: {
         fontSize: '12@ms',
@@ -799,15 +800,19 @@ const styles = ScaledSheet.create({
         marginTop: '15@vs',
         alignItems: 'center',
     },
+    touchIconLike: {
+        paddingLeft: '15@s',
+        paddingRight: '10@s',
+    },
     iconLike: {
         fontSize: '23@ms',
     },
     iconComment: {
-        marginLeft: '20@s',
+        paddingHorizontal: '10@s',
     },
     iconSave: {
         position: 'absolute',
-        right: 0,
+        right: '15@s',
     },
     save: {
         fontSize: '24@ms',
@@ -816,6 +821,7 @@ const styles = ScaledSheet.create({
         marginTop: '10@vs',
         width: '100@s',
         paddingVertical: '5@vs',
+        marginLeft: '15@s',
     },
     textLike: {
         fontSize: '12@ms',
@@ -827,6 +833,7 @@ const styles = ScaledSheet.create({
     commentTouch: {
         paddingVertical: '5@vs',
         width: '50%',
+        marginLeft: '15@s',
     },
 });
 

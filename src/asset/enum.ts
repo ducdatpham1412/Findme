@@ -202,3 +202,15 @@ export enum POST_TYPE {
     review = 0,
     groupBuying = 1,
 }
+
+export enum ACCOUNT {
+    user = 0,
+    shop = 1,
+}
+
+export enum GROUP_BUYING_STATUS {
+    deleted = 0,
+    notJoined = 1,
+    joinedNotBought = 2,
+    bought = 3,
+}

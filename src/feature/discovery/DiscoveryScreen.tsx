@@ -5,6 +5,7 @@ import {
     apiGetListBubbleActive,
     apiGetListBubbleActiveOfUserEnjoy,
 } from 'api/module';
+import {apiLikePost, apiUnLikePost} from 'api/post';
 import {POST_TYPE, TOPIC, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {StyleIcon} from 'components/base';
@@ -22,7 +23,7 @@ import {ScaledSheet} from 'react-native-size-matters';
 import {onGoToSignUp, seeDetailImage} from 'utility/assistant';
 import {useNotification} from 'utility/notification';
 import Bubble from './components/Bubble';
-import BubbleGroupBuying from './components/BubbleGroupBuying';
+import BubbleGroupBuying, {ParamsLikeGB} from './components/BubbleGroupBuying';
 import HeaderDoffy, {headerDoffyHeight} from './components/HeaderDoffy';
 import HeaderFilterTopic from './HeaderFilterTopic';
 
@@ -153,16 +154,57 @@ const DiscoveryScreen = () => {
         optionsRef.current?.show();
     }, []);
 
-    const onGoToDetailGroupBuying = useCallback((item: TypeGroupBuying) => {
-        navigate(DISCOVERY_ROUTE.detailGroupBuying, {
-            item,
-            setList,
-        });
-    }, []);
-
     /**
      * Render views
      */
+    const onHandleLikeGB = useCallback(
+        async (params: ParamsLikeGB) => {
+            const {isLiked, setIsLiked, totalLikes, setTotalLikes, postId} =
+                params;
+
+            if (hadLogan) {
+                const currentLike = isLiked;
+                const currentNumberLikes = totalLikes;
+                try {
+                    setIsLiked(!currentLike);
+                    setTotalLikes(currentNumberLikes + (currentLike ? -1 : 1));
+                    if (currentLike) {
+                        await apiUnLikePost(postId);
+                    } else {
+                        await apiLikePost(postId);
+                    }
+
+                    setList((preValue: Array<TypeGroupBuying>) => {
+                        return preValue.map(value => {
+                            if (value.id !== postId) {
+                                return value;
+                            }
+                            return {
+                                ...value,
+                                isLiked: !currentLike,
+                                totalLikes:
+                                    value.totalLikes + (currentLike ? -1 : 1),
+                            };
+                        });
+                    });
+                } catch (err) {
+                    setIsLiked(currentLike);
+                    setTotalLikes(currentNumberLikes);
+                    appAlert(err);
+                }
+            } else {
+                appAlert('discovery.bubble.goToSignUp', {
+                    moreNotice: 'common.letGo',
+                    moreAction: () => {
+                        goBack();
+                        onGoToSignUp();
+                    },
+                });
+            }
+        },
+        [hadLogan],
+    );
+
     const RenderItemBubble = useCallback(
         (item: TypeBubblePalace & TypeGroupBuying) => {
             if (item.postType === POST_TYPE.review) {
@@ -185,11 +227,18 @@ const DiscoveryScreen = () => {
                     <BubbleGroupBuying
                         item={item}
                         onGoToDetailGroupBuying={value =>
-                            onGoToDetailGroupBuying(value)
+                            navigate(DISCOVERY_ROUTE.detailGroupBuying, {
+                                item: value,
+                                setList,
+                            })
                         }
                         onShowMoreOption={onShowOptions}
+                        onHandleLike={onHandleLikeGB}
                         onShowModalComment={(post, type) =>
                             onShowModalComment(post, type)
+                        }
+                        onChangePostIdFocusing={postId =>
+                            setPostIdFocusing(postId)
                         }
                     />
                 );

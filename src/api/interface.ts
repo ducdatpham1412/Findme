@@ -197,6 +197,7 @@ export interface TypeChangeInformationResponse {
  */
 export interface TypeGetProfileResponse {
     id: number;
+    account_type: number;
     name: string;
     anonymousName: string;
     description: string;
@@ -311,8 +312,8 @@ export interface TypeGroupBuying {
     creatorLocation: string;
     created: string;
     isLiked: boolean;
-    isJoined: boolean;
     isDraft: boolean;
+    status: number;
     relationship: number;
 }
 

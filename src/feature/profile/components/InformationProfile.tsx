@@ -179,7 +179,7 @@ const InformationProfile = (props: Props) => {
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
-        marginTop: Metrics.width / 2,
+        marginTop: Metrics.width / 2.5,
     },
     avatarHeader: {
         width: '70@s',

@@ -1,4 +1,7 @@
+import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeGroupBuying} from 'api/interface';
+import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
+import {GROUP_BUYING_STATUS, RELATIONSHIP, TYPE_DYNAMIC_LINK} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {
@@ -10,81 +13,50 @@ import {
     LANDING_PAGE_URL,
     ratioImageGroupBuying,
 } from 'asset/standardValue';
+import Theme from 'asset/theme/Theme';
 import {
     StyleIcon,
     StyleImage,
     StyleText,
     StyleTouchable,
 } from 'components/base';
-import Redux from 'hook/useRedux';
-import React, {memo, useState} from 'react';
-import isEqual from 'react-fast-compare';
-import {View} from 'react-native';
-import {ScaledSheet} from 'react-native-size-matters';
-import {SharedElement} from 'react-navigation-shared-element';
-import {chooseTextTopic, onGoToProfile, onGoToSignUp} from 'utility/assistant';
-import {formatFromNow} from 'utility/format';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Theme from 'asset/theme/Theme';
-import StyleMoreText from 'components/StyleMoreText';
-import LinearGradient from 'react-native-linear-gradient';
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
-import dynamicLinks from '@react-native-firebase/dynamic-links';
-import {TYPE_DYNAMIC_LINK} from 'asset/enum';
-import {appAlert, goBack} from 'navigation/NavigationService';
+import StyleMoreText from 'components/StyleMoreText';
+import Redux from 'hook/useRedux';
+import {appAlert} from 'navigation/NavigationService';
+import React, {memo, useEffect, useState} from 'react';
+import isEqual from 'react-fast-compare';
+import {View} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import Share from 'react-native-share';
-import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
-import {apiLikePost, apiUnLikePost} from 'api/post';
+import {ScaledSheet} from 'react-native-size-matters';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {SharedElement} from 'react-navigation-shared-element';
+import {chooseTextTopic, onGoToProfile} from 'utility/assistant';
+import {formatFromNow, formatLocaleNumber} from 'utility/format';
+import Entypo from 'react-native-vector-icons/Entypo';
 import {TypeMoreOptionsMe, TypeShowMoreOptions} from '../DiscoveryScreen';
 
-interface Props {
-    item: TypeGroupBuying;
-    onGoToDetailGroupBuying(item: TypeGroupBuying): void;
-    onShowMoreOption(params: TypeShowMoreOptions & TypeMoreOptionsMe): void;
-    onShowModalComment(
-        post: TypeGroupBuying,
-        type: TypeShowModalCommentOrLike,
-    ): void;
-}
-
-const onHandleLike = async (params: {
-    isModeExp: boolean;
+export interface ParamsLikeGB {
     isLiked: boolean;
     setIsLiked: Function;
     totalLikes: number;
     setTotalLikes: Function;
     postId: string;
-}) => {
-    const {isModeExp, isLiked, setIsLiked, totalLikes, setTotalLikes, postId} =
-        params;
+}
 
-    if (!isModeExp) {
-        const currentLike = isLiked;
-        const currentNumberLikes = totalLikes;
-        try {
-            setIsLiked(!currentLike);
-            setTotalLikes(currentNumberLikes + (currentLike ? -1 : 1));
-            if (currentLike) {
-                await apiUnLikePost(postId);
-            } else {
-                await apiLikePost(postId);
-            }
-        } catch (err) {
-            setIsLiked(currentLike);
-            setTotalLikes(currentNumberLikes);
-            appAlert(err);
-        }
-    } else {
-        appAlert('discovery.bubble.goToSignUp', {
-            moreNotice: 'common.letGo',
-            moreAction: () => {
-                goBack();
-                onGoToSignUp();
-            },
-        });
-    }
-};
+interface Props {
+    item: TypeGroupBuying;
+    onGoToDetailGroupBuying(item: TypeGroupBuying): void;
+    onShowMoreOption(params: TypeShowMoreOptions & TypeMoreOptionsMe): void;
+    onHandleLike(params: ParamsLikeGB): void;
+    onShowModalComment(
+        post: TypeGroupBuying,
+        type: TypeShowModalCommentOrLike,
+    ): void;
+    onChangePostIdFocusing(postId: string): void;
+}
 
 const onShowModalShare = async (
     item: TypeGroupBuying,
@@ -148,14 +120,23 @@ const BubbleGroupBuying = (props: Props) => {
         item,
         onGoToDetailGroupBuying,
         onShowMoreOption,
+        onHandleLike,
         onShowModalComment,
+        onChangePostIdFocusing,
     } = props;
     const theme = Redux.getTheme();
-    const isModeExp = Redux.getModeExp();
 
     const [isLiked, setIsLiked] = useState(item.isLiked);
     const [totalLikes, setTotalLikes] = useState(item.totalLikes);
     const [disableShare, setDisableShare] = useState(false);
+
+    useEffect(() => {
+        setIsLiked(item.isLiked);
+    }, [item.isLiked]);
+
+    useEffect(() => {
+        setTotalLikes(item.totalLikes);
+    }, [item.totalLikes]);
 
     const Header = () => {
         return (
@@ -281,7 +262,9 @@ const BubbleGroupBuying = (props: Props) => {
                         />
                         <StyleText originValue="-" customStyle={styles.dash} />
                         <StyleText
-                            originValue={`${price.value}vnd`}
+                            originValue={`${formatLocaleNumber(
+                                price.value,
+                            )}vnd`}
                             customStyle={styles.textPrice}
                         />
                     </View>
@@ -311,6 +294,67 @@ const BubbleGroupBuying = (props: Props) => {
         );
     };
 
+    const ButtonCheckJoined = () => {
+        if (item.relationship === RELATIONSHIP.self) {
+            return null;
+        }
+        if (item.status === GROUP_BUYING_STATUS.bought) {
+            return (
+                <LinearGradient
+                    style={styles.boughtBox}
+                    colors={[
+                        Theme.common.commentGreen,
+                        Theme.common.gradientTabBar2,
+                    ]}>
+                    <Entypo name="check" style={styles.iconBought} />
+                    <StyleText
+                        i18Text="discovery.bought"
+                        customStyle={styles.textBought}
+                    />
+                </LinearGradient>
+            );
+        }
+        if (
+            [
+                GROUP_BUYING_STATUS.notJoined,
+                GROUP_BUYING_STATUS.joinedNotBought,
+            ].includes(item.status)
+        ) {
+            const isJoined =
+                item.status === GROUP_BUYING_STATUS.joinedNotBought;
+            return (
+                <StyleTouchable
+                    customStyle={[
+                        styles.joinGroupBuyingBox,
+                        {
+                            backgroundColor: isJoined
+                                ? theme.highlightColor
+                                : theme.backgroundButtonColor,
+                        },
+                    ]}
+                    onPress={() => onGoToDetailGroupBuying(item)}>
+                    <StyleText
+                        i18Text={
+                            isJoined
+                                ? 'discovery.joined'
+                                : 'discovery.joinGroupBuying'
+                        }
+                        customStyle={[
+                            styles.textTellJoin,
+                            {
+                                color: isJoined
+                                    ? theme.backgroundColor
+                                    : theme.textHightLight,
+                                fontWeight: isJoined ? 'bold' : 'normal',
+                            },
+                        ]}
+                    />
+                </StyleTouchable>
+            );
+        }
+        return null;
+    };
+
     const Footer = () => {
         return (
             <View style={styles.footerView}>
@@ -323,7 +367,6 @@ const BubbleGroupBuying = (props: Props) => {
                             ]}
                             onPress={() =>
                                 onHandleLike({
-                                    isModeExp,
                                     isLiked,
                                     setIsLiked,
                                     totalLikes,
@@ -331,6 +374,7 @@ const BubbleGroupBuying = (props: Props) => {
                                     postId: item.id,
                                 })
                             }
+                            touchableStyle={styles.touchIconLike}
                         />
                     ) : (
                         <IconNotLiked
@@ -340,7 +384,6 @@ const BubbleGroupBuying = (props: Props) => {
                             ]}
                             onPress={() =>
                                 onHandleLike({
-                                    isModeExp,
                                     isLiked,
                                     setIsLiked,
                                     totalLikes,
@@ -348,6 +391,7 @@ const BubbleGroupBuying = (props: Props) => {
                                     postId: item.id,
                                 })
                             }
+                            touchableStyle={styles.touchIconLike}
                         />
                     )}
 
@@ -372,20 +416,7 @@ const BubbleGroupBuying = (props: Props) => {
                         />
                     </StyleTouchable>
 
-                    <StyleTouchable
-                        customStyle={[
-                            styles.joinGroupBuyingBox,
-                            {backgroundColor: theme.backgroundButtonColor},
-                        ]}
-                        onPress={() => onGoToDetailGroupBuying(item)}>
-                        <StyleText
-                            i18Text="discovery.joinGroupBuying"
-                            customStyle={[
-                                styles.textTellJoin,
-                                {color: theme.textHightLight},
-                            ]}
-                        />
-                    </StyleTouchable>
+                    {ButtonCheckJoined()}
                 </View>
 
                 <StyleTouchable
@@ -395,7 +426,6 @@ const BubbleGroupBuying = (props: Props) => {
                             onShowModalComment(item, 'like');
                         } else {
                             onHandleLike({
-                                isModeExp,
                                 isLiked,
                                 setIsLiked,
                                 totalLikes,
@@ -445,10 +475,13 @@ const BubbleGroupBuying = (props: Props) => {
     return (
         <StyleTouchable
             style={[styles.container, {backgroundColor: theme.backgroundColor}]}
-            onPress={() => onGoToDetailGroupBuying(item)}>
+            onPress={() => onGoToDetailGroupBuying(item)}
+            onTouchEnd={() => onChangePostIdFocusing(item.id)}>
             {Header()}
 
-            <SharedElement style={styles.imageView} id="image_group_buying">
+            <SharedElement
+                style={styles.imageView}
+                id={`item.group_buying.${item.id}`}>
                 <StyleImage
                     source={{
                         uri: item.images[0],
@@ -589,7 +622,6 @@ const styles = ScaledSheet.create({
     // footer
     footerView: {
         width: '100%',
-        paddingHorizontal: '15@s',
     },
     textThisPostInDraft: {
         fontSize: '12@ms',
@@ -616,14 +648,19 @@ const styles = ScaledSheet.create({
         marginTop: '15@vs',
         alignItems: 'center',
     },
+    touchIconLike: {
+        paddingLeft: '15@s',
+        paddingRight: '10@s',
+    },
     iconLike: {
         fontSize: '23@ms',
     },
     iconComment: {
-        marginLeft: '20@s',
+        paddingHorizontal: '10@s',
     },
     likeTouch: {
         marginTop: '10@vs',
+        marginLeft: '15@s',
         width: '100@s',
         paddingVertical: '5@vs',
     },
@@ -637,13 +674,33 @@ const styles = ScaledSheet.create({
     commentTouch: {
         paddingVertical: '5@vs',
         width: '50%',
+        marginLeft: '15@s',
     },
     joinGroupBuyingBox: {
         position: 'absolute',
-        right: 0,
+        right: '15@s',
         paddingHorizontal: '20@s',
         paddingVertical: '5@vs',
         borderRadius: '5@ms',
+    },
+    boughtBox: {
+        position: 'absolute',
+        right: '15@s',
+        padding: '5@ms',
+        backgroundColor: Theme.common.gradientTabBar2,
+        borderRadius: '20@ms',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    iconBought: {
+        fontSize: '20@ms',
+        color: Theme.common.white,
+    },
+    textBought: {
+        fontSize: FONT_SIZE.small,
+        fontWeight: 'bold',
+        color: Theme.common.white,
+        marginHorizontal: '3@s',
     },
     textTellJoin: {
         fontSize: FONT_SIZE.small,

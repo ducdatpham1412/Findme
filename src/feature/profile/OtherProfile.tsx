@@ -29,12 +29,12 @@ import {ScaledSheet} from 'react-native-size-matters';
 import {
     fakeBubbleFocusing,
     interactBubble,
-    modalizeMyProfile,
     modalizeYourProfile,
 } from 'utility/assistant';
 import AvatarBackground from './components/AvatarBackground';
 import InformationProfile from './components/InformationProfile';
 import SearchAndSetting from './components/SearchAndSetting';
+import MyListGroupBuying from './MyListGroupBuying';
 import ListShareElement from './post/ListShareElement';
 import PostStatus from './post/PostStatus';
 
@@ -56,7 +56,6 @@ const OtherProfile = ({route}: Props) => {
 
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
-    const myId = Redux.getPassport().profile.id;
     const isLoading = Redux.getIsLoading();
 
     const modalRef = useRef<ModalCommentLike>(null);
@@ -67,7 +66,6 @@ const OtherProfile = ({route}: Props) => {
     const [isFollowing, setIsFollowing] = useState(false);
     const [bubbleFocusing, setBubbleFocusing] = useState<TypeBubblePalace>();
 
-    const isMyProfile = id === myId;
     const isBlock = profile?.relationship === RELATIONSHIP.block;
     const listPaging = usePaging({
         request: apiGetListPost,
@@ -199,59 +197,53 @@ const OtherProfile = ({route}: Props) => {
                         styles.btnInteractView,
                         {backgroundColor: theme.backgroundColor},
                     ]}>
-                    {!isMyProfile && (
-                        <>
-                            <StyleTouchable
-                                customStyle={[
-                                    styles.buttonInteract,
-                                    {
-                                        backgroundColor:
-                                            theme.backgroundButtonColor,
-                                        flex: isFollowing ? 0.6 : 1.5,
-                                    },
-                                ]}
-                                onPress={onHandleFollow}
-                                disable={isFollowing}
-                                disableOpacity={1}>
-                                <StyleText
-                                    i18Text={
-                                        isFollowing
-                                            ? 'profile.component.infoProfile.following'
-                                            : 'profile.screen.follow'
-                                    }
-                                    customStyle={[
-                                        styles.textInteract,
-                                        {
-                                            color: isFollowing
-                                                ? theme.textColor
-                                                : theme.highlightColor,
-                                            fontWeight: 'bold',
-                                        },
-                                    ]}
-                                />
-                            </StyleTouchable>
+                    <StyleTouchable
+                        customStyle={[
+                            styles.buttonInteract,
+                            {
+                                backgroundColor: theme.backgroundButtonColor,
+                                flex: isFollowing ? 0.6 : 1.5,
+                            },
+                        ]}
+                        onPress={onHandleFollow}
+                        disable={isFollowing}
+                        disableOpacity={1}>
+                        <StyleText
+                            i18Text={
+                                isFollowing
+                                    ? 'profile.component.infoProfile.following'
+                                    : 'profile.screen.follow'
+                            }
+                            customStyle={[
+                                styles.textInteract,
+                                {
+                                    color: isFollowing
+                                        ? theme.textColor
+                                        : theme.highlightColor,
+                                    fontWeight: 'bold',
+                                },
+                            ]}
+                        />
+                    </StyleTouchable>
 
-                            <StyleTouchable
-                                customStyle={[
-                                    styles.buttonInteract,
-                                    {
-                                        backgroundColor:
-                                            theme.backgroundButtonColor,
-                                    },
-                                ]}
-                                onPress={onSendMessage}>
-                                <StyleText
-                                    i18Text="profile.screen.sendMessage"
-                                    customStyle={[
-                                        styles.textInteract,
-                                        {
-                                            color: theme.textHightLight,
-                                        },
-                                    ]}
-                                />
-                            </StyleTouchable>
-                        </>
-                    )}
+                    <StyleTouchable
+                        customStyle={[
+                            styles.buttonInteract,
+                            {
+                                backgroundColor: theme.backgroundButtonColor,
+                            },
+                        ]}
+                        onPress={onSendMessage}>
+                        <StyleText
+                            i18Text="profile.screen.sendMessage"
+                            customStyle={[
+                                styles.textInteract,
+                                {
+                                    color: theme.textHightLight,
+                                },
+                            ]}
+                        />
+                    </StyleTouchable>
                 </View>
             </>
         );
@@ -310,6 +302,7 @@ const OtherProfile = ({route}: Props) => {
             />
 
             <View style={{flex: 1}}>
+                <MyListGroupBuying userId={id} />
                 <StyleList
                     data={list}
                     renderItem={({item}) => RenderItemPost(item)}
@@ -377,16 +370,12 @@ const OtherProfile = ({route}: Props) => {
 
             <StyleActionSheet
                 ref={optionsRef}
-                listTextAndAction={
-                    isMyProfile
-                        ? modalizeMyProfile
-                        : modalizeYourProfile({
-                              onBlockUser,
-                              onReport,
-                              onHandleFollow,
-                              isFollowing,
-                          })
-                }
+                listTextAndAction={modalizeYourProfile({
+                    onBlockUser,
+                    onReport,
+                    onHandleFollow,
+                    isFollowing,
+                })}
             />
         </>
     );

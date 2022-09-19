@@ -25,8 +25,8 @@ const DiscoveryRoute = () => {
                 <Stack.Screen
                     name={DISCOVERY_ROUTE.detailGroupBuying}
                     component={DetailGroupBuying}
-                    sharedElementsConfig={() => {
-                        return ['image_group_buying'];
+                    sharedElementsConfig={route => {
+                        return [`item.group_buying.${route.params.item.id}`];
                     }}
                 />
             </Stack.Navigator>

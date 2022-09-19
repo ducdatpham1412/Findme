@@ -165,6 +165,7 @@ const discovery = {
     groupBuyingPrice: 'Bảng giá mua chung',
     numberPeople: '{{value}} người',
     joinGroupBuying: 'Tham gia mua chung',
+    joined: 'Đã tham gia',
     unJoinGroupBuying: 'Rời mua chung',
     numberPeopleJoin: '{{value}} người đã tham gia mua chung',
     bought: 'Đã mua',

@@ -2,7 +2,7 @@
 import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {apiDeletePost} from 'api/module';
-import {apiArchivePost} from 'api/post';
+import {apiArchivePost, apiLikePost, apiUnLikePost} from 'api/post';
 import FindmeStore from 'app-redux/store';
 import {POST_TYPE, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import StyleList from 'components/base/StyleList';
@@ -10,7 +10,9 @@ import StyleActionSheet from 'components/common/StyleActionSheet';
 import {TypeModalCommentPost} from 'components/ModalCommentLike';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import Bubble from 'feature/discovery/components/Bubble';
-import BubbleGroupBuying from 'feature/discovery/components/BubbleGroupBuying';
+import BubbleGroupBuying, {
+    ParamsLikeGB,
+} from 'feature/discovery/components/BubbleGroupBuying';
 import {
     TypeMoreOptionsMe,
     TypeShowMoreOptions,
@@ -187,7 +189,7 @@ export default class ListShareElement extends Component<Props, States> {
     }
 
     private showModalComment(
-        post: TypeBubblePalace,
+        post: TypeBubblePalace | TypeGroupBuying,
         type: TypeShowModalCommentOrLike,
     ) {
         this.props.onShowModalComment({
@@ -195,6 +197,41 @@ export default class ListShareElement extends Component<Props, States> {
             setList: this.props.listPaging.setList,
             type,
         });
+    }
+
+    private async onHandleLike(params: ParamsLikeGB) {
+        const {isLiked, setIsLiked, totalLikes, setTotalLikes, postId} = params;
+        const currentLike = isLiked;
+        const currentNumberLikes = totalLikes;
+        try {
+            setIsLiked(!currentLike);
+            setTotalLikes(currentNumberLikes + (currentLike ? -1 : 1));
+            if (currentLike) {
+                await apiUnLikePost(postId);
+            } else {
+                await apiLikePost(postId);
+            }
+
+            this.props.listPaging.setList(
+                (preValue: Array<TypeGroupBuying>) => {
+                    return preValue.map(value => {
+                        if (value.id !== postId) {
+                            return value;
+                        }
+                        return {
+                            ...value,
+                            isLiked: !currentLike,
+                            totalLikes:
+                                value.totalLikes + (currentLike ? -1 : 1),
+                        };
+                    });
+                },
+            );
+        } catch (err) {
+            setIsLiked(currentLike);
+            setTotalLikes(currentNumberLikes);
+            appAlert(err);
+        }
     }
 
     RenderItemBubble = (item: TypeBubblePalace | TypeGroupBuying) => {
@@ -223,7 +260,14 @@ export default class ListShareElement extends Component<Props, States> {
                             setList: this.props.listPaging.setList,
                         });
                     }}
+                    onHandleLike={value => this.onHandleLike(value)}
                     onShowMoreOption={value => this.showOptions(value)}
+                    onChangePostIdFocusing={postId =>
+                        this.setState({postIdFocusing: postId})
+                    }
+                    onShowModalComment={(post, type) =>
+                        this.showModalComment(post, type)
+                    }
                 />
             );
         }
