@@ -269,6 +269,7 @@ export interface TypeFollowResponse {
  */
 export interface TypeBubblePalace {
     id: string;
+    postType: number;
     topic: number | null;
     feeling: number | null;
     location: string | null;
@@ -287,6 +288,31 @@ export interface TypeBubblePalace {
     isSaved: boolean;
     isDraft?: boolean;
     isArchived?: boolean;
+    relationship: number;
+}
+export interface TypeGroupBuying {
+    id: string;
+    postType: number;
+    topic: number;
+    content: string;
+    images: Array<string>;
+    prices: Array<{
+        number_people: number;
+        value: string;
+    }>;
+    totalLikes: number;
+    totalComments: number;
+    totalJoins: number;
+    startDate: string;
+    endDate: string;
+    creator: number;
+    creatorName: string;
+    creatorAvatar: string;
+    creatorLocation: string;
+    created: string;
+    isLiked: boolean;
+    isJoined: boolean;
+    isDraft: boolean;
     relationship: number;
 }
 

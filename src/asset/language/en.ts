@@ -153,11 +153,20 @@ const discovery = {
         title: 'Share',
     },
     all: 'All',
-    like: 'Like',
-    numberLike: '{{value}} likes',
+    like: 'Rate star',
+    numberLike: '{{value}} stars',
     comment: 'Comment',
     numberComments: '{{numberComments}} comments',
     chooseTopic: 'Topic you like',
+    applicationPeriod: 'Application period',
+    groupBuyingPrice: 'Group buying prices',
+    numberPeople: '{{value}} people',
+    joinGroupBuying: 'Join group buying',
+    unJoinGroupBuying: 'Leave group buying',
+    numberPeopleJoin: '{{value}} people joined group buying',
+    bought: 'Bought',
+    confirmBought: 'Confirm bought',
+    participators: '{{value}} participators',
 };
 
 // REPUTATION

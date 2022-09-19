@@ -1,29 +1,35 @@
-import {
-    CardStyleInterpolators,
-    createStackNavigator,
-} from '@react-navigation/stack';
+import {CardStyleInterpolators} from '@react-navigation/stack';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
+import DetailGroupBuying from 'feature/discovery/DetailGroupBuying';
 import DiscoveryScreen from 'feature/discovery/DiscoveryScreen';
 import {DISCOVERY_ROUTE} from 'navigation/config/routes';
 import React from 'react';
+import {createSharedElementStackNavigator} from 'react-navigation-shared-element';
 
-const DisStack = createStackNavigator();
+const Stack = createSharedElementStackNavigator();
 
 const DiscoveryRoute = () => {
     return (
         <>
             <ViewSafeTopPadding />
-            <DisStack.Navigator
+            <Stack.Navigator
                 screenOptions={{
                     cardStyleInterpolator:
                         CardStyleInterpolators.forFadeFromBottomAndroid,
                     headerShown: false,
                 }}>
-                <DisStack.Screen
+                <Stack.Screen
                     name={DISCOVERY_ROUTE.discoveryScreen}
                     component={DiscoveryScreen}
                 />
-            </DisStack.Navigator>
+                <Stack.Screen
+                    name={DISCOVERY_ROUTE.detailGroupBuying}
+                    component={DetailGroupBuying}
+                    sharedElementsConfig={() => {
+                        return ['image_group_buying'];
+                    }}
+                />
+            </Stack.Navigator>
         </>
     );
 };

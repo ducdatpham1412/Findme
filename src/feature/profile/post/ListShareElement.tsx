@@ -1,15 +1,16 @@
 /* eslint-disable no-underscore-dangle */
-import {TypeBubblePalace} from 'api/interface';
+import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {apiDeletePost} from 'api/module';
 import {apiArchivePost} from 'api/post';
 import FindmeStore from 'app-redux/store';
-import {TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
+import {POST_TYPE, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import {TypeModalCommentPost} from 'components/ModalCommentLike';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import Bubble from 'feature/discovery/components/Bubble';
+import BubbleGroupBuying from 'feature/discovery/components/BubbleGroupBuying';
 import {
     TypeMoreOptionsMe,
     TypeShowMoreOptions,
@@ -46,7 +47,7 @@ interface TypeShow {
     postId: string;
 }
 
-let postModal: TypeBubblePalace;
+let postModal: TypeBubblePalace & TypeGroupBuying;
 
 const onGoToEditPost = () => {
     if (postModal) {
@@ -196,20 +197,37 @@ export default class ListShareElement extends Component<Props, States> {
         });
     }
 
-    RenderItemBubble = (item: TypeBubblePalace) => {
-        return (
-            <Bubble
-                item={item}
-                onShowMoreOption={value => this.showOptions(value)}
-                onShowModalComment={(post, type) =>
-                    this.showModalComment(post, type)
-                }
-                isFocusing={this.state.postIdFocusing === item.id}
-                onChangePostIdFocusing={postId =>
-                    this.setState({postIdFocusing: postId})
-                }
-            />
-        );
+    RenderItemBubble = (item: TypeBubblePalace | TypeGroupBuying) => {
+        if (item.postType === POST_TYPE.review) {
+            return (
+                <Bubble
+                    item={item}
+                    onShowMoreOption={value => this.showOptions(value)}
+                    onShowModalComment={(post, type) =>
+                        this.showModalComment(post, type)
+                    }
+                    isFocusing={this.state.postIdFocusing === item.id}
+                    onChangePostIdFocusing={postId =>
+                        this.setState({postIdFocusing: postId})
+                    }
+                />
+            );
+        }
+        if (item.postType === POST_TYPE.groupBuying) {
+            return (
+                <BubbleGroupBuying
+                    item={item}
+                    onGoToDetailGroupBuying={() => {
+                        navigate(PROFILE_ROUTE.detailGroupBuying, {
+                            item,
+                            setList: this.props.listPaging.setList,
+                        });
+                    }}
+                    onShowMoreOption={value => this.showOptions(value)}
+                />
+            );
+        }
+        return null;
     };
 
     render() {

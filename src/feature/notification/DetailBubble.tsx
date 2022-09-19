@@ -492,7 +492,7 @@ const DetailBubble = ({route}: Props) => {
                 ref={modalRef}
                 theme={theme}
                 bubbleFocusing={bubble || fakeBubbleFocusing}
-                updateBubbleFocusing={value =>
+                updateBubbleFocusing={(value: TypeBubblePalace) =>
                     setBubble(preValue => ({
                         ...preValue,
                         ...value,

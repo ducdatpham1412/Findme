@@ -1,3 +1,4 @@
+import {TypeParamsPaging} from './interface';
 import request from './request';
 
 export const apiSavePost = (postId: string) => {
@@ -21,4 +22,13 @@ export const apiArchivePost = (idPost: string) => {
 
 export const apiUnArchivePost = (idPost: string) => {
     return request.put(`/profile/un-archive-post/${idPost}`);
+};
+
+export const apiGetListGroupBuying = ({params}: TypeParamsPaging) => {
+    return request.get(`/profile/list-group-buying/${params.userId}`, {
+        params: {
+            pageIndex: params.pageIndex,
+            take: params.take,
+        },
+    });
 };

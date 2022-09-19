@@ -1,11 +1,11 @@
 /* eslint-disable no-shadow */
-import {TypeBubblePalace} from 'api/interface';
+import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {
     apiGetListBubbleActive,
     apiGetListBubbleActiveOfUserEnjoy,
 } from 'api/module';
-import {TOPIC, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
+import {POST_TYPE, TOPIC, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {StyleIcon} from 'components/base';
 import StyleList from 'components/base/StyleList';
@@ -13,7 +13,7 @@ import StyleActionSheet from 'components/common/StyleActionSheet';
 import LoadingScreen from 'components/LoadingScreen';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
-import ROOT_SCREEN from 'navigation/config/routes';
+import ROOT_SCREEN, {DISCOVERY_ROUTE} from 'navigation/config/routes';
 import {appAlert, goBack, navigate} from 'navigation/NavigationService';
 import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
@@ -22,6 +22,7 @@ import {ScaledSheet} from 'react-native-size-matters';
 import {onGoToSignUp, seeDetailImage} from 'utility/assistant';
 import {useNotification} from 'utility/notification';
 import Bubble from './components/Bubble';
+import BubbleGroupBuying from './components/BubbleGroupBuying';
 import HeaderDoffy, {headerDoffyHeight} from './components/HeaderDoffy';
 import HeaderFilterTopic from './HeaderFilterTopic';
 
@@ -33,7 +34,7 @@ export interface TypeShowMoreOptions {
 }
 
 export interface TypeMoreOptionsMe {
-    postModal: TypeBubblePalace;
+    postModal: TypeBubblePalace & TypeGroupBuying;
 }
 
 let modalOptions: TypeShowMoreOptions = {
@@ -127,7 +128,10 @@ const DiscoveryScreen = () => {
      * Functions
      */
     const onShowModalComment = useCallback(
-        (post: TypeBubblePalace, type: TypeShowModalCommentOrLike) => {
+        (
+            post: TypeBubblePalace | TypeGroupBuying,
+            type: TypeShowModalCommentOrLike,
+        ) => {
             if (!hadLogan) {
                 appAlert('discovery.bubble.goToSignUp', {
                     moreNotice: 'common.letGo',
@@ -149,22 +153,48 @@ const DiscoveryScreen = () => {
         optionsRef.current?.show();
     }, []);
 
+    const onGoToDetailGroupBuying = useCallback((item: TypeGroupBuying) => {
+        navigate(DISCOVERY_ROUTE.detailGroupBuying, {
+            item,
+            setList,
+        });
+    }, []);
+
     /**
      * Render views
      */
     const RenderItemBubble = useCallback(
-        (item: TypeBubblePalace) => {
-            return (
-                <Bubble
-                    item={item}
-                    onShowMoreOption={onShowOptions}
-                    onShowModalComment={(post, type) =>
-                        onShowModalComment(post, type)
-                    }
-                    isFocusing={postIdFocusing === item.id}
-                    onChangePostIdFocusing={postId => setPostIdFocusing(postId)}
-                />
-            );
+        (item: TypeBubblePalace & TypeGroupBuying) => {
+            if (item.postType === POST_TYPE.review) {
+                return (
+                    <Bubble
+                        item={item}
+                        onShowMoreOption={onShowOptions}
+                        onShowModalComment={(post, type) =>
+                            onShowModalComment(post, type)
+                        }
+                        isFocusing={postIdFocusing === item.id}
+                        onChangePostIdFocusing={postId =>
+                            setPostIdFocusing(postId)
+                        }
+                    />
+                );
+            }
+            if (item.postType === POST_TYPE.groupBuying) {
+                return (
+                    <BubbleGroupBuying
+                        item={item}
+                        onGoToDetailGroupBuying={value =>
+                            onGoToDetailGroupBuying(value)
+                        }
+                        onShowMoreOption={onShowOptions}
+                        onShowModalComment={(post, type) =>
+                            onShowModalComment(post, type)
+                        }
+                    />
+                );
+            }
+            return null;
         },
         [postIdFocusing],
     );

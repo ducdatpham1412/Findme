@@ -353,13 +353,6 @@ export const apiCreateGroup = (
     return request.post('/profile/create-group', params);
 };
 
-// export const apiGetListMyGroups = (): Promise<{
-//     success: boolean;
-//     data: Array<TypeCreateGroupResponse>;
-// }> => {
-//     return request.get('/profile/list-my-groups');
-// };
-
 export const apiDeletePost = (idPost: string) => {
     return request.put(`/profile/delete-post/${idPost}`);
 };
@@ -403,6 +396,12 @@ export const apiGetListPostsSaved = ({
 
 export const apiGetListPostsArchived = ({params}: TypeParamsPaging) => {
     return request.get('/profile/list-posts-archived', {
+        params,
+    });
+};
+
+export const apiGetListGBJoined = ({params}: TypeParamsPaging) => {
+    return request.get('/profile/list-gb-joined', {
         params,
     });
 };

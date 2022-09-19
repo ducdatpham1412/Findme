@@ -1,4 +1,5 @@
 import {Metrics} from 'asset/metrics';
+import DetailGroupBuying from 'feature/discovery/DetailGroupBuying';
 import EditProfile from 'feature/profile/EditProfile';
 import MyProfile from 'feature/profile/MyProfile';
 import Redux from 'hook/useRedux';
@@ -29,6 +30,14 @@ const ProfileRoute = () => {
                 <ProfileStack.Screen
                     name={PROFILE_ROUTE.editProfile}
                     component={EditProfile}
+                />
+
+                <ProfileStack.Screen
+                    name={PROFILE_ROUTE.detailGroupBuying}
+                    component={DetailGroupBuying}
+                    sharedElementsConfig={() => {
+                        return ['image_group_buying'];
+                    }}
                 />
             </ProfileStack.Navigator>
         </>

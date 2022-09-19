@@ -1,16 +1,17 @@
 import Theme from 'asset/theme/Theme';
 import {StyleTouchable} from 'components/base';
 import React, {useEffect, useRef} from 'react';
-import {Animated, StyleProp, TextStyle} from 'react-native';
+import {Animated, StyleProp, TextStyle, ViewStyle} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
 interface Props {
     onPress(): void;
     customStyle?: StyleProp<TextStyle>;
+    touchableStyle?: StyleProp<ViewStyle>;
 }
 
-const IconNotLiked = ({onPress, customStyle}: Props) => {
+const IconNotLiked = ({onPress, customStyle, touchableStyle}: Props) => {
     const aim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
@@ -22,9 +23,9 @@ const IconNotLiked = ({onPress, customStyle}: Props) => {
 
     return (
         <Animated.View style={{transform: [{scale: aim}]}}>
-            <StyleTouchable onPress={onPress}>
+            <StyleTouchable onPress={onPress} customStyle={touchableStyle}>
                 <AntDesign
-                    name="hearto"
+                    name="staro"
                     style={[styles.heartNotLikeIcon, customStyle]}
                 />
             </StyleTouchable>

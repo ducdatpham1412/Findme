@@ -1,4 +1,4 @@
-import {TypeBubblePalace} from 'api/interface';
+import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {Metrics} from 'asset/metrics';
 import {TypeTheme} from 'asset/theme/Theme';
@@ -14,8 +14,8 @@ import Feather from 'react-native-vector-icons/Feather';
 
 interface Props {
     theme: TypeTheme;
-    bubbleFocusing: TypeBubblePalace;
-    updateBubbleFocusing(value: TypeBubblePalace): void;
+    bubbleFocusing: TypeBubblePalace | TypeGroupBuying;
+    updateBubbleFocusing(value: TypeBubblePalace | TypeGroupBuying): void;
     setTotalComments(value: number): void;
     increaseTotalComments(value: number): void;
     inputCommentContainerStyle?: StyleProp<ViewStyle>;
@@ -23,7 +23,7 @@ interface Props {
 }
 
 export interface TypeModalCommentPost {
-    post: TypeBubblePalace;
+    post: TypeBubblePalace | TypeGroupBuying;
     setList?: Function;
     type: TypeShowModalCommentOrLike;
 }
@@ -66,18 +66,20 @@ class ModalCommentLike extends Component<Props> {
             this.preNumberComments !== this.props.bubbleFocusing.totalComments
         ) {
             if (this.setList) {
-                this.setList((preValue: Array<TypeBubblePalace>) => {
-                    return preValue.map(item => {
-                        if (item.id !== this.props.bubbleFocusing.id) {
-                            return item;
-                        }
-                        return {
-                            ...item,
-                            totalComments:
-                                this.props.bubbleFocusing.totalComments,
-                        };
-                    });
-                });
+                this.setList(
+                    (preValue: Array<TypeBubblePalace | TypeGroupBuying>) => {
+                        return preValue.map(item => {
+                            if (item.id !== this.props.bubbleFocusing.id) {
+                                return item;
+                            }
+                            return {
+                                ...item,
+                                totalComments:
+                                    this.props.bubbleFocusing.totalComments,
+                            };
+                        });
+                    },
+                );
             }
         }
     }
