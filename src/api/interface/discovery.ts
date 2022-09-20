@@ -6,5 +6,6 @@ export interface TypePeopleJoinedResponse {
     creatorName: string;
     creatorAvatar: string;
     created: string;
-    relationship: number;
+    status: number | null;
+    relationship: number | null;
 }

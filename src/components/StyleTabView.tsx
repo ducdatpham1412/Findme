@@ -58,10 +58,15 @@ class StyleTabView extends Component<Props, States> {
         layOutWidth: 0,
     };
 
+    __canMoveScreen = true;
+
     private canMoveScreen = (
         event: GestureResponderEvent,
         gestureState: PanResponderGestureState,
     ) => {
+        if (this.__canMoveScreen === false) {
+            return false;
+        }
         const diffX = I18nManager.isRTL ? -gestureState.dx : gestureState.dx;
         const check =
             isMovingHorizontally(event, gestureState) &&
@@ -173,6 +178,14 @@ class StyleTabView extends Component<Props, States> {
 
     navigateToIndex(index: number) {
         this.jumpToIndex(index);
+    }
+
+    disableTouchable() {
+        this.__canMoveScreen = false;
+    }
+
+    enableTouchable() {
+        this.__canMoveScreen = true;
     }
 
     componentDidMount() {

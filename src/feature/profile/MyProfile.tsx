@@ -7,7 +7,7 @@ import {
     apiGetListPostsSaved,
     apiGetProfile,
 } from 'api/module';
-import {TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
+import {ACCOUNT, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
@@ -44,6 +44,8 @@ import SearchAndSetting, {
     searchSettingHeight,
 } from './components/SearchAndSetting';
 import ToolProfile, {toolProfileHeight} from './components/ToolProfile';
+import ListGroupBuyingJoined from './ListGroupBuyingJoined';
+import MyListGroupBuying from './MyListGroupBuying';
 import PostStatus from './post/PostStatus';
 
 interface ChildrenProps {
@@ -154,6 +156,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     const {profile} = Redux.getPassport();
     const bubblePalaceAction = Redux.getBubblePalaceAction();
     const theme = Redux.getTheme();
+    const isShopAccount = profile.account_type === ACCOUNT.shop;
 
     const modalLikeCommentRef = useRef<ModalCommentLike>(null);
 
@@ -185,7 +188,6 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     const myPostRef = useRef<ListShareElement>(null);
     const postLikedRef = useRef<ListShareElement>(null);
     const postSavedRef = useRef<ListShareElement>(null);
-    const gBJoinedRef = useRef<ListShareElement>(null);
     const tabViewRef = useRef<StyleTabView>(null);
     const scrollRef = useRef<ScrollView>(null);
 
@@ -381,11 +383,6 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 index: initIndex === -1 ? 0 : initIndex,
                 postId: bubbleId,
             });
-        } else if (tabIndexRef === 3) {
-            gBJoinedRef.current?.show({
-                index: initIndex === -1 ? 0 : initIndex,
-                postId: bubbleId,
-            });
         }
     };
 
@@ -429,8 +426,6 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             postLikedRef.current?.scrollToNearingEnd();
         } else if (isFocusPostSaved) {
             postSavedRef.current?.scrollToNearingEnd();
-        } else if (isFocusPostArchived) {
-            gBJoinedRef.current?.scrollToNearingEnd();
         }
     }, []);
 
@@ -536,6 +531,17 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                             styles.contentContainerPost,
                             isFocusMyPost ? {} : safeLoadMoreStyle,
                         ]}>
+                        {isShopAccount && (
+                            <MyListGroupBuying
+                                userId={profile.id}
+                                onTouchEnd={() =>
+                                    tabViewRef.current?.enableTouchable()
+                                }
+                                onTouchStart={() =>
+                                    tabViewRef.current?.disableTouchable()
+                                }
+                            />
+                        )}
                         {myPostsPaging.list.map(RenderItemPost)}
                         {myPostsPaging.loading && (
                             <LoadingMoreIndicator
@@ -572,7 +578,10 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                             styles.contentContainerPost,
                             isFocusPostArchived ? {} : safeLoadMoreStyle,
                         ]}>
-                        {gBJoinedPaging.list.map(RenderItemPost)}
+                        <ListGroupBuyingJoined
+                            list={gBJoinedPaging.list}
+                            setList={gBJoinedPaging.setList}
+                        />
                         {gBJoinedPaging.loading && (
                             <LoadingMoreIndicator
                                 color={theme.textHightLight}
@@ -606,16 +615,6 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 ref={postSavedRef}
                 title={profile.name}
                 listPaging={postsSavedPaging}
-                containerStyle={{
-                    backgroundColor: theme.backgroundColorSecond,
-                }}
-                onShowModalComment={showModalLikeComment}
-            />
-
-            <ListShareElement
-                ref={gBJoinedRef}
-                title={profile.name}
-                listPaging={gBJoinedPaging}
                 containerStyle={{
                     backgroundColor: theme.backgroundColorSecond,
                 }}

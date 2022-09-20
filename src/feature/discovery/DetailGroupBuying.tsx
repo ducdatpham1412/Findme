@@ -5,9 +5,12 @@ import {
     apiLeaveGroupBuying,
 } from 'api/discovery';
 import {TypeGroupBuying} from 'api/interface';
-import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
+import {
+    TypePeopleJoinedResponse,
+    TypeShowModalCommentOrLike,
+} from 'api/interface/discovery';
 import {apiLikePost, apiUnLikePost} from 'api/post';
-import {RELATIONSHIP, TYPE_DYNAMIC_LINK} from 'asset/enum';
+import {GROUP_BUYING_STATUS, RELATIONSHIP, TYPE_DYNAMIC_LINK} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {
@@ -42,7 +45,11 @@ import {ScaledSheet} from 'react-native-size-matters';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SharedElement} from 'react-navigation-shared-element';
 import {onGoToProfile, onGoToSignUp} from 'utility/assistant';
-import {formatDayGroupBuying, formatFromNow} from 'utility/format';
+import {
+    formatDayGroupBuying,
+    formatFromNow,
+    formatLocaleNumber,
+} from 'utility/format';
 import {I18Normalize} from 'utility/I18Next';
 import ModalPeopleJoined from './components/ModalPeopleJoined';
 
@@ -68,9 +75,17 @@ const onHandleLike = async (params: {
     totalLikes: number;
     setTotalLikes: Function;
     postId: string;
+    setList: any;
 }) => {
-    const {isModeExp, isLiked, setIsLiked, totalLikes, setTotalLikes, postId} =
-        params;
+    const {
+        isModeExp,
+        isLiked,
+        setIsLiked,
+        totalLikes,
+        setTotalLikes,
+        postId,
+        setList,
+    } = params;
 
     if (!isModeExp) {
         const currentLike = isLiked;
@@ -83,6 +98,18 @@ const onHandleLike = async (params: {
             } else {
                 await apiLikePost(postId);
             }
+            setList((preValue: Array<TypeGroupBuying>) => {
+                return preValue.map(value => {
+                    if (value.id !== postId) {
+                        return value;
+                    }
+                    return {
+                        ...value,
+                        isLiked: !currentLike,
+                        totalLikes: value.totalLikes + (currentLike ? -1 : 1),
+                    };
+                });
+            });
         } catch (err) {
             setIsLiked(currentLike);
             setTotalLikes(currentNumberLikes);
@@ -175,6 +202,7 @@ const DetailGroupBuying = ({route}: Props) => {
     const {item, setList} = route.params;
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
+    const {profile} = Redux.getPassport();
 
     const modalJoinedRef = useRef<Modalize>(null);
 
@@ -188,8 +216,9 @@ const DetailGroupBuying = ({route}: Props) => {
 
     const [isLiked, setIsLiked] = useState(item.isLiked);
     const [totalLikes, setTotalLikes] = useState(item.totalLikes);
+    const [totalJoined, setTotalJoined] = useState(item.totalJoins);
     const [disableShare, setDisableShare] = useState(false);
-    const [hadJoined, setHadJoined] = useState(item.isJoined);
+    const [status, setStatus] = useState(item.status);
 
     const isMyBubble = item.relationship === RELATIONSHIP.self;
 
@@ -212,16 +241,61 @@ const DetailGroupBuying = ({route}: Props) => {
     };
 
     const onJoinGroupBuying = async () => {
-        const currenJoined = hadJoined;
+        const oldStatus = status;
+        const oldListPeopleJoined = [...listJoinedPaging.list];
         try {
-            setHadJoined(!currenJoined);
-            if (!currenJoined) {
+            let updateStatus = status;
+            let updateTotalJoins = 0;
+
+            if (status === GROUP_BUYING_STATUS.notJoined) {
+                setStatus(GROUP_BUYING_STATUS.joinedNotBought);
+                listJoinedPaging.setList(
+                    (preValue: Array<TypePeopleJoinedResponse>) => {
+                        const temp: TypePeopleJoinedResponse = {
+                            id: '',
+                            creator: profile.id,
+                            creatorName: profile.name,
+                            creatorAvatar: profile.avatar,
+                            created: String(new Date()),
+                            status: null,
+                            relationship: RELATIONSHIP.self,
+                        };
+                        return [temp].concat(preValue);
+                    },
+                );
+                updateStatus = GROUP_BUYING_STATUS.joinedNotBought;
+                updateTotalJoins = 1;
                 await apiJoinGroupBuying(item.id);
-            } else {
+            } else if (status === GROUP_BUYING_STATUS.joinedNotBought) {
+                setStatus(GROUP_BUYING_STATUS.notJoined);
+                listJoinedPaging.setList(
+                    (preValue: Array<TypePeopleJoinedResponse>) => {
+                        return preValue.filter(
+                            value => value.creator !== profile.id,
+                        );
+                    },
+                );
+                updateStatus = GROUP_BUYING_STATUS.notJoined;
+                updateTotalJoins = -1;
                 await apiLeaveGroupBuying(item.id);
             }
+
+            setTotalJoined(totalJoined + updateTotalJoins);
+            setList((preValue: Array<TypeGroupBuying>) => {
+                return preValue.map(value => {
+                    if (value.id !== item.id) {
+                        return value;
+                    }
+                    return {
+                        ...value,
+                        totalJoins: value.totalJoins + updateTotalJoins,
+                        status: updateStatus,
+                    };
+                });
+            });
         } catch (err) {
-            setHadJoined(currenJoined);
+            setStatus(oldStatus);
+            listJoinedPaging.setList(oldListPeopleJoined);
             appAlert(err);
         }
     };
@@ -290,7 +364,9 @@ const DetailGroupBuying = ({route}: Props) => {
                                 ]}
                             />
                             <StyleText
-                                originValue={`${price.value} vnd`}
+                                originValue={`${formatLocaleNumber(
+                                    price.value,
+                                )} vnd`}
                                 style={[
                                     styles.peoplePriceText,
                                     {color: theme.highlightColor},
@@ -342,6 +418,7 @@ const DetailGroupBuying = ({route}: Props) => {
                                     totalLikes,
                                     setTotalLikes,
                                     postId: item.id,
+                                    setList,
                                 })
                             }
                             touchableStyle={[
@@ -363,6 +440,7 @@ const DetailGroupBuying = ({route}: Props) => {
                                     totalLikes,
                                     setTotalLikes,
                                     postId: item.id,
+                                    setList,
                                 })
                             }
                             touchableStyle={[
@@ -373,12 +451,12 @@ const DetailGroupBuying = ({route}: Props) => {
                     )}
                     <StyleText
                         i18Text={
-                            item.totalLikes
+                            totalLikes
                                 ? 'discovery.numberLike'
                                 : 'discovery.like'
                         }
                         i18Params={{
-                            value: item.totalLikes,
+                            value: totalLikes,
                         }}
                         customStyle={[
                             styles.textStar,
@@ -452,7 +530,7 @@ const DetailGroupBuying = ({route}: Props) => {
                         {color: theme.textHightLight},
                     ]}
                     i18Params={{
-                        value: item.totalJoins,
+                        value: totalJoined,
                     }}
                     onPress={() => modalJoinedRef.current?.open()}
                 />
@@ -498,6 +576,64 @@ const DetailGroupBuying = ({route}: Props) => {
                 </StyleTouchable>
             </>
         );
+    };
+
+    const ButtonCheckJoin = () => {
+        if (isMyBubble) {
+            return null;
+        }
+        if (status === GROUP_BUYING_STATUS.bought) {
+            return (
+                <StyleIcon
+                    source={Images.images.successful}
+                    size={60}
+                    customStyle={{alignSelf: 'center', marginTop: 10}}
+                />
+            );
+        }
+
+        if (
+            [
+                GROUP_BUYING_STATUS.notJoined,
+                GROUP_BUYING_STATUS.joinedNotBought,
+            ].includes(status)
+        ) {
+            const hadJoined = status === GROUP_BUYING_STATUS.joinedNotBought;
+            return (
+                <LinearGradient
+                    colors={
+                        hadJoined
+                            ? [theme.holderColor, theme.holderColor]
+                            : [
+                                  Theme.common.gradientTabBar1,
+                                  Theme.common.gradientTabBar2,
+                              ]
+                    }
+                    style={styles.groupBuyingBox}>
+                    <StyleTouchable
+                        customStyle={styles.touchGroupBuying}
+                        onPress={onJoinGroupBuying}>
+                        <StyleText
+                            i18Text={
+                                hadJoined
+                                    ? 'discovery.unJoinGroupBuying'
+                                    : 'discovery.joinGroupBuying'
+                            }
+                            customStyle={[
+                                styles.textGroupBuying,
+                                {
+                                    color: hadJoined
+                                        ? theme.textHightLight
+                                        : Theme.common.white,
+                                },
+                            ]}
+                        />
+                    </StyleTouchable>
+                </LinearGradient>
+            );
+        }
+
+        return null;
     };
 
     const Content = () => {
@@ -550,7 +686,9 @@ const DetailGroupBuying = ({route}: Props) => {
                     {backgroundColor: theme.backgroundColor},
                 ]}
                 contentContainerStyle={styles.contentContainer}>
-                <SharedElement id="image_group_buying" style={styles.imageView}>
+                <SharedElement
+                    id={`item.group_buying.${item.id}`}
+                    style={styles.imageView}>
                     <ScrollSyncSizeImage
                         images={item.images}
                         syncWidth={screenWidth}
@@ -563,6 +701,7 @@ const DetailGroupBuying = ({route}: Props) => {
                                     totalLikes,
                                     setTotalLikes,
                                     postId: item.id,
+                                    setList,
                                 });
                             }
                         }}
@@ -572,40 +711,7 @@ const DetailGroupBuying = ({route}: Props) => {
 
                 {Information()}
                 {ToolReaction()}
-
-                {!isMyBubble && (
-                    <LinearGradient
-                        colors={
-                            hadJoined
-                                ? [theme.holderColor, theme.holderColor]
-                                : [
-                                      Theme.common.gradientTabBar1,
-                                      Theme.common.gradientTabBar2,
-                                  ]
-                        }
-                        style={styles.groupBuyingBox}>
-                        <StyleTouchable
-                            customStyle={styles.touchGroupBuying}
-                            onPress={onJoinGroupBuying}>
-                            <StyleText
-                                i18Text={
-                                    hadJoined
-                                        ? 'discovery.unJoinGroupBuying'
-                                        : 'discovery.joinGroupBuying'
-                                }
-                                customStyle={[
-                                    styles.textGroupBuying,
-                                    {
-                                        color: hadJoined
-                                            ? theme.textHightLight
-                                            : Theme.common.white,
-                                    },
-                                ]}
-                            />
-                        </StyleTouchable>
-                    </LinearGradient>
-                )}
-
+                {ButtonCheckJoin()}
                 {ListPeopleBuying()}
                 {Content()}
             </ScrollView>

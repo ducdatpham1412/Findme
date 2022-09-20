@@ -20,6 +20,7 @@ interface LoginType {
 export interface PassportType {
     profile?: {
         id?: number | null | string; // if modeExp -> string '__1", else number
+        account_type: number;
         name?: string;
         anonymousName?: string;
         description?: string;

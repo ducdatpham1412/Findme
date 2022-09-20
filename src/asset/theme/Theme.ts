@@ -30,7 +30,7 @@ const Theme = {
         backgroundButtonColor: '#102a47',
         backgroundTextInput: '#202E44',
         tabBarIconColor: '#75adcb',
-        likeHeart: '#e8a02d',
+        likeHeart: '#ffe106',
         unLikeHeart: 'white',
         joinGroupChat: '#90BEE9',
     },
