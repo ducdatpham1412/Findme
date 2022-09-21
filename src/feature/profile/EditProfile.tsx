@@ -10,6 +10,7 @@ import {
 } from 'components/base';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import LoadingScreen from 'components/LoadingScreen';
+import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
@@ -118,6 +119,7 @@ const EditProfile = () => {
 
     return (
         <>
+            <ViewSafeTopPadding />
             <StyleHeader title="profile.component.infoProfile.editProfile" />
 
             <StyleContainer scrollEnabled customStyle={styles.container}>

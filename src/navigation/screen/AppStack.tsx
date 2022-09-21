@@ -16,6 +16,8 @@ import Redux from 'hook/useRedux';
 import StatusPostCreated from 'navigation/components/StatusPostCreated';
 import ROOT_SCREEN, {MESS_ROUTE, PROFILE_ROUTE} from 'navigation/config/routes';
 import React from 'react';
+import DetailGroupBuying from 'feature/discovery/DetailGroupBuying';
+import MyProfile from 'feature/profile/MyProfile';
 import MainTabs from './MainTabs';
 import SettingRoute from './tabs/SettingRoute';
 
@@ -51,6 +53,18 @@ const AppStack = () => {
                 <Stack.Screen
                     name={ROOT_SCREEN.detailBubble}
                     component={DetailBubble}
+                />
+                <Stack.Screen
+                    name={ROOT_SCREEN.detailGroupBuying}
+                    component={DetailGroupBuying}
+                    options={{
+                        cardStyleInterpolator:
+                            CardStyleInterpolators.forRevealFromBottomAndroid,
+                    }}
+                />
+                <Stack.Screen
+                    name={ROOT_SCREEN.myProfile}
+                    component={MyProfile}
                 />
 
                 {/* Interact Bubble */}
@@ -99,7 +113,7 @@ const AppStack = () => {
                     component={CreatePostPickImage}
                     options={{
                         cardStyleInterpolator:
-                            CardStyleInterpolators.forScaleFromCenterAndroid,
+                            CardStyleInterpolators.forVerticalIOS,
                         gestureEnabled: false,
                     }}
                 />

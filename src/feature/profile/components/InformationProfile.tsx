@@ -1,8 +1,14 @@
 import {TypeGetProfileResponse} from 'api/interface';
-import {TYPE_FOLLOW} from 'asset/enum';
+import {ACCOUNT, TYPE_FOLLOW} from 'asset/enum';
+import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';
-import {StyleImage, StyleText, StyleTouchable} from 'components/base';
+import {
+    StyleIcon,
+    StyleImage,
+    StyleText,
+    StyleTouchable,
+} from 'components/base';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {navigate, push} from 'navigation/NavigationService';
@@ -13,21 +19,20 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 
 interface Props {
     profile: TypeGetProfileResponse;
-    routeName: string;
     havingEditProfile?: boolean;
 }
 
 const InformationProfile = (props: Props) => {
-    const {profile, routeName, havingEditProfile} = props;
+    const {profile, havingEditProfile} = props;
     const theme = Redux.getTheme();
-    const {name, description, followers, followings, avatar} = profile;
+    const {name, description, followers, followings, avatar, account_type} =
+        profile;
 
     const onNavigateFollow = (type: number) => {
         push(ROOT_SCREEN.listFollows, {
             userId: profile.id,
             name: profile.name,
             type,
-            onGoBack: () => navigate(routeName),
         });
     };
 
@@ -108,25 +113,26 @@ const InformationProfile = (props: Props) => {
     };
 
     const ButtonEditProfile = () => {
-        if (havingEditProfile) {
-            return (
-                <StyleTouchable
-                    customStyle={[
-                        styles.editProfileBox,
-                        {backgroundColor: theme.tabBarIconColor},
-                    ]}
-                    onPress={() => navigate(PROFILE_ROUTE.editProfile)}>
-                    <AntDesign
-                        name="edit"
-                        style={[
-                            styles.editProfileIcon,
-                            {color: theme.backgroundColor},
+        return (
+            <>
+                {havingEditProfile && (
+                    <StyleTouchable
+                        customStyle={[
+                            styles.editProfileBox,
+                            {backgroundColor: theme.tabBarIconColor},
                         ]}
-                    />
-                </StyleTouchable>
-            );
-        }
-        return null;
+                        onPress={() => navigate(PROFILE_ROUTE.editProfile)}>
+                        <AntDesign
+                            name="edit"
+                            style={[
+                                styles.editProfileIcon,
+                                {color: theme.backgroundColor},
+                            ]}
+                        />
+                    </StyleTouchable>
+                )}
+            </>
+        );
     };
 
     return (
@@ -152,13 +158,26 @@ const InformationProfile = (props: Props) => {
                 />
 
                 <View style={styles.boxNameAndDescription}>
-                    <StyleText
-                        customStyle={[
-                            styles.textName,
-                            {color: theme.textHightLight},
-                        ]}
-                        originValue={name}
-                    />
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                        }}>
+                        {account_type === ACCOUNT.shop && (
+                            <StyleIcon
+                                source={Images.icons.house}
+                                size={17}
+                                customStyle={styles.shopBox}
+                            />
+                        )}
+                        <StyleText
+                            customStyle={[
+                                styles.textName,
+                                {color: theme.textHightLight},
+                            ]}
+                            originValue={name}
+                        />
+                    </View>
                     {!!description && (
                         <StyleText
                             originValue={description}
@@ -193,6 +212,9 @@ const styles = ScaledSheet.create({
         height: '2.5@vs',
         borderRadius: '20@s',
         alignSelf: 'center',
+    },
+    shopBox: {
+        marginRight: '5@s',
     },
     editProfileBox: {
         position: 'absolute',

@@ -171,6 +171,7 @@ const discovery = {
     bought: 'Đã mua',
     confirmBought: 'Xác nhận đã mua',
     participators: '{{value}} người tham gia',
+    gbExpired: 'Chiến dịch mua chung đã hết hạn',
 };
 
 // REPUTATION
@@ -250,6 +251,7 @@ const profile = {
     draftPost: 'Bài nháp',
     thisPostInDraft: 'Bạn đang lưu nháp bài này',
     goToPost: 'Đi tới đăng bài',
+    reviewProvider: 'Review nhà cung cấp',
 };
 
 // MESS ROUTE

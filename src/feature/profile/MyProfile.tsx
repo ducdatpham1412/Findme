@@ -1,4 +1,4 @@
-import {useIsFocused} from '@react-navigation/native';
+import {useIsFocused, useRoute} from '@react-navigation/native';
 import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
 import {
     apiGetListGBJoined,
@@ -16,10 +16,12 @@ import ModalCommentLike, {
     TypeModalCommentPost,
 } from 'components/ModalCommentLike';
 import StyleTabView from 'components/StyleTabView';
+import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import ListShareElement from 'feature/profile/post/ListShareElement';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import {tabBarViewHeight} from 'navigation/components/TabNavigator';
+import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {appAlert} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
@@ -48,10 +50,6 @@ import ListGroupBuyingJoined from './ListGroupBuyingJoined';
 import MyListGroupBuying from './MyListGroupBuying';
 import PostStatus from './post/PostStatus';
 
-interface ChildrenProps {
-    routeName: string;
-}
-
 const extraHeight = -(Metrics.safeBottomPadding + verticalScale(7));
 const screenWidth = Metrics.width;
 
@@ -59,7 +57,7 @@ const screenWidth = Metrics.width;
  * Profile Enjoy
  * -------------------------
  */
-const ProfileEnjoy = ({routeName}: ChildrenProps) => {
+const ProfileEnjoy = () => {
     const {profile} = Redux.getPassport();
     const theme = Redux.getTheme();
 
@@ -71,50 +69,49 @@ const ProfileEnjoy = ({routeName}: ChildrenProps) => {
 
     return (
         <>
-            <AvatarBackground avatar={profile.avatar} />
-            <View
-                style={[
-                    styles.overlayView,
-                    {backgroundColor: theme.backgroundColor},
-                ]}
-            />
-
-            <SearchAndSetting
-                onShowOptions={onShowOption}
-                hasBackBtn={false}
-                hasGuideButton
-            />
-
-            <ScrollView contentContainerStyle={styles.contentContainer}>
-                <InformationProfile
-                    profile={profile}
-                    routeName={routeName}
-                    havingEditProfile
+            <ViewSafeTopPadding />
+            <View style={{flex: 1}}>
+                <AvatarBackground avatar={profile.avatar} />
+                <View
+                    style={[
+                        styles.overlayView,
+                        {backgroundColor: theme.backgroundColor},
+                    ]}
                 />
-                <ToolProfile index={0} onChangeTab={() => null} />
-                <View style={styles.signUpBox}>
-                    <StyleImage
-                        customStyle={styles.imageTellSignUp}
-                        source={Images.images.signUpNow}
-                        resizeMode="contain"
-                    />
 
-                    <StyleTouchable
-                        customStyle={[
-                            styles.buttonTellSignUp,
-                            {backgroundColor: theme.highlightColor},
-                        ]}
-                        onPress={onGoToSignUp}>
-                        <StyleText
-                            i18Text="profile.component.infoProfile.tellSignUp"
-                            customStyle={[
-                                styles.textTellSignUp,
-                                {color: theme.textHightLight},
-                            ]}
+                <SearchAndSetting
+                    onShowOptions={onShowOption}
+                    hasBackBtn={false}
+                    hasGuideButton
+                />
+
+                <ScrollView contentContainerStyle={styles.contentContainer}>
+                    <InformationProfile profile={profile} havingEditProfile />
+                    <ToolProfile index={0} onChangeTab={() => null} />
+                    <View style={styles.signUpBox}>
+                        <StyleImage
+                            customStyle={styles.imageTellSignUp}
+                            source={Images.images.signUpNow}
+                            resizeMode="contain"
                         />
-                    </StyleTouchable>
-                </View>
-            </ScrollView>
+
+                        <StyleTouchable
+                            customStyle={[
+                                styles.buttonTellSignUp,
+                                {backgroundColor: theme.highlightColor},
+                            ]}
+                            onPress={onGoToSignUp}>
+                            <StyleText
+                                i18Text="profile.component.infoProfile.tellSignUp"
+                                customStyle={[
+                                    styles.textTellSignUp,
+                                    {color: theme.textHightLight},
+                                ]}
+                            />
+                        </StyleTouchable>
+                    </View>
+                </ScrollView>
+            </View>
 
             <StyleActionSheet
                 ref={optionRef}
@@ -150,13 +147,15 @@ const LoadingMoreIndicator = ({color}: any) => {
     );
 };
 
-const ProfileAccount = ({routeName}: ChildrenProps) => {
+const ProfileAccount = () => {
+    const route = useRoute();
     const isFocused = useIsFocused();
 
     const {profile} = Redux.getPassport();
     const bubblePalaceAction = Redux.getBubblePalaceAction();
     const theme = Redux.getTheme();
     const isShopAccount = profile.account_type === ACCOUNT.shop;
+    const isInTabProfile = route.name === PROFILE_ROUTE.myProfile;
 
     const modalLikeCommentRef = useRef<ModalCommentLike>(null);
 
@@ -196,7 +195,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     const isFocusMyPost = tabIndex === 0;
     const isFocusPostLiked = tabIndex === 1;
     const isFocusPostSaved = tabIndex === 2;
-    const isFocusPostArchived = tabIndex === 3;
+    const isFocusGbJoined = tabIndex === 3;
 
     useEffect(() => {
         if (
@@ -282,11 +281,6 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 }),
             );
 
-            if (listCheckTabLazy[3]) {
-                gBJoinedPaging.setList(preValue =>
-                    [postArchived].concat(preValue),
-                );
-            }
             if (listCheckTabLazy[1]) {
                 postsLikedPaging.setList(preValue =>
                     preValue.filter(item => {
@@ -317,9 +311,6 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             TYPE_BUBBLE_PALACE_ACTION.unArchivePost
         ) {
             const archivedPost: TypeBubblePalace = bubblePalaceAction.payload;
-            gBJoinedPaging.setList(preValue =>
-                preValue.filter(item => item.id !== archivedPost.id),
-            );
             myPostsPaging.setList(preValue => [archivedPost].concat(preValue));
             if (archivedPost.isLiked) {
                 postsLikedPaging.setList(preValue =>
@@ -345,8 +336,6 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
             listShareElement = postsLikedPaging.list;
         } else if (tabIndex === 2) {
             listShareElement = postsSavedPaging.list;
-        } else if (tabIndex === 3) {
-            listShareElement = gBJoinedPaging.list;
         }
         tabIndexRef = tabIndex;
     }, [
@@ -354,7 +343,6 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
         myPostsPaging.list,
         postsLikedPaging.list,
         postsSavedPaging.list,
-        gBJoinedPaging.list,
     ]);
 
     /**
@@ -399,7 +387,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 postsLikedPaging.onRefresh();
             } else if (isFocusPostSaved) {
                 postsSavedPaging.onRefresh();
-            } else if (isFocusPostArchived) {
+            } else if (isFocusGbJoined) {
                 gBJoinedPaging.onRefresh();
             }
         } catch (err) {
@@ -407,7 +395,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
         }
     };
 
-    const checkScrollEnd = useCallback((nativeEvent: NativeScrollEvent) => {
+    const checkScrollEnd = (nativeEvent: NativeScrollEvent) => {
         if (isScrollCloseToBottom(nativeEvent)) {
             if (isFocusMyPost) {
                 myPostsPaging.onLoadMore();
@@ -415,7 +403,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
                 postsLikedPaging.onLoadMore();
             } else if (isFocusPostSaved) {
                 postsSavedPaging.onLoadMore();
-            } else if (isFocusPostArchived) {
+            } else if (isFocusGbJoined) {
                 gBJoinedPaging.onLoadMore();
             }
         }
@@ -427,7 +415,7 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
         } else if (isFocusPostSaved) {
             postSavedRef.current?.scrollToNearingEnd();
         }
-    }, []);
+    };
 
     /**
      * Render views
@@ -447,235 +435,242 @@ const ProfileAccount = ({routeName}: ChildrenProps) => {
     );
 
     return (
-        <View style={{flex: 1}}>
-            <AvatarBackground avatar={profile.avatar} />
-            <View
-                style={[
-                    styles.overlayView,
-                    {backgroundColor: theme.backgroundColorSecond},
-                ]}
-            />
-            <SearchAndSetting
-                onShowOptions={onShowOption}
-                hasBackBtn={false}
-                hasGuideButton
-            />
-            <ScrollView
-                ref={scrollRef}
-                stickyHeaderIndices={[1]}
-                onMomentumScrollEnd={({nativeEvent}) => {
-                    checkScrollEnd(nativeEvent);
-                }}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={!!myPostsPaging.refreshing}
-                        onRefresh={onRefreshPage}
-                        tintColor={theme.highlightColor}
-                        colors={[theme.highlightColor]}
-                    />
-                }
-                showsVerticalScrollIndicator={false}>
-                <InformationProfile
-                    profile={profile}
-                    routeName={routeName}
-                    havingEditProfile
+        <>
+            <ViewSafeTopPadding />
+            <View style={{flex: 1}}>
+                <AvatarBackground avatar={profile.avatar} />
+                <View
+                    style={[
+                        styles.overlayView,
+                        {backgroundColor: theme.backgroundColorSecond},
+                    ]}
                 />
-                <>
-                    <ToolProfile
-                        index={tabIndex}
-                        onChangeTab={index => {
-                            setTabIndex(index);
-                            tabViewRef.current?.navigateToIndex(index);
-                        }}
-                    />
-                    <View
-                        style={[
-                            styles.indicatorView,
-                            {backgroundColor: theme.backgroundColor},
-                        ]}>
-                        <Animated.View
-                            style={[
-                                styles.indicator,
-                                {
-                                    flex: 1 / 4,
-                                    borderTopColor: theme.borderColor,
-                                    transform: [
-                                        {translateX: translateXIndicator},
-                                    ],
-                                },
-                            ]}
-                        />
-                    </View>
-                </>
-
-                <StyleTabView
-                    ref={tabViewRef}
-                    onFirstNavigateToIndex={index => {
-                        listCheckTabLazy[index] = true;
-                        if (index === 1) {
-                            postsLikedPaging.onLoadMore();
-                        } else if (index === 2) {
-                            postsSavedPaging.onLoadMore();
-                        } else if (index === 3) {
-                            gBJoinedPaging.onLoadMore();
-                        }
+                <SearchAndSetting
+                    onShowOptions={onShowOption}
+                    hasBackBtn={!isInTabProfile}
+                    hasGuideButton={isInTabProfile}
+                />
+                <ScrollView
+                    ref={scrollRef}
+                    stickyHeaderIndices={[1]}
+                    onMomentumScrollEnd={({nativeEvent}) => {
+                        checkScrollEnd(nativeEvent);
                     }}
-                    onScroll={e => {
-                        translateXIndicator.setValue(e.position * screenWidth);
-                        if (e.index !== tabIndex) {
-                            setTabIndex(e.index);
-                        }
-                    }}>
-                    <View
-                        style={[
-                            styles.contentContainerPost,
-                            isFocusMyPost ? {} : safeLoadMoreStyle,
-                        ]}>
-                        {isShopAccount && (
-                            <MyListGroupBuying
-                                userId={profile.id}
-                                onTouchEnd={() =>
-                                    tabViewRef.current?.enableTouchable()
-                                }
-                                onTouchStart={() =>
-                                    tabViewRef.current?.disableTouchable()
-                                }
-                            />
-                        )}
-                        {myPostsPaging.list.map(RenderItemPost)}
-                        {myPostsPaging.loading && (
-                            <LoadingMoreIndicator
-                                color={theme.textHightLight}
-                            />
-                        )}
-                    </View>
-                    <View
-                        style={[
-                            styles.contentContainerPost,
-                            isFocusPostLiked ? {} : safeLoadMoreStyle,
-                        ]}>
-                        {postsLikedPaging.list.map(RenderItemPost)}
-                        {postsLikedPaging.loading && (
-                            <LoadingMoreIndicator
-                                color={theme.textHightLight}
-                            />
-                        )}
-                    </View>
-                    <View
-                        style={[
-                            styles.contentContainerPost,
-                            isFocusPostSaved ? {} : safeLoadMoreStyle,
-                        ]}>
-                        {postsSavedPaging.list.map(RenderItemPost)}
-                        {postsSavedPaging.loading && (
-                            <LoadingMoreIndicator
-                                color={theme.textHightLight}
-                            />
-                        )}
-                    </View>
-                    <View
-                        style={[
-                            styles.contentContainerPost,
-                            isFocusPostArchived ? {} : safeLoadMoreStyle,
-                        ]}>
-                        <ListGroupBuyingJoined
-                            list={gBJoinedPaging.list}
-                            setList={gBJoinedPaging.setList}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={!!myPostsPaging.refreshing}
+                            onRefresh={onRefreshPage}
+                            tintColor={theme.highlightColor}
+                            colors={[theme.highlightColor]}
                         />
-                        {gBJoinedPaging.loading && (
-                            <LoadingMoreIndicator
-                                color={theme.textHightLight}
+                    }
+                    showsVerticalScrollIndicator={false}>
+                    <InformationProfile profile={profile} havingEditProfile />
+                    <>
+                        <ToolProfile
+                            index={tabIndex}
+                            onChangeTab={index => {
+                                setTabIndex(index);
+                                tabViewRef.current?.navigateToIndex(index);
+                            }}
+                        />
+                        <View
+                            style={[
+                                styles.indicatorView,
+                                {backgroundColor: theme.backgroundColor},
+                            ]}>
+                            <Animated.View
+                                style={[
+                                    styles.indicator,
+                                    {
+                                        flex: 1 / 4,
+                                        borderTopColor: theme.borderColor,
+                                        transform: [
+                                            {translateX: translateXIndicator},
+                                        ],
+                                    },
+                                ]}
                             />
-                        )}
-                    </View>
-                </StyleTabView>
-            </ScrollView>
+                        </View>
+                    </>
 
-            <ListShareElement
-                ref={myPostRef}
-                title={profile.name}
-                listPaging={myPostsPaging}
-                containerStyle={{
-                    backgroundColor: theme.backgroundColorSecond,
-                }}
-                onShowModalComment={showModalLikeComment}
-            />
+                    <StyleTabView
+                        ref={tabViewRef}
+                        onFirstNavigateToIndex={index => {
+                            listCheckTabLazy[index] = true;
+                            if (index === 1) {
+                                postsLikedPaging.onLoadMore();
+                            } else if (index === 2) {
+                                postsSavedPaging.onLoadMore();
+                            } else if (index === 3) {
+                                gBJoinedPaging.onLoadMore();
+                            }
+                        }}
+                        onScroll={e => {
+                            translateXIndicator.setValue(
+                                e.position * screenWidth,
+                            );
+                            if (e.index !== tabIndex) {
+                                setTabIndex(e.index);
+                            }
+                        }}>
+                        <View
+                            style={[
+                                styles.contentContainerPost,
+                                isFocusMyPost ? {} : safeLoadMoreStyle,
+                            ]}>
+                            {isShopAccount && (
+                                <MyListGroupBuying
+                                    userId={profile.id}
+                                    onTouchEnd={() =>
+                                        tabViewRef.current?.enableTouchable()
+                                    }
+                                    onTouchStart={() =>
+                                        tabViewRef.current?.disableTouchable()
+                                    }
+                                    detailGroupBuyingName={
+                                        isInTabProfile
+                                            ? PROFILE_ROUTE.detailGroupBuying
+                                            : ROOT_SCREEN.detailGroupBuying
+                                    }
+                                />
+                            )}
+                            {myPostsPaging.list.map(RenderItemPost)}
+                            {myPostsPaging.loading && (
+                                <LoadingMoreIndicator
+                                    color={theme.textHightLight}
+                                />
+                            )}
+                        </View>
+                        <View
+                            style={[
+                                styles.contentContainerPost,
+                                isFocusPostLiked ? {} : safeLoadMoreStyle,
+                            ]}>
+                            {postsLikedPaging.list.map(RenderItemPost)}
+                            {postsLikedPaging.loading && (
+                                <LoadingMoreIndicator
+                                    color={theme.textHightLight}
+                                />
+                            )}
+                        </View>
+                        <View
+                            style={[
+                                styles.contentContainerPost,
+                                isFocusPostSaved ? {} : safeLoadMoreStyle,
+                            ]}>
+                            {postsSavedPaging.list.map(RenderItemPost)}
+                            {postsSavedPaging.loading && (
+                                <LoadingMoreIndicator
+                                    color={theme.textHightLight}
+                                />
+                            )}
+                        </View>
+                        <View
+                            style={[
+                                styles.contentContainerPost,
+                                isFocusGbJoined ? {} : safeLoadMoreStyle,
+                            ]}>
+                            <ListGroupBuyingJoined
+                                listPaging={gBJoinedPaging}
+                                isInProfileTab={isInTabProfile}
+                            />
+                            {gBJoinedPaging.loading && (
+                                <LoadingMoreIndicator
+                                    color={theme.textHightLight}
+                                />
+                            )}
+                        </View>
+                    </StyleTabView>
+                </ScrollView>
 
-            <ListShareElement
-                ref={postLikedRef}
-                title={profile.name}
-                listPaging={postsLikedPaging}
-                containerStyle={{
-                    backgroundColor: theme.backgroundColorSecond,
-                }}
-                onShowModalComment={showModalLikeComment}
-            />
+                <ListShareElement
+                    ref={myPostRef}
+                    title={profile.name}
+                    listPaging={myPostsPaging}
+                    containerStyle={{
+                        backgroundColor: theme.backgroundColorSecond,
+                    }}
+                    onShowModalComment={showModalLikeComment}
+                />
 
-            <ListShareElement
-                ref={postSavedRef}
-                title={profile.name}
-                listPaging={postsSavedPaging}
-                containerStyle={{
-                    backgroundColor: theme.backgroundColorSecond,
-                }}
-                onShowModalComment={showModalLikeComment}
-            />
+                <ListShareElement
+                    ref={postLikedRef}
+                    title={profile.name}
+                    listPaging={postsLikedPaging}
+                    containerStyle={{
+                        backgroundColor: theme.backgroundColorSecond,
+                    }}
+                    onShowModalComment={showModalLikeComment}
+                />
 
-            <ModalCommentLike
-                ref={modalLikeCommentRef}
-                theme={theme}
-                bubbleFocusing={bubbleFocusing || fakeBubbleFocusing}
-                updateBubbleFocusing={value => {
-                    setBubbleFocusing((preValue: any) => ({
-                        ...preValue,
-                        ...value,
-                    }));
-                }}
-                setTotalComments={value => {
-                    setBubbleFocusing(preValue => {
-                        if (preValue) {
-                            return {
-                                ...preValue,
-                                totalComments: value,
-                            };
-                        }
-                        return preValue;
-                    });
-                }}
-                increaseTotalComments={value => {
-                    setBubbleFocusing(preValue => {
-                        if (preValue) {
-                            return {
-                                ...preValue,
-                                totalComments: preValue.totalComments + value,
-                            };
-                        }
-                        return preValue;
-                    });
-                }}
-                inputCommentContainerStyle={styles.inputCommentView}
-                extraHeight={extraHeight}
-            />
+                <ListShareElement
+                    ref={postSavedRef}
+                    title={profile.name}
+                    listPaging={postsSavedPaging}
+                    containerStyle={{
+                        backgroundColor: theme.backgroundColorSecond,
+                    }}
+                    onShowModalComment={showModalLikeComment}
+                />
 
-            <StyleActionSheet
-                ref={optionRef}
-                listTextAndAction={modalizeMyProfile}
-            />
-        </View>
+                <ModalCommentLike
+                    ref={modalLikeCommentRef}
+                    theme={theme}
+                    bubbleFocusing={bubbleFocusing || fakeBubbleFocusing}
+                    updateBubbleFocusing={value => {
+                        setBubbleFocusing((preValue: any) => ({
+                            ...preValue,
+                            ...value,
+                        }));
+                    }}
+                    setTotalComments={value => {
+                        setBubbleFocusing(preValue => {
+                            if (preValue) {
+                                return {
+                                    ...preValue,
+                                    totalComments: value,
+                                };
+                            }
+                            return preValue;
+                        });
+                    }}
+                    increaseTotalComments={value => {
+                        setBubbleFocusing(preValue => {
+                            if (preValue) {
+                                return {
+                                    ...preValue,
+                                    totalComments:
+                                        preValue.totalComments + value,
+                                };
+                            }
+                            return preValue;
+                        });
+                    }}
+                    inputCommentContainerStyle={styles.inputCommentView}
+                    extraHeight={extraHeight}
+                />
+
+                <StyleActionSheet
+                    ref={optionRef}
+                    listTextAndAction={modalizeMyProfile}
+                />
+            </View>
+        </>
     );
 };
 
 /**
  * BOSS HERE
  */
-const MyProfile = ({route}: any) => {
+const MyProfile = () => {
     const isModeExp = Redux.getModeExp();
     const token = Redux.getToken();
 
     if (!isModeExp && token) {
-        return <ProfileAccount routeName={route.name} />;
+        return <ProfileAccount />;
     }
-    return <ProfileEnjoy routeName={route.name} />;
+    return <ProfileEnjoy />;
 };
 
 const styles = ScaledSheet.create({

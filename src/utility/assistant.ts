@@ -21,7 +21,6 @@ import {LIST_TOPICS, PRIVATE_AVATAR} from 'asset/standardValue';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {
     LOGIN_ROUTE,
-    MAIN_SCREEN,
     PROFILE_ROUTE,
     SETTING_ROUTE,
 } from 'navigation/config/routes';
@@ -288,34 +287,6 @@ export const modeExpUsePaging = () => {
     };
 };
 
-export const modalizeYourProfile = (params: {
-    onBlockUser(): void;
-    onReport(): void;
-    onHandleFollow(): void;
-    isFollowing: boolean;
-}) => {
-    return [
-        {
-            text: params.isFollowing
-                ? 'profile.screen.unFollow'
-                : 'profile.screen.follow',
-            action: params.onHandleFollow,
-        },
-        {
-            text: 'profile.modalize.block',
-            action: params.onBlockUser,
-        },
-        {
-            text: 'profile.modalize.report',
-            action: params.onReport,
-        },
-        {
-            text: 'common.cancel',
-            action: () => null,
-        },
-    ];
-};
-
 export const modalizeMyProfile: Array<{
     text: I18Normalize;
     action: any;
@@ -434,6 +405,7 @@ export const chooseIconTopic = (topic: number) => {
 
 export const fakeBubbleFocusing: TypeBubblePalace = {
     id: '',
+    postType: 0,
     topic: 0,
     feeling: 0,
     location: '',
@@ -455,11 +427,13 @@ export const fakeBubbleFocusing: TypeBubblePalace = {
 };
 
 export const onGoToProfile = (userId: number) => {
+    const isModeExp = FindmeStore.getState().accountSlice.modeExp;
+    if (isModeExp) {
+        return;
+    }
     const myId = FindmeStore.getState().accountSlice.passport.profile.id;
     if (userId === myId) {
-        navigate(MAIN_SCREEN.profileRoute, {
-            screen: PROFILE_ROUTE.myProfile,
-        });
+        navigate(ROOT_SCREEN.myProfile);
         // push(ROOT_SCREEN.otherProfile, {
         //     id: userId,
         // });

@@ -95,7 +95,7 @@ const styles = ScaledSheet.create({
     container: {
         width: '100%',
         height: '50@vs',
-        paddingHorizontal: '30@s',
+        paddingHorizontal: '5@s',
         marginVertical: '7@vs',
         flexDirection: 'row',
         alignItems: 'center',

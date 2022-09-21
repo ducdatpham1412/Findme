@@ -15,6 +15,8 @@ import TopTabNavigator from 'navigation/components/TopTabNavigator';
 import {navigate} from 'navigation/NavigationService';
 import React, {useEffect, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
+import {View} from 'react-native';
+import {ScaledSheet} from 'react-native-size-matters';
 import {modeExpUsePaging} from 'utility/assistant';
 import ItemFollow from './components/ItemFollow';
 
@@ -105,6 +107,7 @@ const FollowingScreen = ({route}: any) => {
 const ListFollows = ({route}: Props) => {
     const {userId, name, type, onGoBack} = route.params;
     const {t} = useTranslation();
+    const theme = Redux.getTheme();
 
     const listTopTab = useMemo(() => {
         return [t('profile.follow.follower'), t('profile.follow.following')];
@@ -137,36 +140,49 @@ const ListFollows = ({route}: Props) => {
             <ViewSafeTopPadding />
             <StyleHeader title={name} onGoBack={onGoBack} />
 
-            <Tab.Navigator
-                tabBar={(props: MaterialTopTabBarProps) => (
-                    <TopTabNavigator
-                        materialProps={props}
-                        listRouteName={listTopTab}
-                        listRouteParams={[
-                            {
-                                userId,
-                            },
-                            {
-                                userId,
-                            },
-                        ]}
+            <View
+                style={[
+                    styles.container,
+                    {backgroundColor: theme.backgroundColor},
+                ]}>
+                <Tab.Navigator
+                    tabBar={(props: MaterialTopTabBarProps) => (
+                        <TopTabNavigator
+                            materialProps={props}
+                            listRouteName={listTopTab}
+                            listRouteParams={[
+                                {
+                                    userId,
+                                },
+                                {
+                                    userId,
+                                },
+                            ]}
+                        />
+                    )}
+                    initialRouteName={initRoute}>
+                    <Tab.Screen
+                        name="Follower"
+                        component={FollowerScreen}
+                        initialParams={{userId}}
                     />
-                )}
-                initialRouteName={initRoute}>
-                <Tab.Screen
-                    name="Follower"
-                    component={FollowerScreen}
-                    initialParams={{userId}}
-                />
 
-                <Tab.Screen
-                    name="Following"
-                    component={FollowingScreen}
-                    initialParams={{userId}}
-                />
-            </Tab.Navigator>
+                    <Tab.Screen
+                        name="Following"
+                        component={FollowingScreen}
+                        initialParams={{userId}}
+                    />
+                </Tab.Navigator>
+            </View>
         </>
     );
 };
+
+const styles = ScaledSheet.create({
+    container: {
+        flex: 1,
+        paddingHorizontal: '30@s',
+    },
+});
 
 export default ListFollows;

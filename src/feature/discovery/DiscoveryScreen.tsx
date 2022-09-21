@@ -20,7 +20,7 @@ import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import {onGoToSignUp, seeDetailImage} from 'utility/assistant';
+import {onGoToSignUp} from 'utility/assistant';
 import {useNotification} from 'utility/notification';
 import Bubble from './components/Bubble';
 import BubbleGroupBuying, {ParamsLikeGB} from './components/BubbleGroupBuying';
@@ -329,22 +329,24 @@ const DiscoveryScreen = () => {
                     {
                         text: 'discovery.report.title',
                         action: () => {
-                            navigate(ROOT_SCREEN.reportUser, {
-                                idUser: modalOptions.idUser,
-                                nameUser: modalOptions.nameUser,
-                            });
+                            if (hadLogan) {
+                                navigate(ROOT_SCREEN.reportUser, {
+                                    idUser: modalOptions.idUser,
+                                    nameUser: modalOptions.nameUser,
+                                });
+                            }
                         },
                     },
-                    {
-                        text: 'discovery.seeDetailImage',
-                        action: () => {
-                            seeDetailImage({
-                                images: modalOptions.imageWantToSee.map(
-                                    url => url,
-                                ),
-                            });
-                        },
-                    },
+                    // {
+                    //     text: 'discovery.seeDetailImage',
+                    //     action: () => {
+                    //         seeDetailImage({
+                    //             images: modalOptions.imageWantToSee.map(
+                    //                 url => url,
+                    //             ),
+                    //         });
+                    //     },
+                    // },
                     {
                         text: 'common.cancel',
                         action: () => null,

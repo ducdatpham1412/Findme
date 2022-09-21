@@ -32,3 +32,12 @@ export const apiGetListGroupBuying = ({params}: TypeParamsPaging) => {
         },
     });
 };
+
+export const apiGetListReviewAboutUser = ({params}: TypeParamsPaging) => {
+    return request.get(`/profile/list-posts-review-user/${params.userId}`, {
+        params: {
+            pageIndex: params.pageIndex,
+            take: params.take,
+        },
+    });
+};
