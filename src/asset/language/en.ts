@@ -168,6 +168,7 @@ const discovery = {
     bought: 'Bought',
     confirmBought: 'Confirm bought',
     participators: '{{value}} participators',
+    gbExpired: 'Group buying campaign was expired',
 };
 
 // REPUTATION
@@ -277,6 +278,7 @@ const profile = {
     draftPost: 'Draft',
     thisPostInDraft: 'This post is in draft',
     goToPost: 'Go to post',
+    reviewProvider: 'Review this provider',
 };
 
 // SETTING ROUTE

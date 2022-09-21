@@ -49,6 +49,7 @@ import {
     formatDayGroupBuying,
     formatFromNow,
     formatLocaleNumber,
+    isTimeBefore,
 } from 'utility/format';
 import {I18Normalize} from 'utility/I18Next';
 import ModalPeopleJoined from './components/ModalPeopleJoined';
@@ -221,6 +222,7 @@ const DetailGroupBuying = ({route}: Props) => {
     const [status, setStatus] = useState(item.status);
 
     const isMyBubble = item.relationship === RELATIONSHIP.self;
+    const isExpired = isTimeBefore(item.endDate, new Date());
 
     const onShowModalComment = (type: TypeShowModalCommentOrLike) => {
         if (isModeExp) {
@@ -330,7 +332,11 @@ const DetailGroupBuying = ({route}: Props) => {
                         originValue={formatDayGroupBuying(item.startDate)}
                         customStyle={[
                             styles.textTime,
-                            {color: theme.textColor},
+                            {
+                                color: isExpired
+                                    ? Theme.common.red
+                                    : theme.textColor,
+                            },
                         ]}
                     />
                 </View>
@@ -600,36 +606,46 @@ const DetailGroupBuying = ({route}: Props) => {
         ) {
             const hadJoined = status === GROUP_BUYING_STATUS.joinedNotBought;
             return (
-                <LinearGradient
-                    colors={
-                        hadJoined
-                            ? [theme.holderColor, theme.holderColor]
-                            : [
-                                  Theme.common.gradientTabBar1,
-                                  Theme.common.gradientTabBar2,
-                              ]
-                    }
-                    style={styles.groupBuyingBox}>
-                    <StyleTouchable
-                        customStyle={styles.touchGroupBuying}
-                        onPress={onJoinGroupBuying}>
+                <>
+                    <LinearGradient
+                        colors={
+                            hadJoined
+                                ? [theme.holderColor, theme.holderColor]
+                                : [
+                                      Theme.common.gradientTabBar1,
+                                      Theme.common.gradientTabBar2,
+                                  ]
+                        }
+                        style={styles.groupBuyingBox}>
+                        <StyleTouchable
+                            customStyle={styles.touchGroupBuying}
+                            onPress={onJoinGroupBuying}
+                            disable={isExpired}>
+                            <StyleText
+                                i18Text={
+                                    hadJoined
+                                        ? 'discovery.unJoinGroupBuying'
+                                        : 'discovery.joinGroupBuying'
+                                }
+                                customStyle={[
+                                    styles.textGroupBuying,
+                                    {
+                                        color: hadJoined
+                                            ? theme.textHightLight
+                                            : Theme.common.white,
+                                    },
+                                ]}
+                            />
+                        </StyleTouchable>
+                    </LinearGradient>
+
+                    {isExpired && (
                         <StyleText
-                            i18Text={
-                                hadJoined
-                                    ? 'discovery.unJoinGroupBuying'
-                                    : 'discovery.joinGroupBuying'
-                            }
-                            customStyle={[
-                                styles.textGroupBuying,
-                                {
-                                    color: hadJoined
-                                        ? theme.textHightLight
-                                        : Theme.common.white,
-                                },
-                            ]}
+                            i18Text="discovery.gbExpired"
+                            customStyle={styles.expiredText}
                         />
-                    </StyleTouchable>
-                </LinearGradient>
+                    )}
+                </>
             );
         }
 
@@ -660,6 +676,7 @@ const DetailGroupBuying = ({route}: Props) => {
                                 {color: theme.textColor},
                             ]}
                             numberOfLines={1}
+                            onPress={() => onGoToProfile(item.creator)}
                         />
                         <StyleText
                             originValue={formatFromNow(item.created)}
@@ -754,7 +771,7 @@ const styles = ScaledSheet.create({
     iconBackView: {
         position: 'absolute',
         left: '10@s',
-        top: '10@vs',
+        top: Metrics.safeTopPadding,
         padding: '5@ms',
         borderRadius: '20@ms',
     },
@@ -847,6 +864,12 @@ const styles = ScaledSheet.create({
         fontSize: FONT_SIZE.normal,
         fontWeight: 'bold',
         color: Theme.common.white,
+    },
+    expiredText: {
+        fontSize: FONT_SIZE.small,
+        color: Theme.common.red,
+        alignSelf: 'center',
+        marginTop: '5@vs',
     },
     titleListPeopleBuying: {
         fontSize: FONT_SIZE.normal,

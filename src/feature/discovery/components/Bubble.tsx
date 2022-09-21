@@ -272,6 +272,7 @@ const Bubble = (props: Props) => {
                                 styles.textName,
                                 {color: theme.textHightLight},
                             ]}
+                            onPress={() => onGoToProfile(item.creator)}
                         />
                         <StyleText
                             originValue={formatFromNow(item.created)}
@@ -664,6 +665,7 @@ const styles = ScaledSheet.create({
         width: '100%',
         marginBottom: '5@vs',
         paddingVertical: '10@vs',
+        borderRadius: '10@ms',
     },
     // header
     headerView: {

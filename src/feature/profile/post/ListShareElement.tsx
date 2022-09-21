@@ -5,6 +5,7 @@ import {apiDeletePost} from 'api/module';
 import {apiArchivePost, apiLikePost, apiUnLikePost} from 'api/post';
 import FindmeStore from 'app-redux/store';
 import {POST_TYPE, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
+import {Metrics} from 'asset/metrics';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import {TypeModalCommentPost} from 'components/ModalCommentLike';
@@ -30,7 +31,7 @@ import React, {Component} from 'react';
 import {Animated, FlatList, StyleProp, ViewStyle} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {DefaultTransitionSpec} from 'utility/animation';
-import {logger, seeDetailImage} from 'utility/assistant';
+import {logger} from 'utility/assistant';
 
 interface Props {
     title: string;
@@ -282,18 +283,18 @@ export default class ListShareElement extends Component<Props, States> {
                 <StyleActionSheet
                     ref={this.myOptionRef}
                     listTextAndAction={[
-                        {
-                            text: 'discovery.seeDetailImage',
-                            action: () => {
-                                if (postModal?.images.length) {
-                                    seeDetailImage({
-                                        images: postModal.images.map(
-                                            url => url,
-                                        ),
-                                    });
-                                }
-                            },
-                        },
+                        // {
+                        //     text: 'discovery.seeDetailImage',
+                        //     action: () => {
+                        //         if (postModal?.images.length) {
+                        //             seeDetailImage({
+                        //                 images: postModal.images.map(
+                        //                     url => url,
+                        //                 ),
+                        //             });
+                        //         }
+                        //     },
+                        // },
                         {
                             text: 'profile.post.edit',
                             action: onGoToEditPost,
@@ -324,18 +325,18 @@ export default class ListShareElement extends Component<Props, States> {
                 <StyleActionSheet
                     ref={this.draftOptionRef}
                     listTextAndAction={[
-                        {
-                            text: 'discovery.seeDetailImage',
-                            action: () => {
-                                if (postModal?.images.length) {
-                                    seeDetailImage({
-                                        images: postModal.images.map(
-                                            url => url,
-                                        ),
-                                    });
-                                }
-                            },
-                        },
+                        // {
+                        //     text: 'discovery.seeDetailImage',
+                        //     action: () => {
+                        //         if (postModal?.images.length) {
+                        //             seeDetailImage({
+                        //                 images: postModal.images.map(
+                        //                     url => url,
+                        //                 ),
+                        //             });
+                        //         }
+                        //     },
+                        // },
                         {
                             text: 'profile.post.edit',
                             action: onGoToEditPost,
@@ -367,21 +368,22 @@ export default class ListShareElement extends Component<Props, States> {
                             action: () => {
                                 navigate(ROOT_SCREEN.reportUser, {
                                     idUser: postModal.creator,
+                                    nameUser: postModal.creatorName,
                                 });
                             },
                         },
-                        {
-                            text: 'discovery.seeDetailImage',
-                            action: () => {
-                                if (postModal?.images.length) {
-                                    seeDetailImage({
-                                        images: postModal.images.map(
-                                            url => url,
-                                        ),
-                                    });
-                                }
-                            },
-                        },
+                        // {
+                        //     text: 'discovery.seeDetailImage',
+                        //     action: () => {
+                        //         if (postModal?.images.length) {
+                        //             seeDetailImage({
+                        //                 images: postModal.images.map(
+                        //                     url => url,
+                        //                 ),
+                        //             });
+                        //         }
+                        //     },
+                        // },
                         {
                             text: 'common.cancel',
                             action: () => null,
@@ -428,6 +430,7 @@ export default class ListShareElement extends Component<Props, States> {
                                 }
                             }
                         }}
+                        contentContainerStyle={styles.contentContainer}
                     />
                 </Animated.View>
 
@@ -444,5 +447,8 @@ const styles = ScaledSheet.create({
         position: 'absolute',
         width: '100%',
         height: '100%',
+    },
+    contentContainer: {
+        paddingBottom: Metrics.safeBottomPadding,
     },
 });

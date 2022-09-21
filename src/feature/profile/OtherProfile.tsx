@@ -10,30 +10,40 @@ import {
     apiGetProfile,
     apiUnFollowUser,
 } from 'api/module';
-import {RELATIONSHIP} from 'asset/enum';
+import {apiGetListReviewAboutUser} from 'api/post';
+import {ACCOUNT, RELATIONSHIP} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
+import {FONT_SIZE} from 'asset/standardValue';
 import {StyleText, StyleTouchable} from 'components/base';
-import StyleList from 'components/base/StyleList';
 import NoData from 'components/common/NoData';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import LoadingScreen from 'components/LoadingScreen';
 import ModalCommentLike from 'components/ModalCommentLike';
+import StyleTabView from 'components/StyleTabView';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
-import ROOT_SCREEN from 'navigation/config/routes';
+import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {View} from 'react-native';
+import {
+    Animated,
+    NativeScrollEvent,
+    Platform,
+    RefreshControl,
+    ScrollView,
+    View,
+} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {
     fakeBubbleFocusing,
     interactBubble,
-    modalizeYourProfile,
+    isScrollCloseToBottom,
 } from 'utility/assistant';
 import AvatarBackground from './components/AvatarBackground';
 import InformationProfile from './components/InformationProfile';
 import SearchAndSetting from './components/SearchAndSetting';
+import ToolOtherProfile from './components/ToolOtherProfile';
 import MyListGroupBuying from './MyListGroupBuying';
 import ListShareElement from './post/ListShareElement';
 import PostStatus from './post/PostStatus';
@@ -48,43 +58,76 @@ interface Props {
     };
 }
 
-let listPosts: Array<TypeBubblePalace> = [];
+const {width} = Metrics;
+
+const onBlockUser = async (userId: number) => {
+    try {
+        await apiBlockUser(userId);
+    } catch (err) {
+        appAlert(err);
+    }
+};
+const onReport = async (userId: number, userName: string) => {
+    navigate(ROOT_SCREEN.reportUser, {
+        idUser: userId,
+        nameUser: userName,
+    });
+};
+
+const onSendMessage = (profile: any) => {
+    if (profile) {
+        interactBubble({
+            userId: profile.id,
+            name: profile.name,
+            avatar: profile.avatar,
+        });
+    }
+};
 
 const OtherProfile = ({route}: Props) => {
     const {id, onGoBack} = route.params;
     const shouldRenderOtherProfile = Redux.getShouldRenderOtherProfile();
 
     const theme = Redux.getTheme();
-    const isModeExp = Redux.getModeExp();
     const isLoading = Redux.getIsLoading();
 
     const modalRef = useRef<ModalCommentLike>(null);
     const optionsRef = useRef<any>(null);
+    const actionReviewRef = useRef<any>(null);
+    const tabViewRef = useRef<StyleTabView>(null);
     const shareRef = useRef<ListShareElement>(null);
+    const translateXIndicator = useRef(new Animated.Value(0)).current;
+    const listPosts = useRef<Array<TypeBubblePalace>>([]);
 
     const [profile, setProfile] = useState<TypeGetProfileResponse>();
     const [isFollowing, setIsFollowing] = useState(false);
     const [bubbleFocusing, setBubbleFocusing] = useState<TypeBubblePalace>();
+    const [tabIndex, setTabIndex] = useState(0);
 
     const isBlock = profile?.relationship === RELATIONSHIP.block;
-    const listPaging = usePaging({
+    const isShopAccount = profile?.account_type === ACCOUNT.shop;
+    const isFocusListPost = tabIndex === 0;
+
+    const listPostsPaging = usePaging({
         request: apiGetListPost,
         params: {
             userId: id,
         },
     });
-    const {list, refreshing, onRefresh, onLoadMore} = listPaging;
+    const listPostsReviewAbout = usePaging({
+        request: apiGetListReviewAboutUser,
+        params: {
+            userId: id,
+        },
+        isInitNotRunRequest: true,
+    });
 
     const getData = async () => {
         try {
-            if (id && !isModeExp) {
-                Redux.setIsLoading(true);
-                const res = await apiGetProfile(id);
-                setIsFollowing(
-                    res.data.relationship === RELATIONSHIP.following,
-                );
-                setProfile(res.data);
-            }
+            Redux.setIsLoading(true);
+            const res = await apiGetProfile(id);
+            setIsFollowing(res.data.relationship === RELATIONSHIP.following);
+            setProfile(res.data);
         } catch (err) {
             appAlert(err);
         } finally {
@@ -93,35 +136,12 @@ const OtherProfile = ({route}: Props) => {
     };
 
     useEffect(() => {
-        listPosts = list;
-    }, [list]);
+        listPosts.current = listPostsPaging.list;
+    }, [listPostsPaging.list]);
 
     useEffect(() => {
         getData();
     }, [shouldRenderOtherProfile]);
-
-    const onSendMessage = () => {
-        if (profile?.name && profile.id && profile.avatar) {
-            interactBubble({
-                userId: profile.id,
-                name: profile.name,
-                avatar: profile.avatar,
-            });
-        }
-    };
-
-    const onBlockUser = async () => {
-        try {
-            await apiBlockUser(id);
-        } catch (err) {
-            appAlert(err);
-        }
-    };
-    const onReport = async () => {
-        navigate(ROOT_SCREEN.reportUser, {
-            idUser: id,
-        });
-    };
 
     const onHandleFollow = async () => {
         if (profile) {
@@ -156,46 +176,87 @@ const OtherProfile = ({route}: Props) => {
         optionsRef.current?.show();
     };
 
-    const onRefreshPage = async () => {
+    const onRefreshPage = useCallback(async () => {
         try {
-            if (!isModeExp) {
-                onRefresh();
-                const res = await apiGetProfile(id);
-                setIsFollowing(
-                    res.data.relationship === RELATIONSHIP.following,
-                );
-                setProfile(res.data);
-            }
+            listPostsPaging.onRefresh();
+            const res = await apiGetProfile(id);
+            setIsFollowing(res.data.relationship === RELATIONSHIP.following);
+            setProfile(res.data);
         } catch (err) {
             appAlert(err);
         }
-    };
+    }, []);
 
     const onGoToDetailPost = (bubbleId: string) => {
-        const initIndex = listPosts.findIndex(item => item.id === bubbleId);
+        const initIndex = listPosts.current.findIndex(
+            item => item.id === bubbleId,
+        );
         shareRef.current?.show({
             index: initIndex === -1 ? 0 : initIndex,
             postId: bubbleId,
         });
     };
 
+    const checkScrollEnd = (nativeEvent: NativeScrollEvent) => {
+        if (isScrollCloseToBottom(nativeEvent)) {
+            if (isFocusListPost) {
+                listPostsPaging.onLoadMore();
+            }
+        }
+        if (isFocusListPost) {
+            shareRef.current?.scrollToNearingEnd();
+        }
+    };
+
     /**
      * Render_view
      */
-    const HeaderComponent = () => {
+    const RenderItemPost = useCallback(
+        (item: TypeBubblePalace & TypeGroupBuying) => {
+            return (
+                <PostStatus
+                    key={item.id}
+                    item={item}
+                    onGoToDetailPost={onGoToDetailPost}
+                    containerStyle={styles.postStatusView}
+                />
+            );
+        },
+        [],
+    );
+
+    if (isBlock) {
         return (
             <>
-                {!!profile && (
-                    <InformationProfile
-                        profile={profile}
-                        routeName={route.name}
-                    />
-                )}
+                <AvatarBackground avatar={profile?.avatar || ''} />
+                <View
+                    style={[
+                        styles.overlayView,
+                        {backgroundColor: theme.backgroundColor},
+                    ]}
+                />
+                <ViewSafeTopPadding />
+                <SearchAndSetting
+                    onShowOptions={onShowOption}
+                    hasSettingBtn={false}
+                    onGoBack={onGoBack}
+                />
+                <NoData content="No Data" />
+            </>
+        );
+    }
 
+    const Header = () => {
+        return (
+            <>
+                {!!profile && <InformationProfile profile={profile} />}
                 <View
                     style={[
                         styles.btnInteractView,
-                        {backgroundColor: theme.backgroundColor},
+                        {
+                            backgroundColor: theme.backgroundColor,
+                            borderBottomColor: theme.holderColor,
+                        },
                     ]}>
                     <StyleTouchable
                         customStyle={[
@@ -233,7 +294,7 @@ const OtherProfile = ({route}: Props) => {
                                 backgroundColor: theme.backgroundButtonColor,
                             },
                         ]}
-                        onPress={onSendMessage}>
+                        onPress={() => onSendMessage(profile)}>
                         <StyleText
                             i18Text="profile.screen.sendMessage"
                             customStyle={[
@@ -245,44 +306,40 @@ const OtherProfile = ({route}: Props) => {
                         />
                     </StyleTouchable>
                 </View>
+
+                <ToolOtherProfile
+                    index={tabIndex}
+                    onChangeTab={index => {
+                        setTabIndex(index);
+                        tabViewRef.current?.navigateToIndex(index);
+                    }}
+                    disableReview={!isShopAccount}
+                    onShowModalReview={() => actionReviewRef.current?.show()}
+                />
             </>
         );
     };
 
-    const RenderItemPost = useCallback(
-        (item: TypeBubblePalace & TypeGroupBuying) => {
-            return (
-                <PostStatus
-                    key={item.id}
-                    item={item}
-                    onGoToDetailPost={onGoToDetailPost}
-                    containerStyle={styles.postStatusView}
-                />
-            );
-        },
-        [],
-    );
-
-    if (isBlock) {
+    const Indicator = () => {
         return (
-            <>
-                <AvatarBackground avatar={profile?.avatar || ''} />
-                <View
+            <View
+                style={[
+                    styles.indicatorView,
+                    {backgroundColor: theme.backgroundColor},
+                ]}>
+                <Animated.View
                     style={[
-                        styles.overlayView,
-                        {backgroundColor: theme.backgroundColor},
+                        styles.indicator,
+                        {
+                            flex: 1 / 3,
+                            borderTopColor: theme.borderColor,
+                            transform: [{translateX: translateXIndicator}],
+                        },
                     ]}
                 />
-                <ViewSafeTopPadding />
-                <SearchAndSetting
-                    onShowOptions={onShowOption}
-                    hasSettingBtn={false}
-                    onGoBack={onGoBack}
-                />
-                <NoData content="No Data" />
-            </>
+            </View>
         );
-    }
+    };
 
     return (
         <>
@@ -302,29 +359,75 @@ const OtherProfile = ({route}: Props) => {
             />
 
             <View style={{flex: 1}}>
-                <MyListGroupBuying userId={id} />
-                <StyleList
-                    data={list}
-                    renderItem={({item}) => RenderItemPost(item)}
-                    ListHeaderComponent={HeaderComponent()}
-                    ListEmptyComponent={() => null}
-                    style={styles.body}
-                    contentContainerStyle={styles.contentContainer}
-                    refreshing={refreshing}
-                    onRefresh={onRefreshPage}
-                    onLoadMore={onLoadMore}
-                    numColumns={3}
-                    onScrollBeginDrag={() => {
-                        shareRef.current?.scrollToNearingEnd();
+                <ScrollView
+                    onMomentumScrollEnd={({nativeEvent}) => {
+                        checkScrollEnd(nativeEvent);
                     }}
-                />
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={!!listPostsPaging.refreshing}
+                            onRefresh={onRefreshPage}
+                            tintColor={theme.highlightColor}
+                            colors={[theme.highlightColor]}
+                        />
+                    }
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.contentContainer}>
+                    {Header()}
+
+                    {Indicator()}
+
+                    <StyleTabView
+                        ref={tabViewRef}
+                        onFirstNavigateToIndex={index => {
+                            if (index === 1 && isShopAccount) {
+                                listPostsReviewAbout.onLoadMore();
+                            }
+                        }}
+                        onScroll={e => {
+                            translateXIndicator.setValue(
+                                (e.position * width * 2) / 3,
+                            );
+                            if (e.index !== tabIndex) {
+                                setTabIndex(e.index);
+                            }
+                        }}>
+                        <View style={styles.tabView}>
+                            {isShopAccount && (
+                                <MyListGroupBuying
+                                    userId={profile.id}
+                                    onTouchStart={() =>
+                                        tabViewRef.current?.disableTouchable()
+                                    }
+                                    onTouchEnd={() =>
+                                        tabViewRef.current?.enableTouchable()
+                                    }
+                                    detailGroupBuyingName={
+                                        ROOT_SCREEN.detailGroupBuying
+                                    }
+                                />
+                            )}
+                            {listPostsPaging.list.map(item =>
+                                RenderItemPost(item),
+                            )}
+                        </View>
+
+                        <View style={styles.tabView}>
+                            {isShopAccount &&
+                                listPostsReviewAbout.list.map(item =>
+                                    RenderItemPost(item),
+                                )}
+                        </View>
+                    </StyleTabView>
+                </ScrollView>
+
                 {isLoading && <LoadingScreen />}
             </View>
 
             <ListShareElement
                 ref={shareRef}
                 title={profile?.name || ''}
-                listPaging={listPaging}
+                listPaging={listPostsPaging}
                 containerStyle={{
                     backgroundColor: theme.backgroundColorSecond,
                 }}
@@ -370,12 +473,40 @@ const OtherProfile = ({route}: Props) => {
 
             <StyleActionSheet
                 ref={optionsRef}
-                listTextAndAction={modalizeYourProfile({
-                    onBlockUser,
-                    onReport,
-                    onHandleFollow,
-                    isFollowing,
-                })}
+                listTextAndAction={[
+                    {
+                        text: isFollowing
+                            ? 'profile.screen.unFollow'
+                            : 'profile.screen.follow',
+                        action: onHandleFollow,
+                    },
+                    {
+                        text: 'profile.modalize.block',
+                        action: () => onBlockUser(id),
+                    },
+                    {
+                        text: 'profile.modalize.report',
+                        action: () => onReport(id, profile?.name || ' '),
+                    },
+                    {
+                        text: 'common.cancel',
+                        action: () => null,
+                    },
+                ]}
+            />
+
+            <StyleActionSheet
+                ref={actionReviewRef}
+                listTextAndAction={[
+                    {
+                        text: 'profile.reviewProvider',
+                        action: () => navigate(PROFILE_ROUTE.createPostPickImg),
+                    },
+                    {
+                        text: 'common.cancel',
+                        action: () => null,
+                    },
+                ]}
             />
         </>
     );
@@ -422,7 +553,12 @@ const styles = ScaledSheet.create({
         paddingHorizontal: '20@s',
         flexDirection: 'row',
         justifyContent: 'center',
-        paddingBottom: '25@vs',
+        paddingBottom: '10@vs',
+        borderBottomWidth: Platform.select({
+            ios: '0.5@ms',
+            android: '0.5@ms',
+        }),
+        marginTop: -1,
     },
     buttonInteract: {
         flex: 1,
@@ -433,7 +569,25 @@ const styles = ScaledSheet.create({
         marginHorizontal: '3@s',
     },
     textInteract: {
-        fontSize: '11@ms',
+        fontSize: FONT_SIZE.small,
+    },
+    // indicator
+    indicatorView: {
+        width: '100%',
+        flexDirection: 'row',
+    },
+    indicator: {
+        flex: 1 / 3,
+        borderTopWidth: Platform.select({
+            ios: '1@ms',
+            android: '2@ms',
+        }),
+    },
+    // content
+    tabView: {
+        width,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
     },
 });
 

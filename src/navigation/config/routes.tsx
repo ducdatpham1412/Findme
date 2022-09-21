@@ -12,6 +12,8 @@ const ROOT_SCREEN = {
     otherProfile: '@ROOT_SCREEN/otherProfile',
     listFollows: '@ROOT_SCREEN/listFollows',
     detailBubble: '@ROOT_SCREEN/detailBubble',
+    detailGroupBuying: '@ROOT_SCREEN/detailGroupBuying',
+    myProfile: '@ROOT_SCREEN/myProfile',
 };
 /**
  * ||

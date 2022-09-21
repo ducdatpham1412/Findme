@@ -11,7 +11,7 @@ import {
     StyleTouchable,
 } from 'components/base';
 import Redux from 'hook/useRedux';
-import {PROFILE_ROUTE} from 'navigation/config/routes';
+import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
 import React, {useCallback} from 'react';
 import {View} from 'react-native';
@@ -27,13 +27,17 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import {onGoToProfile} from 'utility/assistant';
 
 interface Props {
-    list: Array<TypeGroupBuying>;
-    setList: any;
+    listPaging: any;
+    isInProfileTab: boolean;
 }
 
 const ListGroupBuyingJoined = (props: Props) => {
-    const {list, setList} = props;
+    const {listPaging, isInProfileTab} = props;
     const theme = Redux.getTheme();
+
+    const detailGroupTarget = isInProfileTab
+        ? PROFILE_ROUTE.detailGroupBuying
+        : ROOT_SCREEN.detailGroupBuying;
 
     const ButtonCheckJoined = useCallback(
         (item: TypeGroupBuying) => {
@@ -75,9 +79,9 @@ const ListGroupBuyingJoined = (props: Props) => {
                             },
                         ]}
                         onPress={() =>
-                            navigate(PROFILE_ROUTE.detailGroupBuying, {
+                            navigate(detailGroupTarget, {
                                 item,
-                                setList,
+                                setList: listPaging.setList,
                             })
                         }>
                         <StyleText
@@ -107,7 +111,7 @@ const ListGroupBuyingJoined = (props: Props) => {
 
     return (
         <View style={styles.container}>
-            {list.map(item => {
+            {listPaging.list.map((item: TypeGroupBuying) => {
                 const lastPrice = item.prices[item.prices.length - 1];
                 return (
                     <StyleTouchable
@@ -117,9 +121,9 @@ const ListGroupBuyingJoined = (props: Props) => {
                             {backgroundColor: theme.backgroundColor},
                         ]}
                         onPress={() =>
-                            navigate(PROFILE_ROUTE.detailGroupBuying, {
+                            navigate(detailGroupTarget, {
                                 item,
-                                setList,
+                                setList: listPaging.setList,
                             })
                         }>
                         {/* Image preview */}
