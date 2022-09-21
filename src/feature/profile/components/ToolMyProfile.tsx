@@ -9,12 +9,13 @@ import Feather from 'react-native-vector-icons/Feather';
 interface Props {
     index: number;
     onChangeTab(index: number): void;
+    isShopAccount: boolean;
 }
 
 const unFocusOpacity = 0.3;
 
-const ToolProfile = (props: Props) => {
-    const {index, onChangeTab} = props;
+const ToolMyProfile = (props: Props) => {
+    const {index, onChangeTab, isShopAccount} = props;
     const theme = Redux.getTheme();
 
     const isInMyPosts = index === 0;
@@ -79,7 +80,7 @@ const ToolProfile = (props: Props) => {
                 customStyle={styles.buttonBox}
                 onPress={() => onChangeTab(3)}>
                 <Feather
-                    name="shopping-bag"
+                    name={isShopAccount ? 'tag' : 'shopping-bag'}
                     style={[
                         styles.iconArchive,
                         {
@@ -121,8 +122,8 @@ const styles = ScaledSheet.create({
         fontSize: '18@ms',
     },
     iconArchive: {
-        fontSize: '18@ms',
+        fontSize: '16@ms',
     },
 });
 
-export default ToolProfile;
+export default ToolMyProfile;

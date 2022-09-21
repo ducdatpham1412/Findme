@@ -12,8 +12,6 @@ export enum RELATIONSHIP {
     notFollowing = 1,
     following = 2,
     block = 3,
-    joinedBought = 4,
-    joinedNotBought = 5,
     notKnow = 10,
 }
 

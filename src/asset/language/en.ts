@@ -279,6 +279,9 @@ const profile = {
     thisPostInDraft: 'This post is in draft',
     goToPost: 'Go to post',
     reviewProvider: 'Review this provider',
+    postsArchived: 'Post archived',
+    upgradeAccount: 'Provider account',
+    groupBuyingJoined: 'Group buying joined',
 };
 
 // SETTING ROUTE

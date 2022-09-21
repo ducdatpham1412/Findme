@@ -292,8 +292,8 @@ export const modalizeMyProfile: Array<{
     action: any;
 }> = [
     {
-        text: 'profile.modalize.setting',
-        action: () => navigate(PROFILE_ROUTE.settingRoute),
+        text: 'profile.component.infoProfile.editProfile',
+        action: () => navigate(PROFILE_ROUTE.editProfile),
     },
     {
         text: 'profile.modalize.myInfo',
@@ -303,8 +303,41 @@ export const modalizeMyProfile: Array<{
             }),
     },
     {
+        text: 'profile.postsArchived',
+        action: () => logger('go to archived screen'),
+    },
+    {
+        text: 'profile.upgradeAccount',
+        action: () => logger('with to provider account'),
+    },
+    {
+        text: 'common.cancel',
+        action: () => null,
+    },
+];
+
+export const modalizeMyProfileShop: Array<{
+    text: I18Normalize;
+    action: any;
+}> = [
+    {
         text: 'profile.component.infoProfile.editProfile',
         action: () => navigate(PROFILE_ROUTE.editProfile),
+    },
+    {
+        text: 'profile.modalize.myInfo',
+        action: () =>
+            navigate(PROFILE_ROUTE.settingRoute, {
+                screen: SETTING_ROUTE.personalInformation,
+            }),
+    },
+    {
+        text: 'profile.postsArchived',
+        action: () => logger('go to archived screen'),
+    },
+    {
+        text: 'profile.groupBuyingJoined',
+        action: () => logger('got to gbJoined screen'),
     },
     {
         text: 'common.cancel',

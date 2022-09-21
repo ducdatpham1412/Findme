@@ -1,70 +1,78 @@
+import {apiConfirmUserBought} from 'api/discovery';
 import {TypePeopleJoinedResponse} from 'api/interface/discovery';
-import {RELATIONSHIP} from 'asset/enum';
+import {apiFollowUser} from 'api/module';
+import {GROUP_BUYING_STATUS, RELATIONSHIP} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';
+import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import Redux from 'hook/useRedux';
+import {appAlert} from 'navigation/NavigationService';
 import React, {forwardRef, useCallback} from 'react';
 import {Platform, View} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import {Modalize} from 'react-native-modalize';
 import {ScaledSheet} from 'react-native-size-matters';
-import {formatFromNow} from 'utility/format';
-import {I18Normalize} from 'utility/I18Next';
+import Entypo from 'react-native-vector-icons/Entypo';
 import Feather from 'react-native-vector-icons/Feather';
-import {appAlert} from 'navigation/NavigationService';
-import {apiFollowUser} from 'api/module';
-import {apiConfirmUserBought} from 'api/discovery';
 import {onGoToProfile} from 'utility/assistant';
+import {formatFromNow} from 'utility/format';
 
 const modalHeight = (Metrics.height * 2) / 3;
 
 interface Props {
     postId: string;
     listPaging: any;
+    isMyBubble: boolean;
 }
 
 const ModalPeopleJoined = (props: Props, ref: any) => {
-    const {listPaging, postId} = props;
+    const {listPaging, postId, isMyBubble} = props;
     const theme = Redux.getTheme();
     const myId = Redux.getPassport().profile.id;
 
     const onPressButton = async (item: TypePeopleJoinedResponse) => {
         const oldList = [...listPaging.list];
         try {
-            if (item.relationship === RELATIONSHIP.notFollowing) {
-                listPaging.setList(
-                    (preValue: Array<TypePeopleJoinedResponse>) => {
-                        return preValue.map(value => {
-                            if (value.id !== item.id) {
-                                return value;
-                            }
-                            return {
-                                ...value,
-                                relationship: RELATIONSHIP.following,
-                            };
-                        });
-                    },
-                );
-                await apiFollowUser(item.creator);
-            } else if (item.relationship === RELATIONSHIP.joinedNotBought) {
-                listPaging.setList(
-                    (preValue: Array<TypePeopleJoinedResponse>) => {
-                        return preValue.map(value => {
-                            if (value.id !== item.id) {
-                                return value;
-                            }
-                            return {
-                                ...value,
-                                relationship: RELATIONSHIP.joinedBought,
-                            };
-                        });
-                    },
-                );
-                await apiConfirmUserBought({
-                    post_id: postId,
-                    user_id: item.creator,
-                });
+            if (!isMyBubble) {
+                if (item.relationship === RELATIONSHIP.notFollowing) {
+                    listPaging.setList(
+                        (preValue: Array<TypePeopleJoinedResponse>) => {
+                            return preValue.map(value => {
+                                if (value.id !== item.id) {
+                                    return value;
+                                }
+                                return {
+                                    ...value,
+                                    relationship: RELATIONSHIP.following,
+                                };
+                            });
+                        },
+                    );
+                    await apiFollowUser(item.creator);
+                }
+            }
+            if (isMyBubble) {
+                if (item.status === GROUP_BUYING_STATUS.joinedNotBought) {
+                    listPaging.setList(
+                        (preValue: Array<TypePeopleJoinedResponse>) => {
+                            return preValue.map(value => {
+                                if (value.id !== item.id) {
+                                    return value;
+                                }
+                                return {
+                                    ...value,
+                                    status: GROUP_BUYING_STATUS.bought,
+                                };
+                            });
+                        },
+                    );
+                    await apiConfirmUserBought({
+                        post_id: postId,
+                        user_id: item.creator,
+                    });
+                }
             }
         } catch (err) {
             appAlert(err);
@@ -78,24 +86,75 @@ const ModalPeopleJoined = (props: Props, ref: any) => {
                 itemJoined.creator === myId
                     ? `(You) ${itemJoined.creatorName}`
                     : itemJoined.creatorName;
-            let textButton: I18Normalize = 'common.null';
-            let backgroundButton = 'transparent';
-            let textColor = 'transparent';
 
-            if (itemJoined.relationship === RELATIONSHIP.notFollowing) {
-                textButton = 'profile.screen.follow';
-                backgroundButton = theme.backgroundButtonColor;
-                textColor = theme.textColor;
-            } else if (
-                itemJoined.relationship === RELATIONSHIP.joinedNotBought
-            ) {
-                textButton = 'discovery.confirmBought';
-                backgroundButton = theme.backgroundButtonColor;
-                textColor = theme.textColor;
-            } else if (itemJoined.relationship === RELATIONSHIP.joinedBought) {
-                textButton = 'discovery.bought';
-                textColor = theme.highlightColor;
-            }
+            const CheckButtonJoined = () => {
+                if (isMyBubble) {
+                    if (
+                        itemJoined.status ===
+                        GROUP_BUYING_STATUS.joinedNotBought
+                    ) {
+                        return (
+                            <StyleTouchable
+                                customStyle={[
+                                    styles.buttonCheckJoined,
+                                    {
+                                        backgroundColor:
+                                            theme.backgroundButtonColor,
+                                    },
+                                ]}
+                                onPress={() => onPressButton(itemJoined)}>
+                                <StyleText
+                                    i18Text="discovery.confirmBought"
+                                    customStyle={[
+                                        styles.textButton,
+                                        {color: theme.textColor},
+                                    ]}
+                                />
+                            </StyleTouchable>
+                        );
+                    }
+                    if (itemJoined.status === GROUP_BUYING_STATUS.bought) {
+                        return (
+                            <LinearGradient
+                                style={styles.boughtBox}
+                                colors={[
+                                    Theme.common.commentGreen,
+                                    Theme.common.gradientTabBar2,
+                                ]}>
+                                <Entypo
+                                    name="check"
+                                    style={styles.iconBought}
+                                />
+                                <StyleText
+                                    i18Text="discovery.bought"
+                                    customStyle={styles.textBought}
+                                />
+                            </LinearGradient>
+                        );
+                    }
+                }
+
+                if (itemJoined.relationship === RELATIONSHIP.notFollowing) {
+                    <StyleTouchable
+                        customStyle={[
+                            styles.buttonCheckJoined,
+                            {
+                                backgroundColor: theme.backgroundButtonColor,
+                            },
+                        ]}
+                        onPress={() => onPressButton(itemJoined)}>
+                        <StyleText
+                            i18Text="profile.screen.follow"
+                            customStyle={[
+                                styles.textButton,
+                                {color: theme.textColor},
+                            ]}
+                        />
+                    </StyleTouchable>;
+                }
+
+                return null;
+            };
 
             return (
                 <View
@@ -131,24 +190,11 @@ const ModalPeopleJoined = (props: Props, ref: any) => {
                             ]}
                         />
                     </View>
-                    <StyleTouchable
-                        customStyle={[
-                            styles.buttonCheckJoined,
-                            {backgroundColor: backgroundButton},
-                        ]}
-                        onPress={() => onPressButton(itemJoined)}>
-                        <StyleText
-                            i18Text={textButton}
-                            customStyle={[
-                                styles.textButton,
-                                {color: textColor},
-                            ]}
-                        />
-                    </StyleTouchable>
+                    {CheckButtonJoined()}
                 </View>
             );
         },
-        [theme.backgroundColor, postId, myId],
+        [theme.backgroundColor, postId, myId, isMyBubble],
     );
 
     return (
@@ -267,6 +313,23 @@ const styles = ScaledSheet.create({
     textButton: {
         fontSize: FONT_SIZE.small,
         fontWeight: 'bold',
+    },
+    boughtBox: {
+        paddingVertical: '4@vs',
+        paddingHorizontal: '15@s',
+        borderRadius: '20@ms',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    iconBought: {
+        fontSize: '13@ms',
+        color: Theme.common.white,
+    },
+    textBought: {
+        fontSize: FONT_SIZE.small,
+        fontWeight: 'bold',
+        color: Theme.common.white,
+        marginLeft: '5@s',
     },
 });
 
