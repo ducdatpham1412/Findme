@@ -22,6 +22,7 @@ import Carousel from 'react-native-snap-carousel';
 import {SharedElement} from 'react-navigation-shared-element';
 import {formatDayGroupBuying, formatLocaleNumber} from 'utility/format';
 import Entypo from 'react-native-vector-icons/Entypo';
+import LoadingIndicator from 'components/common/LoadingIndicator';
 
 interface Props {
     userId: number;
@@ -36,7 +37,15 @@ const MyListGroupBuying = (props: Props) => {
     const {userId, onTouchStart, onTouchEnd, detailGroupBuyingName} = props;
     const theme = Redux.getTheme();
 
-    const {list, setList, refreshing, onRefresh, onLoadMore} = usePaging({
+    const {
+        list,
+        setList,
+        refreshing,
+        onRefresh,
+        onLoadMore,
+        loading,
+        loadingMore,
+    } = usePaging({
         request: apiGetListGroupBuying,
         params: {
             userId,
@@ -201,12 +210,12 @@ const MyListGroupBuying = (props: Props) => {
         );
     }, []);
 
-    return (
-        <View style={styles.container}>
-            <View
-                style={styles.body}
-                onTouchStart={onTouchStart}
-                onTouchEnd={onTouchEnd}>
+    const Content = () => {
+        if (loading && !loadingMore) {
+            return <LoadingIndicator color={theme.textHightLight} />;
+        }
+        if (list.length) {
+            return (
                 <Carousel
                     horizontal
                     data={list}
@@ -218,6 +227,51 @@ const MyListGroupBuying = (props: Props) => {
                     onRefresh={onRefresh}
                     onEndReached={onLoadMore}
                 />
+            );
+        }
+        return (
+            <View
+                style={[
+                    styles.emptyView,
+                    {
+                        borderColor: theme.textColor,
+                        backgroundColor: theme.backgroundColor,
+                    },
+                ]}>
+                <StyleIcon source={Images.images.squirrelLogin} size={80} />
+                <StyleTouchable
+                    customStyle={[
+                        styles.buttonGoToCreateGb,
+                        {borderColor: theme.textHightLight},
+                    ]}>
+                    <StyleIcon source={Images.icons.dollar} size={15} />
+                    <StyleText
+                        i18Text="profile.gotToCreateGb"
+                        customStyle={[
+                            styles.textCreateGB,
+                            {color: theme.textHightLight},
+                        ]}
+                    />
+                </StyleTouchable>
+            </View>
+        );
+    };
+
+    return (
+        <View style={styles.container}>
+            <View
+                style={styles.body}
+                onTouchStart={() => {
+                    if (list.length) {
+                        onTouchStart();
+                    }
+                }}
+                onTouchEnd={() => {
+                    if (list.length) {
+                        onTouchEnd();
+                    }
+                }}>
+                {Content()}
             </View>
         </View>
     );
@@ -228,8 +282,9 @@ const styles = ScaledSheet.create({
         width: '100%',
         height: (width * 2) / 3.5,
         alignItems: 'center',
-        marginTop: '10@vs',
+        marginVertical: '10@vs',
         overflow: 'hidden',
+        justifyContent: 'center',
     },
     body: {
         width: width * 0.9,
@@ -331,6 +386,28 @@ const styles = ScaledSheet.create({
     },
     textTellJoin: {
         fontSize: FONT_SIZE.small,
+    },
+    emptyView: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: '0.5@ms',
+        borderRadius: '10@ms',
+    },
+    buttonGoToCreateGb: {
+        marginLeft: '10@s',
+        paddingHorizontal: '10@s',
+        paddingVertical: '10@vs',
+        borderWidth: '0.5@ms',
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: '10@ms',
+        marginTop: '15@vs',
+    },
+    textCreateGB: {
+        fontSize: FONT_SIZE.small,
+        fontWeight: 'bold',
+        marginLeft: '5@s',
     },
 });
 

@@ -282,6 +282,7 @@ const profile = {
     postsArchived: 'Post archived',
     upgradeAccount: 'Provider account',
     groupBuyingJoined: 'Group buying joined',
+    gotToCreateGb: 'Create first group buying campaign',
 };
 
 // SETTING ROUTE

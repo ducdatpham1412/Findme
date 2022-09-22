@@ -255,6 +255,7 @@ const profile = {
     postsArchived: 'Bài viết lưu trữ',
     upgradeAccount: 'Chế độ nhà cung cấp',
     groupBuyingJoined: 'Mua chung đã tham gia',
+    gotToCreateGb: 'Tạo chiến dịch mua chung đầu tiên',
 };
 
 // MESS ROUTE
