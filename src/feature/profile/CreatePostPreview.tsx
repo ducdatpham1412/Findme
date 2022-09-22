@@ -32,7 +32,6 @@ import {
     Vibration,
     View,
 } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import {Modalize} from 'react-native-modalize';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -55,6 +54,11 @@ interface Props {
             itemNew?: {
                 images: Array<string>;
                 isVideo: boolean;
+                userReviewed?: {
+                    id: number;
+                    name: string;
+                    avatar: string;
+                };
             };
             itemEdit?: TypeBubblePalace;
             itemDraft?: TypeBubblePalace;
@@ -62,8 +66,6 @@ interface Props {
         };
     };
 }
-
-const AnimatedStars = Animated.createAnimatedComponent(LinearGradient);
 
 const IconStar = () => (
     <AntDesign
@@ -117,6 +119,7 @@ const CreatePostPreview = ({route}: Props) => {
     const scaleStars = useRef(new Animated.Value(1)).current;
     const translateXStars = useRef(new Animated.Value(0)).current;
     const [keyboardHeight, setKeyboardHeight] = useState(0);
+    const scrollViewRef = useRef<ScrollView>(null);
 
     const starRef = useRef<Modalize>(null);
     const linkRef = useRef<ModalAddLink>(null);
@@ -147,6 +150,12 @@ const CreatePostPreview = ({route}: Props) => {
                 itemError?.location ||
                 itemDraft?.location,
             link: itemEdit?.link || itemError?.link || itemDraft?.link,
+            userReviewed:
+                itemNew?.userReviewed ||
+                itemEdit?.userReviewed ||
+                itemDraft?.userReviewed ||
+                itemError?.userReviewed ||
+                undefined,
         };
     }, []);
 
@@ -219,7 +228,8 @@ const CreatePostPreview = ({route}: Props) => {
             link !== initValue.link ||
             feeling !== initValue.feeling ||
             topic !== initValue.topic ||
-            location !== initValue.location
+            location !== initValue.location ||
+            itemError
         ) {
             appAlertYesNo({
                 i18Title: 'common.wantToDiscard',
@@ -238,6 +248,7 @@ const CreatePostPreview = ({route}: Props) => {
 
     const onConfirmPost = async (isDraft: boolean) => {
         if (stars === 0) {
+            scrollViewRef.current?.scrollToEnd();
             Vibration.vibrate();
             Animated.timing(scaleStars, {
                 toValue: 1.5,
@@ -289,6 +300,7 @@ const CreatePostPreview = ({route}: Props) => {
                 location,
                 link,
                 isDraft,
+                userId: initValue.userReviewed?.id,
             };
             try {
                 Redux.setPostCreatedHandling({
@@ -301,14 +313,8 @@ const CreatePostPreview = ({route}: Props) => {
                     1000,
                 );
                 const res = await apiCreatePost({
-                    content,
+                    ...newPost,
                     images: listNameImages,
-                    stars,
-                    feeling,
-                    topic,
-                    location,
-                    link,
-                    isDraft,
                 });
                 Redux.setBubblePalaceAction({
                     action: TYPE_BUBBLE_PALACE_ACTION.createNewPost,
@@ -321,7 +327,10 @@ const CreatePostPreview = ({route}: Props) => {
             } catch (err) {
                 Redux.setPostCreatedHandling({
                     status: 'error',
-                    data: newPost,
+                    data: {
+                        ...newPost,
+                        userReviewed: initValue.userReviewed,
+                    },
                 });
                 appAlert(err);
             }
@@ -413,6 +422,13 @@ const CreatePostPreview = ({route}: Props) => {
                         style={[styles.iconClose, {color: theme.textColor}]}
                     />
                 </StyleTouchable>
+
+                {!!initValue.userReviewed && (
+                    <StyleImage
+                        source={{uri: initValue.userReviewed.avatar}}
+                        customStyle={styles.avatarHeader}
+                    />
+                )}
 
                 {(itemNew || itemError || itemDraft) && (
                     <StyleTouchable
@@ -541,13 +557,72 @@ const CreatePostPreview = ({route}: Props) => {
     }, []);
 
     const StarLink = () => {
+        const Link = () => {
+            if (initValue.userReviewed) {
+                return (
+                    <StyleTouchable
+                        customStyle={[
+                            styles.linkBox,
+                            {backgroundColor: theme.backgroundButtonColor},
+                        ]}
+                        onPress={onAddLink}>
+                        <StyleImage
+                            source={{uri: initValue.userReviewed.avatar}}
+                            customStyle={styles.iconHouseTouch}
+                        />
+                        <StyleText
+                            originValue={initValue.userReviewed.name}
+                            customStyle={styles.textNumberStar}
+                        />
+                    </StyleTouchable>
+                );
+            }
+            if (link) {
+                return (
+                    <StyleTouchable
+                        customStyle={[
+                            styles.linkBox,
+                            {backgroundColor: theme.backgroundButtonColor},
+                        ]}
+                        onPress={onAddLink}>
+                        <View style={styles.iconHouseTouch}>
+                            <StyleImage
+                                source={Images.icons.house}
+                                customStyle={styles.iconHouse}
+                            />
+                        </View>
+                        <StyleText
+                            originValue={'See now'}
+                            customStyle={styles.textNumberStar}
+                        />
+                    </StyleTouchable>
+                );
+            }
+            return (
+                <StyleTouchable
+                    customStyle={[
+                        styles.addLinkBox,
+                        {borderColor: theme.textColor},
+                    ]}
+                    onPress={onAddLink}>
+                    <AntDesign
+                        name="plus"
+                        style={[styles.textAddLink, {color: theme.textColor}]}
+                    />
+                    <StyleText
+                        i18Text="profile.post.addLink"
+                        customStyle={[
+                            styles.textAddLink,
+                            {color: theme.textColor, marginLeft: 10},
+                        ]}
+                    />
+                </StyleTouchable>
+            );
+        };
+
         return (
             <View style={styles.starLinkView}>
-                <AnimatedStars
-                    colors={[
-                        Theme.common.gradientTabBar1,
-                        Theme.common.gradientTabBar2,
-                    ]}
+                <Animated.View
                     style={[
                         styles.starBox,
                         {
@@ -555,6 +630,7 @@ const CreatePostPreview = ({route}: Props) => {
                                 {scale: scaleStars},
                                 {translateX: translateXStars},
                             ],
+                            backgroundColor: theme.backgroundButtonColor,
                         },
                     ]}>
                     <StyleTouchable
@@ -589,53 +665,8 @@ const CreatePostPreview = ({route}: Props) => {
                             customStyle={styles.textNumberStar}
                         />
                     </StyleTouchable>
-                </AnimatedStars>
-
-                {link ? (
-                    <StyleTouchable
-                        customStyle={styles.linkBox}
-                        onPress={onAddLink}>
-                        <LinearGradient
-                            colors={[
-                                Theme.common.gradientTabBar1,
-                                Theme.common.gradientTabBar2,
-                            ]}
-                            style={styles.linkTouch}>
-                            <View style={styles.iconHouseTouch}>
-                                <StyleImage
-                                    source={Images.icons.house}
-                                    customStyle={styles.iconHouse}
-                                />
-                            </View>
-                            <StyleText
-                                originValue={'See now'}
-                                customStyle={styles.textNumberStar}
-                            />
-                        </LinearGradient>
-                    </StyleTouchable>
-                ) : (
-                    <StyleTouchable
-                        customStyle={[
-                            styles.addLinkBox,
-                            {borderColor: theme.textColor},
-                        ]}
-                        onPress={onAddLink}>
-                        <AntDesign
-                            name="plus"
-                            style={[
-                                styles.textAddLink,
-                                {color: theme.textColor},
-                            ]}
-                        />
-                        <StyleText
-                            i18Text="profile.post.addLink"
-                            customStyle={[
-                                styles.textAddLink,
-                                {color: theme.textColor, marginLeft: 10},
-                            ]}
-                        />
-                    </StyleTouchable>
-                )}
+                </Animated.View>
+                {Link()}
             </View>
         );
     };
@@ -727,7 +758,9 @@ const CreatePostPreview = ({route}: Props) => {
             ]}>
             {Header()}
 
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView
+                ref={scrollViewRef}
+                showsVerticalScrollIndicator={false}>
                 {FeelingTopicLocation()}
                 <View style={styles.captionView}>
                     <TextInput
@@ -766,6 +799,7 @@ const CreatePostPreview = ({route}: Props) => {
                 link={link || ''}
                 onChangeLink={value => setLink(value)}
                 theme={theme}
+                userReviewed={initValue.userReviewed}
             />
             <ModalCheckIn
                 ref={checkInRef}
@@ -847,6 +881,13 @@ const styles = ScaledSheet.create({
     iconClose: {
         fontSize: '25@ms',
     },
+    avatarHeader: {
+        position: 'absolute',
+        right: '50@s',
+        height: '20@s',
+        width: '20@s',
+        borderRadius: '10@s',
+    },
     postBox: {
         borderWidth: Platform.select({
             ios: '0.5@ms',
@@ -901,6 +942,11 @@ const styles = ScaledSheet.create({
     },
     linkBox: {
         marginLeft: '10@s',
+        height: '30@ms',
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: '5@ms',
+        paddingHorizontal: '10@s',
     },
     linkTouch: {
         height: '30@ms',

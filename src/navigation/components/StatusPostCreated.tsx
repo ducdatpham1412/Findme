@@ -118,7 +118,7 @@ const styles = ScaledSheet.create({
     },
     closeBox: {
         position: 'absolute',
-        backgroundColor: Theme.common.red,
+        backgroundColor: Theme.common.white,
         padding: '1.5@ms',
         borderRadius: '15@ms',
         right: 0,
@@ -126,7 +126,7 @@ const styles = ScaledSheet.create({
     },
     textClose: {
         fontSize: '10@ms',
-        color: Theme.common.white,
+        color: Theme.common.black,
     },
 });
 

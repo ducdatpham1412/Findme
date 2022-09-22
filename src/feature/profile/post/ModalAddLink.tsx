@@ -1,5 +1,6 @@
+import {FONT_SIZE} from 'asset/standardValue';
 import {TypeTheme} from 'asset/theme/Theme';
-import {StyleButton, StyleText} from 'components/base';
+import {StyleButton, StyleImage, StyleText} from 'components/base';
 import ButtonX from 'components/common/ButtonX';
 import React, {Component} from 'react';
 import {Platform, TextInput, View} from 'react-native';
@@ -12,6 +13,13 @@ interface Props {
     link: string;
     onChangeLink(value: string): void;
     theme: TypeTheme;
+    userReviewed:
+        | {
+              id: number;
+              name: string;
+              avatar: string;
+          }
+        | undefined;
 }
 
 interface States {
@@ -48,31 +56,41 @@ class ModalAddLink extends Component<Props, States> {
     };
 
     render() {
-        const {theme, link} = this.props;
+        const {theme, link, userReviewed} = this.props;
         const {tempLink} = this.state;
         const isValid = tempLink ? validateIsLink(tempLink) : true;
         const borderWidth = isValid ? 0 : borderWidthError;
 
-        return (
-            <Modalize
-                ref={this.modalRef}
-                modalStyle={styles.modal}
-                withHandle={false}>
-                <View
-                    style={[
-                        styles.container,
-                        {backgroundColor: theme.backgroundColor},
-                    ]}>
-                    <ButtonX
-                        containerStyle={styles.buttonClose}
-                        onPress={() => {
-                            this.modalRef.current?.close();
-                            this.setState({
-                                tempLink: link,
-                            });
-                        }}
-                    />
-
+        const Content = () => {
+            if (userReviewed) {
+                return (
+                    <>
+                        <StyleImage
+                            source={{uri: userReviewed.avatar}}
+                            customStyle={styles.avatar}
+                        />
+                        <StyleText
+                            i18Text="discovery.reviewAbout"
+                            customStyle={[
+                                styles.textReview,
+                                {color: theme.textColor},
+                            ]}>
+                            <StyleText
+                                originValue={userReviewed.name}
+                                customStyle={[
+                                    styles.textReview,
+                                    {
+                                        color: theme.textHightLight,
+                                        fontWeight: 'bold',
+                                    },
+                                ]}
+                            />
+                        </StyleText>
+                    </>
+                );
+            }
+            return (
+                <>
                     <StyleText
                         i18Text="profile.post.addLink"
                         customStyle={[styles.title, {color: theme.textColor}]}
@@ -119,6 +137,31 @@ class ModalAddLink extends Component<Props, States> {
                         disable={!isValid}
                         onPress={() => this.onConfirm(tempLink)}
                     />
+                </>
+            );
+        };
+
+        return (
+            <Modalize
+                ref={this.modalRef}
+                modalStyle={styles.modal}
+                withHandle={false}>
+                <View
+                    style={[
+                        styles.container,
+                        {backgroundColor: theme.backgroundColor},
+                    ]}>
+                    <ButtonX
+                        containerStyle={styles.buttonClose}
+                        onPress={() => {
+                            this.modalRef.current?.close();
+                            this.setState({
+                                tempLink: link,
+                            });
+                        }}
+                    />
+
+                    {Content()}
                 </View>
             </Modalize>
         );
@@ -174,6 +217,15 @@ const styles = ScaledSheet.create({
     titleButton: {
         fontSize: '15@ms',
         fontWeight: 'normal',
+    },
+    avatar: {
+        width: '50@s',
+        height: '50@s',
+        borderRadius: '25@s',
+    },
+    textReview: {
+        fontSize: FONT_SIZE.normal,
+        marginTop: '15@vs',
     },
 });
 

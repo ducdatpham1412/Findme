@@ -228,8 +228,14 @@ export interface TypeCreatePostRequest {
     feeling?: number | null;
     location?: string | null;
     link?: string | null;
-    userId?: boolean;
+    userId?: number;
     isDraft: boolean;
+    // this is only for handle error create post in local
+    userReviewed?: {
+        id: number;
+        name: string;
+        avatar: string;
+    };
 }
 export interface TypeEditPostRequest {
     content?: string;
@@ -276,6 +282,13 @@ export interface TypeBubblePalace {
     feeling: number | null;
     location: string | null;
     link: string | null;
+    userReviewed?: {
+        id: number;
+        name: string;
+        avatar: string;
+        location: string;
+        description: string;
+    };
     content: string;
     images: Array<string>;
     stars: number;

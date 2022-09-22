@@ -110,6 +110,7 @@ const OtherProfile = ({route}: Props) => {
     const isBlock = profile?.relationship === RELATIONSHIP.block;
     const isShopAccount = profile?.account_type === ACCOUNT.shop;
     const isFocusListPost = tabIndex === 0;
+    const isFocusPostReviewed = tabIndex === 1;
 
     const listPostsPaging = usePaging({
         request: apiGetListPost,
@@ -184,16 +185,21 @@ const OtherProfile = ({route}: Props) => {
         optionsRef.current?.show();
     };
 
-    const onRefreshPage = useCallback(async () => {
+    const onRefreshPage = async () => {
         try {
-            listPostsPaging.onRefresh();
             const res = await apiGetProfile(id);
             setIsFollowing(res.data.relationship === RELATIONSHIP.following);
             setProfile(res.data);
+
+            if (isFocusListPost) {
+                listPostsPaging.onRefresh();
+            } else if (isFocusPostReviewed) {
+                listPostsReviewAbout.onRefresh();
+            }
         } catch (err) {
             appAlert(err);
         }
-    }, []);
+    };
 
     const onGoToDetailPost = (bubbleId: string) => {
         const initIndex = listPosts.current.findIndex(
@@ -437,7 +443,7 @@ const OtherProfile = ({route}: Props) => {
                                 listPostsReviewAbout.list.map(item =>
                                     RenderItemPost(item),
                                 )}
-                            {listPostsReviewAbout.loading && (
+                            {isShopAccount && listPostsReviewAbout.loading && (
                                 <LoadingIndicator
                                     color={theme.textHightLight}
                                 />
@@ -538,7 +544,17 @@ const OtherProfile = ({route}: Props) => {
                 listTextAndAction={[
                     {
                         text: 'profile.reviewProvider',
-                        action: () => navigate(PROFILE_ROUTE.createPostPickImg),
+                        action: () => {
+                            if (profile) {
+                                navigate(PROFILE_ROUTE.createPostPickImg, {
+                                    userReviewed: {
+                                        id: profile.id,
+                                        name: profile.name,
+                                        avatar: profile.avatar,
+                                    },
+                                });
+                            }
+                        },
                     },
                     {
                         text: 'common.cancel',

@@ -31,12 +31,12 @@ import {View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
+import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SharedElement} from 'react-navigation-shared-element';
 import {chooseTextTopic, onGoToProfile} from 'utility/assistant';
 import {formatFromNow, formatLocaleNumber} from 'utility/format';
-import Entypo from 'react-native-vector-icons/Entypo';
-import {TypeMoreOptionsMe, TypeShowMoreOptions} from '../DiscoveryScreen';
+import {TypeMoreOptionsMe} from '../DiscoveryScreen';
 
 export interface ParamsLikeGB {
     isLiked: boolean;
@@ -49,7 +49,7 @@ export interface ParamsLikeGB {
 interface Props {
     item: TypeGroupBuying;
     onGoToDetailGroupBuying(item: TypeGroupBuying): void;
-    onShowMoreOption(params: TypeShowMoreOptions & TypeMoreOptionsMe): void;
+    onShowMoreOption(params: TypeMoreOptionsMe): void;
     onHandleLike(params: ParamsLikeGB): void;
     onShowModalComment(
         post: TypeGroupBuying,
@@ -189,10 +189,6 @@ const BubbleGroupBuying = (props: Props) => {
                         customStyle={styles.iconMore}
                         onPress={() =>
                             onShowMoreOption({
-                                idUser: item.creator,
-                                nameUser: item.creatorName,
-                                imageWantToSee: item.images,
-                                allowSaveImage: true,
                                 postModal: item,
                             })
                         }

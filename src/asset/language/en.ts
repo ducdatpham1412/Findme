@@ -169,6 +169,7 @@ const discovery = {
     confirmBought: 'Confirm bought',
     participators: '{{value}} participators',
     gbExpired: 'Group buying campaign was expired',
+    reviewAbout: "You're writing review about ",
 };
 
 // REPUTATION
