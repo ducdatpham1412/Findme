@@ -449,7 +449,7 @@ const ProfileAccount = () => {
                 />
             );
         },
-        [],
+        [isShopAccount],
     );
 
     return (

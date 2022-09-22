@@ -18,6 +18,9 @@ import ROOT_SCREEN, {MESS_ROUTE, PROFILE_ROUTE} from 'navigation/config/routes';
 import React from 'react';
 import DetailGroupBuying from 'feature/discovery/DetailGroupBuying';
 import MyProfile from 'feature/profile/MyProfile';
+import PostsArchived from 'feature/common/PostsArchived';
+import GroupBuyingJoined from 'feature/common/GroupBuyingJoined';
+import UpgradeAccount from 'feature/common/UpgradeAccount';
 import MainTabs from './MainTabs';
 import SettingRoute from './tabs/SettingRoute';
 
@@ -131,6 +134,18 @@ const AppStack = () => {
                 <Stack.Screen
                     name={MESS_ROUTE.chatDetailSetting}
                     component={ChatDetailSetting}
+                />
+                <Stack.Screen
+                    name={ROOT_SCREEN.postsArchived}
+                    component={PostsArchived}
+                />
+                <Stack.Screen
+                    name={ROOT_SCREEN.gBJoined}
+                    component={GroupBuyingJoined}
+                />
+                <Stack.Screen
+                    name={ROOT_SCREEN.upgradeAccount}
+                    component={UpgradeAccount}
                 />
             </Stack.Navigator>
 

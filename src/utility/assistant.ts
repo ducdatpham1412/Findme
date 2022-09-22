@@ -304,11 +304,15 @@ export const modalizeMyProfile: Array<{
     },
     {
         text: 'profile.postsArchived',
-        action: () => logger('go to archived screen'),
+        action: () => {
+            push(ROOT_SCREEN.postsArchived);
+        },
     },
     {
         text: 'profile.upgradeAccount',
-        action: () => logger('with to provider account'),
+        action: () => {
+            push(ROOT_SCREEN.upgradeAccount);
+        },
     },
     {
         text: 'common.cancel',
@@ -333,11 +337,15 @@ export const modalizeMyProfileShop: Array<{
     },
     {
         text: 'profile.postsArchived',
-        action: () => logger('go to archived screen'),
+        action: () => {
+            push(ROOT_SCREEN.postsArchived);
+        },
     },
     {
         text: 'profile.groupBuyingJoined',
-        action: () => logger('got to gbJoined screen'),
+        action: () => {
+            push(ROOT_SCREEN.gBJoined);
+        },
     },
     {
         text: 'common.cancel',

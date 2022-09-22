@@ -430,27 +430,6 @@ const Bubble = (props: Props) => {
             );
         }
 
-        if (item.isArchived) {
-            return (
-                <View style={styles.footerView}>
-                    <StyleTouchable
-                        customStyle={[
-                            styles.goToPostBox,
-                            {backgroundColor: theme.backgroundButtonColor},
-                        ]}
-                        onPress={() => onUnArchivePost(item)}>
-                        <StyleText
-                            i18Text="profile.post.unArchive"
-                            customStyle={[
-                                styles.textGoToPost,
-                                {color: theme.textHightLight},
-                            ]}
-                        />
-                    </StyleTouchable>
-                </View>
-            );
-        }
-
         return (
             <View style={styles.footerView}>
                 <View style={styles.likeCommentShareSave}>
@@ -460,16 +439,18 @@ const Bubble = (props: Props) => {
                                 styles.iconLike,
                                 {color: theme.likeHeart},
                             ]}
-                            onPress={() =>
-                                onHandleLike({
-                                    isModeExp,
-                                    isLiked,
-                                    setIsLiked,
-                                    totalLikes,
-                                    setTotalLikes,
-                                    postId: item.id,
-                                })
-                            }
+                            onPress={() => {
+                                if (!item.isArchived) {
+                                    onHandleLike({
+                                        isModeExp,
+                                        isLiked,
+                                        setIsLiked,
+                                        totalLikes,
+                                        setTotalLikes,
+                                        postId: item.id,
+                                    });
+                                }
+                            }}
                             touchableStyle={styles.touchIconLike}
                         />
                     ) : (
@@ -478,16 +459,18 @@ const Bubble = (props: Props) => {
                                 styles.iconLike,
                                 {color: theme.textHightLight},
                             ]}
-                            onPress={() =>
-                                onHandleLike({
-                                    isModeExp,
-                                    isLiked,
-                                    setIsLiked,
-                                    totalLikes,
-                                    setTotalLikes,
-                                    postId: item.id,
-                                })
-                            }
+                            onPress={() => {
+                                if (!item.isArchived) {
+                                    onHandleLike({
+                                        isModeExp,
+                                        isLiked,
+                                        setIsLiked,
+                                        totalLikes,
+                                        setTotalLikes,
+                                        postId: item.id,
+                                    });
+                                }
+                            }}
                             touchableStyle={styles.touchIconLike}
                         />
                     )}
@@ -505,7 +488,7 @@ const Bubble = (props: Props) => {
                     <StyleTouchable
                         customStyle={styles.iconComment}
                         onPress={() => onShowModalShare(item, setDisableShare)}
-                        disable={disableShare}>
+                        disable={disableShare || item.isArchived}>
                         <StyleIcon
                             source={Images.icons.share}
                             size={21}
@@ -515,14 +498,15 @@ const Bubble = (props: Props) => {
 
                     <StyleTouchable
                         customStyle={styles.iconSave}
-                        onPress={() =>
+                        disable={item.isArchived}
+                        onPress={() => {
                             onHandleSave({
                                 isModeExp,
                                 isSaved,
                                 setIsSaved,
                                 postId: item.id,
-                            })
-                        }>
+                            });
+                        }}>
                         {isSaved ? (
                             <FontAwesome
                                 name="bookmark"
@@ -548,7 +532,7 @@ const Bubble = (props: Props) => {
                     onPress={() => {
                         if (totalLikes) {
                             onShowModalComment(item, 'like');
-                        } else {
+                        } else if (!item.isArchived) {
                             onHandleLike({
                                 isModeExp,
                                 isLiked,
@@ -593,6 +577,23 @@ const Bubble = (props: Props) => {
                         ]}
                     />
                 </StyleTouchable>
+
+                {item.isArchived && (
+                    <StyleTouchable
+                        customStyle={[
+                            styles.goToPostBox,
+                            {backgroundColor: theme.backgroundButtonColor},
+                        ]}
+                        onPress={() => onUnArchivePost(item)}>
+                        <StyleText
+                            i18Text="profile.post.unArchive"
+                            customStyle={[
+                                styles.textGoToPost,
+                                {color: theme.textHightLight},
+                            ]}
+                        />
+                    </StyleTouchable>
+                )}
             </View>
         );
     };
@@ -608,7 +609,7 @@ const Bubble = (props: Props) => {
                     images={item.images}
                     syncWidth={screenWidth}
                     onDoublePress={() => {
-                        if (!isLiked) {
+                        if (!isLiked && !item.isArchived) {
                             onHandleLike({
                                 isModeExp,
                                 isLiked,
@@ -617,8 +618,6 @@ const Bubble = (props: Props) => {
                                 setTotalLikes,
                                 postId: item.id,
                             });
-                        } else {
-                            // onSeeDetailImage(item.images);
                         }
                     }}
                     containerStyle={styles.imageView}
@@ -789,7 +788,7 @@ const styles = ScaledSheet.create({
         width: '50%',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: '5@vs',
+        marginVertical: '5@vs',
         alignSelf: 'center',
     },
     textGoToPost: {

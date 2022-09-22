@@ -1,5 +1,6 @@
 import {TypeInteractBubble} from 'api/interface';
 import {Metrics} from 'asset/metrics';
+import {FONT_SIZE} from 'asset/standardValue';
 import {
     StyleImage,
     StyleInput,
@@ -81,18 +82,19 @@ const InteractBubble = ({route}: Props) => {
             <View
                 style={[
                     styles.avatarAndNameBox,
-                    {borderBottomColor: theme.borderColor},
+                    {borderBottomColor: theme.holderColorLighter},
                 ]}>
                 <StyleImage
                     source={{uri: avatar}}
-                    customStyle={[
-                        styles.avatar,
-                        {borderColor: theme.highlightColor},
-                    ]}
+                    customStyle={styles.avatar}
                 />
                 <StyleText
                     originValue={name}
-                    customStyle={[styles.nameText, {color: theme.textColor}]}
+                    customStyle={[
+                        styles.nameText,
+                        {color: theme.textHightLight},
+                    ]}
+                    numberOfLines={1}
                 />
             </View>
         );
@@ -132,14 +134,17 @@ const InteractBubble = ({route}: Props) => {
                         },
                     ]}>
                     {RenderNameAndAvatar()}
-                    {/* Input Message */}
+
                     <View style={styles.inputAndSendView}>
                         <StyleInput
                             ref={inputRef}
                             value={message}
                             onChangeText={text => setMessage(text)}
                             containerStyle={styles.inputContainer}
-                            inputStyle={{color: theme.textHightLight}}
+                            inputStyle={[
+                                styles.input,
+                                {color: theme.textHightLight},
+                            ]}
                             multiline
                             i18Placeholder="Hello"
                             placeholderTextColor={theme.holderColorLighter}
@@ -191,15 +196,15 @@ const styles = ScaledSheet.create({
             ios: '0.25@ms',
             android: '0.5@ms',
         }),
+        overflow: 'hidden',
     },
     avatar: {
         width: '35@s',
         height: '35@s',
         borderRadius: '30@s',
-        borderWidth: 2,
     },
     nameText: {
-        fontSize: '17@ms',
+        fontSize: FONT_SIZE.big,
         fontWeight: 'bold',
         marginLeft: '10@s',
     },
@@ -223,6 +228,9 @@ const styles = ScaledSheet.create({
         paddingBottom: '10@vs',
         fontSize: '14@ms',
         maxHeight: '70@vs',
+    },
+    input: {
+        fontSize: FONT_SIZE.normal,
     },
     iconSend: {
         fontSize: '20@ms',

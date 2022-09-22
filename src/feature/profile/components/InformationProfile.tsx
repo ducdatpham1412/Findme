@@ -1,3 +1,4 @@
+import {useRoute} from '@react-navigation/native';
 import {TypeGetProfileResponse} from 'api/interface';
 import {ACCOUNT, TYPE_FOLLOW} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
@@ -18,6 +19,7 @@ interface Props {
 }
 
 const InformationProfile = (props: Props) => {
+    const route = useRoute();
     const {profile, havingEditProfile} = props;
     const theme = Redux.getTheme();
     const {name, description, followers, followings, avatar, account_type} =
@@ -28,6 +30,7 @@ const InformationProfile = (props: Props) => {
             userId: profile.id,
             name: profile.name,
             type,
+            onGoBack: () => navigate(route.name),
         });
     };
 
