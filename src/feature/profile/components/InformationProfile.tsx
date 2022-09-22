@@ -1,14 +1,8 @@
 import {TypeGetProfileResponse} from 'api/interface';
 import {ACCOUNT, TYPE_FOLLOW} from 'asset/enum';
-import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';
-import {
-    StyleIcon,
-    StyleImage,
-    StyleText,
-    StyleTouchable,
-} from 'components/base';
+import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {navigate, push} from 'navigation/NavigationService';
@@ -16,6 +10,7 @@ import React from 'react';
 import {Platform, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 interface Props {
     profile: TypeGetProfileResponse;
@@ -119,17 +114,33 @@ const InformationProfile = (props: Props) => {
                     <StyleTouchable
                         customStyle={[
                             styles.editProfileBox,
-                            {backgroundColor: theme.tabBarIconColor},
+                            {borderColor: theme.tabBarIconColor},
                         ]}
                         onPress={() => navigate(PROFILE_ROUTE.editProfile)}>
                         <AntDesign
                             name="edit"
                             style={[
                                 styles.editProfileIcon,
-                                {color: theme.backgroundColor},
+                                {color: theme.tabBarIconColor},
                             ]}
                         />
                     </StyleTouchable>
+                )}
+
+                {account_type === ACCOUNT.shop && (
+                    <View
+                        style={[
+                            styles.shopButtonBox,
+                            {borderColor: theme.borderColor},
+                        ]}>
+                        <Entypo
+                            name="shop"
+                            style={[
+                                styles.editProfileIcon,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                    </View>
                 )}
             </>
         );
@@ -163,13 +174,6 @@ const InformationProfile = (props: Props) => {
                             flexDirection: 'row',
                             alignItems: 'center',
                         }}>
-                        {account_type === ACCOUNT.shop && (
-                            <StyleIcon
-                                source={Images.icons.house}
-                                size={17}
-                                customStyle={styles.shopBox}
-                            />
-                        )}
                         <StyleText
                             customStyle={[
                                 styles.textName,
@@ -213,15 +217,21 @@ const styles = ScaledSheet.create({
         borderRadius: '20@s',
         alignSelf: 'center',
     },
-    shopBox: {
-        marginRight: '5@s',
-    },
     editProfileBox: {
         position: 'absolute',
         padding: '7@ms',
         borderRadius: '50@s',
         top: '17@s',
         right: '17@s',
+        borderWidth: '1@ms',
+    },
+    shopButtonBox: {
+        position: 'absolute',
+        padding: '7@ms',
+        borderRadius: '50@s',
+        top: '17@s',
+        left: '17@s',
+        borderWidth: '1@ms',
     },
     editProfileIcon: {
         fontSize: '16@ms',

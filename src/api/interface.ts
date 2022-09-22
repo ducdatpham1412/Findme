@@ -228,6 +228,7 @@ export interface TypeCreatePostRequest {
     feeling?: number | null;
     location?: string | null;
     link?: string | null;
+    userId?: boolean;
     isDraft: boolean;
 }
 export interface TypeEditPostRequest {

@@ -15,6 +15,7 @@ import {ACCOUNT, RELATIONSHIP} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';
 import {StyleText, StyleTouchable} from 'components/base';
+import LoadingIndicator from 'components/common/LoadingIndicator';
 import NoData from 'components/common/NoData';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import LoadingScreen from 'components/LoadingScreen';
@@ -95,9 +96,11 @@ const OtherProfile = ({route}: Props) => {
     const optionsRef = useRef<any>(null);
     const actionReviewRef = useRef<any>(null);
     const tabViewRef = useRef<StyleTabView>(null);
-    const shareRef = useRef<ListShareElement>(null);
+    const listUserPostsRef = useRef<ListShareElement>(null);
+    const listPostReviewRef = useRef<ListShareElement>(null);
     const translateXIndicator = useRef(new Animated.Value(0)).current;
     const listPosts = useRef<Array<TypeBubblePalace>>([]);
+    const tabIndexRef = useRef(0);
 
     const [profile, setProfile] = useState<TypeGetProfileResponse>();
     const [isFollowing, setIsFollowing] = useState(false);
@@ -136,8 +139,13 @@ const OtherProfile = ({route}: Props) => {
     };
 
     useEffect(() => {
-        listPosts.current = listPostsPaging.list;
-    }, [listPostsPaging.list]);
+        if (tabIndex === 0) {
+            listPosts.current = listPostsPaging.list;
+        } else if (tabIndex === 1) {
+            listPosts.current = listPostsReviewAbout.list;
+        }
+        tabIndexRef.current = tabIndex;
+    }, [tabIndex, listPostsPaging.list, listPostsReviewAbout.list]);
 
     useEffect(() => {
         getData();
@@ -191,10 +199,17 @@ const OtherProfile = ({route}: Props) => {
         const initIndex = listPosts.current.findIndex(
             item => item.id === bubbleId,
         );
-        shareRef.current?.show({
-            index: initIndex === -1 ? 0 : initIndex,
-            postId: bubbleId,
-        });
+        if (tabIndexRef.current === 0) {
+            listUserPostsRef.current?.show({
+                index: initIndex === -1 ? 0 : initIndex,
+                postId: bubbleId,
+            });
+        } else if (tabIndexRef.current === 1) {
+            listPostReviewRef.current?.show({
+                index: initIndex === -1 ? 0 : initIndex,
+                postId: bubbleId,
+            });
+        }
     };
 
     const checkScrollEnd = (nativeEvent: NativeScrollEvent) => {
@@ -204,7 +219,7 @@ const OtherProfile = ({route}: Props) => {
             }
         }
         if (isFocusListPost) {
-            shareRef.current?.scrollToNearingEnd();
+            listUserPostsRef.current?.scrollToNearingEnd();
         }
     };
 
@@ -410,6 +425,11 @@ const OtherProfile = ({route}: Props) => {
                             {listPostsPaging.list.map(item =>
                                 RenderItemPost(item),
                             )}
+                            {listPostsPaging.loading && (
+                                <LoadingIndicator
+                                    color={theme.textHightLight}
+                                />
+                            )}
                         </View>
 
                         <View style={styles.tabView}>
@@ -417,6 +437,11 @@ const OtherProfile = ({route}: Props) => {
                                 listPostsReviewAbout.list.map(item =>
                                     RenderItemPost(item),
                                 )}
+                            {listPostsReviewAbout.loading && (
+                                <LoadingIndicator
+                                    color={theme.textHightLight}
+                                />
+                            )}
                         </View>
                     </StyleTabView>
                 </ScrollView>
@@ -425,9 +450,22 @@ const OtherProfile = ({route}: Props) => {
             </View>
 
             <ListShareElement
-                ref={shareRef}
+                ref={listUserPostsRef}
                 title={profile?.name || ''}
                 listPaging={listPostsPaging}
+                containerStyle={{
+                    backgroundColor: theme.backgroundColorSecond,
+                }}
+                onShowModalComment={params => {
+                    modalRef.current?.show(params);
+                }}
+                isSaveTop
+            />
+
+            <ListShareElement
+                ref={listPostReviewRef}
+                title={profile?.name || ''}
+                listPaging={listPostsReviewAbout}
                 containerStyle={{
                     backgroundColor: theme.backgroundColorSecond,
                 }}

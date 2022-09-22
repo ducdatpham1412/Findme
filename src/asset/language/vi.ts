@@ -252,6 +252,9 @@ const profile = {
     thisPostInDraft: 'Bạn đang lưu nháp bài này',
     goToPost: 'Đi tới đăng bài',
     reviewProvider: 'Review nhà cung cấp',
+    postsArchived: 'Bài viết lưu trữ',
+    upgradeAccount: 'Chế độ nhà cung cấp',
+    groupBuyingJoined: 'Mua chung đã tham gia',
 };
 
 // MESS ROUTE

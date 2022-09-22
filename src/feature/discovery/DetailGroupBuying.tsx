@@ -749,6 +749,7 @@ const DetailGroupBuying = ({route}: Props) => {
                 ref={modalJoinedRef}
                 postId={item.id}
                 listPaging={listJoinedPaging}
+                isMyBubble={isMyBubble}
             />
         </>
     );
