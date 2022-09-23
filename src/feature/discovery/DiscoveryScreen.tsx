@@ -8,10 +8,12 @@ import {
 import {apiLikePost, apiUnLikePost} from 'api/post';
 import {POST_TYPE, TOPIC, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
+import {Metrics} from 'asset/metrics';
 import {StyleIcon} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import LoadingScreen from 'components/LoadingScreen';
+import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {DISCOVERY_ROUTE} from 'navigation/config/routes';
@@ -256,98 +258,121 @@ const DiscoveryScreen = () => {
         return null;
     };
 
-    return (
-        <View
-            style={[
-                styles.container,
-                {backgroundColor: theme.backgroundColorSecond},
-            ]}>
-            <StyleList
-                ref={listRef}
-                data={list}
-                renderItem={({item}) => RenderItemBubble(item)}
-                keyExtractor={(_, index) => String(index)}
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                onLoadMore={onLoadMore}
-                ListHeaderComponent={
-                    <View style={{height: headerDoffyHeight}} />
-                }
-                ListEmptyComponent={EmptyView}
-                ListFooterComponent={FooterComponent}
-                ListFooterComponentStyle={{
-                    backgroundColor: theme.backgroundColor,
-                    paddingVertical: 20,
-                }}
-                maxToRenderPerBatch={20}
-                onScroll={e => {
-                    const currentOffset = e.nativeEvent.contentOffset.y;
-                    if (currentOffset <= 0) {
-                        headerDoffyRef.current?.show();
-                        oldOffset = currentOffset;
-                        return;
-                    }
-                    const distance = currentOffset - oldOffset;
-                    if (distance > 75) {
-                        headerDoffyRef.current?.hide();
-                        oldOffset = currentOffset;
-                    } else if (distance < -75) {
-                        headerDoffyRef.current?.show();
-                        oldOffset = currentOffset;
-                    }
-                }}
-                // removeClippedSubviews
-            />
-
-            <HeaderDoffy
-                ref={headerDoffyRef}
-                theme={theme}
-                onPressFilter={() => headerFilterRef.current?.show()}
-            />
-            <HeaderFilterTopic
-                ref={headerFilterRef}
-                listTopics={listTopics}
-                theme={theme}
-                onChangeTopic={list => setListTopics(list)}
-            />
-
-            <StyleActionSheet
-                ref={optionsRef}
-                listTextAndAction={[
-                    {
-                        text: 'discovery.report.title',
-                        action: () => {
-                            if (hadLogan && modalOptions) {
-                                navigate(ROOT_SCREEN.reportUser, {
-                                    idUser: modalOptions.creator,
-                                    nameUser: modalOptions.creatorName,
-                                });
-                            }
-                        },
-                    },
-                    // {
-                    //     text: 'discovery.seeDetailImage',
-                    //     action: () => {
-                    //         seeDetailImage({
-                    //             images: modalOptions.imageWantToSee.map(
-                    //                 url => url,
-                    //             ),
-                    //         });
-                    //     },
-                    // },
-                    {
-                        text: 'common.cancel',
-                        action: () => null,
-                    },
+    const OverLayTop = useMemo(() => {
+        return (
+            <View
+                style={[
+                    styles.overlayView,
+                    {backgroundColor: theme.backgroundColor},
                 ]}
             />
-        </View>
+        );
+    }, [theme.backgroundColor]);
+
+    return (
+        <>
+            <ViewSafeTopPadding />
+
+            <View
+                style={[
+                    styles.container,
+                    {backgroundColor: theme.backgroundColorSecond},
+                ]}>
+                <StyleList
+                    ref={listRef}
+                    data={list}
+                    renderItem={({item}) => RenderItemBubble(item)}
+                    keyExtractor={(_, index) => String(index)}
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    onLoadMore={onLoadMore}
+                    ListHeaderComponent={
+                        <View style={{height: headerDoffyHeight}} />
+                    }
+                    ListEmptyComponent={EmptyView}
+                    ListFooterComponent={FooterComponent}
+                    ListFooterComponentStyle={{
+                        backgroundColor: theme.backgroundColor,
+                        paddingVertical: 20,
+                    }}
+                    maxToRenderPerBatch={20}
+                    onScroll={e => {
+                        const currentOffset = e.nativeEvent.contentOffset.y;
+                        if (currentOffset <= 0) {
+                            headerDoffyRef.current?.show();
+                            oldOffset = currentOffset;
+                            return;
+                        }
+                        const distance = currentOffset - oldOffset;
+                        if (distance > 75) {
+                            headerDoffyRef.current?.hide();
+                            oldOffset = currentOffset;
+                        } else if (distance < -75) {
+                            headerDoffyRef.current?.show();
+                            oldOffset = currentOffset;
+                        }
+                    }}
+                    // removeClippedSubviews
+                />
+
+                <HeaderDoffy
+                    ref={headerDoffyRef}
+                    theme={theme}
+                    onPressFilter={() => headerFilterRef.current?.show()}
+                />
+                <HeaderFilterTopic
+                    ref={headerFilterRef}
+                    listTopics={listTopics}
+                    theme={theme}
+                    onChangeTopic={list => setListTopics(list)}
+                />
+
+                <StyleActionSheet
+                    ref={optionsRef}
+                    listTextAndAction={[
+                        {
+                            text: 'discovery.report.title',
+                            action: () => {
+                                if (hadLogan && modalOptions) {
+                                    navigate(ROOT_SCREEN.reportUser, {
+                                        idUser: modalOptions.creator,
+                                        nameUser: modalOptions.creatorName,
+                                    });
+                                }
+                            },
+                        },
+                        // {
+                        //     text: 'discovery.seeDetailImage',
+                        //     action: () => {
+                        //         seeDetailImage({
+                        //             images: modalOptions.imageWantToSee.map(
+                        //                 url => url,
+                        //             ),
+                        //         });
+                        //     },
+                        // },
+                        {
+                            text: 'common.cancel',
+                            action: () => null,
+                        },
+                    ]}
+                />
+            </View>
+
+            {OverLayTop}
+        </>
     );
 };
 
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
+    },
+    overlayView: {
+        position: 'absolute',
+        width: '100%',
+        height: Metrics.safeTopPadding,
+        top: 0,
     },
 });
 export default DiscoveryScreen;
