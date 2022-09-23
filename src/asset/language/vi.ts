@@ -175,6 +175,8 @@ const discovery = {
     reviewAbout: 'Bạn đang viết review về ',
     goToProfile: 'Xem trang cá nhân',
     openLink: 'Mở đường dẫn',
+    dayRemain: '{{value}} ngày còn lại',
+    today: 'Hôm nay',
 };
 
 // REPUTATION
@@ -259,6 +261,14 @@ const profile = {
     upgradeAccount: 'Chế độ nhà cung cấp',
     groupBuyingJoined: 'Mua chung đã tham gia',
     gotToCreateGb: 'Tạo chiến dịch mua chung đầu tiên',
+    createReviewPost: 'Bài review',
+    createGroupBuying: 'Tạo chiến dịch mua chung',
+    subscriptionDeadline: 'Thời hạn đăng ký',
+    startDate: 'Ngày bắt đầu',
+    endDate: 'Ngày kết thúc',
+    addPrice: 'Thêm',
+    number: 'Số lượng',
+    price: 'Giá',
 };
 
 // MESS ROUTE
@@ -392,6 +402,8 @@ const alert = {
     // PROFILE
     successUpdatePro: 'Cập nhật trang cá nhân thành công !',
     invalidLink: 'Đường dẫn URL không hợp lệ',
+    numberPeopleMoreThan: 'Số lượng người phải nhiều hơn {{value}}',
+    priceLessThan: 'Giá tiền phải ít hơn {{value}}',
 
     // PERMISSION
     permissionCamera: 'Cho phép Doffy truy cập vào máy ảnh',

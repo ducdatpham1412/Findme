@@ -447,7 +447,7 @@ export const chooseIconTopic = (topic: number) => {
 export const fakeBubbleFocusing: TypeBubblePalace = {
     id: '',
     postType: 0,
-    topic: 0,
+    topic: [0],
     feeling: 0,
     location: '',
     link: '',

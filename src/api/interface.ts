@@ -224,7 +224,7 @@ export interface TypeCreatePostRequest {
     content: string;
     images: Array<string>;
     stars: number;
-    topic?: number | null;
+    topic?: Array<number>;
     feeling?: number | null;
     location?: string | null;
     link?: string | null;
@@ -240,7 +240,7 @@ export interface TypeCreatePostRequest {
 export interface TypeEditPostRequest {
     content?: string;
     stars?: number;
-    topic?: number | null;
+    topic?: Array<number>;
     feeling?: number | null;
     location?: string | null;
     link?: string | null;
@@ -278,7 +278,7 @@ export interface TypeFollowResponse {
 export interface TypeBubblePalace {
     id: string;
     postType: number;
-    topic: number | null;
+    topic: Array<number>;
     feeling: number | null;
     location: string | null;
     link: string | null;
@@ -308,7 +308,7 @@ export interface TypeBubblePalace {
 export interface TypeGroupBuying {
     id: string;
     postType: number;
-    topic: number;
+    topic: Array<number>;
     content: string;
     images: Array<string>;
     prices: Array<{
@@ -318,6 +318,7 @@ export interface TypeGroupBuying {
     totalLikes: number;
     totalComments: number;
     totalJoins: number;
+    deadlineDate: string;
     startDate: string;
     endDate: string;
     creator: number;

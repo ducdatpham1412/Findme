@@ -200,7 +200,8 @@ const styles = ScaledSheet.create({
     },
     input: {
         marginVertical: 0,
-        paddingVertical: 0,
+        paddingTop: 0,
+        // paddingBottom: '0.25@vs',
         maxHeight: '70@vs',
     },
     textInvalidLink: {

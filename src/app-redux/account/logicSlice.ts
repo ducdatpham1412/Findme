@@ -1,3 +1,4 @@
+import {TypeCreateGroupBuying} from 'api/interface/discovery';
 import {createSlice} from '@reduxjs/toolkit';
 import {
     TypeBubblePalace,
@@ -11,7 +12,7 @@ import {HobbyType} from 'hook/useRedux';
 
 export type ReduxPostCreatedHandle = {
     status: 'loading' | 'success' | 'error' | 'done';
-    data: TypeCreatePostRequest | undefined;
+    data: TypeCreatePostRequest | TypeCreateGroupBuying | undefined;
 };
 
 export const initialLogicState = {

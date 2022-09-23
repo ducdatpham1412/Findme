@@ -30,9 +30,16 @@ const StatusPostCreated = () => {
                 screen: PROFILE_ROUTE.myProfile,
             });
         } else if (status === 'error') {
-            navigate(PROFILE_ROUTE.createPostPreview, {
-                itemError: data,
-            });
+            const temp: any = data;
+            if (temp.prices) {
+                navigate(PROFILE_ROUTE.createGroupBuying, {
+                    itemError: data,
+                });
+            } else {
+                navigate(PROFILE_ROUTE.createPostPreview, {
+                    itemError: data,
+                });
+            }
         }
         onClose();
     };

@@ -82,7 +82,7 @@ const DiscoveryScreen = () => {
         request: selectedApi,
         params: {
             take: 30,
-            listTopics: undefined,
+            topics: undefined,
         },
     });
 

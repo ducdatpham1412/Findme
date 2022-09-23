@@ -46,6 +46,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SharedElement} from 'react-navigation-shared-element';
 import {onGoToProfile, onGoToSignUp} from 'utility/assistant';
 import {
+    formatDayFromNow,
     formatDayGroupBuying,
     formatFromNow,
     formatLocaleNumber,
@@ -306,6 +307,45 @@ const DetailGroupBuying = ({route}: Props) => {
      * Render views
      */
     const Information = () => {
+        const chooseTextRemaining = () => {
+            const dayRemaining = formatDayFromNow(item.deadlineDate);
+            if (dayRemaining > 0) {
+                return (
+                    <StyleText
+                        i18Text="discovery.dayRemain"
+                        i18Params={{
+                            value: formatDayFromNow(item.deadlineDate),
+                        }}
+                        customStyle={[
+                            styles.textTime,
+                            {
+                                color: isExpired
+                                    ? Theme.common.red
+                                    : theme.textColor,
+                            },
+                        ]}
+                    />
+                );
+            }
+
+            if (dayRemaining === 0) {
+                return (
+                    <StyleText
+                        i18Text="discovery.today"
+                        customStyle={[
+                            styles.textTime,
+                            {
+                                color: Theme.common.red,
+                                fontWeight: 'bold',
+                            },
+                        ]}
+                    />
+                );
+            }
+
+            return null;
+        };
+
         return (
             <>
                 <TitleInformation
@@ -339,6 +379,29 @@ const DetailGroupBuying = ({route}: Props) => {
                             },
                         ]}
                     />
+                </View>
+
+                <TitleInformation
+                    icon={Images.icons.deadline}
+                    title="profile.subscriptionDeadline"
+                    titleColor={theme.textHightLight}
+                />
+                <View style={styles.timeView}>
+                    <StyleText
+                        originValue={formatDayGroupBuying(item.deadlineDate)}
+                        customStyle={[
+                            styles.textTime,
+                            {color: theme.textColor},
+                        ]}
+                    />
+                    <StyleText
+                        originValue=":"
+                        customStyle={[
+                            styles.textTime,
+                            {color: theme.borderColor},
+                        ]}
+                    />
+                    {chooseTextRemaining()}
                 </View>
 
                 <TitleInformation
@@ -790,7 +853,7 @@ const styles = ScaledSheet.create({
         alignSelf: 'center',
     },
     textTime: {
-        fontSize: FONT_SIZE.normal,
+        fontSize: FONT_SIZE.small,
         marginRight: '17@s',
     },
     pricesView: {
@@ -803,7 +866,7 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
     },
     peoplePriceText: {
-        fontSize: FONT_SIZE.normal,
+        fontSize: FONT_SIZE.small,
         marginBottom: '5@vs',
     },
     informationView: {

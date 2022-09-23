@@ -18,7 +18,8 @@ export const requireLength = (min: number, max: number) => {
 };
 
 export const formatUTCDate = (date: string | Date) => {
-    return dayjs(date).utc().format('YYYY-MM-DD HH:mm:ss');
+    return dayjs(date).utc().format();
+    // dayjs(date).utc().format('YYYY-MM-DD HH:mm:ss');
 };
 
 export const formatDateDayMonthYear = (date: string | Date) => {
@@ -82,9 +83,16 @@ export const formatDateChatTag = (date: Date | string) => {
 };
 
 export const formatDayGroupBuying = (date: string) => {
+    if (!date) {
+        return '';
+    }
     return dayjs(date).format('dddd, DD/MM/YYYY');
 };
 
 export const formatLocaleNumber = (value: string) => {
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+export const formatDayFromNow = (date: Date | string) => {
+    return dayjs(date).diff(new Date(), 'day');
 };
