@@ -21,8 +21,16 @@ import MyProfile from 'feature/profile/MyProfile';
 import PostsArchived from 'feature/common/PostsArchived';
 import GroupBuyingJoined from 'feature/common/GroupBuyingJoined';
 import UpgradeAccount from 'feature/common/UpgradeAccount';
+import ModalPreviewLink from 'components/ModalPreviewLink';
+import {TypeBubblePalace} from 'api/interface';
 import MainTabs from './MainTabs';
 import SettingRoute from './tabs/SettingRoute';
+
+const modalPreviewLinkRef = React.createRef<ModalPreviewLink>();
+
+export const showPreviewLink = (item: TypeBubblePalace) => {
+    modalPreviewLinkRef.current?.show(item);
+};
 
 const Stack = createStackNavigator();
 
@@ -150,6 +158,7 @@ const AppStack = () => {
             </Stack.Navigator>
 
             <StatusPostCreated />
+            <ModalPreviewLink ref={modalPreviewLinkRef} theme={theme} />
         </>
     );
 };

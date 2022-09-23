@@ -329,7 +329,7 @@ const DetailGroupBuying = ({route}: Props) => {
                         ]}
                     />
                     <StyleText
-                        originValue={formatDayGroupBuying(item.startDate)}
+                        originValue={formatDayGroupBuying(item.endDate)}
                         customStyle={[
                             styles.textTime,
                             {

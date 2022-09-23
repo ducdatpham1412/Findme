@@ -33,9 +33,10 @@ import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
 import {appAlert, goBack, navigate} from 'navigation/NavigationService';
+import {showPreviewLink} from 'navigation/screen/AppStack';
 import React, {memo, useEffect, useState} from 'react';
 import isEqual from 'react-fast-compare';
-import {Linking, View} from 'react-native';
+import {View} from 'react-native';
 import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -44,7 +45,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
     chooseIconFeeling,
     chooseTextTopic,
-    logger,
     onGoToProfile,
     onGoToSignUp,
 } from 'utility/assistant';
@@ -150,14 +150,6 @@ const onUnArchivePost = async (post: TypeBubblePalace) => {
         });
     } catch (err) {
         appAlert(err);
-    }
-};
-
-const onOpenLink = (link: string) => {
-    try {
-        Linking.openURL(link);
-    } catch (err) {
-        logger(err);
     }
 };
 
@@ -360,7 +352,7 @@ const Bubble = (props: Props) => {
                 return (
                     <StyleTouchable
                         customStyle={styles.linkBox}
-                        onPress={() => onOpenLink(item.link || '')}>
+                        onPress={() => showPreviewLink(item)}>
                         <View
                             style={[
                                 styles.linkTouch,
@@ -386,7 +378,7 @@ const Bubble = (props: Props) => {
                 return (
                     <StyleTouchable
                         customStyle={styles.linkBox}
-                        onPress={() => onOpenLink(item.link || '')}>
+                        onPress={() => showPreviewLink(item)}>
                         <View
                             style={[
                                 styles.linkTouch,

@@ -170,6 +170,8 @@ const discovery = {
     participators: '{{value}} participators',
     gbExpired: 'Group buying campaign was expired',
     reviewAbout: "You're writing review about ",
+    goToProfile: 'Visit profile',
+    openLink: 'Open link',
 };
 
 // REPUTATION

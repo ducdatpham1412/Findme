@@ -173,6 +173,8 @@ const discovery = {
     participators: '{{value}} người tham gia',
     gbExpired: 'Chiến dịch mua chung đã hết hạn',
     reviewAbout: 'Bạn đang viết review về ',
+    goToProfile: 'Xem trang cá nhân',
+    openLink: 'Mở đường dẫn',
 };
 
 // REPUTATION
