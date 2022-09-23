@@ -238,25 +238,7 @@ const ProfileAccount = () => {
                 action: TYPE_BUBBLE_PALACE_ACTION.null,
                 payload: null,
             });
-        }
-    }, [bubblePalaceAction]);
-
-    useEffect(() => {
-        let x: any;
-        if (!isFocused) {
-            checkIsFocus.current = false;
-        } else {
-            x = setTimeout(() => {
-                checkIsFocus.current = true;
-            }, 200);
-        }
-        return () => {
-            clearTimeout(x);
-        };
-    }, [isFocused]);
-
-    useEffect(() => {
-        if (
+        } else if (
             checkIsFocus &&
             bubblePalaceAction.action ===
                 TYPE_BUBBLE_PALACE_ACTION.scrollToTopMyProfile
@@ -267,6 +249,8 @@ const ProfileAccount = () => {
                 postLikedRef.current?.hide();
             } else if (postSavedRef.current?.isShowing()) {
                 postSavedRef.current?.hide();
+            } else if (tabFourSharedRef.current?.isShowing()) {
+                tabFourSharedRef.current?.hide();
             } else {
                 scrollRef.current?.scrollTo({
                     y: 0,
@@ -340,12 +324,28 @@ const ProfileAccount = () => {
     }, [bubblePalaceAction]);
 
     useEffect(() => {
+        let x: any;
+        if (!isFocused) {
+            checkIsFocus.current = false;
+        } else {
+            x = setTimeout(() => {
+                checkIsFocus.current = true;
+            }, 200);
+        }
+        return () => {
+            clearTimeout(x);
+        };
+    }, [isFocused]);
+
+    useEffect(() => {
         if (tabIndex === 0) {
             listShareElement.current = myPostsPaging.list;
         } else if (tabIndex === 1) {
             listShareElement.current = postsLikedPaging.list;
         } else if (tabIndex === 2) {
             listShareElement.current = postsSavedPaging.list;
+        } else if (tabIndex === 3) {
+            listShareElement.current = tabFourPaging.list;
         }
         tabIndexRef.current = tabIndex;
     }, [
@@ -353,6 +353,7 @@ const ProfileAccount = () => {
         myPostsPaging.list,
         postsLikedPaging.list,
         postsSavedPaging.list,
+        tabFourPaging.list,
     ]);
 
     /**

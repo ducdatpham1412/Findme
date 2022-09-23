@@ -18,9 +18,21 @@ import Video from 'react-native-video';
 import {chooseImageFromCamera, logger} from 'utility/assistant';
 import ImageUploader from 'utility/ImageUploader';
 
-const screenWidth = Metrics.width;
+interface Props {
+    route: {
+        params: {
+            userReviewed?: {
+                id: number;
+                name: string;
+                avatar: string;
+            };
+        };
+    };
+}
 
-const CreatePostPickImage = () => {
+const {width} = Metrics;
+
+const CreatePostPickImage = ({route}: Props) => {
     const theme = Redux.getTheme();
     const tabPickRef = useRef<StyleTabView>(null);
     const isFocused = useIsFocused();
@@ -83,6 +95,7 @@ const CreatePostPickImage = () => {
             itemNew: {
                 images: tabIndex === 0 ? images : [video],
                 isVideo: tabIndex === 1,
+                userReviewed: route.params?.userReviewed,
             },
         });
     };
@@ -136,7 +149,7 @@ const CreatePostPickImage = () => {
                         uri: video,
                     }}
                     style={{
-                        width: screenWidth,
+                        width,
                         minHeight: '60%',
                         maxHeight: '80%',
                     }}

@@ -27,23 +27,11 @@ import BubbleGroupBuying, {ParamsLikeGB} from './components/BubbleGroupBuying';
 import HeaderDoffy, {headerDoffyHeight} from './components/HeaderDoffy';
 import HeaderFilterTopic from './HeaderFilterTopic';
 
-export interface TypeShowMoreOptions {
-    idUser: number;
-    nameUser: string;
-    imageWantToSee: Array<string>;
-    allowSaveImage: boolean;
-}
-
 export interface TypeMoreOptionsMe {
-    postModal: TypeBubblePalace & TypeGroupBuying;
+    postModal: TypeBubblePalace | TypeGroupBuying;
 }
 
-let modalOptions: TypeShowMoreOptions = {
-    idUser: 0,
-    nameUser: '',
-    imageWantToSee: [],
-    allowSaveImage: true,
-};
+let modalOptions: TypeBubblePalace | TypeGroupBuying;
 
 let oldOffset = 0;
 
@@ -149,8 +137,8 @@ const DiscoveryScreen = () => {
         [hadLogan],
     );
 
-    const onShowOptions = useCallback((params: TypeShowMoreOptions) => {
-        modalOptions = params;
+    const onShowOptions = useCallback((params: TypeMoreOptionsMe) => {
+        modalOptions = params.postModal;
         optionsRef.current?.show();
     }, []);
 
@@ -329,10 +317,10 @@ const DiscoveryScreen = () => {
                     {
                         text: 'discovery.report.title',
                         action: () => {
-                            if (hadLogan) {
+                            if (hadLogan && modalOptions) {
                                 navigate(ROOT_SCREEN.reportUser, {
-                                    idUser: modalOptions.idUser,
-                                    nameUser: modalOptions.nameUser,
+                                    idUser: modalOptions.creator,
+                                    nameUser: modalOptions.creatorName,
                                 });
                             }
                         },

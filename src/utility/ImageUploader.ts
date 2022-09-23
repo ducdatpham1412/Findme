@@ -3,6 +3,7 @@ import {apiUploadFile} from 'api/module';
 import ImagePicker from 'react-native-image-crop-picker';
 import I18Next from 'utility/I18Next';
 import {checkPhoto} from './permission/permission';
+import {checkIsVideo} from './validate';
 
 const MAX_WIDTH = 1500;
 const MAX_HEIGHT = 1500;
@@ -79,7 +80,11 @@ const ImageUploader = {
             name: 'file',
         };
         payload.append('file', formatImage);
-        const uriImg = await apiUploadFile(payload, quality);
+        const uriImg = await apiUploadFile({
+            formData: payload,
+            quality,
+            timeout: checkIsVideo(path) ? 60000 : 10000,
+        });
         if (uriImg?.data?.length > 0) {
             return uriImg?.data[0];
         }
@@ -91,7 +96,7 @@ const ImageUploader = {
         quality: number | undefined = undefined,
     ): Promise<Array<string>> => {
         const payload = new FormData();
-
+        let timeout = 0;
         arrPath.forEach((path: any) => {
             const formatImage: any = {
                 uri: path,
@@ -99,8 +104,17 @@ const ImageUploader = {
                 name: 'file',
             };
             payload.append('file', formatImage);
+            if (checkIsVideo(path)) {
+                timeout += 60000;
+            } else {
+                timeout += 10000;
+            }
         });
-        const uriImg = await apiUploadFile(payload, quality);
+        const uriImg = await apiUploadFile({
+            formData: payload,
+            quality,
+            timeout,
+        });
         if (uriImg?.data.length > 0) {
             return uriImg?.data;
         }

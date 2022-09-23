@@ -113,11 +113,16 @@ export const apiGetResource = (): Promise<TypeResourceResponse> => {
     return request.get('/common/get-resource');
 };
 
-export const apiUploadFile = (formData: any, quality?: number) =>
-    request.post('/common/upload-file', formData, {
+export const apiUploadFile = (params: {
+    formData: FormData;
+    quality?: number;
+    timeout?: number;
+}) =>
+    request.post('/common/upload-file', params.formData, {
         params: {
-            quality: quality || undefined,
+            quality: params.quality || undefined,
         },
+        timeout: params.timeout || 10000,
     });
 
 export const apiUpdateMyBubbles = (params: TypeUpdateMyBubblesRequest) => {

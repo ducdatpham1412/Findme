@@ -14,10 +14,7 @@ import Bubble from 'feature/discovery/components/Bubble';
 import BubbleGroupBuying, {
     ParamsLikeGB,
 } from 'feature/discovery/components/BubbleGroupBuying';
-import {
-    TypeMoreOptionsMe,
-    TypeShowMoreOptions,
-} from 'feature/discovery/DiscoveryScreen';
+import {TypeMoreOptionsMe} from 'feature/discovery/DiscoveryScreen';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
@@ -50,7 +47,7 @@ interface TypeShow {
     postId: string;
 }
 
-let postModal: TypeBubblePalace & TypeGroupBuying;
+let postModal: TypeBubblePalace | TypeGroupBuying;
 
 const onGoToEditPost = () => {
     if (postModal) {
@@ -60,18 +57,20 @@ const onGoToEditPost = () => {
     }
 };
 
-const onArchivePost = async (post: TypeBubblePalace) => {
-    try {
-        await apiArchivePost(post.id);
-        Redux.setBubblePalaceAction({
-            action: TYPE_BUBBLE_PALACE_ACTION.archivePost,
-            payload: {
-                ...post,
-                isArchived: true,
-            },
-        });
-    } catch (err) {
-        appAlert(err);
+const onArchivePost = async () => {
+    if (postModal) {
+        try {
+            await apiArchivePost(postModal.id);
+            Redux.setBubblePalaceAction({
+                action: TYPE_BUBBLE_PALACE_ACTION.archivePost,
+                payload: {
+                    ...postModal,
+                    isArchived: true,
+                },
+            });
+        } catch (err) {
+            appAlert(err);
+        }
     }
 };
 
@@ -175,7 +174,7 @@ export default class ListShareElement extends Component<Props, States> {
         });
     }
 
-    private showOptions(params: TypeShowMoreOptions & TypeMoreOptionsMe) {
+    private showOptions(params: TypeMoreOptionsMe) {
         const {id} = FindmeStore.getState().accountSlice.passport.profile;
         postModal = params.postModal;
         if (postModal.creator === id) {
@@ -283,30 +282,18 @@ export default class ListShareElement extends Component<Props, States> {
                 <StyleActionSheet
                     ref={this.myOptionRef}
                     listTextAndAction={[
-                        // {
-                        //     text: 'discovery.seeDetailImage',
-                        //     action: () => {
-                        //         if (postModal?.images.length) {
-                        //             seeDetailImage({
-                        //                 images: postModal.images.map(
-                        //                     url => url,
-                        //                 ),
-                        //             });
-                        //         }
-                        //     },
-                        // },
                         {
                             text: 'profile.post.edit',
                             action: onGoToEditPost,
                         },
                         {
                             text: 'profile.post.archive',
-                            action: () => onArchivePost(postModal),
+                            action: onArchivePost,
                         },
                         {
                             text: 'profile.post.delete',
                             action: () => {
-                                if (postModal?.id) {
+                                if (postModal) {
                                     this.onDeletePost(postModal.id);
                                 }
                             },
@@ -325,18 +312,6 @@ export default class ListShareElement extends Component<Props, States> {
                 <StyleActionSheet
                     ref={this.draftOptionRef}
                     listTextAndAction={[
-                        // {
-                        //     text: 'discovery.seeDetailImage',
-                        //     action: () => {
-                        //         if (postModal?.images.length) {
-                        //             seeDetailImage({
-                        //                 images: postModal.images.map(
-                        //                     url => url,
-                        //                 ),
-                        //             });
-                        //         }
-                        //     },
-                        // },
                         {
                             text: 'profile.post.edit',
                             action: onGoToEditPost,
@@ -372,18 +347,6 @@ export default class ListShareElement extends Component<Props, States> {
                                 });
                             },
                         },
-                        // {
-                        //     text: 'discovery.seeDetailImage',
-                        //     action: () => {
-                        //         if (postModal?.images.length) {
-                        //             seeDetailImage({
-                        //                 images: postModal.images.map(
-                        //                     url => url,
-                        //                 ),
-                        //             });
-                        //         }
-                        //     },
-                        // },
                         {
                             text: 'common.cancel',
                             action: () => null,

@@ -50,11 +50,11 @@ import {
 } from 'utility/assistant';
 import {formatFromNow} from 'utility/format';
 import {checkIsVideo} from 'utility/validate';
-import {TypeMoreOptionsMe, TypeShowMoreOptions} from '../DiscoveryScreen';
+import {TypeMoreOptionsMe} from '../DiscoveryScreen';
 
 interface Props {
     item: TypeBubblePalace;
-    onShowMoreOption(params: TypeShowMoreOptions & TypeMoreOptionsMe): void;
+    onShowMoreOption(params: TypeMoreOptionsMe): void;
     onShowModalComment(
         post: TypeBubblePalace,
         type: TypeShowModalCommentOrLike,
@@ -304,10 +304,6 @@ const Bubble = (props: Props) => {
                         customStyle={styles.iconMore}
                         onPress={() =>
                             onShowMoreOption({
-                                idUser: item.creator,
-                                nameUser: item.creatorName,
-                                imageWantToSee: item.images,
-                                allowSaveImage: true,
                                 postModal: item,
                             })
                         }
@@ -358,22 +354,36 @@ const Bubble = (props: Props) => {
 
     const StarLink = () => {
         const arrayStars = Array(item.stars).fill(0);
-        return (
-            <View style={styles.starLink}>
-                <View
-                    style={[
-                        styles.starBox,
-                        {backgroundColor: theme.backgroundButtonColor},
-                    ]}>
-                    {arrayStars.map((_, index) => (
-                        <AntDesign
-                            key={index}
-                            name="star"
-                            style={styles.star}
-                        />
-                    ))}
-                </View>
-                {item?.link && (
+
+        const Link = () => {
+            if (item.userReviewed) {
+                return (
+                    <StyleTouchable
+                        customStyle={styles.linkBox}
+                        onPress={() => onOpenLink(item.link || '')}>
+                        <View
+                            style={[
+                                styles.linkTouch,
+                                {backgroundColor: theme.backgroundButtonColor},
+                            ]}>
+                            <StyleImage
+                                source={{uri: item.userReviewed.avatar}}
+                                customStyle={styles.iconAvatar}
+                            />
+
+                            <StyleText
+                                originValue={item.userReviewed.name}
+                                customStyle={[
+                                    styles.textSeeNow,
+                                    {color: theme.textHightLight},
+                                ]}
+                            />
+                        </View>
+                    </StyleTouchable>
+                );
+            }
+            if (item.link) {
+                return (
                     <StyleTouchable
                         customStyle={styles.linkBox}
                         onPress={() => onOpenLink(item.link || '')}>
@@ -396,7 +406,27 @@ const Bubble = (props: Props) => {
                             />
                         </View>
                     </StyleTouchable>
-                )}
+                );
+            }
+            return null;
+        };
+
+        return (
+            <View style={styles.starLink}>
+                <View
+                    style={[
+                        styles.starBox,
+                        {backgroundColor: theme.backgroundButtonColor},
+                    ]}>
+                    {arrayStars.map((_, index) => (
+                        <AntDesign
+                            key={index}
+                            name="star"
+                            style={styles.star}
+                        />
+                    ))}
+                </View>
+                {Link()}
             </View>
         );
     };
@@ -766,6 +796,11 @@ const styles = ScaledSheet.create({
     iconHouse: {
         width: '10@ms',
         height: '10@ms',
+    },
+    iconAvatar: {
+        width: '15@ms',
+        height: '15@ms',
+        borderRadius: '8@ms',
     },
     textSeeNow: {
         fontSize: '10@ms',

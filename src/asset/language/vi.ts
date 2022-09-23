@@ -172,6 +172,7 @@ const discovery = {
     confirmBought: 'Xác nhận đã mua',
     participators: '{{value}} người tham gia',
     gbExpired: 'Chiến dịch mua chung đã hết hạn',
+    reviewAbout: 'Bạn đang viết review về ',
 };
 
 // REPUTATION
