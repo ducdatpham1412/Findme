@@ -344,7 +344,7 @@ const Bubble = (props: Props) => {
     };
 
     const StarLink = () => {
-        const arrayStars = Array(item.stars).fill(0);
+        const numberStars = Array(item.stars).fill(0).length;
 
         const Link = () => {
             if (item.userReviewed) {
@@ -409,13 +409,28 @@ const Bubble = (props: Props) => {
                         styles.starBox,
                         {backgroundColor: theme.backgroundButtonColor},
                     ]}>
-                    {arrayStars.map((_, index) => (
-                        <AntDesign
-                            key={index}
-                            name="star"
-                            style={styles.star}
-                        />
-                    ))}
+                    {[0, 1, 2, 3, 4].map((_, index) => {
+                        const isChosen = index < numberStars;
+                        if (isChosen) {
+                            return (
+                                <AntDesign
+                                    key={index}
+                                    name="star"
+                                    style={styles.star}
+                                />
+                            );
+                        }
+                        return (
+                            <AntDesign
+                                key={index}
+                                name="staro"
+                                style={[
+                                    styles.starNotChosen,
+                                    {color: theme.holderColorLighter},
+                                ]}
+                            />
+                        );
+                    })}
                 </View>
                 {Link()}
             </View>
@@ -753,6 +768,10 @@ const styles = ScaledSheet.create({
         fontSize: '14@ms',
         marginHorizontal: '3@s',
         color: Theme.common.orange,
+    },
+    starNotChosen: {
+        fontSize: '14@ms',
+        marginHorizontal: '3@s',
     },
     linkBox: {
         marginLeft: '10@s',

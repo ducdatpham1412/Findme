@@ -194,12 +194,12 @@ const ListGroupBuyingJoined = (props: Props) => {
                             <View style={{flex: 1}}>
                                 <View style={styles.infoView}>
                                     <StyleIcon
-                                        source={Images.icons.calendar}
+                                        source={Images.icons.deadline}
                                         size={15}
                                     />
                                     <StyleText
                                         originValue={formatDayGroupBuying(
-                                            item.endDate,
+                                            item.deadlineDate,
                                         )}
                                         customStyle={[
                                             styles.textInfo,
