@@ -77,7 +77,9 @@ const onArchivePost = async () => {
 export default class ListShareElement extends Component<Props, States> {
     pan = new Animated.ValueXY();
 
-    scale = new Animated.Value(0);
+    scaleX = new Animated.Value(0);
+
+    scaleY = new Animated.Value(0);
 
     listRef = React.createRef<FlatList>();
 
@@ -100,8 +102,7 @@ export default class ListShareElement extends Component<Props, States> {
     private enableHearingScrollEvent = true;
 
     isShowing() {
-        const temp: any = this.scale;
-        return temp._value === 1;
+        return this.scaleX._value === 1 && this.scaleY._value === 1;
     }
 
     show(params: TypeShow) {
@@ -111,11 +112,18 @@ export default class ListShareElement extends Component<Props, States> {
             index: params.index,
             animated: false,
         });
-        Animated.timing(this.scale, {
-            toValue: 1,
-            duration: 350,
-            useNativeDriver: false,
-        }).start(() => {
+        Animated.parallel([
+            Animated.timing(this.scaleX, {
+                toValue: 1,
+                duration: 350,
+                useNativeDriver: false,
+            }),
+            Animated.timing(this.scaleY, {
+                toValue: 1,
+                duration: 350,
+                useNativeDriver: false,
+            }),
+        ]).start(() => {
             this.setState({
                 postIdFocusing: params.postId,
             });
@@ -125,7 +133,12 @@ export default class ListShareElement extends Component<Props, States> {
     hide() {
         const {timing, ...transitionConfig} = DefaultTransitionSpec;
         Animated.parallel([
-            timing(this.scale, {
+            timing(this.scaleX, {
+                ...transitionConfig,
+                toValue: 0,
+                useNativeDriver: false,
+            }),
+            timing(this.scaleY, {
                 ...transitionConfig,
                 toValue: 0,
                 useNativeDriver: false,
@@ -365,7 +378,8 @@ export default class ListShareElement extends Component<Props, States> {
                             transform: [
                                 {translateX: this.pan.x},
                                 {translateY: this.pan.y},
-                                {scaleX: this.scale},
+                                {scaleX: this.scaleX},
+                                {scaleY: this.scaleY},
                             ],
                         },
                         containerStyle,

@@ -1,4 +1,5 @@
 import {Metrics} from 'asset/metrics';
+import {FONT_SIZE} from 'asset/standardValue';
 import {StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import {socketTyping, socketUnTyping} from 'hook/useSocketIO';
@@ -293,7 +294,7 @@ const styles = ScaledSheet.create({
         fontSize: '20@ms',
     },
     inputView: {
-        borderRadius: '20@vs',
+        borderRadius: '30@ms',
         paddingTop: '3@vs',
         paddingBottom: isIOS ? '7@vs' : '2@vs',
         paddingHorizontal: Platform.select({
@@ -310,7 +311,7 @@ const styles = ScaledSheet.create({
     input: {
         width: '100%',
         color: 'white',
-        fontSize: '15@ms',
+        fontSize: FONT_SIZE.normal,
         paddingVertical: 0,
     },
     sendIcon: {

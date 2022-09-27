@@ -3,6 +3,7 @@ import {TypeGetProfileResponse} from 'api/interface';
 import {ACCOUNT, TYPE_FOLLOW} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';
+import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
@@ -12,6 +13,7 @@ import {Platform, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface Props {
     profile: TypeGetProfileResponse;
@@ -194,6 +196,21 @@ const InformationProfile = (props: Props) => {
                             ]}
                         />
                     )}
+                    {!!profile.location && (
+                        <View style={styles.locationBox}>
+                            <Ionicons
+                                name="location"
+                                style={styles.iconLocation}
+                            />
+                            <StyleText
+                                originValue={profile.location}
+                                customStyle={[
+                                    styles.textLocation,
+                                    {color: theme.borderColor},
+                                ]}
+                            />
+                        </View>
+                    )}
                 </View>
                 {Follows()}
                 {ButtonEditProfile()}
@@ -270,7 +287,21 @@ const styles = ScaledSheet.create({
     },
     textDescription: {
         fontSize: FONT_SIZE.normal,
-        marginTop: '15@vs',
+        marginTop: '10@vs',
+    },
+    locationBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: '10@vs',
+        maxWidth: '80%',
+    },
+    iconLocation: {
+        fontSize: '17@ms',
+        color: Theme.common.commentGreen,
+    },
+    textLocation: {
+        fontSize: FONT_SIZE.small,
+        marginLeft: '5@s',
     },
     // box follow
     followBox: {

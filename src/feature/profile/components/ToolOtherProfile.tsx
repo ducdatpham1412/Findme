@@ -86,7 +86,7 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        borderTopWidth: 0,
+        marginTop: -1,
     },
     spaceBackground: {
         position: 'absolute',
