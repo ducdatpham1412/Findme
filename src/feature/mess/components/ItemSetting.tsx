@@ -54,7 +54,7 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderBottomWidth: Platform.select({
-            ios: '0.2@ms',
+            ios: '0.25@ms',
             android: '0.5@ms',
         }),
         marginBottom: '7@vs',

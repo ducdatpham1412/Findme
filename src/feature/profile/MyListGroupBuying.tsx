@@ -1,6 +1,10 @@
 import {TypeGroupBuying} from 'api/interface';
 import {apiGetListGroupBuying} from 'api/post';
-import {GROUP_BUYING_STATUS, RELATIONSHIP} from 'asset/enum';
+import {
+    GROUP_BUYING_STATUS,
+    RELATIONSHIP,
+    TYPE_BUBBLE_PALACE_ACTION,
+} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE, ratioImageGroupBuying} from 'asset/standardValue';
@@ -11,18 +15,20 @@ import {
     StyleText,
     StyleTouchable,
 } from 'components/base';
+import LoadingIndicator from 'components/common/LoadingIndicator';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import {navigate, push} from 'navigation/NavigationService';
-import React, {useCallback} from 'react';
-import {View} from 'react-native';
+import React, {useCallback, useEffect} from 'react';
+import {StyleSheet, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {ScaledSheet} from 'react-native-size-matters';
 import Carousel from 'react-native-snap-carousel';
+import Entypo from 'react-native-vector-icons/Entypo';
 import {SharedElement} from 'react-navigation-shared-element';
 import {formatDayGroupBuying, formatLocaleNumber} from 'utility/format';
-import Entypo from 'react-native-vector-icons/Entypo';
-import LoadingIndicator from 'components/common/LoadingIndicator';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {PROFILE_ROUTE} from 'navigation/config/routes';
 
 interface Props {
     userId: number;
@@ -36,6 +42,7 @@ const {width} = Metrics;
 const MyListGroupBuying = (props: Props) => {
     const {userId, onTouchStart, onTouchEnd, detailGroupBuyingName} = props;
     const theme = Redux.getTheme();
+    const bubblePalaceAction = Redux.getBubblePalaceAction();
 
     const {
         list,
@@ -52,11 +59,30 @@ const MyListGroupBuying = (props: Props) => {
         },
     });
 
+    useEffect(() => {
+        if (
+            bubblePalaceAction.action ===
+            TYPE_BUBBLE_PALACE_ACTION.createNewGroupBuying
+        ) {
+            setList(preValue => [bubblePalaceAction.payload].concat(preValue));
+            Redux.setBubblePalaceAction({
+                action: TYPE_BUBBLE_PALACE_ACTION.null,
+                payload: null,
+            });
+        }
+    }, [bubblePalaceAction]);
+
     const goToDetailPost = (item: TypeGroupBuying) => {
-        push(detailGroupBuyingName, {
-            item,
-            setList,
-        });
+        if (item.isDraft) {
+            navigate(PROFILE_ROUTE.createGroupBuying, {
+                itemDraft: item,
+            });
+        } else {
+            push(detailGroupBuyingName, {
+                item,
+                setList,
+            });
+        }
     };
 
     /**
@@ -141,74 +167,100 @@ const MyListGroupBuying = (props: Props) => {
         [theme.holderColor],
     );
 
-    const RenderItem = useCallback((item: TypeGroupBuying) => {
-        const displayPrices = item.prices[item.prices.length - 1];
+    const RenderItem = useCallback(
+        (item: TypeGroupBuying) => {
+            const displayPrices = item.prices[item.prices.length - 1];
 
-        return (
-            <StyleTouchable
-                customStyle={[
-                    styles.itemView,
-                    {backgroundColor: theme.backgroundColor},
-                ]}
-                onPress={() => goToDetailPost(item)}>
-                <SharedElement
-                    style={styles.imagePreview}
-                    id={`item.group_buying.${item.id}`}>
-                    <StyleImage
-                        source={{uri: item.images[0]}}
-                        customStyle={styles.imagePreview}
-                    />
-                    <View style={styles.numberPeopleBox}>
-                        <StyleIcon
-                            source={Images.icons.createGroup}
-                            size={15}
-                            customStyle={styles.iconGroup}
-                        />
-                        <StyleText
-                            originValue={item.totalJoins}
-                            customStyle={styles.textNumberPeople}
-                        />
-                    </View>
-                </SharedElement>
-                <StyleText
-                    originValue={item.content}
+            return (
+                <StyleTouchable
                     customStyle={[
-                        styles.textContent,
-                        {color: theme.textHightLight},
+                        styles.itemView,
+                        {backgroundColor: theme.backgroundColor},
                     ]}
-                    numberOfLines={1}
-                />
-                <View style={styles.footerView}>
-                    <View style={styles.infoBox}>
-                        <StyleIcon source={Images.icons.calendar} size={13} />
-                        <StyleText
-                            originValue={formatDayGroupBuying(item.endDate)}
-                            customStyle={[
-                                styles.textEndDate,
-                                {color: theme.borderColor},
-                            ]}
+                    onPress={() => goToDetailPost(item)}>
+                    <SharedElement
+                        style={styles.imagePreview}
+                        id={`item.group_buying.${item.id}`}>
+                        <StyleImage
+                            source={{uri: item.images[0]}}
+                            customStyle={styles.imagePreview}
                         />
+                        <View style={styles.numberPeopleBox}>
+                            <StyleIcon
+                                source={Images.icons.createGroup}
+                                size={15}
+                                customStyle={styles.iconGroup}
+                            />
+                            <StyleText
+                                originValue={item.totalJoins}
+                                customStyle={styles.textNumberPeople}
+                            />
+                        </View>
+                    </SharedElement>
+                    <StyleText
+                        originValue={item.content}
+                        customStyle={[
+                            styles.textContent,
+                            {color: theme.textHightLight},
+                        ]}
+                        numberOfLines={1}
+                    />
+                    <View style={styles.footerView}>
+                        <View style={styles.infoBox}>
+                            <StyleIcon
+                                source={Images.icons.deadline}
+                                size={13}
+                            />
+                            <StyleText
+                                originValue={formatDayGroupBuying(
+                                    item.deadlineDate,
+                                )}
+                                customStyle={[
+                                    styles.textEndDate,
+                                    {color: theme.borderColor},
+                                ]}
+                            />
+                        </View>
+                        <View style={styles.infoBox}>
+                            <StyleIcon source={Images.icons.dollar} size={13} />
+                            <StyleText
+                                originValue={`${
+                                    displayPrices.number_people
+                                } - ${formatLocaleNumber(
+                                    displayPrices.value,
+                                )}vnd`}
+                                customStyle={[
+                                    styles.textEndDate,
+                                    {color: theme.borderColor},
+                                ]}
+                            />
+                        </View>
+                        <View
+                            style={[
+                                styles.infoBox,
+                                {justifyContent: 'flex-end'},
+                            ]}>
+                            {ButtonCheckJoined(item)}
+                        </View>
                     </View>
-                    <View style={styles.infoBox}>
-                        <StyleIcon source={Images.icons.dollar} size={13} />
-                        <StyleText
-                            originValue={`${
-                                displayPrices.number_people
-                            } - ${formatLocaleNumber(displayPrices.value)}vnd`}
-                            customStyle={[
-                                styles.textEndDate,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                    </View>
-                    <View
-                        style={[styles.infoBox, {justifyContent: 'flex-end'}]}>
-                        {ButtonCheckJoined(item)}
-                    </View>
-                </View>
-            </StyleTouchable>
-        );
-    }, []);
+
+                    {item.isDraft && (
+                        <View
+                            style={[
+                                styles.spaceBackgroundDraft,
+                                {backgroundColor: theme.backgroundOpacity(0.5)},
+                            ]}>
+                            <StyleText
+                                i18Text="profile.draftPost"
+                                customStyle={styles.textDraft}
+                            />
+                        </View>
+                    )}
+                </StyleTouchable>
+            );
+        },
+        [theme.backgroundColor],
+    );
 
     const Content = () => {
         if (loading && !loadingMore) {
@@ -226,6 +278,25 @@ const MyListGroupBuying = (props: Props) => {
                     refreshing={refreshing}
                     onRefresh={onRefresh}
                     onEndReached={onLoadMore}
+                    ListHeaderComponent={() => {
+                        return (
+                            <StyleTouchable
+                                customStyle={styles.reloadView}
+                                onPress={onRefresh}
+                                hitSlop={10}>
+                                <Ionicons
+                                    name="reload"
+                                    style={[
+                                        styles.iconReload,
+                                        {color: theme.textHightLight},
+                                    ]}
+                                />
+                            </StyleTouchable>
+                        );
+                    }}
+                    contentContainerCustomStyle={{
+                        alignItems: 'center',
+                    }}
                 />
             );
         }
@@ -297,6 +368,16 @@ const styles = ScaledSheet.create({
         width: '100%',
         height: '100%',
         borderRadius: '8@ms',
+    },
+    spaceBackgroundDraft: {
+        ...StyleSheet.absoluteFillObject,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    textDraft: {
+        fontSize: FONT_SIZE.normal,
+        fontWeight: 'bold',
+        color: Theme.common.white,
     },
     imagePreview: {
         width: width * 0.6,
@@ -408,6 +489,13 @@ const styles = ScaledSheet.create({
         fontSize: FONT_SIZE.small,
         fontWeight: 'bold',
         marginLeft: '5@s',
+    },
+    // reload
+    reloadView: {
+        marginRight: '10@s',
+    },
+    iconReload: {
+        fontSize: '15@ms',
     },
 });
 

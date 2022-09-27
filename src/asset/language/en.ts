@@ -172,6 +172,8 @@ const discovery = {
     reviewAbout: "You're writing review about ",
     goToProfile: 'Visit profile',
     openLink: 'Open link',
+    dayRemain: '{{value}} days remaining',
+    today: 'Today',
 };
 
 // REPUTATION
@@ -286,6 +288,14 @@ const profile = {
     upgradeAccount: 'Provider account',
     groupBuyingJoined: 'Group buying joined',
     gotToCreateGb: 'Create first group buying campaign',
+    createReviewPost: 'Review post',
+    createGroupBuying: 'Group buying campaign',
+    subscriptionDeadline: 'Subscription deadline',
+    startDate: 'Start date',
+    endDate: 'End date',
+    addPrice: 'Add price',
+    number: 'Number',
+    price: 'Price',
 };
 
 // SETTING ROUTE
@@ -386,6 +396,8 @@ const alert = {
     // PROFILE
     successUpdatePro: 'Update profile successful !',
     invalidLink: 'Invalid link',
+    numberPeopleMoreThan: 'Number people have to be more than {{value}}',
+    priceLessThan: 'Price have to be less {{value}}',
 
     // PERMISSION
     permissionCamera: 'Access camera',

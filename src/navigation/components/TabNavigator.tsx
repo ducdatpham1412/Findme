@@ -1,4 +1,4 @@
-import {TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
+import {ACCOUNT, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
@@ -15,6 +15,7 @@ import {
     verticalScale,
 } from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
+import StyleActionSheet from 'components/common/StyleActionSheet';
 
 const tabBarHeight = moderateScale(50);
 const addMoreHeight = moderateScale(3);
@@ -27,7 +28,9 @@ const TabNavigator = (props: any) => {
     const theme = Redux.getTheme();
     const numberNewNotifications = Redux.getNumberNewNotifications();
     const numberNewMessages = Redux.getNumberNewMessages();
-    const {avatar} = Redux.getPassport().profile;
+    const {avatar, account_type} = Redux.getPassport().profile;
+
+    const typeCreateRef = useRef<any>(null);
 
     // for animation all tab bar
     // const aim = useRef(new Animated.Value(0)).current;
@@ -84,7 +87,11 @@ const TabNavigator = (props: any) => {
     }, [tabIndexFocus]);
 
     const onGoToCreatePost = () => {
-        navigate(PROFILE_ROUTE.createPostPickImg);
+        if (account_type === ACCOUNT.user) {
+            navigate(PROFILE_ROUTE.createPostPickImg);
+        } else if (account_type === ACCOUNT.shop) {
+            typeCreateRef.current?.show();
+        }
     };
 
     /**
@@ -298,6 +305,26 @@ const TabNavigator = (props: any) => {
                 style={[
                     styles.safeBottom,
                     {backgroundColor: theme.backgroundColor},
+                ]}
+            />
+            <StyleActionSheet
+                ref={typeCreateRef}
+                listTextAndAction={[
+                    {
+                        text: 'profile.createReviewPost',
+                        action: () => navigate(PROFILE_ROUTE.createPostPickImg),
+                    },
+                    {
+                        text: 'profile.createGroupBuying',
+                        action: () =>
+                            navigate(PROFILE_ROUTE.createPostPickImg, {
+                                isCreateGB: true,
+                            }),
+                    },
+                    {
+                        text: 'common.cancel',
+                        action: () => null,
+                    },
                 ]}
             />
         </>

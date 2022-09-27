@@ -31,6 +31,7 @@ interface Props {
     onChangeTabIndex?(index: number): void;
     onScroll?(e: TypeNativeEvent): void;
     containerStyle?: StyleProp<ViewStyle>;
+    enableScroll?: boolean;
 }
 
 interface States {
@@ -64,7 +65,10 @@ class StyleTabView extends Component<Props, States> {
         event: GestureResponderEvent,
         gestureState: PanResponderGestureState,
     ) => {
-        if (this.__canMoveScreen === false) {
+        if (
+            this.__canMoveScreen === false ||
+            this.props.enableScroll === false
+        ) {
             return false;
         }
         const diffX = I18nManager.isRTL ? -gestureState.dx : gestureState.dx;

@@ -16,6 +16,10 @@ export const validateIsPhone = (phone: string) => {
     return REGEX_PHONE.test(phone);
 };
 
+export const validateIsNumber = (value: any) => {
+    return /^[0-9]+$/.test(value);
+};
+
 export function validateIsLink(str: string) {
     const pattern = new RegExp(
         '^(https?:\\/\\/)?' + // protocol

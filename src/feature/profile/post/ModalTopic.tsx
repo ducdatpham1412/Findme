@@ -1,22 +1,75 @@
 import {LIST_FEELINGS, LIST_TOPICS} from 'asset/standardValue';
-import {StyleIcon, StyleText, StyleTouchable} from 'components/base';
+import {
+    StyleButton,
+    StyleIcon,
+    StyleText,
+    StyleTouchable,
+} from 'components/base';
 import ButtonX from 'components/common/ButtonX';
 import Redux from 'hook/useRedux';
-import React, {forwardRef} from 'react';
-import {Platform, View} from 'react-native';
+import React, {forwardRef, useEffect, useRef, useState} from 'react';
+import {Animated, Platform, View} from 'react-native';
 import {Modalize} from 'react-native-modalize';
 import {ScaledSheet} from 'react-native-size-matters';
 
 interface Props {
-    onChangeTopic(value: number): void;
+    topics: Array<number>;
+    onChangeListTopics(value: Array<number>): void;
 }
 
+const IconChoose = ({item, textColor, isChosen}: any) => {
+    const aim = useRef(new Animated.Value(1)).current;
+
+    useEffect(() => {
+        if (isChosen) {
+            Animated.spring(aim, {
+                toValue: 1,
+                useNativeDriver: true,
+            }).start();
+        } else {
+            Animated.spring(aim, {
+                toValue: 0.7,
+                useNativeDriver: true,
+            }).start();
+        }
+    }, [isChosen]);
+
+    return (
+        <Animated.View
+            style={[
+                styles.topicTouch,
+                {transform: [{scale: aim}], opacity: aim},
+            ]}>
+            <StyleIcon source={item.icon} size={40} />
+            <StyleText
+                i18Text={item.text}
+                customStyle={[styles.textFeeling, {color: textColor}]}
+            />
+        </Animated.View>
+    );
+};
+
 const ModalTopic = (props: Props, ref: any) => {
-    const {onChangeTopic} = props;
+    const {onChangeListTopics, topics} = props;
     const theme = Redux.getTheme();
 
-    const onConfirm = (item: any) => {
-        onChangeTopic(item.id);
+    const [tempTopics, setTempTopics] = useState(topics);
+
+    const onChoose = (topicId: any) => {
+        if (tempTopics.includes(topicId)) {
+            setTempTopics(tempTopics.filter(id => id !== topicId));
+        } else {
+            setTempTopics(tempTopics.concat(topicId));
+        }
+    };
+
+    const onSave = () => {
+        onChangeListTopics(tempTopics);
+        ref.current.close();
+    };
+
+    const onClose = () => {
+        setTempTopics(topics);
         ref.current.close();
     };
 
@@ -35,7 +88,7 @@ const ModalTopic = (props: Props, ref: any) => {
                 ]}>
                 <ButtonX
                     containerStyle={styles.buttonClose}
-                    onPress={() => ref.current.close()}
+                    onPress={onClose}
                 />
                 <StyleText
                     i18Text="profile.post.topic"
@@ -54,19 +107,22 @@ const ModalTopic = (props: Props, ref: any) => {
                                     styles.topicBox,
                                     {borderRightColor},
                                 ]}
-                                onPress={() => onConfirm(item)}>
-                                <StyleIcon source={item.icon} size={40} />
-                                <StyleText
-                                    i18Text={item.text}
-                                    customStyle={[
-                                        styles.textFeeling,
-                                        {color: theme.textColor},
-                                    ]}
+                                onPress={() => onChoose(item.id)}>
+                                <IconChoose
+                                    item={item}
+                                    textColor={theme.textColor}
+                                    isChosen={tempTopics.includes(item.id)}
                                 />
                             </StyleTouchable>
                         );
                     })}
                 </View>
+
+                <StyleButton
+                    title="common.save"
+                    onPress={onSave}
+                    containerStyle={styles.buttonView}
+                />
             </View>
         </Modalize>
     );
@@ -102,15 +158,22 @@ const styles = ScaledSheet.create({
     },
     topicBox: {
         flex: 1,
-        alignItems: 'center',
         borderRightWidth: Platform.select({
             ios: '0.25@ms',
             android: '0.5@ms',
         }),
     },
+    topicTouch: {
+        flex: 1,
+        alignItems: 'center',
+    },
     textFeeling: {
         fontSize: '8@ms',
         marginTop: '10@vs',
+    },
+    buttonView: {
+        paddingVertical: '8@vs',
+        marginTop: '30@vs',
     },
 });
 

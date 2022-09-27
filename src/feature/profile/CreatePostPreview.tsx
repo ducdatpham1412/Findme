@@ -140,9 +140,9 @@ const CreatePostPreview = ({route}: Props) => {
                 itemDraft?.images ||
                 itemNew?.images ||
                 [],
-            starts:
-                itemEdit?.stars || itemError?.stars || itemDraft?.stars || 0,
-            topic: itemEdit?.topic || itemError?.topic || itemDraft?.topic,
+            stars: itemEdit?.stars || itemError?.stars || itemDraft?.stars || 0,
+            topics:
+                itemEdit?.topic || itemError?.topic || itemDraft?.topic || [],
             feeling:
                 itemEdit?.feeling || itemError?.feeling || itemDraft?.feeling,
             location:
@@ -161,9 +161,9 @@ const CreatePostPreview = ({route}: Props) => {
 
     const [content, setContent] = useState(initValue.content);
     const [images] = useState(initValue.images);
-    const [stars, setStars] = useState(initValue.starts);
+    const [stars, setStars] = useState(initValue.stars);
 
-    const [topic, setTopic] = useState(initValue.topic);
+    const [topics, setTopics] = useState(initValue.topics);
     const [feeling, setFeeling] = useState(initValue.feeling);
     const [location, setLocation] = useState(initValue.location);
     const [link, setLink] = useState(initValue.link);
@@ -224,10 +224,10 @@ const CreatePostPreview = ({route}: Props) => {
     const onGoBack = () => {
         if (
             content !== initValue.content ||
-            stars !== initValue.starts ||
+            stars !== initValue.stars ||
             link !== initValue.link ||
             feeling !== initValue.feeling ||
-            topic !== initValue.topic ||
+            topics !== initValue.topics ||
             location !== initValue.location ||
             itemError
         ) {
@@ -296,7 +296,7 @@ const CreatePostPreview = ({route}: Props) => {
                 images,
                 stars,
                 feeling,
-                topic,
+                topic: topics,
                 location,
                 link,
                 isDraft,
@@ -350,11 +350,11 @@ const CreatePostPreview = ({route}: Props) => {
         if (content !== initValue.content) {
             updateObject.content = content;
         }
-        if (stars !== initValue.starts) {
+        if (stars !== initValue.stars) {
             updateObject.stars = stars;
         }
-        if (topic !== initValue.topic) {
-            updateObject.topic = topic;
+        if (topics !== initValue.topics) {
+            updateObject.topic = topics;
         }
         if (feeling !== initValue.feeling) {
             updateObject.feeling = feeling;
@@ -496,10 +496,9 @@ const CreatePostPreview = ({route}: Props) => {
 
     const FeelingTopicLocation = () => {
         const chooseFeeling = LIST_FEELINGS.find(item => item.id === feeling);
-        const chooseTopic = LIST_TOPICS.find(item => item.id === topic);
         return (
             <View style={styles.feelingTopicLocationView}>
-                {(!!chooseFeeling || !!chooseTopic) && (
+                {(!!chooseFeeling || !!topics.length) && (
                     <View style={styles.locationBox}>
                         {!!chooseFeeling && (
                             <StyleImage
@@ -507,24 +506,32 @@ const CreatePostPreview = ({route}: Props) => {
                                 customStyle={styles.iconFeeling}
                             />
                         )}
-                        {!!chooseFeeling && !!chooseTopic && (
-                            <StyleText
-                                originValue="  ・  "
-                                customStyle={[
-                                    styles.textTopic,
-                                    {color: theme.textColor},
-                                ]}
-                            />
-                        )}
-                        {!!chooseTopic && (
-                            <StyleText
-                                i18Text={chooseTopic.text}
-                                customStyle={[
-                                    styles.textTopic,
-                                    {color: theme.textColor},
-                                ]}
-                            />
-                        )}
+                        {topics.map(item => {
+                            const chooseTopic = LIST_TOPICS.find(
+                                _to => _to.id === item,
+                            );
+                            if (chooseTopic) {
+                                return (
+                                    <>
+                                        <StyleText
+                                            originValue="  ・  "
+                                            customStyle={[
+                                                styles.textTopic,
+                                                {color: theme.textColor},
+                                            ]}
+                                        />
+                                        <StyleText
+                                            i18Text={chooseTopic.text}
+                                            customStyle={[
+                                                styles.textTopic,
+                                                {color: theme.textColor},
+                                            ]}
+                                        />
+                                    </>
+                                );
+                            }
+                            return null;
+                        })}
                     </View>
                 )}
                 {!!location && (
@@ -813,7 +820,10 @@ const CreatePostPreview = ({route}: Props) => {
             />
             <ModalTopic
                 ref={topicRef}
-                onChangeTopic={value => setTopic(value)}
+                topics={topics}
+                onChangeListTopics={value => {
+                    setTopics(value);
+                }}
             />
         </View>
     );

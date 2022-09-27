@@ -23,6 +23,7 @@ import GroupBuyingJoined from 'feature/common/GroupBuyingJoined';
 import UpgradeAccount from 'feature/common/UpgradeAccount';
 import ModalPreviewLink from 'components/ModalPreviewLink';
 import {TypeBubblePalace} from 'api/interface';
+import CreateGroupBuying from 'feature/profile/CreateGroupBuying';
 import MainTabs from './MainTabs';
 import SettingRoute from './tabs/SettingRoute';
 
@@ -125,6 +126,13 @@ const AppStack = () => {
                     options={{
                         cardStyleInterpolator:
                             CardStyleInterpolators.forVerticalIOS,
+                        gestureEnabled: false,
+                    }}
+                />
+                <Stack.Screen
+                    name={PROFILE_ROUTE.createGroupBuying}
+                    component={CreateGroupBuying}
+                    options={{
                         gestureEnabled: false,
                     }}
                 />

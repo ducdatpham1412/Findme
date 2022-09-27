@@ -275,22 +275,23 @@ const Bubble = (props: Props) => {
                         />
                     </View>
 
-                    {item.topic !== null && (
+                    {item.topic.map(topic => (
                         <StyleText
+                            key={topic}
                             originValue="   ・ "
                             customStyle={[
                                 styles.textTopic,
                                 {color: theme.textColor},
                             ]}>
                             <StyleText
-                                i18Text={chooseTextTopic(item.topic)}
+                                i18Text={chooseTextTopic(topic)}
                                 customStyle={[
                                     styles.textTopic,
                                     {color: theme.textColor},
                                 ]}
                             />
                         </StyleText>
-                    )}
+                    ))}
 
                     <StyleTouchable
                         customStyle={styles.iconMore}

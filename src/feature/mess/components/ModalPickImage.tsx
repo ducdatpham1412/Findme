@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
-import {TypeTheme} from 'asset/theme/Theme';
+import Theme, {TypeTheme} from 'asset/theme/Theme';
 import {StyleImage, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import Redux from 'hook/useRedux';
@@ -18,6 +18,7 @@ interface Props {
     containerStyle?: StyleProp<ViewStyle>;
     numberColumns?: number;
     initIndexImage?: number;
+    urlFocusing?: string;
 }
 interface StatusLibrary {
     endCursor: string | undefined;
@@ -25,15 +26,17 @@ interface StatusLibrary {
 }
 
 interface RenderImageParams {
-    item: any;
+    item: string;
     images: Array<string>;
     onChooseImage(image: string): void;
     theme: TypeTheme;
     numberColumns: number;
+    isFocusing: boolean;
 }
 
 const RenderImage = (params: RenderImageParams) => {
-    const {item, images, onChooseImage, theme, numberColumns} = params;
+    const {item, images, onChooseImage, theme, numberColumns, isFocusing} =
+        params;
     const isChosen = images.includes(item);
     const size = Metrics.width / numberColumns;
 
@@ -48,19 +51,25 @@ const RenderImage = (params: RenderImageParams) => {
             />
 
             {isChosen && (
-                <View
-                    style={[
-                        styles.layoutChosen,
-                        {backgroundColor: theme.backgroundColor},
-                    ]}
-                />
-            )}
-
-            {isChosen && (
-                <AntDesign
-                    name="check"
-                    style={[styles.checkIcon, {color: theme.highlightColor}]}
-                />
+                <>
+                    <View
+                        style={[
+                            styles.layoutChosen,
+                            {backgroundColor: Theme.common.black},
+                        ]}
+                    />
+                    <AntDesign
+                        name="check"
+                        style={[
+                            styles.checkIcon,
+                            {
+                                color: isFocusing
+                                    ? Theme.common.white
+                                    : theme.highlightColor,
+                            },
+                        ]}
+                    />
+                </>
             )}
         </StyleTouchable>
     );
@@ -74,6 +83,7 @@ const ModalPickImage = (props: Props) => {
         containerStyle,
         numberColumns = 4,
         initIndexImage,
+        urlFocusing,
     } = props;
 
     const [libraryImages, setLibraryImages] = useState<Array<any>>([]);
@@ -142,6 +152,7 @@ const ModalPickImage = (props: Props) => {
                         onChooseImage,
                         theme,
                         numberColumns,
+                        isFocusing: urlFocusing === item,
                     })
                 }
                 numColumns={numberColumns}

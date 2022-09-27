@@ -1,8 +1,11 @@
+/* eslint-disable no-shadow */
 import {useIsFocused} from '@react-navigation/native';
 import {Metrics} from 'asset/metrics';
-import {MAX_NUMBER_IMAGES_POST} from 'asset/standardValue';
+import {
+    MAX_NUMBER_IMAGES_POST,
+    ratioImageGroupBuying,
+} from 'asset/standardValue';
 import {StyleText, StyleTouchable} from 'components/base';
-import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
 import StyleTabView from 'components/StyleTabView';
 import ModalPickImage from 'feature/mess/components/ModalPickImage';
 import Redux from 'hook/useRedux';
@@ -10,6 +13,7 @@ import {PROFILE_ROUTE} from 'navigation/config/routes';
 import {goBack, navigate} from 'navigation/NavigationService';
 import React, {useRef, useState} from 'react';
 import {Platform, View} from 'react-native';
+import ImageZoomAndCrop from 'react-native-image-zoom-and-crop';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -17,6 +21,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Video from 'react-native-video';
 import {chooseImageFromCamera, logger} from 'utility/assistant';
 import ImageUploader from 'utility/ImageUploader';
+import ScrollCropImages from './components/ScrollCropImages';
 
 interface Props {
     route: {
@@ -26,6 +31,7 @@ interface Props {
                 name: string;
                 avatar: string;
             };
+            isCreateGB?: boolean;
         };
     };
 }
@@ -33,28 +39,55 @@ interface Props {
 const {width} = Metrics;
 
 const CreatePostPickImage = ({route}: Props) => {
+    const isCreateGB = route.params?.isCreateGB;
     const theme = Redux.getTheme();
-    const tabPickRef = useRef<StyleTabView>(null);
     const isFocused = useIsFocused();
 
+    const tabPickRef = useRef<StyleTabView>(null);
+
     const [images, setImages] = useState<Array<string>>([]);
-    const [indexScroll, setIndexScroll] = useState(0);
+    const [imageFocusing, setImageFocusing] = useState('');
     const [video, setVideo] = useState('');
     const [tabIndex, setTabIndex] = useState(0);
+    const [indexScroll, setIndexScroll] = useState(0);
+    const [cropSize, setCropSize] = useState({
+        width: 0,
+        height: 0,
+    });
+
+    const [cropperParams, setCropperParams] = useState<
+        Array<{url: string; value: any}>
+    >([]);
 
     const onChooseImage = (url: string) => {
         if (images.length === MAX_NUMBER_IMAGES_POST) {
             return;
         }
+
         if (images.includes(url)) {
-            if (images.length === 1) {
-                return;
+            const currentIndex = images.indexOf(url);
+            if (imageFocusing === url) {
+                if (images.length === 1) {
+                    return;
+                }
+                const chosenIndex =
+                    currentIndex === 0 ? currentIndex + 1 : currentIndex - 1;
+                setImageFocusing(images[chosenIndex]);
+                setImages(images.filter(item => item !== url));
+                setCropperParams(
+                    cropperParams.filter(item => item.url !== url),
+                );
+                setIndexScroll(chosenIndex);
+            } else {
+                setImageFocusing(url);
+                setIndexScroll(currentIndex);
             }
-            setImages(images.filter(item => item !== url));
         } else {
-            const oldLength = images.length;
+            const lastIndex = images.length;
+            setImageFocusing(url);
             setImages(images.concat(url));
-            setIndexScroll(oldLength);
+            setCropperParams(cropperParams.concat({url, value: null}));
+            setIndexScroll(lastIndex);
         }
     };
 
@@ -90,14 +123,41 @@ const CreatePostPickImage = ({route}: Props) => {
         }
     };
 
-    const onNavigatePreview = () => {
-        navigate(PROFILE_ROUTE.createPostPreview, {
-            itemNew: {
-                images: tabIndex === 0 ? images : [video],
-                isVideo: tabIndex === 1,
-                userReviewed: route.params?.userReviewed,
-            },
-        });
+    const onNavigatePreview = async () => {
+        const results = await Promise.all(
+            images.map(async url => {
+                const cropperCheck = cropperParams.find(
+                    item => item.url === url,
+                );
+                if (cropperCheck?.value) {
+                    const temp = await ImageZoomAndCrop.crop({
+                        ...cropperCheck.value,
+                        imageUri: url,
+                        cropSize,
+                        cropAreaSize: cropSize,
+                    });
+                    return temp;
+                }
+                return url;
+            }),
+        );
+
+        if (isCreateGB) {
+            navigate(PROFILE_ROUTE.createGroupBuying, {
+                itemNew: {
+                    images: tabIndex === 0 ? results : [video],
+                    isVideo: tabIndex === 1,
+                },
+            });
+        } else {
+            navigate(PROFILE_ROUTE.createPostPreview, {
+                itemNew: {
+                    images: tabIndex === 0 ? results : [video],
+                    isVideo: tabIndex === 1,
+                    userReviewed: route.params?.userReviewed,
+                },
+            });
+        }
     };
 
     /**
@@ -148,11 +208,7 @@ const CreatePostPickImage = ({route}: Props) => {
                     source={{
                         uri: video,
                     }}
-                    style={{
-                        width,
-                        minHeight: '60%',
-                        maxHeight: '80%',
-                    }}
+                    style={styles.videoView}
                     repeat
                     controls
                     muted={!isFocused}
@@ -160,13 +216,27 @@ const CreatePostPickImage = ({route}: Props) => {
                 />
             );
         }
+
         return (
-            <ScrollSyncSizeImage
+            <ScrollCropImages
                 images={images}
-                syncWidth={Metrics.width}
-                containerStyle={styles.imagePreviewView}
+                imageFocusing={imageFocusing}
                 index={indexScroll}
-                onChangeIndex={value => setIndexScroll(value)}
+                width={width}
+                height={isCreateGB ? width * ratioImageGroupBuying : width}
+                onChangeCropperParams={value => {
+                    setCropperParams(preValue =>
+                        preValue.map(item => {
+                            if (item.url !== value.url) {
+                                return item;
+                            }
+                            return value;
+                        }),
+                    );
+                }}
+                initRatio={isCreateGB ? ratioImageGroupBuying : 1}
+                onChangeCropperSize={value => setCropSize(value)}
+                havingZoomButton={!isCreateGB}
             />
         );
     };
@@ -211,7 +281,7 @@ const CreatePostPickImage = ({route}: Props) => {
 
                 {tabIndex === 0 && (
                     <StyleText
-                        originValue={`${indexScroll + 1} / ${images.length}`}
+                        originValue={`${images.length}`}
                         customStyle={[
                             styles.indexText,
                             {color: theme.textColor},
@@ -260,13 +330,15 @@ const CreatePostPickImage = ({route}: Props) => {
                 containerStyle={styles.tabView}
                 onChangeTabIndex={index => {
                     setTabIndex(index);
-                }}>
+                }}
+                enableScroll={false}>
                 <ModalPickImage
                     images={images}
                     onChooseImage={onChooseImage}
                     numberColumns={4}
                     containerStyle={styles.modalPickImageView}
                     initIndexImage={0}
+                    urlFocusing={imageFocusing}
                 />
                 <View />
             </StyleTabView>
@@ -310,8 +382,10 @@ const styles = ScaledSheet.create({
         fontWeight: 'bold',
     },
     // image preview
-    imagePreviewView: {
-        maxHeight: '60%',
+    videoView: {
+        width,
+        minHeight: width,
+        maxHeight: '80%',
     },
     // tool
     toolView: {

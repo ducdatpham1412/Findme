@@ -1,3 +1,4 @@
+import {TypeCreateGroupBuying} from 'api/interface/discovery';
 import {TypeParamsPaging} from './interface';
 import request from './request';
 
@@ -23,4 +24,8 @@ export const apiConfirmUserBought = (body: {
     user_id: number;
 }) => {
     return request.put('profile/confirm-user-bought', body);
+};
+
+export const apiCreateGroupBuying = (body: TypeCreateGroupBuying) => {
+    return request.post('profile/create-group-buying', body);
 };
