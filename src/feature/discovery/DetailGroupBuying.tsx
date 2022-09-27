@@ -9,6 +9,7 @@ import {
     TypePeopleJoinedResponse,
     TypeShowModalCommentOrLike,
 } from 'api/interface/discovery';
+import {apiGetDetailBubble} from 'api/module';
 import {apiLikePost, apiUnLikePost} from 'api/post';
 import {GROUP_BUYING_STATUS, RELATIONSHIP, TYPE_DYNAMIC_LINK} from 'asset/enum';
 import Images from 'asset/img/images';
@@ -35,8 +36,8 @@ import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import {appAlert, goBack} from 'navigation/NavigationService';
-import {showCommentDiscovery} from 'navigation/screen/MainTabs';
-import React, {useRef, useState} from 'react';
+import {showCommentDiscovery} from 'navigation/screen/AppStack';
+import React, {useEffect, useRef, useState} from 'react';
 import {Platform, ScrollView, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {Modalize} from 'react-native-modalize';
@@ -44,7 +45,7 @@ import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SharedElement} from 'react-navigation-shared-element';
-import {onGoToProfile, onGoToSignUp} from 'utility/assistant';
+import {fakeGroupBuying, onGoToProfile, onGoToSignUp} from 'utility/assistant';
 import {
     formatDayFromNow,
     formatDayGroupBuying,
@@ -58,8 +59,9 @@ import ModalPeopleJoined from './components/ModalPeopleJoined';
 interface Props {
     route: {
         params: {
-            item: TypeGroupBuying;
-            setList: any;
+            item?: TypeGroupBuying;
+            itemId?: string;
+            setList?: any;
         };
     };
 }
@@ -100,18 +102,21 @@ const onHandleLike = async (params: {
             } else {
                 await apiLikePost(postId);
             }
-            setList((preValue: Array<TypeGroupBuying>) => {
-                return preValue.map(value => {
-                    if (value.id !== postId) {
-                        return value;
-                    }
-                    return {
-                        ...value,
-                        isLiked: !currentLike,
-                        totalLikes: value.totalLikes + (currentLike ? -1 : 1),
-                    };
+            if (setList) {
+                setList((preValue: Array<TypeGroupBuying>) => {
+                    return preValue.map(value => {
+                        if (value.id !== postId) {
+                            return value;
+                        }
+                        return {
+                            ...value,
+                            isLiked: !currentLike,
+                            totalLikes:
+                                value.totalLikes + (currentLike ? -1 : 1),
+                        };
+                    });
                 });
-            });
+            }
         } catch (err) {
             setIsLiked(currentLike);
             setTotalLikes(currentNumberLikes);
@@ -201,17 +206,19 @@ const onShowModalShare = async (
 const screenWidth = Metrics.width;
 
 const DetailGroupBuying = ({route}: Props) => {
-    const {item, setList} = route.params;
+    const setList = route.params?.setList;
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
     const {profile} = Redux.getPassport();
 
     const modalJoinedRef = useRef<Modalize>(null);
 
+    const [item, setItem] = useState(route.params?.item || fakeGroupBuying);
+
     const listJoinedPaging = usePaging({
         request: apiGetListPeopleJoined,
         params: {
-            postId: item.id,
+            postId: item.id || route.params?.itemId,
             take: 10,
         },
     });
@@ -224,6 +231,25 @@ const DetailGroupBuying = ({route}: Props) => {
 
     const isMyBubble = item.relationship === RELATIONSHIP.self;
     const isExpired = isTimeBefore(item.endDate, new Date());
+
+    useEffect(() => {
+        const getData = async () => {
+            if (route.params.itemId) {
+                try {
+                    const res = await apiGetDetailBubble(route.params.itemId);
+                    const {data} = res;
+                    setItem(data);
+                    setIsLiked(data.isLiked);
+                    setTotalLikes(data.totalLikes);
+                    setTotalJoined(data.totalJoins);
+                    setStatus(item.status);
+                } catch (err) {
+                    appAlert(err);
+                }
+            }
+        };
+        getData();
+    }, []);
 
     const onShowModalComment = (type: TypeShowModalCommentOrLike) => {
         if (isModeExp) {

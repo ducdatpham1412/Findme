@@ -19,6 +19,7 @@ import {
     TypeGetListBlockedResponse,
     TypeGetPassportResponse,
     TypeGetProfileResponse,
+    TypeGroupBuying,
     TypeLoginRequest,
     TypeLoginResponse,
     TypeLoginSocialRequest,
@@ -152,36 +153,13 @@ export const apiGetListBubbleActiveOfUserEnjoy = ({
     });
 };
 
-// export const apiGetListBubbleGroup = ({params}: TypeParamsPaging) => {
-//     return request.get('/common/get-list-bubble-group', {
-//         params,
-//     });
-// };
-
-// export const apiGetListBubbleGroupOfUserEnjoy = ({
-//     params,
-// }: TypeParamsPaging) => {
-//     return request.get('/common/get-list-bubble-group-enjoy', {
-//         params,
-//     });
-// };
-
 export const apiGetDetailBubble = (
     idBubble: string,
 ): Promise<{
     success: true;
-    data: TypeBubblePalace;
+    data: TypeBubblePalace & TypeGroupBuying;
 }> => {
     return request.get(`/common/detail-bubble-profile/${idBubble}`);
-};
-
-export const apiGetDetailBubbleEnjoy = (
-    idBubble: string,
-): Promise<{
-    success: true;
-    data: TypeBubblePalace;
-}> => {
-    return request.get(`/common/detail-bubble-profile-enjoy/${idBubble}`);
 };
 
 export const apiGetListComments = (

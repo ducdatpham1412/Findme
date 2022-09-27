@@ -74,6 +74,12 @@ const NotificationAccount = () => {
                     displayComment: true,
                 });
             }
+        } else if (item.type === TYPE_NOTIFICATION.likeGroupBuying) {
+            if (item?.postId) {
+                navigate(ROOT_SCREEN.detailGroupBuying, {
+                    itemId: item.postId,
+                });
+            }
         }
 
         if (!item.isRead) {

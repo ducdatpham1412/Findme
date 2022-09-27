@@ -24,19 +24,28 @@ import UpgradeAccount from 'feature/common/UpgradeAccount';
 import ModalPreviewLink from 'components/ModalPreviewLink';
 import {TypeBubblePalace} from 'api/interface';
 import CreateGroupBuying from 'feature/profile/CreateGroupBuying';
+import ModalCommentLike, {
+    TypeModalCommentPost,
+} from 'components/ModalCommentLike';
+import FindmeStore from 'app-redux/store';
 import MainTabs from './MainTabs';
 import SettingRoute from './tabs/SettingRoute';
 
 const modalPreviewLinkRef = React.createRef<ModalPreviewLink>();
-
 export const showPreviewLink = (item: TypeBubblePalace) => {
     modalPreviewLinkRef.current?.show(item);
+};
+
+const modalRef = React.createRef<ModalCommentLike>();
+export const showCommentDiscovery = (params: TypeModalCommentPost) => {
+    modalRef.current?.show(params);
 };
 
 const Stack = createStackNavigator();
 
 const AppStack = () => {
     const theme = Redux.getTheme();
+    const bubbleFocusing = Redux.getBubbleFocusing();
 
     const cardStyle = {
         backgroundColor: theme.backgroundColor,
@@ -167,6 +176,27 @@ const AppStack = () => {
 
             <StatusPostCreated />
             <ModalPreviewLink ref={modalPreviewLinkRef} theme={theme} />
+            <ModalCommentLike
+                ref={modalRef}
+                theme={theme}
+                bubbleFocusing={bubbleFocusing}
+                updateBubbleFocusing={value =>
+                    Redux.updateBubbleFocusing(value)
+                }
+                setTotalComments={value => {
+                    Redux.updateBubbleFocusing({
+                        totalComments: value,
+                    });
+                }}
+                increaseTotalComments={value => {
+                    const currentComments =
+                        FindmeStore.getState().logicSlice.bubbleFocusing
+                            .totalComments;
+                    Redux.updateBubbleFocusing({
+                        totalComments: currentComments + value,
+                    });
+                }}
+            />
         </>
     );
 };

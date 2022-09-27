@@ -366,6 +366,7 @@ const notification = {
     follow: ' bắt đầu theo dõi bạn',
     likePost: ' thích bài đăng của bạn',
     friendPostNew: ' vừa đăng một bài mới',
+    likeGroupBuying: '  thích chiến dịch mua chung của bạn',
 };
 
 // ALERT

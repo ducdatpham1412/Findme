@@ -1,4 +1,5 @@
 import {TypeNotificationResponse} from 'api/interface';
+import {TYPE_NOTIFICATION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {FONT_SIZE} from 'asset/standardValue';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
@@ -6,13 +7,31 @@ import Redux from 'hook/useRedux';
 import React from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import {chooseTextNotification, onGoToProfile} from 'utility/assistant';
+import {onGoToProfile} from 'utility/assistant';
 import {formatFromNow} from 'utility/format';
+import {I18Normalize} from 'utility/I18Next';
 
 interface Props {
     item: TypeNotificationResponse;
     onGoToDetailNotification(item: TypeNotificationResponse): void;
 }
+
+const chooseTextNotification = (type: number): I18Normalize => {
+    switch (type) {
+        case TYPE_NOTIFICATION.comment:
+            return 'notification.comment';
+        case TYPE_NOTIFICATION.follow:
+            return 'notification.follow';
+        case TYPE_NOTIFICATION.friendPostNew:
+            return 'notification.friendPostNew';
+        case TYPE_NOTIFICATION.likePost:
+            return 'notification.likePost';
+        case TYPE_NOTIFICATION.likeGroupBuying:
+            return 'notification.likeGroupBuying';
+        default:
+            return 'common.null';
+    }
+};
 
 const ItemNotification = (props: Props) => {
     const {item, onGoToDetailNotification} = props;
