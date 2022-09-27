@@ -28,7 +28,6 @@ import {
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
-import VideoBubble from 'components/common/VideoBubble';
 import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
@@ -49,7 +48,6 @@ import {
     onGoToSignUp,
 } from 'utility/assistant';
 import {formatFromNow} from 'utility/format';
-import {checkIsVideo} from 'utility/validate';
 import {TypeMoreOptionsMe} from '../DiscoveryScreen';
 
 interface Props {
@@ -625,34 +623,13 @@ const Bubble = (props: Props) => {
         if (!item.images[0]) {
             return null;
         }
-        const isVideo = checkIsVideo(item.images[0]);
-        if (!isVideo) {
-            return (
-                <ScrollSyncSizeImage
-                    images={item.images}
-                    syncWidth={screenWidth}
-                    onDoublePress={() => {
-                        if (!isLiked && !item.isArchived) {
-                            onHandleLike({
-                                isModeExp,
-                                isLiked,
-                                setIsLiked,
-                                totalLikes,
-                                setTotalLikes,
-                                postId: item.id,
-                            });
-                        }
-                    }}
-                    containerStyle={styles.imageView}
-                />
-            );
-        }
 
         return (
-            <VideoBubble
-                source={{uri: item.images[0]}}
+            <ScrollSyncSizeImage
+                images={item.images}
+                syncWidth={screenWidth}
                 onDoublePress={() => {
-                    if (!isLiked) {
+                    if (!isLiked && !item.isArchived) {
                         onHandleLike({
                             isModeExp,
                             isLiked,
@@ -661,11 +638,12 @@ const Bubble = (props: Props) => {
                             setTotalLikes,
                             postId: item.id,
                         });
-                    } else {
-                        // onSeeDetailImage(item.images);
                     }
                 }}
-                paused={!isFocusing}
+                containerStyle={styles.imageView}
+                videoProps={{
+                    paused: !isFocusing,
+                }}
             />
         );
     };

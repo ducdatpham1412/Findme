@@ -327,16 +327,6 @@ const OtherProfile = ({route}: Props) => {
                         />
                     </StyleTouchable>
                 </View>
-
-                <ToolOtherProfile
-                    index={tabIndex}
-                    onChangeTab={index => {
-                        setTabIndex(index);
-                        tabViewRef.current?.navigateToIndex(index);
-                    }}
-                    disableReview={!isShopAccount}
-                    onShowModalReview={() => actionReviewRef.current?.show()}
-                />
             </>
         );
     };
@@ -393,8 +383,20 @@ const OtherProfile = ({route}: Props) => {
                         />
                     }
                     showsVerticalScrollIndicator={false}
-                    contentContainerStyle={styles.contentContainer}>
+                    contentContainerStyle={styles.contentContainer}
+                    stickyHeaderIndices={[1]}>
                     {Header()}
+                    <ToolOtherProfile
+                        index={tabIndex}
+                        onChangeTab={index => {
+                            setTabIndex(index);
+                            tabViewRef.current?.navigateToIndex(index);
+                        }}
+                        disableReview={!isShopAccount}
+                        onShowModalReview={() =>
+                            actionReviewRef.current?.show()
+                        }
+                    />
 
                     {Indicator()}
 

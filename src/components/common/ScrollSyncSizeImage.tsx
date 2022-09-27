@@ -15,6 +15,7 @@ import {
     ViewStyle,
 } from 'react-native';
 import {scale, ScaledSheet} from 'react-native-size-matters';
+import Video from 'react-native-video';
 import {
     DEAD_ZONE,
     DefaultTransitionSpec,
@@ -22,6 +23,7 @@ import {
     swipeVelocityThreshold,
     useAnimatedValue,
 } from 'utility/animation';
+import {checkIsVideo} from 'utility/validate';
 
 interface Props {
     images: Array<string>;
@@ -30,6 +32,9 @@ interface Props {
     onDoublePress?(): void;
     index?: number;
     onChangeIndex?(value: number): void;
+    videoProps?: {
+        paused?: boolean;
+    };
 }
 
 const indicatorPointWidth = scale(10);
@@ -43,6 +48,7 @@ const ScrollSyncSizeImage = (props: Props) => {
         onDoublePress,
         index,
         onChangeIndex,
+        videoProps,
     } = props;
 
     const currentIndexRef = useRef(0);
@@ -193,7 +199,7 @@ const ScrollSyncSizeImage = (props: Props) => {
 
     useEffect(() => {
         let isSubscribe = true;
-        if (images[0]) {
+        if (images[0] && !checkIsVideo(images[0])) {
             Image.getSize(
                 images[0],
                 (w, h) => {
@@ -237,19 +243,53 @@ const ScrollSyncSizeImage = (props: Props) => {
                     transform: [{translateX}],
                 }}
                 {...panResponder.panHandlers}>
-                {images.map(url => (
-                    <PinchImage
-                        key={url}
-                        containerStyle={{
-                            width: syncWidth,
-                            height,
-                        }}
-                        imageProps={{
-                            source: {uri: url},
-                            style: styles.image,
-                        }}
-                    />
-                ))}
+                {images.map(url => {
+                    if (!checkIsVideo(url)) {
+                        return (
+                            <PinchImage
+                                key={url}
+                                containerStyle={{
+                                    width: syncWidth,
+                                    height,
+                                }}
+                                imageProps={{
+                                    source: {uri: url},
+                                    style: styles.image,
+                                }}
+                            />
+                        );
+                    }
+
+                    return (
+                        <Video
+                            key={url}
+                            source={{uri: url}}
+                            style={{
+                                width: syncWidth,
+                                height,
+                            }}
+                            onLoad={e => {
+                                let tempRatio = 1;
+                                if (e.naturalSize.orientation === 'landscape') {
+                                    tempRatio =
+                                        e.naturalSize.height /
+                                        e.naturalSize.width;
+                                } else if (
+                                    e.naturalSize.orientation === 'portrait'
+                                ) {
+                                    tempRatio =
+                                        e.naturalSize.width /
+                                        e.naturalSize.height;
+                                }
+                                tempRatio = tempRatio > 1.3 ? 1.3 : tempRatio;
+                                setRatio(tempRatio);
+                            }}
+                            controls
+                            resizeMode="cover"
+                            {...videoProps}
+                        />
+                    );
+                })}
             </Animated.View>
 
             {numberTabs >= 2 && (

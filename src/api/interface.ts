@@ -199,6 +199,7 @@ export interface TypeGetProfileResponse {
     id: number;
     account_type: number;
     name: string;
+    location: string;
     anonymousName: string;
     description: string;
     avatar: string;

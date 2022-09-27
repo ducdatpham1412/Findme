@@ -1,7 +1,7 @@
 import {TypeChatMessageResponse} from 'api/interface';
 import {MESSAGE_TYPE, RELATIONSHIP} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
-import {DELAY_LONG_PRESS} from 'asset/standardValue';
+import {DELAY_LONG_PRESS, FONT_SIZE} from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
@@ -410,12 +410,12 @@ const styles = ScaledSheet.create({
         flex: 1,
     },
     messageBox: {
-        borderRadius: '25@ms',
+        borderRadius: '12@ms',
         maxWidth: '70%',
         minWidth: '20%',
     },
     messageText: {
-        fontSize: '15@ms',
+        fontSize: FONT_SIZE.normal,
         marginVertical: '8.5@ms',
     },
     dateText: {
