@@ -18,7 +18,7 @@ import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {DISCOVERY_ROUTE} from 'navigation/config/routes';
 import {appAlert, goBack, navigate} from 'navigation/NavigationService';
-import {showCommentDiscovery} from 'navigation/screen/MainTabs';
+import {showCommentDiscovery} from 'navigation/screen/AppStack';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';

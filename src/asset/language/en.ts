@@ -362,6 +362,7 @@ const notification = {
     follow: ' start following you',
     likePost: ' liked your post',
     friendPostNew: ' post new post',
+    likeGroupBuying: '  like your group buying campaign',
 };
 
 // ALERT

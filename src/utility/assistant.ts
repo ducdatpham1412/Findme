@@ -4,6 +4,7 @@ import {
     TypeBubblePalace,
     TypeCreateGroupResponse,
     TypeGradient,
+    TypeGroupBuying,
     TypeInteractBubble,
     TypeMemberInListChatTag,
 } from 'api/interface';
@@ -14,7 +15,6 @@ import {
     LANGUAGE_TYPE,
     SIGN_UP_TYPE,
     TYPE_COLOR,
-    TYPE_NOTIFICATION,
 } from 'asset/enum';
 import Images from 'asset/img/images';
 import {LIST_TOPICS, PRIVATE_AVATAR} from 'asset/standardValue';
@@ -467,6 +467,30 @@ export const fakeBubbleFocusing: TypeBubblePalace = {
     relationship: 0,
 };
 
+export const fakeGroupBuying: TypeGroupBuying = {
+    id: '',
+    postType: 1,
+    topic: [],
+    content: '',
+    images: [],
+    prices: [],
+    totalLikes: 0,
+    totalComments: 0,
+    totalJoins: 0,
+    deadlineDate: '',
+    startDate: '',
+    endDate: '',
+    creator: 0,
+    creatorName: '',
+    creatorAvatar: '',
+    creatorLocation: '',
+    created: '',
+    isLiked: false,
+    isDraft: false,
+    status: 1,
+    relationship: 0,
+};
+
 export const onGoToProfile = (userId: number) => {
     const isModeExp = FindmeStore.getState().accountSlice.modeExp;
     if (isModeExp) {
@@ -482,21 +506,6 @@ export const onGoToProfile = (userId: number) => {
         push(ROOT_SCREEN.otherProfile, {
             id: userId,
         });
-    }
-};
-
-export const chooseTextNotification = (type: number): I18Normalize => {
-    switch (type) {
-        case TYPE_NOTIFICATION.comment:
-            return 'notification.comment';
-        case TYPE_NOTIFICATION.follow:
-            return 'notification.follow';
-        case TYPE_NOTIFICATION.friendPostNew:
-            return 'notification.friendPostNew';
-        case TYPE_NOTIFICATION.likePost:
-            return 'notification.likePost';
-        default:
-            return 'common.null';
     }
 };
 
