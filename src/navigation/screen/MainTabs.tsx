@@ -2,6 +2,10 @@ import {
     BottomTabBarProps,
     createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs';
+import FindmeStore from 'app-redux/store';
+import ModalCommentLike, {
+    TypeModalCommentPost,
+} from 'components/ModalCommentLike';
 import NotificationScreen from 'feature/notification/NotificationScreen';
 import ReputationScreen from 'feature/reputation/ReputationScreen';
 import Redux from 'hook/useRedux';
@@ -15,8 +19,15 @@ import ProfileRoute from './tabs/ProfileRoute';
 
 const BottomTab = createBottomTabNavigator();
 
+// This modal use for modal in 2 screen: DiscoveryScreen and MyProfileScreen
+const modalRef = React.createRef<ModalCommentLike>();
+export const showCommentDiscovery = (params: TypeModalCommentPost) => {
+    modalRef.current?.show(params);
+};
+
 const MainTabs: React.FunctionComponent = () => {
     const theme = Redux.getTheme();
+    const bubbleFocusing = Redux.getBubbleFocusing();
 
     return (
         <View
@@ -63,6 +74,28 @@ const MainTabs: React.FunctionComponent = () => {
                     component={ProfileRoute}
                 />
             </BottomTab.Navigator>
+
+            <ModalCommentLike
+                ref={modalRef}
+                theme={theme}
+                bubbleFocusing={bubbleFocusing}
+                updateBubbleFocusing={value =>
+                    Redux.updateBubbleFocusing(value)
+                }
+                setTotalComments={value => {
+                    Redux.updateBubbleFocusing({
+                        totalComments: value,
+                    });
+                }}
+                increaseTotalComments={value => {
+                    const currentComments =
+                        FindmeStore.getState().logicSlice.bubbleFocusing
+                            .totalComments;
+                    Redux.updateBubbleFocusing({
+                        totalComments: currentComments + value,
+                    });
+                }}
+            />
         </View>
     );
 };

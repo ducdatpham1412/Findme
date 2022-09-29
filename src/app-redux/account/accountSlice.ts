@@ -26,6 +26,7 @@ export const initialAccountState = {
             followings: 0,
             reputations: 0,
             relationship: 0,
+            location: '',
         },
         information: {
             facebook: '',

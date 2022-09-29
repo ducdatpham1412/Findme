@@ -33,10 +33,12 @@ import {
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
+import ModalCommentLike from 'components/ModalCommentLike';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
+import ROOT_SCREEN from 'navigation/config/routes';
 import {appAlert, goBack} from 'navigation/NavigationService';
-import {showCommentDiscovery} from 'navigation/screen/AppStack';
+import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {useEffect, useRef, useState} from 'react';
 import {Platform, ScrollView, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -63,6 +65,7 @@ interface Props {
             itemId?: string;
             setList?: any;
         };
+        [key: string]: any;
     };
 }
 
@@ -207,11 +210,13 @@ const screenWidth = Metrics.width;
 
 const DetailGroupBuying = ({route}: Props) => {
     const setList = route.params?.setList;
+    const isInRoot = route.name === ROOT_SCREEN.detailGroupBuying;
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
     const {profile} = Redux.getPassport();
 
     const modalJoinedRef = useRef<Modalize>(null);
+    const modalCommentLikeRef = useRef<ModalCommentLike>(null);
 
     const [item, setItem] = useState(route.params?.item || fakeGroupBuying);
 
@@ -260,11 +265,15 @@ const DetailGroupBuying = ({route}: Props) => {
                     onGoToSignUp();
                 },
             });
+        } else if (isInRoot) {
+            modalCommentLikeRef.current?.show({
+                post: item,
+                type,
+            });
         } else {
             showCommentDiscovery({
                 post: item,
                 type,
-                setList,
             });
         }
     };
@@ -843,6 +852,40 @@ const DetailGroupBuying = ({route}: Props) => {
                 postId={item.id}
                 listPaging={listJoinedPaging}
                 isMyBubble={isMyBubble}
+            />
+
+            <ModalCommentLike
+                ref={modalCommentLikeRef}
+                theme={theme}
+                bubbleFocusing={item}
+                updateBubbleFocusing={(value: TypeGroupBuying) => {
+                    setItem({
+                        ...item,
+                        ...value,
+                    });
+                }}
+                setTotalComments={value =>
+                    setItem(preValue => {
+                        if (preValue) {
+                            return {
+                                ...preValue,
+                                totalComments: value,
+                            };
+                        }
+                        return preValue;
+                    })
+                }
+                increaseTotalComments={value => {
+                    setItem(preValue => {
+                        if (preValue) {
+                            return {
+                                ...preValue,
+                                totalComments: preValue.totalComments + value,
+                            };
+                        }
+                        return preValue;
+                    });
+                }}
             />
         </>
     );

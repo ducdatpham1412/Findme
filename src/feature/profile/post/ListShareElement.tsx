@@ -8,7 +8,6 @@ import {POST_TYPE, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
-import {TypeModalCommentPost} from 'components/ModalCommentLike';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import Bubble from 'feature/discovery/components/Bubble';
 import BubbleGroupBuying, {
@@ -24,6 +23,7 @@ import {
     goBack,
     navigate,
 } from 'navigation/NavigationService';
+import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {Component} from 'react';
 import {Animated, FlatList, StyleProp, ViewStyle} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
@@ -34,7 +34,6 @@ interface Props {
     title: string;
     listPaging: any;
     containerStyle?: StyleProp<ViewStyle>;
-    onShowModalComment(params: TypeModalCommentPost): void;
     isSaveTop?: boolean;
 }
 
@@ -205,7 +204,7 @@ export default class ListShareElement extends Component<Props, States> {
         post: TypeBubblePalace | TypeGroupBuying,
         type: TypeShowModalCommentOrLike,
     ) {
-        this.props.onShowModalComment({
+        showCommentDiscovery({
             post,
             setList: this.props.listPaging.setList,
             type,

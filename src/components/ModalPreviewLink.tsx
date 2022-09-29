@@ -69,42 +69,6 @@ export default class ModalPreviewLink extends Component<Props, States> {
             : 'discovery.openLink';
 
         const Content = () => {
-            if (link) {
-                const isLinkValid = validateIsLink(link);
-                return (
-                    <>
-                        <View style={styles.textLinkView}>
-                            <StyleText
-                                originValue={link}
-                                customStyle={[
-                                    styles.textLink,
-                                    {color: theme.borderColor},
-                                ]}
-                                numberOfLines={1}
-                            />
-                        </View>
-                        <View
-                            style={[
-                                styles.webView,
-                                isLinkValid
-                                    ? {}
-                                    : {
-                                          alignItems: 'center',
-                                          justifyContent: 'center',
-                                      },
-                            ]}>
-                            {isLinkValid ? (
-                                <StyleWebView source={{uri: link}} />
-                            ) : (
-                                <StyleText
-                                    i18Text="alert.invalidLink"
-                                    customStyle={[styles.textInvalid]}
-                                />
-                            )}
-                        </View>
-                    </>
-                );
-            }
             if (userReviewed) {
                 return (
                     <View style={styles.informationView}>
@@ -151,6 +115,44 @@ export default class ModalPreviewLink extends Component<Props, States> {
                     </View>
                 );
             }
+
+            if (link) {
+                const isLinkValid = validateIsLink(link);
+                return (
+                    <>
+                        <View style={styles.textLinkView}>
+                            <StyleText
+                                originValue={link}
+                                customStyle={[
+                                    styles.textLink,
+                                    {color: theme.borderColor},
+                                ]}
+                                numberOfLines={1}
+                            />
+                        </View>
+                        <View
+                            style={[
+                                styles.webView,
+                                isLinkValid
+                                    ? {}
+                                    : {
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                      },
+                            ]}>
+                            {isLinkValid ? (
+                                <StyleWebView source={{uri: link}} />
+                            ) : (
+                                <StyleText
+                                    i18Text="alert.invalidLink"
+                                    customStyle={[styles.textInvalid]}
+                                />
+                            )}
+                        </View>
+                    </>
+                );
+            }
+
             return null;
         };
 
