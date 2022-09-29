@@ -219,7 +219,7 @@ const styles = ScaledSheet.create({
         width: '100%',
         height: '100%',
         borderWidth: '2@ms',
-        borderRadius: '100@vs',
+        borderRadius: '200@s',
     },
     avatarImg: {
         width: '100%',

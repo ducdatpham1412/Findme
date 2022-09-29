@@ -619,7 +619,11 @@ const DetailGroupBuying = ({route}: Props) => {
         return (
             <>
                 <StyleText
-                    i18Text="discovery.numberPeopleJoin"
+                    i18Text={
+                        totalJoined
+                            ? 'discovery.numberPeopleJoin'
+                            : 'discovery.beTheFirstJoin'
+                    }
                     customStyle={[
                         styles.titleListPeopleBuying,
                         {color: theme.textHightLight},
@@ -1009,8 +1013,8 @@ const styles = ScaledSheet.create({
         marginTop: '10@vs',
     },
     creatorAvatar: {
-        width: '40@s',
-        height: '40@s',
+        width: '40@ms',
+        height: '40@ms',
         borderRadius: '25@s',
     },
     nameTimeTouch: {

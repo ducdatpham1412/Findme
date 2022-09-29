@@ -211,7 +211,7 @@ const ModalPeopleJoined = (props: Props, ref: any) => {
             <View
                 style={[
                     styles.container,
-                    {backgroundColor: theme.backgroundColor},
+                    {backgroundColor: theme.backgroundColorSecond},
                 ]}>
                 <View style={styles.headerView}>
                     <StyleText
