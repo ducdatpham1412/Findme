@@ -14,9 +14,6 @@ import {Metrics} from 'asset/metrics';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import LoadingIndicator from 'components/common/LoadingIndicator';
 import StyleActionSheet from 'components/common/StyleActionSheet';
-import ModalCommentLike, {
-    TypeModalCommentPost,
-} from 'components/ModalCommentLike';
 import StyleTabView from 'components/StyleTabView';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import ListShareElement from 'feature/profile/post/ListShareElement';
@@ -34,9 +31,8 @@ import {
     ScrollView,
     View,
 } from 'react-native';
-import {ScaledSheet, verticalScale} from 'react-native-size-matters';
+import {ScaledSheet} from 'react-native-size-matters';
 import {
-    fakeBubbleFocusing,
     isScrollCloseToBottom,
     modalizeMyProfile,
     modalizeMyProfileShop,
@@ -52,7 +48,6 @@ import ListGroupBuyingJoined from './ListGroupBuyingJoined';
 import MyListGroupBuying from './MyListGroupBuying';
 import PostStatus from './post/PostStatus';
 
-const extraHeight = -(Metrics.safeBottomPadding + verticalScale(7));
 const {width, safeBottomPadding} = Metrics;
 
 /** ------------------------
@@ -150,7 +145,6 @@ const ProfileAccount = () => {
     const isShopAccount = profile.account_type === ACCOUNT.shop;
     const isInTabProfile = route.name === PROFILE_ROUTE.myProfile;
 
-    const modalLikeCommentRef = useRef<ModalCommentLike>(null);
     const listShareElement = useRef<Array<TypeBubblePalace>>([]);
     const tabIndexRef = useRef(0);
     const checkIsFocus = useRef(true);
@@ -164,10 +158,6 @@ const ProfileAccount = () => {
     const apiFour = useMemo(() => {
         return isShopAccount ? apiGetListReviewAboutUser : apiGetListGBJoined;
     }, [isShopAccount]);
-
-    const showModalLikeComment = useCallback((params: TypeModalCommentPost) => {
-        modalLikeCommentRef.current?.show(params);
-    }, []);
 
     const myPostsPaging = usePaging({
         request: apiGetListPost,
@@ -201,7 +191,6 @@ const ProfileAccount = () => {
     const scrollRef = useRef<ScrollView>(null);
 
     const [tabIndex, setTabIndex] = useState(0);
-    const [bubbleFocusing, setBubbleFocusing] = useState<TypeBubblePalace>();
     const isFocusMyPost = tabIndex === 0;
     const isFocusPostLiked = tabIndex === 1;
     const isFocusPostSaved = tabIndex === 2;
@@ -616,7 +605,6 @@ const ProfileAccount = () => {
                     containerStyle={{
                         backgroundColor: theme.backgroundColorSecond,
                     }}
-                    onShowModalComment={showModalLikeComment}
                 />
 
                 <ListShareElement
@@ -626,7 +614,6 @@ const ProfileAccount = () => {
                     containerStyle={{
                         backgroundColor: theme.backgroundColorSecond,
                     }}
-                    onShowModalComment={showModalLikeComment}
                 />
 
                 <ListShareElement
@@ -636,7 +623,6 @@ const ProfileAccount = () => {
                     containerStyle={{
                         backgroundColor: theme.backgroundColorSecond,
                     }}
-                    onShowModalComment={showModalLikeComment}
                 />
 
                 {isShopAccount && (
@@ -647,46 +633,8 @@ const ProfileAccount = () => {
                         containerStyle={{
                             backgroundColor: theme.backgroundColorSecond,
                         }}
-                        onShowModalComment={showModalLikeComment}
                     />
                 )}
-
-                <ModalCommentLike
-                    ref={modalLikeCommentRef}
-                    theme={theme}
-                    bubbleFocusing={bubbleFocusing || fakeBubbleFocusing}
-                    updateBubbleFocusing={value => {
-                        setBubbleFocusing((preValue: any) => ({
-                            ...preValue,
-                            ...value,
-                        }));
-                    }}
-                    setTotalComments={value => {
-                        setBubbleFocusing(preValue => {
-                            if (preValue) {
-                                return {
-                                    ...preValue,
-                                    totalComments: value,
-                                };
-                            }
-                            return preValue;
-                        });
-                    }}
-                    increaseTotalComments={value => {
-                        setBubbleFocusing(preValue => {
-                            if (preValue) {
-                                return {
-                                    ...preValue,
-                                    totalComments:
-                                        preValue.totalComments + value,
-                                };
-                            }
-                            return preValue;
-                        });
-                    }}
-                    inputCommentContainerStyle={styles.inputCommentView}
-                    extraHeight={extraHeight}
-                />
 
                 <StyleActionSheet
                     ref={optionRef}

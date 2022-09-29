@@ -2,32 +2,28 @@ import {
     CardStyleInterpolators,
     createStackNavigator,
 } from '@react-navigation/stack';
+import {TypeBubblePalace} from 'api/interface';
+import ModalPreviewLink from 'components/ModalPreviewLink';
 import SwipeImages from 'components/SwipeImages';
+import GroupBuyingJoined from 'feature/common/GroupBuyingJoined';
+import PostsArchived from 'feature/common/PostsArchived';
+import UpgradeAccount from 'feature/common/UpgradeAccount';
+import DetailGroupBuying from 'feature/discovery/DetailGroupBuying';
 import InteractBubble from 'feature/discovery/InteractBubble';
 import ReportUser from 'feature/discovery/ReportUser';
 import ChatDetail from 'feature/mess/ChatDetail';
 import ChatDetailSetting from 'feature/mess/ChatDetailSetting';
 import DetailBubble from 'feature/notification/DetailBubble';
-import CreatePostPreview from 'feature/profile/CreatePostPreview';
+import CreateGroupBuying from 'feature/profile/CreateGroupBuying';
 import CreatePostPickImage from 'feature/profile/CreatePostPickImage';
+import CreatePostPreview from 'feature/profile/CreatePostPreview';
 import ListFollows from 'feature/profile/ListFollows';
+import MyProfile from 'feature/profile/MyProfile';
 import OtherProfile from 'feature/profile/OtherProfile';
 import Redux from 'hook/useRedux';
 import StatusPostCreated from 'navigation/components/StatusPostCreated';
 import ROOT_SCREEN, {MESS_ROUTE, PROFILE_ROUTE} from 'navigation/config/routes';
 import React from 'react';
-import DetailGroupBuying from 'feature/discovery/DetailGroupBuying';
-import MyProfile from 'feature/profile/MyProfile';
-import PostsArchived from 'feature/common/PostsArchived';
-import GroupBuyingJoined from 'feature/common/GroupBuyingJoined';
-import UpgradeAccount from 'feature/common/UpgradeAccount';
-import ModalPreviewLink from 'components/ModalPreviewLink';
-import {TypeBubblePalace} from 'api/interface';
-import CreateGroupBuying from 'feature/profile/CreateGroupBuying';
-import ModalCommentLike, {
-    TypeModalCommentPost,
-} from 'components/ModalCommentLike';
-import FindmeStore from 'app-redux/store';
 import MainTabs from './MainTabs';
 import SettingRoute from './tabs/SettingRoute';
 
@@ -36,16 +32,10 @@ export const showPreviewLink = (item: TypeBubblePalace) => {
     modalPreviewLinkRef.current?.show(item);
 };
 
-const modalRef = React.createRef<ModalCommentLike>();
-export const showCommentDiscovery = (params: TypeModalCommentPost) => {
-    modalRef.current?.show(params);
-};
-
 const Stack = createStackNavigator();
 
 const AppStack = () => {
     const theme = Redux.getTheme();
-    const bubbleFocusing = Redux.getBubbleFocusing();
 
     const cardStyle = {
         backgroundColor: theme.backgroundColor,
@@ -176,27 +166,6 @@ const AppStack = () => {
 
             <StatusPostCreated />
             <ModalPreviewLink ref={modalPreviewLinkRef} theme={theme} />
-            <ModalCommentLike
-                ref={modalRef}
-                theme={theme}
-                bubbleFocusing={bubbleFocusing}
-                updateBubbleFocusing={value =>
-                    Redux.updateBubbleFocusing(value)
-                }
-                setTotalComments={value => {
-                    Redux.updateBubbleFocusing({
-                        totalComments: value,
-                    });
-                }}
-                increaseTotalComments={value => {
-                    const currentComments =
-                        FindmeStore.getState().logicSlice.bubbleFocusing
-                            .totalComments;
-                    Redux.updateBubbleFocusing({
-                        totalComments: currentComments + value,
-                    });
-                }}
-            />
         </>
     );
 };
