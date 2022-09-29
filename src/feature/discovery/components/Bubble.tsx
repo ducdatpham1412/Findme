@@ -693,8 +693,8 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
     },
     avatarFeeling: {
-        width: '35@s',
-        height: '35@s',
+        width: '35@ms',
+        height: '35@ms',
     },
     avatar: {
         width: '100%',
@@ -704,11 +704,11 @@ const styles = ScaledSheet.create({
     feeling: {
         position: 'absolute',
         bottom: '-1@s',
-        left: '23@s',
+        left: '23@ms',
     },
     nameTime: {
         maxWidth: '50%',
-        marginLeft: '10@ms',
+        marginLeft: '10@s',
     },
     textName: {
         fontSize: '14@ms',

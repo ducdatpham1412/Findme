@@ -35,7 +35,11 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SharedElement} from 'react-navigation-shared-element';
 import {chooseTextTopic, onGoToProfile} from 'utility/assistant';
-import {formatFromNow, formatLocaleNumber} from 'utility/format';
+import {
+    formatDayGroupBuying,
+    formatFromNow,
+    formatLocaleNumber,
+} from 'utility/format';
 import {TypeMoreOptionsMe} from '../DiscoveryScreen';
 
 export interface ParamsLikeGB {
@@ -251,21 +255,37 @@ const BubbleGroupBuying = (props: Props) => {
                     start={{x: 0, y: 1}}
                     end={{x: 0.8, y: 1}}
                 />
-                {displayPrices.map((price, index) => (
-                    <View key={index} style={styles.priceBox}>
-                        <StyleText
-                            originValue={price.number_people}
-                            customStyle={styles.textNumberPeople}
-                        />
-                        <StyleText originValue="-" customStyle={styles.dash} />
-                        <StyleText
-                            originValue={`${formatLocaleNumber(
-                                price.value,
-                            )}vnd`}
-                            customStyle={styles.textPrice}
-                        />
+                <View style={styles.priceView}>
+                    <StyleIcon source={Images.icons.dollar} size={15} />
+                    <View>
+                        {displayPrices.map((price, index) => (
+                            <View key={index} style={styles.priceBox}>
+                                <StyleText
+                                    originValue={price.number_people}
+                                    customStyle={styles.textNumberPeople}
+                                />
+                                <StyleText
+                                    originValue="-"
+                                    customStyle={styles.dash}
+                                />
+                                <StyleText
+                                    originValue={`${formatLocaleNumber(
+                                        price.value,
+                                    )}vnd`}
+                                    customStyle={styles.textPrice}
+                                />
+                            </View>
+                        ))}
                     </View>
-                ))}
+                </View>
+                <View style={styles.priceView}>
+                    <StyleIcon source={Images.icons.deadline} size={15} />
+                    <StyleText
+                        originValue={formatDayGroupBuying(item.deadlineDate)}
+                        customStyle={styles.textDeadline}
+                    />
+                </View>
+
                 {isBiggerThanThree && (
                     <View style={styles.priceBox}>
                         <StyleText
@@ -512,8 +532,8 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
     },
     avatarFeeling: {
-        width: '35@s',
-        height: '35@s',
+        width: '35@ms',
+        height: '35@ms',
     },
     avatar: {
         width: '100%',
@@ -527,7 +547,7 @@ const styles = ScaledSheet.create({
     },
     nameTime: {
         maxWidth: '50%',
-        marginLeft: '10@ms',
+        marginLeft: '10@s',
     },
     textName: {
         fontSize: '14@ms',
@@ -580,10 +600,16 @@ const styles = ScaledSheet.create({
         width: '100%',
         height: '100%',
     },
+    priceView: {
+        flexDirection: 'row',
+        marginLeft: '5@s',
+        marginVertical: '5@vs',
+        alignItems: 'center',
+    },
     priceBox: {
         flexDirection: 'row',
-        marginLeft: '10@s',
-        marginVertical: '5@vs',
+        marginLeft: '5@s',
+        marginBottom: '5@vs',
     },
     textNumberPeople: {
         width: '35@ms',
@@ -611,9 +637,14 @@ const styles = ScaledSheet.create({
         tintColor: Theme.common.white,
     },
     textJoined: {
-        fontSize: FONT_SIZE.big,
+        fontSize: FONT_SIZE.normal,
         fontWeight: 'bold',
         color: Theme.common.white,
+        marginLeft: '5@s',
+    },
+    textDeadline: {
+        color: Theme.common.white,
+        fontSize: FONT_SIZE.small,
         marginLeft: '5@s',
     },
     // footer

@@ -165,6 +165,7 @@ const discovery = {
     joined: 'Joined',
     unJoinGroupBuying: 'Leave group buying',
     numberPeopleJoin: '{{value}} people joined group buying',
+    beTheFirstJoin: 'Be the first person join this campaign ^^',
     bought: 'Bought',
     confirmBought: 'Confirm bought',
     participators: '{{value}} participators',

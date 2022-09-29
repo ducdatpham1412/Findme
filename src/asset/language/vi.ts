@@ -168,6 +168,7 @@ const discovery = {
     joined: 'Đã tham gia',
     unJoinGroupBuying: 'Rời mua chung',
     numberPeopleJoin: '{{value}} người đã tham gia mua chung',
+    beTheFirstJoin: 'Hãy là người đầu tiên tham gia chiến dịch này nào ^^',
     bought: 'Đã mua',
     confirmBought: 'Xác nhận đã mua',
     participators: '{{value}} người tham gia',

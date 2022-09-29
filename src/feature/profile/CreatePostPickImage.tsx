@@ -5,7 +5,7 @@ import {
     MAX_NUMBER_IMAGES_POST,
     ratioImageGroupBuying,
 } from 'asset/standardValue';
-import {StyleText, StyleTouchable} from 'components/base';
+import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import StyleTabView from 'components/StyleTabView';
 import ModalPickImage from 'feature/mess/components/ModalPickImage';
 import Redux from 'hook/useRedux';
@@ -36,7 +36,11 @@ interface Props {
     };
 }
 
-const {width} = Metrics;
+const {width, height} = Metrics;
+const containerPreviewImage = {
+    width,
+    height: width / height > 0.6 ? width * 0.6 : width,
+};
 
 const CreatePostPickImage = ({route}: Props) => {
     const isCreateGB = route.params?.isCreateGB;
@@ -217,27 +221,64 @@ const CreatePostPickImage = ({route}: Props) => {
             );
         }
 
+        if (isCreateGB) {
+            return (
+                <ScrollCropImages
+                    images={images}
+                    imageFocusing={imageFocusing}
+                    index={indexScroll}
+                    width={width}
+                    height={width * ratioImageGroupBuying}
+                    onChangeCropperParams={value => {
+                        setCropperParams(preValue =>
+                            preValue.map(item => {
+                                if (item.url !== value.url) {
+                                    return item;
+                                }
+                                return value;
+                            }),
+                        );
+                    }}
+                    initRatio={isCreateGB ? ratioImageGroupBuying : 1}
+                    onChangeCropperSize={value => setCropSize(value)}
+                    havingZoomButton={!isCreateGB}
+                />
+            );
+        }
+
         return (
-            <ScrollCropImages
-                images={images}
-                imageFocusing={imageFocusing}
-                index={indexScroll}
-                width={width}
-                height={isCreateGB ? width * ratioImageGroupBuying : width}
-                onChangeCropperParams={value => {
-                    setCropperParams(preValue =>
-                        preValue.map(item => {
-                            if (item.url !== value.url) {
-                                return item;
-                            }
-                            return value;
-                        }),
-                    );
-                }}
-                initRatio={isCreateGB ? ratioImageGroupBuying : 1}
-                onChangeCropperSize={value => setCropSize(value)}
-                havingZoomButton={!isCreateGB}
-            />
+            <View
+                style={{
+                    width: containerPreviewImage.width,
+                    height: containerPreviewImage.height,
+                    alignItems: 'center',
+                }}>
+                <StyleImage
+                    source={{uri: images[0]}}
+                    customStyle={styles.imageBehind}
+                    blurRadius={10}
+                />
+                <ScrollCropImages
+                    images={images}
+                    imageFocusing={imageFocusing}
+                    index={indexScroll}
+                    width={containerPreviewImage.height}
+                    height={containerPreviewImage.height}
+                    onChangeCropperParams={value => {
+                        setCropperParams(preValue =>
+                            preValue.map(item => {
+                                if (item.url !== value.url) {
+                                    return item;
+                                }
+                                return value;
+                            }),
+                        );
+                    }}
+                    initRatio={isCreateGB ? ratioImageGroupBuying : 1}
+                    onChangeCropperSize={value => setCropSize(value)}
+                    havingZoomButton={!isCreateGB}
+                />
+            </View>
         );
     };
 
@@ -449,6 +490,11 @@ const styles = ScaledSheet.create({
     modalPickImageView: {
         height: undefined,
         flex: 1,
+    },
+    imageBehind: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
     },
 });
 
