@@ -1,3 +1,4 @@
+import {FONT_SIZE} from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
 import React from 'react';
 import {StyleProp, TextStyle, ViewStyle} from 'react-native';
@@ -40,7 +41,7 @@ const styles = ScaledSheet.create({
         backgroundColor: Theme.common.joinGroupChat,
     },
     title: {
-        fontSize: '14@ms',
+        fontSize: FONT_SIZE.normal,
         fontWeight: 'bold',
         color: Theme.common.white,
     },

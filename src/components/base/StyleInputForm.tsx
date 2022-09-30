@@ -21,7 +21,7 @@ const StyleInputForm = (props: StyleInputFormProps, ref: any) => {
     const errorMessage = errors?.[name]?.message || '';
 
     if (!formContext) {
-        return <StyleText i18Text="" />;
+        return <StyleText i18Text="common.null" />;
     }
 
     return (

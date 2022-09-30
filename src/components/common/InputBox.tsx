@@ -7,11 +7,11 @@ const InputBox = (props: StyleInputProps, ref: any) => {
     return (
         <StyleInput
             ref={ref}
-            inputStyle={styles.input}
             hasErrorBox={false}
             hasUnderLine={false}
             placeholderTextColor={Theme.common.blueInputHolder}
             {...props}
+            inputStyle={[styles.input, props.inputStyle]}
         />
     );
 };

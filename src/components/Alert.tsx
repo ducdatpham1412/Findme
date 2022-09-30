@@ -1,5 +1,6 @@
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
+import {FONT_SIZE} from 'asset/standardValue';
 import Redux from 'hook/useRedux';
 import {goBack} from 'navigation/NavigationService';
 import React, {useEffect, useRef} from 'react';
@@ -114,8 +115,6 @@ const styles = ScaledSheet.create({
         marginTop: Metrics.width / 2,
         alignSelf: 'center',
     },
-
-    // header view
     header: {
         width: '100%',
         flexDirection: 'row',
@@ -123,22 +122,18 @@ const styles = ScaledSheet.create({
         paddingVertical: '10@vs',
     },
     headerText: {
-        fontSize: '20@ms',
+        fontSize: FONT_SIZE.big,
         fontWeight: 'bold',
         marginLeft: '8@s',
     },
-
-    // notification view
     notice: {
         width: '100%',
         alignItems: 'center',
     },
     contentText: {
-        fontSize: '17@ms',
+        fontSize: FONT_SIZE.normal,
         fontStyle: 'italic',
     },
-
-    // button view
     buttonBox: {
         width: '100%',
         flexDirection: 'row',
@@ -150,8 +145,6 @@ const styles = ScaledSheet.create({
         paddingVertical: '5@vs',
         paddingHorizontal: '20@s',
         borderRadius: '15@s',
-        // alignItems: 'center',
-        // justifyContent: 'center',
     },
     textButtonElement: {
         fontSize: '18@ms',

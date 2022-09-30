@@ -25,6 +25,7 @@ const common = {
     stay: 'Stay',
     wantToDiscard: 'You want to discard the changes?',
     null: '',
+    search: 'Search',
 };
 
 const login = {
@@ -118,20 +119,9 @@ const login = {
 
 // DISCOVERY ROUTE
 const discovery = {
-    heart: {
-        headerTitle: 'Chat hobbies',
-    },
-    discoveryScreen: {
-        searchHobbies: 'Find hobbies',
-        searchChat: 'Find chat',
-        personal: 'Personal',
-        community: 'Community',
-    },
     bubble: {
-        startChat: 'Start chat now',
         goToSignUp: 'Go to login so you can start chatting with everyone',
         joinCommunity: 'Join community',
-        goToConversation: 'Go to conversation',
     },
     report: {
         title: 'Report',
@@ -297,6 +287,17 @@ const profile = {
     addPrice: 'Add price',
     number: 'Number',
     price: 'Price',
+    toBecomeShopAccount:
+        'In order to become touring supplier\nWe need some information to complete review process',
+    firstEnterLocation: "First, let's us know your location",
+    location: 'Location',
+    bank: 'Choose bank',
+    accountNumber: 'Account number',
+    byTapping: 'By tapping ',
+    agreeSendTheseInformation:
+        ", you agree to send these information to us.\nReviewing process can take some time, we'll notice to you within 24 hours via email ",
+    phoneNumber: 'Your phone number',
+    requestUpgradeSuccess: 'Send request successfully',
 };
 
 // SETTING ROUTE

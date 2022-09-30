@@ -25,6 +25,7 @@ const common = {
     stay: 'Ở lại',
     wantToDiscard: 'Bạn muốn bỏ những thay đổi vừa rồi?',
     null: '',
+    search: 'Tìm kiếm',
 };
 
 const login = {
@@ -120,21 +121,10 @@ const login = {
 
 // DISCOVERY ROUTE
 const discovery = {
-    heart: {
-        headerTitle: 'Sở thích chat',
-    },
-    discoveryScreen: {
-        searchHobbies: 'Tìm sở thích',
-        searchChat: 'Tìm cuộc trò chuyện',
-        personal: 'Cá nhân',
-        community: 'Cộng đồng',
-    },
     bubble: {
-        startChat: 'Bắt chuyện ngay',
         goToSignUp:
             'Đi tới đăng nhập để có thể bắt đầu trò chuyện với mọi người nhé',
         joinCommunity: 'Tham gia nhóm',
-        goToConversation: 'Đi tới trò chuyện',
     },
     report: {
         title: 'Tố cáo',
@@ -195,7 +185,7 @@ const profile = {
             introduce:
                 'Đăng ký tài khoản để trải nghiệm các năng chat và tạo trang cá nhân của riêng mình nhé !',
             tellSignUp: 'Đi tới đăng ký',
-            editProfile: 'Trang cá nhân',
+            editProfile: 'Chỉnh sửa trang cá nhân',
         },
         searchAndSetting: 'Tìm những người khác',
     },
@@ -270,6 +260,17 @@ const profile = {
     addPrice: 'Thêm',
     number: 'Số lượng',
     price: 'Giá',
+    toBecomeShopAccount:
+        'Để trở thành một nhà cung cấp tour\ndu lịch\nChúng tôi cần một số thông tin phục vụ cho quá trình xét duyệt',
+    firstEnterLocation: 'Đầu tiên, hãy cho chúng tôi biết địa chỉ của bạn',
+    location: 'Địa chỉ',
+    bank: 'Chọn ngân hàng',
+    accountNumber: 'Số tài khoản',
+    byTapping: 'Bằng việc ấn ',
+    agreeSendTheseInformation:
+        ', bạn đồng ý gửi các thông tin trên cho chúng tôi.\nQuá trình xét duyệt có thể mất chút thời gian, chúng tôi sẽ thông báo tới bạn qua địa chỉ email ',
+    phoneNumber: 'Số điện thoại của bạn',
+    requestUpgradeSuccess: 'Gửi yêu cầu thành công',
 };
 
 // MESS ROUTE
