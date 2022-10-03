@@ -591,9 +591,11 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Findme/Findme.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = M2AG54A2UF;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = M2AG54A2UF;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Findme/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
@@ -606,9 +608,10 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.doffy.ios.production;
+				PRODUCT_BUNDLE_IDENTIFIER = com.doffy.ios.development;
 				PRODUCT_NAME = Findme;
 				PROVISIONING_PROFILE_SPECIFIER = Doffy_Production;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Doffy_Development;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -627,9 +630,11 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Findme/Findme.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = M2AG54A2UF;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = M2AG54A2UF;
 				INFOPLIST_FILE = Findme/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -641,9 +646,10 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.doffy.ios.production;
+				PRODUCT_BUNDLE_IDENTIFIER = com.doffy.ios.development;
 				PRODUCT_NAME = Findme;
 				PROVISIONING_PROFILE_SPECIFIER = Doffy_Production;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Doffy_Development;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
