@@ -26,6 +26,7 @@ const common = {
     wantToDiscard: 'Bạn muốn bỏ những thay đổi vừa rồi?',
     null: '',
     search: 'Tìm kiếm',
+    change: 'Thay đổi',
 };
 
 const login = {
@@ -343,6 +344,8 @@ const setting = {
             'Bạn chắc chắn muốn thay đổi thông tin này của mình chứ?',
         confirm: 'Xác nhận',
         passwordNotTrue: 'Mật khẩu không đúng !',
+        editEmail: 'Chỉnh sửa email',
+        editPhone: 'Sửa số điện thoại',
     },
     extendSetting: {
         headerTitle: 'Cài đặt mở rộng',
@@ -376,7 +379,6 @@ const alert = {
     // FOR LOGIN
     notNull: 'Giá trị không được để trống !',
     passConfirmFalse: 'Mật khẩu xác nhận\nkhông đúng !',
-    emailNotValid: 'Email không hợp lệ !',
     wantToSave: 'Bạn muốn giữ trạng thái đăng nhập cho lần sau chứ?',
     loginFail: 'Đăng nhập thất bại',
     wantToChange: 'Xác nhận thay đổi',

@@ -1,7 +1,8 @@
 import {TypeRequestOTPRequest} from 'api/interface';
 import {apiRequestOTP} from 'api/module';
-import {INFO_TYPE, SIGN_UP_TYPE, TYPE_OTP} from 'asset/enum';
+import {SIGN_UP_TYPE, TYPE_OTP} from 'asset/enum';
 import {StyleButton, StyleContainer, StyleInput} from 'components/base';
+import LoadingScreen from 'components/LoadingScreen';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
 import {SETTING_ROUTE} from 'navigation/config/routes';
@@ -14,15 +15,17 @@ import FindmeAsyncStorage from 'utility/FindmeAsyncStorage';
 interface Props {
     route: {
         params: {
-            newInfo: any;
-            typeChange: string;
+            newInfo: {
+                email?: string;
+                phone?: string;
+            };
         };
     };
 }
 
 const EnterPassword = ({route}: Props) => {
-    const {newInfo, typeChange} = route.params;
-
+    const {newInfo} = route.params;
+    const isLoading = Redux.getIsLoading();
     const inputRef = useRef<TextInput>(null);
     const [password, setPassword] = useState('');
 
@@ -38,32 +41,36 @@ const EnterPassword = ({route}: Props) => {
             return;
         }
 
-        let targetInfo;
-        if (typeChange === INFO_TYPE.email) {
+        let targetInfo: number | undefined;
+        let username = '';
+        if (newInfo.email) {
             targetInfo = SIGN_UP_TYPE.email;
-        } else if (typeChange === INFO_TYPE.phone) {
+            username = newInfo.email;
+        } else if (newInfo.phone) {
             targetInfo = SIGN_UP_TYPE.phone;
+            username = newInfo.phone;
         }
 
-        const paramsOTP: TypeRequestOTPRequest = {
-            username: newInfo,
-            targetInfo,
-            typeOTP: TYPE_OTP.changeInfo,
-        };
+        if (targetInfo !== undefined) {
+            const paramsOTP: TypeRequestOTPRequest = {
+                username,
+                targetInfo,
+                typeOTP: TYPE_OTP.changeInfo,
+            };
 
-        try {
-            Redux.setIsLoading(true);
-            await apiRequestOTP(paramsOTP);
-            navigate(SETTING_ROUTE.sendOTPChangeInfo, {
-                name: newInfo,
-                newInfo,
-                typeChange,
-                paramsOTP,
-            });
-        } catch (err) {
-            appAlert(err);
-        } finally {
-            Redux.setIsLoading(false);
+            try {
+                Redux.setIsLoading(true);
+                await apiRequestOTP(paramsOTP);
+                navigate(SETTING_ROUTE.sendOTPChangeInfo, {
+                    name: username,
+                    newInfo,
+                    paramsOTP,
+                });
+            } catch (err) {
+                appAlert(err);
+            } finally {
+                Redux.setIsLoading(false);
+            }
         }
     };
 
@@ -87,6 +94,8 @@ const EnterPassword = ({route}: Props) => {
                     containerStyle={styles.buttonView}
                     onPress={onConfirmPassword}
                 />
+
+                {isLoading && <LoadingScreen />}
             </StyleContainer>
         </>
     );

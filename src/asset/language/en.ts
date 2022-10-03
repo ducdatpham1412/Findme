@@ -26,6 +26,7 @@ const common = {
     wantToDiscard: 'You want to discard the changes?',
     null: '',
     search: 'Search',
+    change: 'Change',
 };
 
 const login = {
@@ -276,7 +277,7 @@ const profile = {
     goToPost: 'Go to post',
     reviewProvider: 'Review this provider',
     postsArchived: 'Post archived',
-    upgradeAccount: 'Provider account',
+    upgradeAccount: 'Supplier account',
     groupBuyingJoined: 'Group buying joined',
     gotToCreateGb: 'Create first group buying campaign',
     createReviewPost: 'Review post',
@@ -339,6 +340,8 @@ const setting = {
         alertCfChange: 'Are you sure want to change this information?',
         confirm: 'Confirm',
         passwordNotTrue: 'Password not true !',
+        editEmail: 'Edit email',
+        editPhone: 'Edit phone number',
     },
     extendSetting: {
         headerTitle: 'Extend setting',
@@ -372,7 +375,6 @@ const alert = {
     // FOR LOGIN
     notNull: 'This is a required field !',
     passConfirmFalse: 'Password confirm is false !',
-    emailNotValid: 'Email  not valid !',
     wantToSave: 'Do you want to save account for login later?',
     loginFail: 'Login Fail',
     wantToChange: 'Want to change ?',

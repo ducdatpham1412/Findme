@@ -194,6 +194,7 @@ class ModalApplicatonPeriod extends Component<Props, States> {
                                 endDate: null,
                             })
                         }
+                        theme={theme}
                     />
                     <ClassDateTimePicker
                         ref={this.endDateRef}
@@ -212,6 +213,7 @@ class ModalApplicatonPeriod extends Component<Props, States> {
                                 endDate: String(value),
                             })
                         }
+                        theme={theme}
                     />
                 </Modalize>
             </>

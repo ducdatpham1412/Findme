@@ -19,6 +19,7 @@ import {appAlert, goBack} from 'navigation/NavigationService';
 import React, {useRef, useState} from 'react';
 import {Platform, ScrollView, TextInput, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
+import {validateIsPhone} from 'utility/validate';
 import ModalBankAccount from './components/ModalBankAccount';
 import ModalChooseBank from './components/ModalChooseBank';
 
@@ -132,6 +133,7 @@ const UpgradeAccount = () => {
                         i18Placeholder="profile.phoneNumber"
                         defaultValue={phone}
                         onChangeText={text => setPhone(text)}
+                        keyboardType="numeric"
                     />
                     <StyleButton
                         title="common.next"
@@ -142,7 +144,7 @@ const UpgradeAccount = () => {
                             });
                         }}
                         containerStyle={styles.buttonView}
-                        disable={!phone}
+                        disable={!validateIsPhone(phone)}
                     />
                 </StyleKeyboardAwareView>
             </View>

@@ -1,8 +1,7 @@
 import {useIsFocused} from '@react-navigation/native';
-import ChangePersonalInfo from 'api/actions/setting/ChangePersonalInfo';
 import {TypeRequestOTPRequest} from 'api/interface';
-import {apiCheckOTP, apiRequestOTP} from 'api/module';
-import {standValue} from 'asset/standardValue';
+import {apiChangeInformation, apiCheckOTP, apiRequestOTP} from 'api/module';
+import {FONT_SIZE, standValue} from 'asset/standardValue';
 import {
     StyleButton,
     StyleContainer,
@@ -19,20 +18,23 @@ import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScaledSheet} from 'react-native-size-matters';
+import {Vibration} from 'react-native';
 
 interface Props {
     route: {
         params: {
             name: string;
-            newInfo: any;
-            typeChange: string;
+            newInfo: {
+                email?: string;
+                phone?: string;
+            };
             paramsOTP: TypeRequestOTPRequest;
         };
     };
 }
 
 const SendOTPChangeInfo = ({route}: Props) => {
-    const {name, newInfo, typeChange, paramsOTP} = route.params;
+    const {name, newInfo, paramsOTP} = route.params;
 
     const theme = Redux.getTheme();
     const {t} = useTranslation();
@@ -53,9 +55,13 @@ const SendOTPChangeInfo = ({route}: Props) => {
         try {
             Redux.setIsLoading(true);
             await apiCheckOTP({username: paramsOTP.username, code});
-            await ChangePersonalInfo.changeInfo(newInfo, typeChange);
+            await apiChangeInformation(newInfo);
+            Redux.updatePassport({
+                information: newInfo,
+            });
             navigate(SETTING_ROUTE.personalInformation);
         } catch (err) {
+            Vibration.vibrate();
             appAlert(err);
         } finally {
             Redux.setIsLoading(false);
@@ -128,7 +134,7 @@ const SendOTPChangeInfo = ({route}: Props) => {
                     onPress={onSendAgain}>
                     <StyleText
                         i18Text={TextSendAgain}
-                        i18Params={{countdown: countdown}}
+                        i18Params={{countdown}}
                         customStyle={[
                             styles.titleSendAgain,
                             {color: theme.textColor},
@@ -145,12 +151,14 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
     },
     textNotification: {
-        fontSize: '17@ms',
+        fontSize: FONT_SIZE.normal,
         marginTop: '5%',
         marginBottom: '2%',
+        width: '90%',
+        textAlign: 'center',
     },
     textDestination: {
-        fontSize: '13@ms',
+        fontSize: FONT_SIZE.normal,
         fontStyle: 'italic',
         fontWeight: 'bold',
     },
