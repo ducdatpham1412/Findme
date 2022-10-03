@@ -173,7 +173,7 @@ const ReportUser = ({route}: Props) => {
                         multiline
                         hasUnderLine={false}
                         containerStyle={{width: '100%'}}
-                        i18Placeholder="Aa"
+                        placeholder="Aa"
                         maxLength={200}
                         onChangeText={(text: string) => setDescription(text)}
                         isEffectTabBar={false}

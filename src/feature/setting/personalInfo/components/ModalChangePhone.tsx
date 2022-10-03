@@ -1,3 +1,4 @@
+import {FONT_SIZE} from 'asset/standardValue';
 import {TypeTheme} from 'asset/theme/Theme';
 import {StyleButton, StyleText} from 'components/base';
 import ButtonX from 'components/common/ButtonX';
@@ -6,15 +7,16 @@ import {Platform, TextInput, View} from 'react-native';
 import {Modalize} from 'react-native-modalize';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import I18Next from 'utility/I18Next';
+import {validateIsPhone} from 'utility/validate';
 
 interface Props {
-    value: string;
-    onChangeValue(value: string): void;
+    phone: string;
+    onChangePhone(value: string): void;
     theme: TypeTheme;
 }
 
 interface States {
-    tempValue: string;
+    tempPhone: string;
 }
 
 let timeout: any;
@@ -24,13 +26,13 @@ const borderWidthError = Platform.select({
     android: moderateScale(1),
 });
 
-class ModalBankAccount extends Component<Props, States> {
+class ModalChangePhone extends Component<Props, States> {
     modalRef = React.createRef<Modalize>();
 
     inputRef = React.createRef<TextInput>();
 
     state: States = {
-        tempValue: this.props.value,
+        tempPhone: this.props.phone,
     };
 
     show() {
@@ -41,22 +43,22 @@ class ModalBankAccount extends Component<Props, States> {
         return () => clearTimeout(timeout);
     }
 
-    private onConfirm = (value: string) => {
-        this.props.onChangeValue(value);
+    private onConfirm = () => {
+        this.props.onChangePhone(this.state.tempPhone);
         this.modalRef.current?.close();
     };
 
     render() {
-        const {theme, value} = this.props;
-        const {tempValue} = this.state;
-        const isValid = true;
+        const {phone, theme} = this.props;
+        const {tempPhone} = this.state;
+        const isValid = validateIsPhone(tempPhone);
         const borderWidth = isValid ? 0 : borderWidthError;
 
         const Content = () => {
             return (
                 <>
                     <StyleText
-                        i18Text="profile.accountNumber"
+                        i18Text="setting.personalInfo.editPhone"
                         customStyle={[styles.title, {color: theme.textColor}]}
                     />
 
@@ -71,36 +73,35 @@ class ModalBankAccount extends Component<Props, States> {
                         ]}>
                         <TextInput
                             ref={this.inputRef}
-                            defaultValue={tempValue}
-                            onChangeText={text =>
+                            defaultValue={tempPhone}
+                            onChangeText={value =>
                                 this.setState({
-                                    tempValue: text,
+                                    tempPhone: value,
                                 })
                             }
-                            placeholder={I18Next.t('profile.accountNumber')}
+                            placeholder={I18Next.t(
+                                'setting.personalInfo.editPhone',
+                            )}
                             placeholderTextColor={theme.borderColor}
                             multiline
                             style={[styles.input, {color: theme.textColor}]}
-                            keyboardType="numeric"
                         />
                     </View>
 
-                    {!isValid && (
-                        <StyleText
-                            i18Text="alert.invalidLink"
-                            customStyle={[
-                                styles.textInvalidLink,
-                                {color: theme.highlightColor},
-                            ]}
-                        />
-                    )}
+                    <StyleText
+                        i18Text={isValid ? 'common.null' : 'alert.inValidPhone'}
+                        customStyle={[
+                            styles.textInvalidLink,
+                            {color: theme.highlightColor},
+                        ]}
+                    />
 
                     <StyleButton
                         containerStyle={styles.buttonView}
                         titleStyle={styles.titleButton}
-                        title="common.save"
-                        disable={!isValid}
-                        onPress={() => this.onConfirm(tempValue)}
+                        title="common.change"
+                        disable={!isValid || phone === tempPhone}
+                        onPress={() => this.onConfirm()}
                     />
                 </>
             );
@@ -121,7 +122,7 @@ class ModalBankAccount extends Component<Props, States> {
                         onPress={() => {
                             this.modalRef.current?.close();
                             this.setState({
-                                tempValue: value,
+                                tempPhone: phone,
                             });
                         }}
                     />
@@ -184,6 +185,15 @@ const styles = ScaledSheet.create({
         fontSize: '15@ms',
         fontWeight: 'normal',
     },
+    avatar: {
+        width: '50@s',
+        height: '50@s',
+        borderRadius: '25@s',
+    },
+    textReview: {
+        fontSize: FONT_SIZE.normal,
+        marginTop: '15@vs',
+    },
 });
 
-export default ModalBankAccount;
+export default ModalChangePhone;

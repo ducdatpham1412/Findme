@@ -117,14 +117,6 @@ export const chooseImageFromCamera = async (
 /**
  * OTHERS
  */
-export const convertToFormatDate = (value: any) => {
-    const temp = value || new Date(1975, 3, 30);
-    return String(temp.getDate())
-        .concat(' / ')
-        .concat(String(temp.getMonth() + 1))
-        .concat(' / ')
-        .concat(String(temp.getFullYear()));
-};
 
 export const isIOS = Platform.OS === 'ios';
 

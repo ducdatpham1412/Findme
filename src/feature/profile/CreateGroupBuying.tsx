@@ -610,6 +610,7 @@ const CreateGroupBuying = ({route}: Props) => {
                 initDate={deadlineDate ? new Date(deadlineDate) : new Date()}
                 minimumDate={new Date()}
                 onChangeDateTime={value => setDeadlineDate(String(value))}
+                theme={theme}
             />
             <ModalApplicationPeriod
                 ref={modalApplicationRef}

@@ -3,6 +3,7 @@ import {goBack} from 'navigation/NavigationService';
 import React, {ReactNode, useRef, useState} from 'react';
 import {Animated, ScrollView, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
+import {FONT_SIZE} from 'asset/standardValue';
 import StyleTouchable from '../StyleTouchable';
 import StyleText from '../StyleText';
 import StyleContainer from '../StyleContainer';
@@ -154,7 +155,7 @@ const styles = ScaledSheet.create({
     body: {
         width: '100%',
         borderWidth: '1@ms',
-        borderRadius: '20@ms',
+        borderRadius: '10@ms',
         borderBottomWidth: 0,
     },
     // header view
@@ -166,10 +167,10 @@ const styles = ScaledSheet.create({
         borderBottomWidth: '0.5@ms',
     },
     textCancel: {
-        fontSize: '15@ms',
+        fontSize: FONT_SIZE.normal,
     },
     textSelect: {
-        fontSize: '17@ms',
+        fontSize: FONT_SIZE.normal,
         fontWeight: 'bold',
     },
     // picker view

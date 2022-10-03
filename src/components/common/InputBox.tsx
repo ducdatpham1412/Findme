@@ -1,3 +1,4 @@
+import {FONT_SIZE} from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
 import StyleInput, {StyleInputProps} from 'components/base/StyleInput';
 import React, {forwardRef} from 'react';
@@ -22,6 +23,7 @@ const styles = ScaledSheet.create({
         backgroundColor: Theme.common.blueInput,
         paddingVertical: '14@ms',
         borderRadius: '6@ms',
+        fontSize: FONT_SIZE.normal,
     },
 });
 
