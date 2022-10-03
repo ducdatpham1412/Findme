@@ -731,7 +731,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 0ae35a37b20d5e031eb020a69cc5afdbd6406301
   react-native-blur: cad4d93b364f91e7b7931b3fa935455487e5c33c
   react-native-cameraroll: 2957f2bce63ae896a848fbe0d5352c1bd4d20866
-  react-native-config: 6502b1879f97ed5ac570a029961fc35ea606cd14
+  react-native-config: eb806eab48a5f56d052623c7ebbe6fe2fb0cd314
   react-native-image-editor: 9361a215c3991cafbe5e7f28cbbad6e72c9c2705
   react-native-onesignal: 7643517fe655b94cfda8e697ec16f9b9135648b8
   react-native-pager-view: 3ee7d4c7697fb3ef788346e834a60cca97ed8540
