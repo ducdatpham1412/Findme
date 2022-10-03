@@ -3,7 +3,7 @@ import {StyleInputForm, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import React, {ReactNode, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {View, Keyboard} from 'react-native';
+import {Keyboard, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
@@ -57,7 +57,10 @@ const BoxInfo = (props: BoxInfoProps) => {
                     ref={inputRef}
                     name={type}
                     containerStyle={styles.contentBox}
-                    inputStyle={styles.inputInfo}
+                    inputStyle={[
+                        styles.inputInfo,
+                        {color: theme.textHightLight},
+                    ]}
                     hasErrorBox={false}
                     defaultValue={initValue}
                     placeholder={initValue || t('setting.personalInfo.notYet')}
@@ -71,7 +74,10 @@ const BoxInfo = (props: BoxInfoProps) => {
                     name={type}
                     hasErrorBox={false}
                     containerStyle={styles.contentBox}
-                    inputStyle={styles.inputInfo}
+                    inputStyle={[
+                        styles.inputInfo,
+                        {color: theme.textHightLight},
+                    ]}
                     defaultValue={initValue}
                     placeholder={initValue || t('setting.personalInfo.notYet')}
                     editable={false}
@@ -83,7 +89,10 @@ const BoxInfo = (props: BoxInfoProps) => {
                     name={type}
                     hasErrorBox={false}
                     containerStyle={styles.contentBox}
-                    inputStyle={styles.inputInfo}
+                    inputStyle={[
+                        styles.inputInfo,
+                        {color: theme.textHightLight},
+                    ]}
                     defaultValue={initValue}
                     editable={false}
                 />
@@ -139,6 +148,7 @@ const styles = ScaledSheet.create({
         fontSize: '15@ms',
         paddingHorizontal: '5@vs',
         textAlign: 'left',
+        backgroundColor: 'transparent',
     },
     // icon edit - check
     ic_edit_check: {

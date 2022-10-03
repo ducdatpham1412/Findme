@@ -49,6 +49,7 @@ const UserInput = (props: UserInputProps, inputRef: any) => {
     const theme = Redux.getTheme();
     const myId = Redux.getPassport().profile.id;
     const chatTagFocusing = Redux.getChatTagFocusing();
+    const borderMessRoute = Redux.getBorderMessRoute();
 
     const aim = useRef(new Animated.Value(0.6)).current;
     const [inputWidth, setInputWidth] = useState(0.6 * Metrics.width);
@@ -258,6 +259,7 @@ const UserInput = (props: UserInputProps, inputRef: any) => {
                     }
                     placeholder="Hi"
                     placeholderTextColor={theme.holderColorLighter}
+                    selectionColor={borderMessRoute}
                 />
             </Animated.View>
 

@@ -111,7 +111,7 @@ const GroupBuyingJoined = () => {
                 key={item.id}
                 style={[
                     styles.itemView,
-                    {backgroundColor: theme.backgroundColor},
+                    {backgroundColor: theme.backgroundColorSecond},
                 ]}
                 onPress={() =>
                     navigate(ROOT_SCREEN.detailGroupBuying, {
@@ -182,11 +182,13 @@ const GroupBuyingJoined = () => {
                     <View style={{flex: 1}}>
                         <View style={styles.infoView}>
                             <StyleIcon
-                                source={Images.icons.calendar}
+                                source={Images.icons.deadline}
                                 size={15}
                             />
                             <StyleText
-                                originValue={formatDayGroupBuying(item.endDate)}
+                                originValue={formatDayGroupBuying(
+                                    item.deadlineDate,
+                                )}
                                 customStyle={[
                                     styles.textInfo,
                                     {color: theme.borderColor},

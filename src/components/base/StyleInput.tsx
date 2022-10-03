@@ -18,7 +18,7 @@ import StyleText from './StyleText';
 export interface StyleInputProps extends TextInputProps {
     containerStyle?: StyleProp<ViewStyle>;
     inputStyle?: StyleProp<TextStyle>;
-    i18Placeholder?: any;
+    i18Placeholder?: I18Normalize;
     hasErrorBox?: boolean;
     label?: any;
     hasUnderLine?: boolean;
@@ -111,7 +111,7 @@ const StyleInput = (props: StyleInputProps, ref: any) => {
                 style={[styles.input, {color: theme.textColor}, inputStyle]}
                 placeholderTextColor={theme.holderColor}
                 autoCapitalize="none"
-                placeholder={t(i18Placeholder)}
+                placeholder={i18Placeholder ? t(String(i18Placeholder)) : ''}
                 returnKeyType="next"
                 keyboardAppearance={Redux.getThemeKeyboard()}
                 textContentType="oneTimeCode"
