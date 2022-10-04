@@ -148,7 +148,7 @@ const discovery = {
     numberLike: '{{value}} stars',
     comment: 'Comment',
     numberComments: '{{numberComments}} comments',
-    chooseTopic: 'Topic you like',
+    chooseTopic: 'Topics',
     applicationPeriod: 'Application period',
     groupBuyingPrice: 'Group buying prices',
     numberPeople: '{{value}} people',
@@ -166,6 +166,7 @@ const discovery = {
     openLink: 'Open link',
     dayRemain: '{{value}} days remaining',
     today: 'Today',
+    postType: 'Posts',
 };
 
 // REPUTATION
@@ -281,7 +282,7 @@ const profile = {
     groupBuyingJoined: 'Group buying joined',
     gotToCreateGb: 'Create first group buying campaign',
     createReviewPost: 'Review post',
-    createGroupBuying: 'Group buying campaign',
+    createGroupBuying: 'Group booking campaign',
     subscriptionDeadline: 'Subscription deadline',
     startDate: 'Start date',
     endDate: 'End date',

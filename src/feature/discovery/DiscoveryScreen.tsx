@@ -67,6 +67,10 @@ const DiscoveryScreen = () => {
         TOPIC.travel,
         TOPIC.cuisine,
     ]);
+    const [postTypes, setPostTypes] = useState<Array<number>>([
+        POST_TYPE.review,
+        POST_TYPE.groupBuying,
+    ]);
     const [postIdFocusing, setPostIdFocusing] = useState('');
 
     const {
@@ -83,6 +87,7 @@ const DiscoveryScreen = () => {
         params: {
             take: 30,
             topics: undefined,
+            postTypes: undefined,
         },
     });
 
@@ -93,11 +98,14 @@ const DiscoveryScreen = () => {
         });
         const paramsTopic =
             listTopics.length === 2 ? undefined : `[${String(listTopics)}]`;
+        const paramsPostTypes =
+            postTypes.length === 2 ? undefined : `[${String(postTypes)}]`;
         setParams({
             take: 30,
-            listTopics: paramsTopic,
+            topics: paramsTopic,
+            postTypes: paramsPostTypes,
         });
-    }, [listTopics]);
+    }, [listTopics, postTypes]);
 
     useEffect(() => {
         if (
@@ -323,8 +331,10 @@ const DiscoveryScreen = () => {
                 <HeaderFilterTopic
                     ref={headerFilterRef}
                     listTopics={listTopics}
+                    listPostTypes={postTypes}
                     theme={theme}
                     onChangeTopic={list => setListTopics(list)}
+                    onChangePostType={list => setPostTypes(list)}
                 />
 
                 <StyleActionSheet
