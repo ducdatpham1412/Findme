@@ -297,6 +297,8 @@ const MyListGroupBuying = (props: Props) => {
                     contentContainerCustomStyle={{
                         alignItems: 'center',
                     }}
+                    decelerationRate="fast"
+                    vertical={false}
                 />
             );
         }
@@ -314,7 +316,12 @@ const MyListGroupBuying = (props: Props) => {
                     customStyle={[
                         styles.buttonGoToCreateGb,
                         {borderColor: theme.textHightLight},
-                    ]}>
+                    ]}
+                    onPress={() => {
+                        navigate(PROFILE_ROUTE.createPostPickImg, {
+                            isCreateGB: true,
+                        });
+                    }}>
                     <StyleIcon source={Images.icons.dollar} size={15} />
                     <StyleText
                         i18Text="profile.gotToCreateGb"

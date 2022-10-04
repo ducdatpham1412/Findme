@@ -1,11 +1,12 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
+import FindmeStore from 'app-redux/store';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';
 import Theme, {TypeTheme} from 'asset/theme/Theme';
 import React, {Component} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import {isIOS} from 'utility/assistant';
+import {chooseLanguageFromId, isIOS} from 'utility/assistant';
 import StyleText from '../StyleText';
 import StyleTouchable from '../StyleTouchable';
 
@@ -61,6 +62,7 @@ class ClassDateTimePicker extends Component<Props, States> {
         if (!this.state.display) {
             return null;
         }
+        const {language} = FindmeStore.getState().accountSlice.passport.setting;
 
         if (isIOS) {
             return (
@@ -93,6 +95,7 @@ class ClassDateTimePicker extends Component<Props, States> {
                             }
                             minimumDate={minimumDate}
                             themeVariant={dateTheme}
+                            locale={chooseLanguageFromId(language)}
                         />
                         <View
                             style={[
