@@ -151,7 +151,7 @@ const discovery = {
     numberLike: '{{value}} sao',
     comment: 'Bình luận',
     numberComments: '{{numberComments}} bình luận',
-    chooseTopic: 'Chủ đề yêu thích',
+    chooseTopic: 'Chủ đề',
     applicationPeriod: 'Thời gian áp dụng',
     groupBuyingPrice: 'Bảng giá mua chung',
     numberPeople: '{{value}} người',
@@ -169,6 +169,7 @@ const discovery = {
     openLink: 'Mở đường dẫn',
     dayRemain: '{{value}} ngày còn lại',
     today: 'Hôm nay',
+    postType: 'Bài đăng',
 };
 
 // REPUTATION

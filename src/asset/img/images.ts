@@ -45,6 +45,7 @@ const Images = {
         calendar: require('./ic_calendar.png'),
         dollar: require('./ic_dollar.png'),
         deadline: require('./ic_deadline.png'),
+        star: require('./ic_star.png'),
     },
     images: {
         logo: require('./img_logo.png'),

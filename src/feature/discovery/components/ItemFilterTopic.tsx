@@ -20,8 +20,9 @@ const ItemFilterTopic = (props: Props) => {
 
     useEffect(() => {
         Animated.spring(scale, {
-            toValue: isChosen ? 1 : 0.45,
+            toValue: isChosen ? 1 : 0.7,
             useNativeDriver: true,
+            stiffness: 200,
         }).start();
     }, [isChosen]);
 
@@ -33,9 +34,9 @@ const ItemFilterTopic = (props: Props) => {
             <Animated.View
                 style={[
                     styles.container,
-                    {transform: [{scale}], opacity: isChosen ? 1 : 0.8},
+                    {transform: [{scale}], opacity: isChosen ? 1 : 0.5},
                 ]}>
-                <StyleIcon source={icon} size={40} customStyle={iconStyle} />
+                <StyleIcon source={icon} size={27} customStyle={iconStyle} />
                 <StyleText
                     i18Text={title}
                     customStyle={[styles.title, {color: theme.textColor}]}
@@ -52,7 +53,7 @@ const styles = ScaledSheet.create({
         justifyContent: 'center',
     },
     title: {
-        fontSize: '12@ms',
+        fontSize: '7@ms',
         marginTop: '5@vs',
     },
 });
