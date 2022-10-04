@@ -1,6 +1,7 @@
 import {apiEditProfile} from 'api/module';
 import FindmeStore from 'app-redux/store';
-import {AVATAR_SIZE} from 'asset/standardValue';
+import {ACCOUNT} from 'asset/enum';
+import {AVATAR_SIZE, FONT_SIZE} from 'asset/standardValue';
 import {
     StyleButton,
     StyleContainer,
@@ -24,23 +25,33 @@ import {
     chooseImageFromLibrary,
     seeDetailImage,
 } from 'utility/assistant';
+import {I18Normalize} from 'utility/I18Next';
 import ImageUploader from 'utility/ImageUploader';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useTranslation} from 'react-i18next';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import BtnPenEdit from './components/BtnPenEdit';
 
 const EditProfile = () => {
     const {profile} = Redux.getPassport();
     const theme = Redux.getTheme();
     const isLoading = Redux.getIsLoading();
+    const {t} = useTranslation();
 
     const inputDescriptionRef = useRef<TextInput>(null);
     const actionRef = useRef<any>(null);
     const [avatar, setAvatar] = useState(profile?.avatar);
     const [name, setName] = useState(profile?.name);
+    const [location, setLocation] = useState(profile?.location);
     const [description, setDescription] = useState(profile?.description);
+    const isShopAccount = profile.account_type === ACCOUNT.shop;
 
-    const disableButton = !name;
+    const disableButton = isShopAccount ? !name || !location : !name;
 
-    const listTextAndOption = useMemo(() => {
+    const listTextAndOption: Array<{
+        text: I18Normalize;
+        action(): void;
+    }> = useMemo(() => {
         return [
             {
                 text: 'common.chooseFromCamera',
@@ -95,16 +106,19 @@ const EditProfile = () => {
                     description === profile.description
                         ? undefined
                         : description;
+                const newLocation =
+                    location === profile.location ? undefined : location;
 
                 await apiEditProfile({
                     avatar: newAvatar,
                     name: newName,
                     description: newDescription,
+                    location: newLocation,
                 });
             }
 
             Redux.updatePassport({
-                profile: {avatar: avatar || '', name, description},
+                profile: {avatar: avatar || '', name, description, location},
             });
 
             appAlert('alert.successUpdatePro', {
@@ -161,15 +175,57 @@ const EditProfile = () => {
                     />
                 </View>
 
-                <View style={styles.nameBox}>
-                    <StyleInput
-                        value={name}
-                        i18Placeholder="profile.edit.name"
-                        onChangeText={value => setName(value)}
-                        inputStyle={styles.inputName}
+                <View
+                    style={[
+                        styles.nameBox,
+                        {borderColor: theme.borderColor, width: '70%'},
+                    ]}>
+                    <AntDesign
+                        name="user"
+                        style={[
+                            styles.iconLocation,
+                            {color: theme.borderColor},
+                        ]}
+                    />
+                    <TextInput
+                        defaultValue={name || ''}
+                        onChangeText={text => setName(text)}
+                        placeholder={t('profile.edit.name')}
+                        placeholderTextColor={theme.holderColorLighter}
+                        style={[
+                            styles.inputName,
+                            {color: theme.textHightLight},
+                        ]}
                         maxLength={100}
                     />
                 </View>
+
+                {isShopAccount && (
+                    <View
+                        style={[
+                            styles.nameBox,
+                            {borderColor: theme.borderColor},
+                        ]}>
+                        <Ionicons
+                            name="location-outline"
+                            style={[
+                                styles.iconLocation,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                        <TextInput
+                            defaultValue={location || ''}
+                            onChangeText={text => setLocation(text)}
+                            placeholder={t('profile.location')}
+                            placeholderTextColor={theme.holderColorLighter}
+                            style={[
+                                styles.inputName,
+                                {color: theme.textHightLight},
+                            ]}
+                            maxLength={100}
+                        />
+                    </View>
+                )}
 
                 <StyleTouchable
                     customStyle={[
@@ -181,7 +237,7 @@ const EditProfile = () => {
                     <StyleInput
                         ref={inputDescriptionRef}
                         value={description}
-                        i18Placeholder="About me"
+                        i18Placeholder="profile.description"
                         multiline
                         onChangeText={value => setDescription(value)}
                         containerStyle={{width: '100%'}}
@@ -234,20 +290,33 @@ const styles = ScaledSheet.create({
     },
     // name
     nameBox: {
-        height: '50@vs',
         width: '80%',
-        marginTop: '40@vs',
         alignSelf: 'center',
+        borderWidth: Platform.select({
+            ios: '0.25@ms',
+            android: '0.5@ms',
+        }),
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: '5@s',
+        borderRadius: '5@ms',
+        marginTop: '20@vs',
     },
     inputName: {
-        fontSize: '14@ms',
+        flex: 1,
+        fontSize: FONT_SIZE.normal,
+        paddingTop: '10@vs',
+        paddingBottom: '10@vs',
+        marginLeft: '5@s',
     },
     iconNameBox: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
     },
-
+    iconLocation: {
+        fontSize: '20@ms',
+    },
     // description
     descriptionBox: {
         width: '80%',
@@ -260,9 +329,10 @@ const styles = ScaledSheet.create({
         }),
         borderColor: 'white',
         borderRadius: '10@s',
+        marginTop: '20@vs',
     },
     inputDescription: {
-        fontSize: '13@ms',
+        fontSize: FONT_SIZE.normal,
     },
 
     // btnSave

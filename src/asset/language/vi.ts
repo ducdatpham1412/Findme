@@ -273,6 +273,7 @@ const profile = {
         ', bạn đồng ý gửi các thông tin trên cho chúng tôi.\nQuá trình xét duyệt có thể mất chút thời gian, chúng tôi sẽ thông báo tới bạn qua địa chỉ email ',
     phoneNumber: 'Số điện thoại của bạn',
     requestUpgradeSuccess: 'Gửi yêu cầu thành công',
+    description: 'Mô tả về bạn',
 };
 
 // MESS ROUTE

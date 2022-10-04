@@ -64,7 +64,7 @@ const CreatePostPickImage = ({route}: Props) => {
     >([]);
 
     const onChooseImage = (url: string) => {
-        if (images.length === MAX_NUMBER_IMAGES_POST) {
+        if (images.length === MAX_NUMBER_IMAGES_POST && !images.includes(url)) {
             return;
         }
 

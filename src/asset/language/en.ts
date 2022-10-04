@@ -300,6 +300,7 @@ const profile = {
         ", you agree to send these information to us.\nReviewing process can take some time, we'll notice to you within 24 hours via email ",
     phoneNumber: 'Your phone number',
     requestUpgradeSuccess: 'Send request successfully',
+    description: 'Description about you',
 };
 
 // SETTING ROUTE

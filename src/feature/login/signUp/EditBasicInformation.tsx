@@ -1,6 +1,7 @@
 import {apiChangeInformation} from 'api/module';
 import {GENDER_TYPE} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
+import {FONT_SIZE} from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
 import {
     StyleButton,
@@ -8,7 +9,7 @@ import {
     StyleText,
     StyleTouchable,
 } from 'components/base';
-import StyleDatetimePicker from 'components/base/picker/StyleDatetimePicker';
+import ClassDateTimePicker from 'components/base/picker/ClassDateTimePicker';
 import InputBox from 'components/common/InputBox';
 import Redux from 'hook/useRedux';
 import {appAlert, appAlertYesNo, goBack} from 'navigation/NavigationService';
@@ -36,16 +37,16 @@ export const scrollItemHeight = verticalScale(140);
 const defaultDate = new Date(2000, 0, 1);
 
 const EditBasicInformation = ({route}: Props) => {
-    const {itemLoginSuccess, isLoginSocial = false} = route.params;
+    const {isLoginSocial = false, itemLoginSuccess} = route.params;
 
     const scrollPickerRef = useRef<ScrollView>(null);
+    const dateTimeRef = useRef<ClassDateTimePicker>(null);
 
     const [gender, setGender] = useState(GENDER_TYPE.woman);
     const [name, setName] = useState('');
     const [birthday, setBirthday] = useState<Date | undefined>(undefined);
 
     const [index, setIndex] = useState(0);
-    const [showBirthdayPicker, setShowBirthdayPicker] = useState(false);
 
     const onPressButton = () => {
         if (index < 2) {
@@ -155,10 +156,9 @@ const EditBasicInformation = ({route}: Props) => {
 
     const RenderPicker = () => {
         const textBirthday = birthday
-            ? String(formatDateDayMonthYear(birthday))
+            ? formatDateDayMonthYear(birthday)
             : 'login.detailInformation.chooseBirthday';
         const titleButton = index === 2 ? 'common.done' : 'common.next';
-        // const disableButton = index < 2 ? false : !birthday;
         let disableButton = false;
         if (index === 1) {
             disableButton = !name;
@@ -200,7 +200,7 @@ const EditBasicInformation = ({route}: Props) => {
                         <View style={styles.pickerBox}>
                             <StyleTouchable
                                 hitSlop={20}
-                                onPress={() => setShowBirthdayPicker(true)}>
+                                onPress={() => dateTimeRef.current?.show()}>
                                 <StyleText
                                     i18Text={textBirthday}
                                     customStyle={
@@ -230,13 +230,12 @@ const EditBasicInformation = ({route}: Props) => {
             {/* {InformationPreview()} */}
             {RenderPicker()}
 
-            {showBirthdayPicker && (
-                <StyleDatetimePicker
-                    initDate={birthday || defaultDate}
-                    onChangeDateTime={date => setBirthday(date)}
-                    onPressBackground={() => setShowBirthdayPicker(false)}
-                />
-            )}
+            <ClassDateTimePicker
+                ref={dateTimeRef}
+                initDate={birthday || defaultDate}
+                onChangeDateTime={value => setBirthday(value)}
+                theme={Theme.lightTheme}
+            />
         </View>
     );
 };
@@ -251,7 +250,7 @@ const styles = ScaledSheet.create({
         height: Metrics.safeTopPadding + verticalScale(10),
     },
     titleText: {
-        fontSize: '20@ms',
+        fontSize: FONT_SIZE.big,
         color: Theme.common.white,
         alignSelf: 'center',
     },

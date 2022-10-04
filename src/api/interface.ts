@@ -215,6 +215,7 @@ export interface TypeEditProfileRequest {
     description?: string;
     avatar?: string;
     cover?: string;
+    location?: string;
 }
 export interface TypeEditProfileResponse {
     success: boolean;
