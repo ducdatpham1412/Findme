@@ -155,7 +155,7 @@ const discovery = {
     applicationPeriod: 'Thời gian áp dụng',
     groupBuyingPrice: 'Bảng giá mua chung',
     numberPeople: '{{value}} người',
-    joinGroupBuying: 'Tham gia mua chung',
+    joinGroupBuying: 'Tham gia ngay',
     joined: 'Đã tham gia',
     unJoinGroupBuying: 'Rời mua chung',
     numberPeopleJoin: '{{value}} người đã tham gia mua chung',

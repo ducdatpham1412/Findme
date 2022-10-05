@@ -299,6 +299,7 @@ const MyListGroupBuying = (props: Props) => {
                     }}
                     decelerationRate="fast"
                     vertical={false}
+                    directionalLockEnabled
                 />
             );
         }

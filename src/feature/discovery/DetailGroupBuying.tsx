@@ -41,7 +41,7 @@ import ROOT_SCREEN from 'navigation/config/routes';
 import {appAlert, goBack} from 'navigation/NavigationService';
 import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {useEffect, useRef, useState} from 'react';
-import {Platform, ScrollView, View} from 'react-native';
+import {Platform, ScrollView, StyleSheet, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {Modalize} from 'react-native-modalize';
 import Share from 'react-native-share';
@@ -62,6 +62,7 @@ import {
     isTimeBefore,
 } from 'utility/format';
 import {I18Normalize} from 'utility/I18Next';
+import {BlurView} from '@react-native-community/blur';
 import ModalPeopleJoined from './components/ModalPeopleJoined';
 
 interface Props {
@@ -849,16 +850,14 @@ const DetailGroupBuying = ({route}: Props) => {
                 {Content()}
             </ScrollView>
 
-            <StyleTouchable
-                customStyle={[
-                    styles.iconBackView,
-                    {backgroundColor: theme.backgroundColor},
-                ]}
-                onPress={goBack}>
-                <Ionicons
-                    name="arrow-back"
-                    style={[styles.iconBack, {color: theme.textColor}]}
+            <StyleTouchable customStyle={styles.iconBackView} onPress={goBack}>
+                <BlurView
+                    style={StyleSheet.absoluteFill}
+                    blurType="light"
+                    blurAmount={3}
+                    blurRadius={20}
                 />
+                <Ionicons name="arrow-back" style={styles.iconBack} />
             </StyleTouchable>
 
             {!isModeExp && (
@@ -926,10 +925,11 @@ const styles = ScaledSheet.create({
         left: '10@s',
         top: Metrics.safeTopPadding,
         padding: '5@ms',
-        borderRadius: '20@ms',
+        borderRadius: '15@ms',
     },
     iconBack: {
         fontSize: '20@ms',
+        color: Theme.common.white,
     },
     avatar: {
         borderRadius: '30@s',

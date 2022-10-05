@@ -1,5 +1,6 @@
 import {POST_TYPE, TOPIC} from 'asset/enum';
 import Images from 'asset/img/images';
+import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';
 import {TypeTheme} from 'asset/theme/Theme';
 import {StyleText, StyleTouchable} from 'components/base';
@@ -22,7 +23,7 @@ interface States {
     tempListPostTypes: Array<number>;
 }
 
-const containerHeight = verticalScale(170);
+const containerHeight = verticalScale(170) + Metrics.safeTopPadding;
 
 export default class HeaderFilterTopic extends Component<Props, States> {
     aim = new Animated.Value(0);
@@ -281,6 +282,7 @@ const styles = ScaledSheet.create({
         backgroundColor: 'red',
         borderBottomRightRadius: '15@ms',
         borderBottomLeftRadius: '15@ms',
+        paddingTop: Metrics.safeTopPadding,
     },
     title: {
         fontSize: FONT_SIZE.small,

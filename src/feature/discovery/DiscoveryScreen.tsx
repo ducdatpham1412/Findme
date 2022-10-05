@@ -5,7 +5,6 @@ import {apiGetListBubbleActive} from 'api/module';
 import {apiLikePost, apiUnLikePost} from 'api/post';
 import {POST_TYPE, TOPIC, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
-import {Metrics} from 'asset/metrics';
 import {StyleIcon} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
@@ -16,14 +15,15 @@ import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {DISCOVERY_ROUTE} from 'navigation/config/routes';
 import {appAlert, goBack, navigate} from 'navigation/NavigationService';
 import {showCommentDiscovery} from 'navigation/screen/MainTabs';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {onGoToSignUp} from 'utility/assistant';
 import {useNotification} from 'utility/notification';
 import Bubble from './components/Bubble';
 import BubbleGroupBuying, {ParamsLikeGB} from './components/BubbleGroupBuying';
-import HeaderDoffy, {headerDoffyHeight} from './components/HeaderDoffy';
+import HeaderDoffy from './components/HeaderDoffy';
+import ListTopGroupBuying from './components/ListTopGroupBuying';
 import HeaderFilterTopic from './HeaderFilterTopic';
 
 export interface TypeMoreOptionsMe {
@@ -31,8 +31,6 @@ export interface TypeMoreOptionsMe {
 }
 
 let modalOptions: TypeBubblePalace | TypeGroupBuying;
-
-let oldOffset = 0;
 
 const onGoToSignUpFromAlert = () => {
     goBack();
@@ -45,7 +43,6 @@ const DiscoveryScreen = () => {
     const listRef = useRef<FlatList>(null);
     const optionsRef = useRef<any>(null);
     const headerFilterRef = useRef<HeaderFilterTopic>(null);
-    const headerDoffyRef = useRef<HeaderDoffy>(null);
 
     const theme = Redux.getTheme();
     const token = Redux.getToken();
@@ -257,20 +254,14 @@ const DiscoveryScreen = () => {
         return null;
     };
 
-    const OverLayTop = useMemo(() => {
-        return (
-            <View
-                style={[
-                    styles.overlayView,
-                    {backgroundColor: theme.backgroundColor},
-                ]}
-            />
-        );
-    }, [theme.backgroundColor]);
-
     return (
         <>
             <ViewSafeTopPadding />
+
+            <HeaderDoffy
+                theme={theme}
+                onPressFilter={() => headerFilterRef.current?.show()}
+            />
 
             <View
                 style={[
@@ -285,47 +276,14 @@ const DiscoveryScreen = () => {
                     refreshing={refreshing}
                     onRefresh={onRefresh}
                     onLoadMore={onLoadMore}
-                    ListHeaderComponent={
-                        <View style={{height: headerDoffyHeight}} />
-                    }
                     ListEmptyComponent={EmptyView}
+                    ListHeaderComponent={ListTopGroupBuying}
                     ListFooterComponent={FooterComponent}
                     ListFooterComponentStyle={{
                         backgroundColor: theme.backgroundColor,
                         paddingVertical: 20,
                     }}
                     maxToRenderPerBatch={20}
-                    onScroll={e => {
-                        const currentOffset = e.nativeEvent.contentOffset.y;
-                        if (currentOffset <= 0) {
-                            headerDoffyRef.current?.show();
-                            oldOffset = currentOffset;
-                            return;
-                        }
-                        const distance = currentOffset - oldOffset;
-                        if (distance > 75) {
-                            headerDoffyRef.current?.hide();
-                            oldOffset = currentOffset;
-                        } else if (distance < -75) {
-                            headerDoffyRef.current?.show();
-                            oldOffset = currentOffset;
-                        }
-                    }}
-                    // removeClippedSubviews
-                />
-
-                <HeaderDoffy
-                    ref={headerDoffyRef}
-                    theme={theme}
-                    onPressFilter={() => headerFilterRef.current?.show()}
-                />
-                <HeaderFilterTopic
-                    ref={headerFilterRef}
-                    listTopics={listTopics}
-                    listPostTypes={postTypes}
-                    theme={theme}
-                    onChangeTopic={list => setListTopics(list)}
-                    onChangePostType={list => setPostTypes(list)}
                 />
 
                 <StyleActionSheet
@@ -342,16 +300,6 @@ const DiscoveryScreen = () => {
                                 }
                             },
                         },
-                        // {
-                        //     text: 'discovery.seeDetailImage',
-                        //     action: () => {
-                        //         seeDetailImage({
-                        //             images: modalOptions.imageWantToSee.map(
-                        //                 url => url,
-                        //             ),
-                        //         });
-                        //     },
-                        // },
                         {
                             text: 'common.cancel',
                             action: () => null,
@@ -360,7 +308,14 @@ const DiscoveryScreen = () => {
                 />
             </View>
 
-            {OverLayTop}
+            <HeaderFilterTopic
+                ref={headerFilterRef}
+                listTopics={listTopics}
+                listPostTypes={postTypes}
+                theme={theme}
+                onChangeTopic={list => setListTopics(list)}
+                onChangePostType={list => setPostTypes(list)}
+            />
         </>
     );
 };
@@ -368,12 +323,6 @@ const DiscoveryScreen = () => {
 const styles = ScaledSheet.create({
     container: {
         flex: 1,
-    },
-    overlayView: {
-        position: 'absolute',
-        width: '100%',
-        height: Metrics.safeTopPadding,
-        top: 0,
     },
 });
 export default DiscoveryScreen;
