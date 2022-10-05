@@ -1,14 +1,14 @@
 import {yupResolver} from '@hookform/resolvers/yup';
 import {apiChangePassword} from 'api/module';
+import {FONT_SIZE} from 'asset/standardValue';
 import {StyleButton, StyleInputForm} from 'components/base';
 import Redux from 'hook/useRedux';
 import {appAlert} from 'navigation/NavigationService';
 import React, {memo, useEffect, useRef, useState} from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
 import {useTranslation} from 'react-i18next';
-import {Animated} from 'react-native';
+import {Animated, Platform} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
-import {isIOS} from 'utility/assistant';
 import FindmeAsyncStorage from 'utility/FindmeAsyncStorage';
 import {yupValidate} from 'utility/validate';
 import * as yup from 'yup';
@@ -125,9 +125,14 @@ const ChangingPassword = ({isOpening}: Props) => {
                     placeholderTextColor={theme.holderColor}
                     containerStyle={[
                         styles.moduleInput,
-                        {borderColor: theme.borderColor},
+                        {
+                            borderColor: theme.borderColor,
+                        },
                     ]}
-                    inputStyle={styles.inputStyle}
+                    inputStyle={[
+                        styles.inputStyle,
+                        {color: theme.textHightLight},
+                    ]}
                     hasErrorBox={false}
                     onSubmitEditing={() => ref_newPassword.current.focus()}
                     secureTextEntry
@@ -142,7 +147,10 @@ const ChangingPassword = ({isOpening}: Props) => {
                         styles.moduleInput,
                         {borderColor: theme.borderColor},
                     ]}
-                    inputStyle={styles.inputStyle}
+                    inputStyle={[
+                        styles.inputStyle,
+                        {color: theme.textHightLight},
+                    ]}
                     hasErrorBox={false}
                     onSubmitEditing={() => ref_passwordCf.current.focus()}
                     secureTextEntry
@@ -157,7 +165,10 @@ const ChangingPassword = ({isOpening}: Props) => {
                         styles.moduleInput,
                         {borderColor: theme.borderColor},
                     ]}
-                    inputStyle={styles.inputStyle}
+                    inputStyle={[
+                        styles.inputStyle,
+                        {color: theme.textHightLight},
+                    ]}
                     hasErrorBox={false}
                     returnKeyType="done"
                     secureTextEntry
@@ -183,10 +194,12 @@ const styles = ScaledSheet.create({
     },
     moduleInput: {
         width: '100%',
-        borderWidth: 0.5,
-        borderRadius: '20@s',
+        borderWidth: Platform.select({
+            ios: '0.25@ms',
+            android: '0.5@ms',
+        }),
+        borderRadius: '10@ms',
         marginVertical: '5@vs',
-        paddingVertical: isIOS ? '10@vs' : 0,
     },
     buttonConfirm: {
         marginVertical: '15@vs',
@@ -197,8 +210,11 @@ const styles = ScaledSheet.create({
         fontSize: '14@ms',
     },
     inputStyle: {
-        fontSize: '14@ms',
-        paddingHorizontal: '17@s',
+        fontSize: FONT_SIZE.normal,
+        paddingHorizontal: '10@s',
+        backgroundColor: 'transparent',
+        paddingTop: '7@vs',
+        paddingBottom: '7@vs',
     },
 });
 

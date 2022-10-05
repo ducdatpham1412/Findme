@@ -1,3 +1,4 @@
+import {FONT_SIZE} from 'asset/standardValue';
 import {StyleText} from 'components/base';
 import Redux from 'hook/useRedux';
 import React, {ReactNode} from 'react';
@@ -42,7 +43,7 @@ const styles = ScaledSheet.create({
         justifyContent: 'center',
     },
     textHeader: {
-        fontSize: '15@ms',
+        fontSize: FONT_SIZE.normal,
     },
     iconView: {
         position: 'absolute',
