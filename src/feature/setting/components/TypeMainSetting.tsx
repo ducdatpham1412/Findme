@@ -1,3 +1,4 @@
+import {FONT_SIZE} from 'asset/standardValue';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import React from 'react';
@@ -80,7 +81,7 @@ const styles = ScaledSheet.create({
         marginRight: '10@s',
     },
     text: {
-        fontSize: '15@ms',
+        fontSize: FONT_SIZE.normal,
     },
 });
 
