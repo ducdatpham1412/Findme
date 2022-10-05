@@ -1,41 +1,18 @@
 import Images from 'asset/img/images';
 import Redux from 'hook/useRedux';
-import React, {useEffect, useRef} from 'react';
-import {Animated, Easing, StyleSheet, View} from 'react-native';
-import {StyleImage} from './base';
+import LottieView from 'lottie-react-native';
+import React from 'react';
+import {StyleSheet, View} from 'react-native';
+import {ScaledSheet} from 'react-native-size-matters';
 
 interface Props {
     hasLogo?: boolean;
     opacityBackground?: number;
 }
 
-let x: any;
-
 const LoadingScreen = (props: Props) => {
-    const aim = useRef(new Animated.Value(0.5)).current;
     const {hasLogo = true, opacityBackground = 0.9} = props;
     const theme = Redux.getTheme();
-
-    const movingLogo = () => {
-        x = setInterval(() => {
-            Animated.timing(aim, {
-                toValue: 1,
-                duration: 890,
-                useNativeDriver: true,
-                easing: Easing.circle,
-            }).start(() => aim.setValue(0.5));
-        }, 900);
-        return () => clearInterval(x);
-    };
-
-    useEffect(() => {
-        movingLogo();
-    }, []);
-
-    // const spin = aim.interpolate({
-    //     inputRange: [0, 1],
-    //     outputRange: ['0deg', '360deg'],
-    // });
 
     return (
         <View
@@ -47,23 +24,27 @@ const LoadingScreen = (props: Props) => {
                 },
             ]}>
             {hasLogo && (
-                <Animated.View
-                    style={{
-                        // transform: [{rotate: spin}],
-                        opacity: aim,
-                    }}>
-                    <StyleImage source={Images.icons.logo} />
-                </Animated.View>
+                <LottieView
+                    source={Images.images.loadingPlane}
+                    style={styles.iconFly}
+                    autoPlay
+                    loop
+                    speed={1}
+                />
             )}
         </View>
     );
 };
 
-const styles = StyleSheet.create({
+const styles = ScaledSheet.create({
     container: {
         ...StyleSheet.absoluteFillObject,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    iconFly: {
+        width: '150@ms',
+        height: '150@ms',
     },
 });
 

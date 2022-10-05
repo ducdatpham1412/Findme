@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {
     apiGetListPeopleJoined,
@@ -47,7 +48,12 @@ import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SharedElement} from 'react-navigation-shared-element';
-import {fakeGroupBuying, onGoToProfile, onGoToSignUp} from 'utility/assistant';
+import {
+    fakeGroupBuying,
+    modeExpUsePaging,
+    onGoToProfile,
+    onGoToSignUp,
+} from 'utility/assistant';
 import {
     formatDayFromNow,
     formatDayGroupBuying,
@@ -220,13 +226,15 @@ const DetailGroupBuying = ({route}: Props) => {
 
     const [item, setItem] = useState(route.params?.item || fakeGroupBuying);
 
-    const listJoinedPaging = usePaging({
-        request: apiGetListPeopleJoined,
-        params: {
-            postId: item.id || route.params?.itemId,
-            take: 10,
-        },
-    });
+    const listJoinedPaging: any = !isModeExp
+        ? usePaging({
+              request: apiGetListPeopleJoined,
+              params: {
+                  postId: item.id || route.params?.itemId,
+                  take: 10,
+              },
+          })
+        : modeExpUsePaging();
 
     const [isLiked, setIsLiked] = useState(item.isLiked);
     const [totalLikes, setTotalLikes] = useState(item.totalLikes);
@@ -239,6 +247,9 @@ const DetailGroupBuying = ({route}: Props) => {
 
     useEffect(() => {
         const getData = async () => {
+            if (isModeExp) {
+                return;
+            }
             if (route.params.itemId) {
                 try {
                     const res = await apiGetDetailBubble(route.params.itemId);
@@ -247,14 +258,14 @@ const DetailGroupBuying = ({route}: Props) => {
                     setIsLiked(data.isLiked);
                     setTotalLikes(data.totalLikes);
                     setTotalJoined(data.totalJoins);
-                    setStatus(item.status);
+                    setStatus(data.status);
                 } catch (err) {
                     appAlert(err);
                 }
             }
         };
         getData();
-    }, []);
+    }, [isModeExp]);
 
     const onShowModalComment = (type: TypeShowModalCommentOrLike) => {
         if (isModeExp) {
@@ -279,6 +290,9 @@ const DetailGroupBuying = ({route}: Props) => {
     };
 
     const onJoinGroupBuying = async () => {
+        if (isModeExp) {
+            return;
+        }
         const oldStatus = status;
         const oldListPeopleJoined = [...listJoinedPaging.list];
         try {
@@ -445,8 +459,8 @@ const DetailGroupBuying = ({route}: Props) => {
                     titleColor={theme.textHightLight}
                 />
                 <View style={styles.pricesView}>
-                    {item.prices.map(price => (
-                        <View key={price.number_people} style={styles.priceBox}>
+                    {item.prices.map((price, index) => (
+                        <View key={index} style={styles.priceBox}>
                             <StyleText
                                 i18Text="discovery.numberPeople"
                                 i18Params={{
@@ -647,7 +661,7 @@ const DetailGroupBuying = ({route}: Props) => {
                     onPress={() => modalJoinedRef.current?.open()}>
                     {displayPeople.map((peopleJoin, index) => (
                         <StyleImage
-                            key={peopleJoin.id}
+                            key={index}
                             source={{uri: peopleJoin.creatorAvatar}}
                             customStyle={[
                                 styles.peopleJoinAvatar,
@@ -847,12 +861,14 @@ const DetailGroupBuying = ({route}: Props) => {
                 />
             </StyleTouchable>
 
-            <ModalPeopleJoined
-                ref={modalJoinedRef}
-                postId={item.id}
-                listPaging={listJoinedPaging}
-                isMyBubble={isMyBubble}
-            />
+            {!isModeExp && (
+                <ModalPeopleJoined
+                    ref={modalJoinedRef}
+                    postId={item.id}
+                    listPaging={listJoinedPaging}
+                    isMyBubble={isMyBubble}
+                />
+            )}
 
             <ModalCommentLike
                 ref={modalCommentLikeRef}
