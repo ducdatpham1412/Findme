@@ -46,6 +46,7 @@ const Images = {
         dollar: require('./ic_dollar.png'),
         deadline: require('./ic_deadline.png'),
         star: require('./ic_star.png'),
+        loading: require('./ic_loading.json'),
     },
     images: {
         logo: require('./img_logo.png'),
@@ -63,6 +64,7 @@ const Images = {
         // discovery
         defaultImage: require('./img_default_image.png'),
         defaultAvatar: require('./img_default_avatar.png'),
+        loadingPlane: require('./img_loading_plane.json'),
     },
 };
 

@@ -145,14 +145,6 @@ export const apiGetListBubbleActive = ({
     });
 };
 
-export const apiGetListBubbleActiveOfUserEnjoy = ({
-    params,
-}: TypeParamsPaging): Promise<TypeBubblePalace> => {
-    return request.get('/common/get-list-bubble-profile-enjoy', {
-        params,
-    });
-};
-
 export const apiGetDetailBubble = (
     idBubble: string,
 ): Promise<{

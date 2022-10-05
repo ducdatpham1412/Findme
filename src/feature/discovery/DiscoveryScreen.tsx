@@ -1,10 +1,7 @@
 /* eslint-disable no-shadow */
 import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
-import {
-    apiGetListBubbleActive,
-    apiGetListBubbleActiveOfUserEnjoy,
-} from 'api/module';
+import {apiGetListBubbleActive} from 'api/module';
 import {apiLikePost, apiUnLikePost} from 'api/post';
 import {POST_TYPE, TOPIC, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
@@ -57,12 +54,6 @@ const DiscoveryScreen = () => {
 
     const hadLogan = token && !isModeExp;
 
-    const selectedApi = useMemo(() => {
-        return token
-            ? apiGetListBubbleActive
-            : apiGetListBubbleActiveOfUserEnjoy;
-    }, [token]);
-
     const [listTopics, setListTopics] = useState<Array<number>>([
         TOPIC.travel,
         TOPIC.cuisine,
@@ -83,7 +74,7 @@ const DiscoveryScreen = () => {
         onRefresh,
         noMore,
     } = usePaging({
-        request: selectedApi,
+        request: apiGetListBubbleActive,
         params: {
             take: 30,
             topics: undefined,
