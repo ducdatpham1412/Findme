@@ -1,6 +1,7 @@
 import {apiGetTopGroupBuying} from 'api/discovery';
 import {TypeGroupBuying} from 'api/interface';
 import {Metrics} from 'asset/metrics';
+import {FONT_SIZE} from 'asset/standardValue';
 import {StyleText} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import ItemGroupBuying from 'feature/common/components/ItemGroupBuying';
@@ -69,14 +70,16 @@ const styles = ScaledSheet.create({
         width: '100%',
     },
     title: {
-        fontSize: '20@ms',
+        fontSize: FONT_SIZE.big,
         fontWeight: 'bold',
         left: '10@s',
-        marginTop: '10@vs',
+        marginTop: '5@vs',
         marginBottom: '5@vs',
     },
     itemView: {
         marginHorizontal: '5@s',
+        marginTop: 0,
+        marginLeft: '2@vs',
     },
 });
 

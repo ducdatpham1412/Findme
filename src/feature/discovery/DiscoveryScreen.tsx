@@ -226,6 +226,7 @@ const DiscoveryScreen = () => {
                         onChangePostIdFocusing={postId =>
                             setPostIdFocusing(postId)
                         }
+                        detailGroupTarget={DISCOVERY_ROUTE.detailGroupBuying}
                     />
                 );
             }

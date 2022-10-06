@@ -1,3 +1,4 @@
+import {BlurView} from '@react-native-community/blur';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeGroupBuying} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
@@ -13,7 +14,7 @@ import {
     LANDING_PAGE_URL,
     ratioImageGroupBuying,
 } from 'asset/standardValue';
-import Theme from 'asset/theme/Theme';
+import Theme, {TypeTheme} from 'asset/theme/Theme';
 import {
     StyleIcon,
     StyleImage,
@@ -22,24 +23,18 @@ import {
 } from 'components/base';
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
-import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
 import {appAlert} from 'navigation/NavigationService';
 import React, {memo, useEffect, useState} from 'react';
 import isEqual from 'react-fast-compare';
-import {View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Share from 'react-native-share';
-import {ScaledSheet} from 'react-native-size-matters';
+import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SharedElement} from 'react-navigation-shared-element';
-import {chooseTextTopic, onGoToProfile} from 'utility/assistant';
-import {
-    formatDayGroupBuying,
-    formatFromNow,
-    formatLocaleNumber,
-} from 'utility/format';
+import {onGoToProfile} from 'utility/assistant';
+import {formatDayGroupBuying, formatLocaleNumber} from 'utility/format';
 import {TypeMoreOptionsMe} from '../DiscoveryScreen';
 
 export interface ParamsLikeGB {
@@ -60,6 +55,7 @@ interface Props {
         type: TypeShowModalCommentOrLike,
     ): void;
     onChangePostIdFocusing(postId: string): void;
+    detailGroupTarget: string;
 }
 
 const onShowModalShare = async (
@@ -119,6 +115,80 @@ const onShowModalShare = async (
     }
 };
 
+const {width} = Metrics;
+
+const CustomBlurView = () => {
+    return (
+        <BlurView
+            style={styles.blurView}
+            blurType="ultraThinMaterialLight"
+            blurAmount={0}
+            blurRadius={1}
+            reducedTransparencyFallbackColor="white"
+        />
+    );
+};
+
+const ButtonCheckJoined = (item: TypeGroupBuying, theme: TypeTheme) => {
+    if (item.relationship === RELATIONSHIP.self) {
+        return null;
+    }
+    if (item.status === GROUP_BUYING_STATUS.bought) {
+        return (
+            <LinearGradient
+                style={styles.boughtBox}
+                colors={[
+                    Theme.common.commentGreen,
+                    Theme.common.gradientTabBar2,
+                ]}>
+                <Entypo name="check" style={styles.iconBought} />
+                <StyleText
+                    i18Text="discovery.bought"
+                    customStyle={styles.textBought}
+                />
+            </LinearGradient>
+        );
+    }
+    if (
+        [
+            GROUP_BUYING_STATUS.notJoined,
+            GROUP_BUYING_STATUS.joinedNotBought,
+        ].includes(item.status)
+    ) {
+        const isJoined = item.status === GROUP_BUYING_STATUS.joinedNotBought;
+        return (
+            <View
+                style={[
+                    styles.joinGroupBuyingBox,
+                    {
+                        backgroundColor: isJoined
+                            ? theme.highlightColor
+                            : theme.backgroundButtonColor,
+                    },
+                ]}>
+                <StyleText
+                    i18Text={
+                        isJoined
+                            ? 'discovery.joined'
+                            : 'discovery.joinGroupBuying'
+                    }
+                    customStyle={[
+                        styles.textTellJoin,
+                        {
+                            color: isJoined
+                                ? theme.backgroundColor
+                                : theme.textHightLight,
+                            fontWeight: isJoined ? 'bold' : 'normal',
+                        },
+                    ]}
+                />
+            </View>
+        );
+    }
+
+    return null;
+};
+
 const BubbleGroupBuying = (props: Props) => {
     const {
         item,
@@ -142,56 +212,48 @@ const BubbleGroupBuying = (props: Props) => {
         setTotalLikes(item.totalLikes);
     }, [item.totalLikes]);
 
-    const Header = () => {
-        return (
-            <View style={styles.headerView}>
-                <View style={styles.avatarNameOptionBox}>
+    const lastPrice = item.prices[item.prices.length - 1];
+
+    return (
+        <StyleTouchable
+            key={item.id}
+            style={[
+                styles.itemView,
+                {
+                    backgroundColor: theme.backgroundColor,
+                    shadowColor: theme.borderColor,
+                },
+            ]}
+            onPress={() => onGoToDetailGroupBuying(item)}
+            onTouchEnd={() => onChangePostIdFocusing(item.id)}>
+            {/* Image preview */}
+            <SharedElement
+                style={styles.imagePreview}
+                id={`item.group_buying.${item.id}`}>
+                <StyleImage
+                    source={{uri: item.images[0]}}
+                    customStyle={styles.imagePreview}
+                />
+
+                <View style={styles.topView}>
                     <StyleTouchable
-                        customStyle={styles.avatarFeeling}
+                        customStyle={styles.creatorView}
                         onPress={() => onGoToProfile(item.creator)}>
-                        <StyleImage
+                        <CustomBlurView />
+                        <StyleIcon
                             source={{uri: item.creatorAvatar}}
+                            size={20}
                             customStyle={styles.avatar}
+                        />
+                        <StyleText
+                            originValue={item.creatorName}
+                            numberOfLines={1}
+                            customStyle={styles.textName}
                         />
                     </StyleTouchable>
 
-                    <View style={styles.nameTime}>
-                        <StyleText
-                            originValue={item.creatorName}
-                            customStyle={[
-                                styles.textName,
-                                {color: theme.textHightLight},
-                            ]}
-                        />
-                        <StyleText
-                            originValue={formatFromNow(item.created)}
-                            customStyle={[
-                                styles.textCreated,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                    </View>
-
-                    {item.topic.map(topic => (
-                        <StyleText
-                            key={topic}
-                            originValue="   ・ "
-                            customStyle={[
-                                styles.textTopic,
-                                {color: theme.textColor},
-                            ]}>
-                            <StyleText
-                                i18Text={chooseTextTopic(topic)}
-                                customStyle={[
-                                    styles.textTopic,
-                                    {color: theme.textColor},
-                                ]}
-                            />
-                        </StyleText>
-                    ))}
-
                     <StyleTouchable
-                        customStyle={styles.iconMore}
+                        customStyle={styles.iconMoreView}
                         onPress={() =>
                             onShowMoreOption({
                                 postModal: item,
@@ -201,240 +263,162 @@ const BubbleGroupBuying = (props: Props) => {
                         <StyleIcon
                             source={Images.icons.more}
                             size={15}
-                            customStyle={{tintColor: theme.textHightLight}}
+                            customStyle={styles.iconMore}
                         />
                     </StyleTouchable>
                 </View>
 
-                {!!item.creatorLocation && (
-                    <View style={styles.locationBox}>
-                        <Ionicons
-                            name="ios-location-sharp"
-                            style={[
-                                styles.iconLocationCaption,
-                                {color: Theme.common.commentGreen},
+                <View style={styles.bottomView}>
+                    <View style={styles.bottomLeft}>
+                        <View style={styles.numberJoinedBox}>
+                            <CustomBlurView />
+                            <StyleIcon
+                                source={Images.icons.createGroup}
+                                size={15}
+                                customStyle={styles.iconNumberPeople}
+                            />
+                            <StyleText
+                                originValue={item.totalJoins}
+                                customStyle={styles.textNumberPeople}
+                            />
+                        </View>
+
+                        <View style={styles.locationBox}>
+                            <CustomBlurView />
+                            <Entypo
+                                name="location-pin"
+                                style={styles.iconLocation}
+                            />
+                            <StyleText
+                                originValue={item.creatorLocation}
+                                customStyle={styles.textLocation}
+                                numberOfLines={1}
+                            />
+                        </View>
+                    </View>
+
+                    <View style={styles.leftRight}>
+                        <StyleTouchable
+                            customStyle={styles.contractBox}
+                            onPress={() => onShowModalComment(item, 'comment')}>
+                            <CustomBlurView />
+                            <StyleIcon
+                                source={Images.icons.comment}
+                                size={14}
+                                customStyle={{tintColor: Theme.common.white}}
+                            />
+                        </StyleTouchable>
+                        <StyleTouchable
+                            customStyle={styles.contractBox}
+                            disableOpacity={0.85}
+                            onPress={() =>
+                                onShowModalShare(item, setDisableShare)
+                            }
+                            disable={disableShare}>
+                            <CustomBlurView />
+                            <StyleIcon
+                                source={Images.icons.share}
+                                size={15}
+                                customStyle={{tintColor: Theme.common.white}}
+                            />
+                        </StyleTouchable>
+                    </View>
+                </View>
+            </SharedElement>
+
+            {/* Content */}
+            {!!item.content && (
+                <StyleText
+                    originValue={item.content}
+                    customStyle={[
+                        styles.textContent,
+                        {color: theme.textHightLight},
+                    ]}
+                    numberOfLines={1}
+                />
+            )}
+
+            <View style={styles.contentView}>
+                <View style={{flex: 1}}>
+                    <View style={styles.infoView}>
+                        <StyleIcon source={Images.icons.deadline} size={15} />
+                        <StyleText
+                            originValue={formatDayGroupBuying(
+                                item.deadlineDate,
+                            )}
+                            customStyle={[
+                                styles.textInfo,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                    </View>
+                    <View style={styles.infoView}>
+                        <StyleIcon source={Images.icons.dollar} size={15} />
+                        <StyleText
+                            originValue={`${lastPrice.number_people}`}
+                            customStyle={[
+                                styles.textInfo,
+                                {color: theme.borderColor},
                             ]}
                         />
                         <StyleText
-                            originValue={item.creatorLocation}
+                            originValue=" - "
                             customStyle={[
-                                styles.textLocation,
+                                styles.textInfo,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                        <StyleText
+                            originValue={`${formatLocaleNumber(
+                                lastPrice.value,
+                            )}vnd`}
+                            customStyle={[
+                                styles.textInfo,
                                 {color: theme.highlightColor},
                             ]}
                         />
                     </View>
-                )}
+                </View>
+                {ButtonCheckJoined(item, theme)}
+            </View>
 
-                {item.content ? (
-                    <StyleMoreText
-                        value={item.content}
-                        textStyle={[
-                            styles.textCaption,
-                            {color: theme.textColor},
+            {/* Footer */}
+            <View style={styles.footerView}>
+                {isLiked ? (
+                    <IconLiked
+                        customStyle={[
+                            styles.iconLike,
+                            {color: theme.likeHeart},
                         ]}
-                        containerStyle={styles.captionBox}
-                        maxRows={3}
+                        touchableStyle={styles.touchIconLike}
+                        onPress={() =>
+                            onHandleLike({
+                                isLiked,
+                                setIsLiked,
+                                totalLikes,
+                                setTotalLikes,
+                                postId: item.id,
+                            })
+                        }
                     />
                 ) : (
-                    <View style={styles.spaceCaption} />
-                )}
-            </View>
-        );
-    };
-
-    const PriceAndTotalJoins = () => {
-        const isBiggerThanThree = item.prices.length > 3;
-        const displayPrices = isBiggerThanThree
-            ? item.prices.slice(0, 3)
-            : item.prices;
-        return (
-            <View style={styles.linearOverlay}>
-                <LinearGradient
-                    style={[styles.linearOverlay, {opacity: 0.7}]}
-                    colors={['black', 'transparent']}
-                    start={{x: 0, y: 1}}
-                    end={{x: 0.8, y: 1}}
-                />
-                <View style={styles.priceView}>
-                    <StyleIcon source={Images.icons.dollar} size={12} />
-                    <View>
-                        {displayPrices.map((price, index) => (
-                            <View key={index} style={styles.priceBox}>
-                                <StyleText
-                                    originValue={price.number_people}
-                                    customStyle={styles.textNumberPeople}
-                                />
-                                <StyleText
-                                    originValue="-"
-                                    customStyle={styles.dash}
-                                />
-                                <StyleText
-                                    originValue={`${formatLocaleNumber(
-                                        price.value,
-                                    )}vnd`}
-                                    customStyle={styles.textPrice}
-                                />
-                            </View>
-                        ))}
-                    </View>
-                </View>
-                <View style={styles.priceView}>
-                    <StyleIcon source={Images.icons.deadline} size={14} />
-                    <StyleText
-                        originValue={formatDayGroupBuying(item.deadlineDate)}
-                        customStyle={styles.textDeadline}
-                    />
-                </View>
-
-                {isBiggerThanThree && (
-                    <View style={styles.priceBox}>
-                        <StyleText
-                            originValue="..."
-                            customStyle={styles.textNumberPeople}
-                        />
-                    </View>
-                )}
-                <View style={styles.peopleJoinBox}>
-                    <StyleIcon
-                        source={Images.icons.createGroup}
-                        size={20}
-                        customStyle={styles.iconJoined}
-                    />
-                    {!!item.totalJoins && (
-                        <StyleText
-                            originValue={item.totalJoins}
-                            customStyle={styles.textJoined}
-                        />
-                    )}
-                </View>
-            </View>
-        );
-    };
-
-    const ButtonCheckJoined = () => {
-        if (item.relationship === RELATIONSHIP.self) {
-            return null;
-        }
-        if (item.status === GROUP_BUYING_STATUS.bought) {
-            return (
-                <LinearGradient
-                    style={styles.boughtBox}
-                    colors={[
-                        Theme.common.commentGreen,
-                        Theme.common.gradientTabBar2,
-                    ]}>
-                    <Entypo name="check" style={styles.iconBought} />
-                    <StyleText
-                        i18Text="discovery.bought"
-                        customStyle={styles.textBought}
-                    />
-                </LinearGradient>
-            );
-        }
-        if (
-            [
-                GROUP_BUYING_STATUS.notJoined,
-                GROUP_BUYING_STATUS.joinedNotBought,
-            ].includes(item.status)
-        ) {
-            const isJoined =
-                item.status === GROUP_BUYING_STATUS.joinedNotBought;
-            return (
-                <StyleTouchable
-                    customStyle={[
-                        styles.joinGroupBuyingBox,
-                        {
-                            backgroundColor: isJoined
-                                ? theme.highlightColor
-                                : theme.backgroundButtonColor,
-                        },
-                    ]}
-                    onPress={() => onGoToDetailGroupBuying(item)}>
-                    <StyleText
-                        i18Text={
-                            isJoined
-                                ? 'discovery.joined'
-                                : 'discovery.joinGroupBuying'
-                        }
+                    <IconNotLiked
                         customStyle={[
-                            styles.textTellJoin,
-                            {
-                                color: isJoined
-                                    ? theme.backgroundColor
-                                    : theme.textHightLight,
-                                fontWeight: isJoined ? 'bold' : 'normal',
-                            },
+                            styles.iconLike,
+                            {color: theme.borderColor},
                         ]}
+                        touchableStyle={styles.touchIconLike}
+                        onPress={() =>
+                            onHandleLike({
+                                isLiked,
+                                setIsLiked,
+                                totalLikes,
+                                setTotalLikes,
+                                postId: item.id,
+                            })
+                        }
                     />
-                </StyleTouchable>
-            );
-        }
-        return null;
-    };
-
-    const Footer = () => {
-        return (
-            <View style={styles.footerView}>
-                <View style={styles.likeCommentShareSave}>
-                    {isLiked ? (
-                        <IconLiked
-                            customStyle={[
-                                styles.iconLike,
-                                {color: theme.likeHeart},
-                            ]}
-                            onPress={() =>
-                                onHandleLike({
-                                    isLiked,
-                                    setIsLiked,
-                                    totalLikes,
-                                    setTotalLikes,
-                                    postId: item.id,
-                                })
-                            }
-                            touchableStyle={styles.touchIconLike}
-                        />
-                    ) : (
-                        <IconNotLiked
-                            customStyle={[
-                                styles.iconLike,
-                                {color: theme.textHightLight},
-                            ]}
-                            onPress={() =>
-                                onHandleLike({
-                                    isLiked,
-                                    setIsLiked,
-                                    totalLikes,
-                                    setTotalLikes,
-                                    postId: item.id,
-                                })
-                            }
-                            touchableStyle={styles.touchIconLike}
-                        />
-                    )}
-
-                    <StyleTouchable
-                        customStyle={styles.iconComment}
-                        onPress={() => onShowModalComment(item, 'comment')}>
-                        <StyleIcon
-                            source={Images.icons.comment}
-                            size={20}
-                            customStyle={{tintColor: theme.textHightLight}}
-                        />
-                    </StyleTouchable>
-
-                    <StyleTouchable
-                        customStyle={styles.iconComment}
-                        onPress={() => onShowModalShare(item, setDisableShare)}
-                        disable={disableShare}>
-                        <StyleIcon
-                            source={Images.icons.share}
-                            size={21}
-                            customStyle={{tintColor: theme.textHightLight}}
-                        />
-                    </StyleTouchable>
-
-                    {ButtonCheckJoined()}
-                </View>
+                )}
 
                 <StyleTouchable
                     customStyle={styles.likeTouch}
@@ -450,7 +434,8 @@ const BubbleGroupBuying = (props: Props) => {
                                 postId: item.id,
                             });
                         }
-                    }}>
+                    }}
+                    hitSlop={{top: 10, bottom: 10}}>
                     <StyleText
                         i18Text={
                             totalLikes
@@ -462,14 +447,15 @@ const BubbleGroupBuying = (props: Props) => {
                         }}
                         customStyle={[
                             styles.textLike,
-                            {color: theme.textColor},
+                            {color: theme.borderColor},
                         ]}
                     />
                 </StyleTouchable>
 
                 <StyleTouchable
                     customStyle={styles.commentTouch}
-                    onPress={() => onShowModalComment(item, 'comment')}>
+                    onPress={() => onShowModalComment(item, 'comment')}
+                    hitSlop={{top: 10, bottom: 10}}>
                     <StyleText
                         i18Text={
                             item.totalComments
@@ -486,211 +472,185 @@ const BubbleGroupBuying = (props: Props) => {
                     />
                 </StyleTouchable>
             </View>
-        );
-    };
-
-    return (
-        <StyleTouchable
-            style={[styles.container, {backgroundColor: theme.backgroundColor}]}
-            onPress={() => onGoToDetailGroupBuying(item)}
-            onTouchEnd={() => onChangePostIdFocusing(item.id)}>
-            {Header()}
-
-            <SharedElement
-                style={styles.imageView}
-                id={`item.group_buying.${item.id}`}>
-                <StyleImage
-                    source={{
-                        uri: item.images[0],
-                    }}
-                    customStyle={styles.image}
-                    defaultSource={Images.images.defaultImage}
-                />
-                {PriceAndTotalJoins()}
-            </SharedElement>
-
-            {Footer()}
         </StyleTouchable>
     );
 };
 
 const styles = ScaledSheet.create({
-    container: {
+    itemView: {
+        width,
+        marginBottom: '8@vs',
+        borderRadius: '15@ms',
+        shadowOpacity: 0.1,
+        shadowOffset: {
+            height: moderateScale(1),
+            width: 0,
+        },
+    },
+    imagePreview: {
         width: '100%',
-        marginBottom: '5@vs',
-        paddingVertical: '10@vs',
+        borderTopLeftRadius: '15@ms',
+        borderTopRightRadius: '15@ms',
+        height: width * ratioImageGroupBuying,
+    },
+    creatorView: {
+        flexDirection: 'row',
         alignItems: 'center',
+        borderRadius: '20@ms',
     },
-    // header
-    headerView: {
-        width: '100%',
-        paddingHorizontal: '15@s',
+    blurView: {
+        ...StyleSheet.absoluteFillObject,
     },
-    avatarNameOptionBox: {
+    avatar: {
+        borderRadius: '30@ms',
+        marginLeft: '5@s',
+        marginVertical: '2@s',
+    },
+    textName: {
+        fontSize: FONT_SIZE.small,
+        fontWeight: 'bold',
+        color: Theme.common.white,
+        marginHorizontal: '5@s',
+    },
+    textCreated: {
+        fontSize: FONT_SIZE.small,
+        color: Theme.common.grayLight,
+    },
+    topView: {
+        position: 'absolute',
+        top: '7@s',
+        paddingHorizontal: '7@s',
+        flexDirection: 'row',
+        alignItems: 'center',
         width: '100%',
+    },
+    bottomView: {
+        position: 'absolute',
+        bottom: '7@s',
+        paddingHorizontal: '7@s',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    bottomLeft: {
         flexDirection: 'row',
         alignItems: 'center',
     },
-    avatarFeeling: {
-        width: '35@ms',
-        height: '35@ms',
+    numberJoinedBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: '20@ms',
+        overflow: 'hidden',
     },
-    avatar: {
-        width: '100%',
-        height: '100%',
-        borderRadius: '25@s',
+    iconNumberPeople: {
+        tintColor: Theme.common.white,
+        marginLeft: '5@s',
+        marginVertical: '2@s',
     },
-    feeling: {
-        position: 'absolute',
-        bottom: '-1@s',
-        left: '23@s',
-    },
-    nameTime: {
-        maxWidth: '50%',
-        marginLeft: '10@s',
-    },
-    textName: {
-        fontSize: '14@ms',
+    textNumberPeople: {
+        fontSize: FONT_SIZE.small,
         fontWeight: 'bold',
-    },
-    textCreated: {
-        fontSize: '10@ms',
-        marginTop: '2@vs',
-    },
-    textTopic: {
-        fontSize: '12@ms',
-    },
-    iconMore: {
-        position: 'absolute',
-        right: 0,
+        color: Theme.common.white,
+        marginHorizontal: '5@s',
     },
     locationBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: '15@vs',
+        marginLeft: '10@s',
+        maxWidth: '80%',
+        overflow: 'hidden',
+        borderRadius: '20@ms',
     },
-    iconLocationCaption: {
-        fontSize: '17@ms',
+    iconLocation: {
+        fontSize: '13@ms',
+        marginLeft: '5@s',
+        marginVertical: '2@s',
+        color: Theme.common.white,
     },
     textLocation: {
-        fontSize: '12@ms',
-        marginLeft: '2@s',
+        fontSize: FONT_SIZE.small,
+        color: Theme.common.white,
+        marginLeft: '3@s',
+        maxWidth: '80%',
     },
-    captionBox: {
-        marginVertical: '10@vs',
-    },
-    spaceCaption: {
-        height: '10@vs',
-    },
-    textCaption: {
-        fontSize: '14@ms',
-    },
-    // image preview
-    imageView: {
+    // content
+    contentView: {
         width: '100%',
+        flexDirection: 'row',
         alignItems: 'center',
     },
-    image: {
-        width: Metrics.width,
-        height: Metrics.width * ratioImageGroupBuying,
-        borderRadius: '5@ms',
+    textContent: {
+        fontSize: FONT_SIZE.small,
+        marginHorizontal: '10@s',
+        marginVertical: '5@vs',
     },
-    linearOverlay: {
-        position: 'absolute',
+    infoView: {
         width: '100%',
-        height: '100%',
-    },
-    priceView: {
         flexDirection: 'row',
-        marginLeft: '5@s',
+        paddingHorizontal: '10@s',
         marginVertical: '5@vs',
         alignItems: 'center',
     },
-    priceBox: {
-        flexDirection: 'row',
-        marginLeft: '5@s',
-        marginVertical: '2.5@vs',
-    },
-    textNumberPeople: {
-        width: '35@ms',
-        color: Theme.common.white,
-        fontWeight: 'bold',
+    textInfo: {
         fontSize: FONT_SIZE.small,
+        marginLeft: '8@s',
     },
-    dash: {
-        fontSize: FONT_SIZE.small,
-        color: Theme.common.white,
-    },
-    textPrice: {
-        color: Theme.common.white,
-        fontSize: FONT_SIZE.small,
-        marginLeft: '15@ms',
-    },
-    peopleJoinBox: {
-        position: 'absolute',
-        bottom: '5@vs',
-        left: '10@s',
+    boughtBox: {
+        marginRight: '10@s',
+        padding: '5@ms',
+        borderRadius: '20@ms',
         flexDirection: 'row',
         alignItems: 'center',
     },
-    iconJoined: {
-        tintColor: Theme.common.white,
+    iconBought: {
+        fontSize: '15@ms',
+        color: Theme.common.white,
     },
-    textJoined: {
-        fontSize: FONT_SIZE.normal,
+    textBought: {
+        fontSize: FONT_SIZE.small,
         fontWeight: 'bold',
         color: Theme.common.white,
-        marginLeft: '5@s',
+        marginHorizontal: '3@s',
     },
-    textDeadline: {
-        color: Theme.common.white,
-        fontSize: FONT_SIZE.small,
-        marginLeft: '5@s',
-    },
-    // footer
-    footerView: {
-        width: '100%',
-    },
-    textThisPostInDraft: {
-        fontSize: '12@ms',
-        marginTop: '10@vs',
-        alignSelf: 'center',
-    },
-    goToPostBox: {
+    joinGroupBuyingBox: {
+        marginRight: '5@s',
         paddingHorizontal: '10@s',
         paddingVertical: '5@vs',
-        borderRadius: '5@ms',
-        width: '50%',
+        borderRadius: '20@ms',
+    },
+    textTellJoin: {
+        fontSize: FONT_SIZE.small,
+    },
+    leftRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    contractBox: {
+        width: '33@ms',
+        height: '33@ms',
+        borderRadius: '20@ms',
+        marginLeft: '8@s',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: '5@vs',
-        alignSelf: 'center',
     },
-    textGoToPost: {
-        fontSize: '14@ms',
-        fontWeight: 'bold',
-    },
-    likeCommentShareSave: {
+    footerView: {
         width: '100%',
-        flexDirection: 'row',
-        marginTop: '15@vs',
+        flexDirection: 'row-reverse',
         alignItems: 'center',
-    },
-    touchIconLike: {
-        paddingLeft: '15@s',
-        paddingRight: '10@s',
+        marginTop: '5@vs',
+        marginBottom: '10@vs',
     },
     iconLike: {
-        fontSize: '23@ms',
+        fontSize: '30@ms',
     },
-    iconComment: {
-        paddingHorizontal: '10@s',
+    touchIconLike: {
+        paddingLeft: '10@s',
+        paddingRight: '10@s',
+        marginLeft: '10@s',
     },
     likeTouch: {
-        marginTop: '10@vs',
-        marginLeft: '15@s',
-        width: '100@s',
-        paddingVertical: '5@vs',
+        paddingLeft: '10@s',
     },
     textLike: {
         fontSize: '12@ms',
@@ -700,38 +660,17 @@ const styles = ScaledSheet.create({
         fontSize: '12@ms',
     },
     commentTouch: {
-        paddingVertical: '5@vs',
-        width: '50%',
-        marginLeft: '15@s',
+        paddingLeft: '10@s',
     },
-    joinGroupBuyingBox: {
+    iconMoreView: {
         position: 'absolute',
-        right: '15@s',
-        paddingHorizontal: '20@s',
-        paddingVertical: '5@vs',
-        borderRadius: '5@ms',
+        right: '10@s',
+        borderRadius: '10@ms',
+        backgroundColor: Theme.common.black,
     },
-    boughtBox: {
-        position: 'absolute',
-        right: '15@s',
-        padding: '5@ms',
-        backgroundColor: Theme.common.gradientTabBar2,
-        borderRadius: '20@ms',
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    iconBought: {
-        fontSize: '20@ms',
-        color: Theme.common.white,
-    },
-    textBought: {
-        fontSize: FONT_SIZE.small,
-        fontWeight: 'bold',
-        color: Theme.common.white,
+    iconMore: {
         marginHorizontal: '3@s',
-    },
-    textTellJoin: {
-        fontSize: FONT_SIZE.small,
+        tintColor: Theme.common.white,
     },
 });
 

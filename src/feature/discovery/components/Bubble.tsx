@@ -1,3 +1,4 @@
+import {BlurView} from '@react-native-community/blur';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeBubblePalace} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
@@ -16,6 +17,7 @@ import {
     DYNAMIC_LINK_ANDROID,
     DYNAMIC_LINK_IOS,
     DYNAMIC_LINK_SHARE,
+    FONT_SIZE,
     LANDING_PAGE_URL,
 } from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
@@ -28,19 +30,18 @@ import {
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
-import StyleMoreText from 'components/StyleMoreText';
 import Redux from 'hook/useRedux';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
 import {appAlert, goBack, navigate} from 'navigation/NavigationService';
 import {showPreviewLink} from 'navigation/screen/AppStack';
 import React, {memo, useEffect, useState} from 'react';
 import isEqual from 'react-fast-compare';
-import {View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import Share from 'react-native-share';
-import {ScaledSheet} from 'react-native-size-matters';
+import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
     chooseIconFeeling,
     chooseTextTopic,
@@ -208,6 +209,18 @@ const onShowModalShare = async (
     }
 };
 
+const CustomBlurView = () => {
+    return (
+        <BlurView
+            style={styles.blurView}
+            blurType="ultraThinMaterialLight"
+            blurAmount={0}
+            blurRadius={1}
+            reducedTransparencyFallbackColor="white"
+        />
+    );
+};
+
 const screenWidth = Metrics.width;
 
 const Bubble = (props: Props) => {
@@ -307,34 +320,14 @@ const Bubble = (props: Props) => {
                     </StyleTouchable>
                 </View>
 
-                {!!item.location && (
-                    <View style={styles.locationBox}>
-                        <Ionicons
-                            name="ios-location-sharp"
-                            style={[
-                                styles.iconLocationCaption,
-                                {color: Theme.common.commentGreen},
-                            ]}
-                        />
-                        <StyleText
-                            originValue={item.location}
-                            customStyle={[
-                                styles.textLocation,
-                                {color: theme.highlightColor},
-                            ]}
-                        />
-                    </View>
-                )}
-
                 {item.content ? (
-                    <StyleMoreText
-                        value={item.content}
-                        textStyle={[
+                    <StyleText
+                        originValue={item.content}
+                        customStyle={[
                             styles.textCaption,
-                            {color: theme.textColor},
+                            {color: theme.textHightLight},
                         ]}
-                        containerStyle={styles.captionBox}
-                        maxRows={3}
+                        numberOfLines={1}
                     />
                 ) : (
                     <View style={styles.spaceCaption} />
@@ -343,104 +336,10 @@ const Bubble = (props: Props) => {
         );
     };
 
-    const StarLink = () => {
-        const numberStars = Array(item.stars).fill(0).length;
-
-        const Link = () => {
-            if (item.userReviewed) {
-                return (
-                    <StyleTouchable
-                        customStyle={styles.linkBox}
-                        onPress={() => showPreviewLink(item)}>
-                        <View
-                            style={[
-                                styles.linkTouch,
-                                {backgroundColor: theme.backgroundButtonColor},
-                            ]}>
-                            <StyleImage
-                                source={{uri: item.userReviewed.avatar}}
-                                customStyle={styles.iconAvatar}
-                            />
-
-                            <StyleText
-                                originValue={item.userReviewed.name}
-                                customStyle={[
-                                    styles.textSeeNow,
-                                    {color: theme.textHightLight},
-                                ]}
-                            />
-                        </View>
-                    </StyleTouchable>
-                );
-            }
-            if (item.link) {
-                return (
-                    <StyleTouchable
-                        customStyle={styles.linkBox}
-                        onPress={() => showPreviewLink(item)}>
-                        <View
-                            style={[
-                                styles.linkTouch,
-                                {backgroundColor: theme.backgroundButtonColor},
-                            ]}>
-                            <StyleImage
-                                source={Images.icons.house}
-                                customStyle={styles.iconHouse}
-                            />
-
-                            <StyleText
-                                originValue={'See now'}
-                                customStyle={[
-                                    styles.textSeeNow,
-                                    {color: theme.textHightLight},
-                                ]}
-                            />
-                        </View>
-                    </StyleTouchable>
-                );
-            }
-            return null;
-        };
-
-        return (
-            <View style={styles.starLink}>
-                <View
-                    style={[
-                        styles.starBox,
-                        {backgroundColor: theme.backgroundButtonColor},
-                    ]}>
-                    {[0, 1, 2, 3, 4].map((_, index) => {
-                        const isChosen = index < numberStars;
-                        if (isChosen) {
-                            return (
-                                <AntDesign
-                                    key={index}
-                                    name="star"
-                                    style={styles.star}
-                                />
-                            );
-                        }
-                        return (
-                            <AntDesign
-                                key={index}
-                                name="staro"
-                                style={[
-                                    styles.starNotChosen,
-                                    {color: theme.holderColorLighter},
-                                ]}
-                            />
-                        );
-                    })}
-                </View>
-                {Link()}
-            </View>
-        );
-    };
-
     const Footer = () => {
         if (item.isDraft) {
             return (
-                <View style={styles.footerView}>
+                <View style={styles.footerViewDraft}>
                     <StyleText
                         i18Text="profile.thisPostInDraft"
                         customStyle={[
@@ -468,100 +367,47 @@ const Bubble = (props: Props) => {
 
         return (
             <View style={styles.footerView}>
-                <View style={styles.likeCommentShareSave}>
-                    {isLiked ? (
-                        <IconLiked
-                            customStyle={[
-                                styles.iconLike,
-                                {color: theme.likeHeart},
-                            ]}
-                            onPress={() => {
-                                if (!item.isArchived) {
-                                    onHandleLike({
-                                        isModeExp,
-                                        isLiked,
-                                        setIsLiked,
-                                        totalLikes,
-                                        setTotalLikes,
-                                        postId: item.id,
-                                    });
-                                }
-                            }}
-                            touchableStyle={styles.touchIconLike}
-                        />
-                    ) : (
-                        <IconNotLiked
-                            customStyle={[
-                                styles.iconLike,
-                                {color: theme.textHightLight},
-                            ]}
-                            onPress={() => {
-                                if (!item.isArchived) {
-                                    onHandleLike({
-                                        isModeExp,
-                                        isLiked,
-                                        setIsLiked,
-                                        totalLikes,
-                                        setTotalLikes,
-                                        postId: item.id,
-                                    });
-                                }
-                            }}
-                            touchableStyle={styles.touchIconLike}
-                        />
-                    )}
-
-                    <StyleTouchable
-                        customStyle={styles.iconComment}
-                        onPress={() => onShowModalComment(item, 'comment')}>
-                        <StyleIcon
-                            source={Images.icons.comment}
-                            size={20}
-                            customStyle={{tintColor: theme.textHightLight}}
-                        />
-                    </StyleTouchable>
-
-                    <StyleTouchable
-                        customStyle={styles.iconComment}
-                        onPress={() => onShowModalShare(item, setDisableShare)}
-                        disable={disableShare || item.isArchived}>
-                        <StyleIcon
-                            source={Images.icons.share}
-                            size={21}
-                            customStyle={{tintColor: theme.textHightLight}}
-                        />
-                    </StyleTouchable>
-
-                    <StyleTouchable
-                        customStyle={styles.iconSave}
-                        disable={item.isArchived}
+                {isLiked ? (
+                    <IconLiked
+                        customStyle={[
+                            styles.iconLike,
+                            {color: theme.likeHeart},
+                        ]}
                         onPress={() => {
-                            onHandleSave({
-                                isModeExp,
-                                isSaved,
-                                setIsSaved,
-                                postId: item.id,
-                            });
-                        }}>
-                        {isSaved ? (
-                            <FontAwesome
-                                name="bookmark"
-                                style={[
-                                    styles.save,
-                                    {color: Theme.common.gradientTabBar1},
-                                ]}
-                            />
-                        ) : (
-                            <FontAwesome
-                                name="bookmark-o"
-                                style={[
-                                    styles.save,
-                                    {color: theme.textHightLight},
-                                ]}
-                            />
-                        )}
-                    </StyleTouchable>
-                </View>
+                            if (!item.isArchived) {
+                                onHandleLike({
+                                    isModeExp,
+                                    isLiked,
+                                    setIsLiked,
+                                    totalLikes,
+                                    setTotalLikes,
+                                    postId: item.id,
+                                });
+                            }
+                        }}
+                        touchableStyle={styles.touchIconLike}
+                    />
+                ) : (
+                    <IconNotLiked
+                        customStyle={[
+                            styles.iconLike,
+                            {color: theme.borderColor},
+                        ]}
+                        onPress={() => {
+                            if (!item.isArchived) {
+                                onHandleLike({
+                                    isModeExp,
+                                    isLiked,
+                                    setIsLiked,
+                                    totalLikes,
+                                    setTotalLikes,
+                                    postId: item.id,
+                                });
+                            }
+                        }}
+                        touchableStyle={styles.touchIconLike}
+                    />
+                )}
 
                 <StyleTouchable
                     customStyle={styles.likeTouch}
@@ -590,7 +436,7 @@ const Bubble = (props: Props) => {
                         }}
                         customStyle={[
                             styles.textLike,
-                            {color: theme.textColor},
+                            {color: theme.borderColor},
                         ]}
                     />
                 </StyleTouchable>
@@ -630,6 +476,8 @@ const Bubble = (props: Props) => {
                         />
                     </StyleTouchable>
                 )}
+
+                <View style={styles.captionBox} />
             </View>
         );
     };
@@ -638,6 +486,93 @@ const Bubble = (props: Props) => {
         if (!item.images[0]) {
             return null;
         }
+
+        const chooseLink = () => {
+            if (item.userReviewed) {
+                return (
+                    <>
+                        <FontAwesome name="user" style={styles.iconLink} />
+                        <StyleText
+                            originValue={item.userReviewed.name}
+                            customStyle={styles.textStars}
+                        />
+                    </>
+                );
+            }
+            if (item.link) {
+                return (
+                    <>
+                        <AntDesign name="link" style={styles.iconLink} />
+                        <StyleText
+                            originValue="See more"
+                            customStyle={styles.textStars}
+                        />
+                    </>
+                );
+            }
+            return null;
+        };
+
+        const bottomRight = () => {
+            if (item.isDraft) {
+                return null;
+            }
+            return (
+                <View style={styles.leftRight}>
+                    <StyleTouchable
+                        customStyle={styles.contractBox}
+                        onPress={() => onShowModalComment(item, 'comment')}>
+                        <CustomBlurView />
+                        <StyleIcon
+                            source={Images.icons.comment}
+                            size={14}
+                            customStyle={{tintColor: Theme.common.white}}
+                        />
+                    </StyleTouchable>
+                    <StyleTouchable
+                        customStyle={styles.contractBox}
+                        disableOpacity={0.85}
+                        onPress={() => onShowModalShare(item, setDisableShare)}
+                        disable={disableShare}>
+                        <CustomBlurView />
+                        <StyleIcon
+                            source={Images.icons.share}
+                            size={15}
+                            customStyle={{tintColor: Theme.common.white}}
+                        />
+                    </StyleTouchable>
+                    <StyleTouchable
+                        customStyle={styles.contractBox}
+                        onPress={() => {
+                            onHandleSave({
+                                isModeExp,
+                                isSaved,
+                                setIsSaved,
+                                postId: item.id,
+                            });
+                        }}>
+                        <CustomBlurView />
+                        {isSaved ? (
+                            <FontAwesome
+                                name="bookmark"
+                                style={[
+                                    styles.save,
+                                    {color: Theme.common.comment},
+                                ]}
+                            />
+                        ) : (
+                            <FontAwesome
+                                name="bookmark-o"
+                                style={[
+                                    styles.save,
+                                    {color: Theme.common.white},
+                                ]}
+                            />
+                        )}
+                    </StyleTouchable>
+                </View>
+            );
+        };
 
         return (
             <ScrollSyncSizeImage
@@ -658,18 +593,61 @@ const Bubble = (props: Props) => {
                 containerStyle={styles.imageView}
                 videoProps={{
                     paused: !isFocusing,
-                }}
-            />
+                }}>
+                <View style={styles.topView}>
+                    {!!item.location && (
+                        <View style={styles.blurContainer}>
+                            <CustomBlurView />
+                            <Entypo
+                                name="location-pin"
+                                style={styles.iconLink}
+                            />
+                            <StyleText
+                                originValue={item.location}
+                                customStyle={styles.textLocation}
+                                numberOfLines={1}
+                            />
+                        </View>
+                    )}
+                </View>
+
+                <View style={styles.bottomView}>
+                    <View style={styles.leftBottom}>
+                        <View style={styles.blurContainer}>
+                            <CustomBlurView />
+                            <AntDesign name="star" style={styles.star} />
+                            <StyleText
+                                originValue={item.stars}
+                                customStyle={styles.textStars}
+                            />
+                        </View>
+
+                        <StyleTouchable
+                            customStyle={styles.blurLink}
+                            onPress={() => showPreviewLink(item)}>
+                            <CustomBlurView />
+                            {chooseLink()}
+                        </StyleTouchable>
+                    </View>
+
+                    {bottomRight()}
+                </View>
+            </ScrollSyncSizeImage>
         );
     };
 
     return (
         <View
-            style={[styles.container, {backgroundColor: theme.backgroundColor}]}
+            style={[
+                styles.container,
+                {
+                    backgroundColor: theme.backgroundColor,
+                    shadowColor: theme.borderColor,
+                },
+            ]}
             onTouchEnd={() => onChangePostIdFocusing(item.id)}>
             {Header()}
             {ImagePreview()}
-            {StarLink()}
             {Footer()}
         </View>
     );
@@ -678,9 +656,14 @@ const Bubble = (props: Props) => {
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
-        marginBottom: '5@vs',
         paddingVertical: '10@vs',
-        borderRadius: '10@ms',
+        borderRadius: '20@ms',
+        marginBottom: '10@vs',
+        shadowOpacity: 0.1,
+        shadowOffset: {
+            height: moderateScale(1),
+            width: 0,
+        },
     },
     // header
     headerView: {
@@ -734,21 +717,17 @@ const styles = ScaledSheet.create({
         fontSize: '17@ms',
     },
     textLocation: {
-        fontSize: '12@ms',
-        marginLeft: '2@s',
-    },
-    captionBox: {
-        marginVertical: '10@vs',
-    },
-    spaceCaption: {
-        height: '10@vs',
-    },
-    textCaption: {
-        fontSize: '14@ms',
+        fontSize: FONT_SIZE.small,
+        color: Theme.common.white,
+        fontWeight: 'bold',
+        marginRight: '9@s',
+        maxWidth: screenWidth * 0.6,
     },
     // image
     imageView: {
         maxHeight: Metrics.width * 1.5,
+        borderRadius: '8@ms',
+        alignSelf: 'center',
     },
     // star link
     starLink: {
@@ -763,11 +742,6 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: '5@ms',
-    },
-    star: {
-        fontSize: '14@ms',
-        marginHorizontal: '3@s',
-        color: Theme.common.orange,
     },
     starNotChosen: {
         fontSize: '14@ms',
@@ -800,6 +774,13 @@ const styles = ScaledSheet.create({
     // footer
     footerView: {
         width: '100%',
+        flexDirection: 'row-reverse',
+        alignItems: 'center',
+        marginTop: '5@vs',
+    },
+    footerViewDraft: {
+        width: '100%',
+        alignItems: 'center',
     },
     textThisPostInDraft: {
         fontSize: '12@ms',
@@ -810,14 +791,13 @@ const styles = ScaledSheet.create({
         paddingHorizontal: '10@s',
         paddingVertical: '5@vs',
         borderRadius: '5@ms',
-        width: '50%',
         alignItems: 'center',
         justifyContent: 'center',
-        marginVertical: '5@vs',
-        alignSelf: 'center',
+        position: 'absolute',
+        right: '10@s',
     },
     textGoToPost: {
-        fontSize: '14@ms',
+        fontSize: FONT_SIZE.small,
         fontWeight: 'bold',
     },
     likeCommentShareSave: {
@@ -827,27 +807,21 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
     },
     touchIconLike: {
-        paddingLeft: '15@s',
+        paddingLeft: '10@s',
         paddingRight: '10@s',
+        marginLeft: '10@s',
     },
     iconLike: {
-        fontSize: '23@ms',
+        fontSize: '30@ms',
     },
     iconComment: {
         paddingHorizontal: '10@s',
     },
-    iconSave: {
-        position: 'absolute',
-        right: '15@s',
-    },
     save: {
-        fontSize: '24@ms',
+        fontSize: '14@ms',
     },
     likeTouch: {
-        marginTop: '10@vs',
-        width: '100@s',
-        paddingVertical: '5@vs',
-        marginLeft: '15@s',
+        paddingLeft: '10@s',
     },
     textLike: {
         fontSize: '12@ms',
@@ -857,9 +831,86 @@ const styles = ScaledSheet.create({
         fontSize: '12@ms',
     },
     commentTouch: {
-        paddingVertical: '5@vs',
-        width: '50%',
-        marginLeft: '15@s',
+        paddingLeft: '10@s',
+    },
+    // new optimize
+    bottomView: {
+        width: '100%',
+        position: 'absolute',
+        flexDirection: 'row',
+        bottom: '10@s',
+        paddingHorizontal: '10@s',
+        justifyContent: 'space-between',
+    },
+    leftBottom: {
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+    },
+    blurContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    blurView: {
+        ...StyleSheet.absoluteFillObject,
+        borderRadius: '10@ms',
+    },
+    star: {
+        fontSize: '15@ms',
+        marginHorizontal: '3@s',
+        color: Theme.common.orange,
+        marginLeft: '7@s',
+        marginVertical: '3@s',
+    },
+    textStars: {
+        fontSize: FONT_SIZE.small,
+        color: Theme.common.white,
+        fontWeight: 'bold',
+        marginRight: '9@s',
+    },
+    blurLink: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: '5@s',
+    },
+    iconLink: {
+        fontSize: '15@ms',
+        marginHorizontal: '3@s',
+        color: Theme.common.white,
+        marginLeft: '9@s',
+        marginVertical: '3@s',
+    },
+    leftRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    topView: {
+        width: '100%',
+        position: 'absolute',
+        flexDirection: 'row',
+        top: '10@s',
+        paddingHorizontal: '10@s',
+    },
+    captionBox: {
+        flex: 1,
+        justifyContent: 'center',
+        paddingHorizontal: '10@s',
+    },
+    textCaption: {
+        fontSize: FONT_SIZE.normal,
+        color: Theme.common.white,
+        marginVertical: '10@vs',
+    },
+    spaceCaption: {
+        height: '10@vs',
+    },
+    // contract view
+    contractBox: {
+        width: '33@ms',
+        height: '33@ms',
+        borderRadius: '20@ms',
+        marginLeft: '8@s',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 });
 
