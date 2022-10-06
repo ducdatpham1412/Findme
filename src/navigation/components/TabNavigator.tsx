@@ -91,6 +91,8 @@ const TabNavigator = (props: any) => {
             navigate(PROFILE_ROUTE.createPostPickImg);
         } else if (account_type === ACCOUNT.shop) {
             typeCreateRef.current?.show();
+        } else if (account_type === 2) {
+            typeCreateRef.current?.show();
         }
     };
 

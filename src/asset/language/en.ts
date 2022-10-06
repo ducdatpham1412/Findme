@@ -152,7 +152,7 @@ const discovery = {
     applicationPeriod: 'Application period',
     groupBuyingPrice: 'Group buying prices',
     numberPeople: '{{value}} people',
-    joinGroupBuying: 'Join group buying',
+    joinGroupBuying: 'Join now',
     joined: 'Joined',
     unJoinGroupBuying: 'Leave group buying',
     numberPeopleJoin: '{{value}} people joined group buying',

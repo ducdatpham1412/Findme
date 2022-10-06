@@ -43,8 +43,8 @@ const styles = ScaledSheet.create({
         justifyContent: 'center',
     },
     iconFly: {
-        width: '150@ms',
-        height: '150@ms',
+        width: '100@ms',
+        height: '100@ms',
     },
 });
 

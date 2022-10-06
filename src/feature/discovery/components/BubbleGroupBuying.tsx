@@ -256,7 +256,7 @@ const BubbleGroupBuying = (props: Props) => {
                     end={{x: 0.8, y: 1}}
                 />
                 <View style={styles.priceView}>
-                    <StyleIcon source={Images.icons.dollar} size={15} />
+                    <StyleIcon source={Images.icons.dollar} size={12} />
                     <View>
                         {displayPrices.map((price, index) => (
                             <View key={index} style={styles.priceBox}>
@@ -279,7 +279,7 @@ const BubbleGroupBuying = (props: Props) => {
                     </View>
                 </View>
                 <View style={styles.priceView}>
-                    <StyleIcon source={Images.icons.deadline} size={15} />
+                    <StyleIcon source={Images.icons.deadline} size={14} />
                     <StyleText
                         originValue={formatDayGroupBuying(item.deadlineDate)}
                         customStyle={styles.textDeadline}
@@ -609,7 +609,7 @@ const styles = ScaledSheet.create({
     priceBox: {
         flexDirection: 'row',
         marginLeft: '5@s',
-        marginBottom: '5@vs',
+        marginVertical: '2.5@vs',
     },
     textNumberPeople: {
         width: '35@ms',

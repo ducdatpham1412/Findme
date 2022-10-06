@@ -29,3 +29,7 @@ export const apiConfirmUserBought = (body: {
 export const apiCreateGroupBuying = (body: TypeCreateGroupBuying) => {
     return request.post('profile/create-group-buying', body);
 };
+
+export const apiGetTopGroupBuying = () => {
+    return request.get('/common/get-top-group-buying');
+};
