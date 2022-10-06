@@ -114,6 +114,7 @@ const ItemGroupBuying = (props: Props) => {
     const theme = Redux.getTheme();
 
     const lastPrice = item.prices[item.prices.length - 1];
+    const iconSize = (syncWidth / width) * 15;
 
     return (
         <StyleTouchable
@@ -214,7 +215,10 @@ const ItemGroupBuying = (props: Props) => {
             <View style={styles.contentView}>
                 <View style={{flex: 1}}>
                     <View style={styles.infoView}>
-                        <StyleIcon source={Images.icons.deadline} size={15} />
+                        <StyleIcon
+                            source={Images.icons.deadline}
+                            size={iconSize}
+                        />
                         <StyleText
                             originValue={formatDayGroupBuying(
                                 item.deadlineDate,
@@ -226,7 +230,10 @@ const ItemGroupBuying = (props: Props) => {
                         />
                     </View>
                     <View style={styles.infoView}>
-                        <StyleIcon source={Images.icons.dollar} size={15} />
+                        <StyleIcon
+                            source={Images.icons.dollar}
+                            size={iconSize}
+                        />
                         <StyleText
                             originValue={`${lastPrice.number_people}`}
                             customStyle={[

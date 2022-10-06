@@ -16,6 +16,7 @@ import {
 } from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 import StyleActionSheet from 'components/common/StyleActionSheet';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const tabBarHeight = moderateScale(50);
 const addMoreHeight = moderateScale(3);
@@ -28,7 +29,7 @@ const TabNavigator = (props: any) => {
     const theme = Redux.getTheme();
     const numberNewNotifications = Redux.getNumberNewNotifications();
     const numberNewMessages = Redux.getNumberNewMessages();
-    const {avatar, account_type} = Redux.getPassport().profile;
+    const {account_type} = Redux.getPassport().profile;
 
     const typeCreateRef = useRef<any>(null);
 
@@ -73,7 +74,7 @@ const TabNavigator = (props: any) => {
             toValue: indicatorWidth * tabIndexFocus,
             useNativeDriver: true,
         }).start();
-        if (tabIndexFocus === 4 || tabIndexFocus === 2) {
+        if (tabIndexFocus === 2) {
             Animated.spring(scale, {
                 toValue: 0,
                 useNativeDriver: true,
@@ -176,6 +177,7 @@ const TabNavigator = (props: any) => {
 
     const ProfileButton = () => {
         const isFocus = tabIndexFocus === 4;
+        const tintColor = isFocus ? Theme.common.white : theme.tabBarIconColor;
         return (
             <StyleTouchable
                 onPress={() => {
@@ -192,9 +194,9 @@ const TabNavigator = (props: any) => {
                     }
                 }}
                 customStyle={styles.buttonView}>
-                <StyleImage
-                    source={{uri: avatar}}
-                    customStyle={styles.profile}
+                <FontAwesome
+                    name="user-o"
+                    style={[styles.profile, {color: tintColor}]}
                 />
             </StyleTouchable>
         );
@@ -346,9 +348,7 @@ const styles = ScaledSheet.create({
         right: '-5@ms',
     },
     profile: {
-        width: '30@ms',
-        height: '30@ms',
-        borderRadius: '20@ms',
+        fontSize: '22@ms',
     },
     addMoreView: {
         width: '100%',

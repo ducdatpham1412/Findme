@@ -167,6 +167,14 @@ const discovery = {
     dayRemain: '{{value}} days remaining',
     today: 'Today',
     postType: 'Posts',
+    seeMore: 'See more',
+    whereShouldWeGo: 'Where should we go...',
+    bookTourWithOther: 'Group booking',
+    travelWithReasonablePrice: 'Travel with the most reasonable price 😯🥳',
+    travelReview: 'Review travel',
+    letCreateCommunity: "Let's create a\ntrust travel community 🙌",
+    topGroupBooking: 'Top group booking',
+    discovery: 'Discovery',
 };
 
 // REPUTATION

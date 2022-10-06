@@ -8,22 +8,20 @@ import Images from 'asset/img/images';
 import {StyleIcon} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
-import LoadingScreen from 'components/LoadingScreen';
-import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {DISCOVERY_ROUTE} from 'navigation/config/routes';
 import {appAlert, goBack, navigate} from 'navigation/NavigationService';
 import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import {FlatList, ImageBackground} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {onGoToSignUp} from 'utility/assistant';
 import {useNotification} from 'utility/notification';
 import Bubble from './components/Bubble';
 import BubbleGroupBuying, {ParamsLikeGB} from './components/BubbleGroupBuying';
 import HeaderDoffy from './components/HeaderDoffy';
-import ListTopGroupBuying from './components/ListTopGroupBuying';
+import ListTopGroupBuying, {spaceHeight} from './components/ListTopGroupBuying';
 import HeaderFilterTopic from './HeaderFilterTopic';
 
 export interface TypeMoreOptionsMe {
@@ -43,11 +41,15 @@ const DiscoveryScreen = () => {
     const listRef = useRef<FlatList>(null);
     const optionsRef = useRef<any>(null);
     const headerFilterRef = useRef<HeaderFilterTopic>(null);
+    const headerRef = useRef<HeaderDoffy>(null);
+    const topGroupBuyingRef = useRef<ListTopGroupBuying>(null);
 
     const theme = Redux.getTheme();
     const token = Redux.getToken();
     const isModeExp = Redux.getModeExp();
     const bubblePalace = Redux.getBubblePalaceAction();
+    const {profile} = Redux.getPassport();
+    const {imageBackground} = Redux.getResource();
 
     const hadLogan = token && !isModeExp;
 
@@ -64,7 +66,6 @@ const DiscoveryScreen = () => {
     const {
         list,
         setList,
-        loading,
         setParams,
         onLoadMore,
         refreshing,
@@ -235,13 +236,6 @@ const DiscoveryScreen = () => {
         [postIdFocusing],
     );
 
-    const EmptyView = () => {
-        if (loading) {
-            return <LoadingScreen />;
-        }
-        return null;
-    };
-
     const FooterComponent = () => {
         if (noMore) {
             return (
@@ -256,58 +250,82 @@ const DiscoveryScreen = () => {
     };
 
     return (
-        <>
-            <ViewSafeTopPadding />
-
+        <ImageBackground
+            source={{uri: imageBackground}}
+            imageStyle={{
+                top: -470,
+            }}
+            style={[
+                styles.container,
+                {backgroundColor: theme.backgroundColorSecond},
+            ]}>
             <HeaderDoffy
+                ref={headerRef}
                 theme={theme}
-                onPressFilter={() => headerFilterRef.current?.show()}
+                profile={profile}
+                onPressFilterIcon={() => headerFilterRef.current?.show()}
             />
 
-            <View
-                style={[
-                    styles.container,
-                    {backgroundColor: theme.backgroundColorSecond},
-                ]}>
-                <StyleList
-                    ref={listRef}
-                    data={list}
-                    renderItem={({item}) => RenderItemBubble(item)}
-                    keyExtractor={(_, index) => String(index)}
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    onLoadMore={onLoadMore}
-                    ListEmptyComponent={EmptyView}
-                    ListHeaderComponent={ListTopGroupBuying}
-                    ListFooterComponent={FooterComponent}
-                    ListFooterComponentStyle={{
-                        backgroundColor: theme.backgroundColor,
-                        paddingVertical: 20,
-                    }}
-                    maxToRenderPerBatch={20}
-                />
+            <StyleList
+                ref={listRef}
+                data={list}
+                renderItem={({item}) => RenderItemBubble(item)}
+                keyExtractor={(_, index) => String(index)}
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                onLoadMore={onLoadMore}
+                ListHeaderComponent={
+                    <ListTopGroupBuying
+                        ref={topGroupBuyingRef}
+                        theme={theme}
+                        onSearch={text => text}
+                    />
+                }
+                ListFooterComponent={FooterComponent}
+                ListFooterComponentStyle={{
+                    backgroundColor: theme.backgroundColor,
+                    paddingVertical: 20,
+                }}
+                maxToRenderPerBatch={20}
+                onScroll={({nativeEvent}) => {
+                    const {y} = nativeEvent.contentOffset;
+                    if (y >= 0 && y < spaceHeight / 3) {
+                        headerRef.current?.setOpacity(0);
+                        topGroupBuyingRef.current?.setOpacity(1);
+                    } else if (y >= spaceHeight / 3 && y <= spaceHeight) {
+                        const ratio =
+                            (y - spaceHeight / 3) / ((spaceHeight * 2) / 3);
+                        headerRef.current?.setOpacity(ratio);
+                        topGroupBuyingRef.current?.setOpacity(1 - ratio);
+                    } else if (y > spaceHeight && y < spaceHeight * 2) {
+                        headerRef.current?.setOpacity(1);
+                        topGroupBuyingRef.current?.setOpacity(0);
+                    }
+                }}
+                keyboardDismissMode="on-drag"
+                keyboardShouldPersistTaps="handled"
+            />
 
-                <StyleActionSheet
-                    ref={optionsRef}
-                    listTextAndAction={[
-                        {
-                            text: 'discovery.report.title',
-                            action: () => {
-                                if (hadLogan && modalOptions) {
-                                    navigate(ROOT_SCREEN.reportUser, {
-                                        idUser: modalOptions.creator,
-                                        nameUser: modalOptions.creatorName,
-                                    });
-                                }
-                            },
+            <StyleActionSheet
+                ref={optionsRef}
+                listTextAndAction={[
+                    {
+                        text: 'discovery.report.title',
+                        action: () => {
+                            if (hadLogan && modalOptions) {
+                                navigate(ROOT_SCREEN.reportUser, {
+                                    idUser: modalOptions.creator,
+                                    nameUser: modalOptions.creatorName,
+                                });
+                            }
                         },
-                        {
-                            text: 'common.cancel',
-                            action: () => null,
-                        },
-                    ]}
-                />
-            </View>
+                    },
+                    {
+                        text: 'common.cancel',
+                        action: () => null,
+                    },
+                ]}
+            />
 
             <HeaderFilterTopic
                 ref={headerFilterRef}
@@ -317,7 +335,7 @@ const DiscoveryScreen = () => {
                 onChangeTopic={list => setListTopics(list)}
                 onChangePostType={list => setPostTypes(list)}
             />
-        </>
+        </ImageBackground>
     );
 };
 

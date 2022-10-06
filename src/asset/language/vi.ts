@@ -170,6 +170,15 @@ const discovery = {
     dayRemain: '{{value}} ngày còn lại',
     today: 'Hôm nay',
     postType: 'Bài đăng',
+    seeMore: 'Xem thêm',
+    whereShouldWeGo: 'Đi đâu nữa đây...',
+    bookTourWithOther: 'Đặt tour nhóm',
+    travelWithReasonablePrice: 'Đi du lịch với giá ưu đãi nhất 😯🥳',
+    travelReview: 'Review trải nghiệm',
+    letCreateCommunity:
+        'Cùng chúng tôi tạo lên một cộng đồng du lịch chân thực 🙌',
+    topGroupBooking: 'Top đơn mua chung',
+    discovery: 'Khám phá',
 };
 
 // REPUTATION
