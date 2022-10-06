@@ -2,7 +2,7 @@
 import Theme from 'asset/theme/Theme';
 import StyleTouchHaveDouble from 'components/base/StyleTouchHaveDouble';
 import PinchImage from 'components/PinchImage';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {ReactNode, useEffect, useRef, useState} from 'react';
 import {
     Animated,
     GestureResponderEvent,
@@ -35,6 +35,7 @@ interface Props {
     videoProps?: {
         paused?: boolean;
     };
+    children?: ReactNode;
 }
 
 const indicatorPointWidth = scale(10);
@@ -49,6 +50,7 @@ const ScrollSyncSizeImage = (props: Props) => {
         index,
         onChangeIndex,
         videoProps,
+        children,
     } = props;
 
     const currentIndexRef = useRef(0);
@@ -307,6 +309,8 @@ const ScrollSyncSizeImage = (props: Props) => {
                     />
                 </View>
             )}
+
+            {children}
         </StyleTouchHaveDouble>
     );
 };

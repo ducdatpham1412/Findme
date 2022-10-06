@@ -32,6 +32,18 @@ interface Props {
 
 const {width} = Metrics;
 
+const CustomBlurView = () => {
+    return (
+        <BlurView
+            style={styles.blurView}
+            blurType="ultraThinMaterialLight"
+            blurAmount={0}
+            blurRadius={1}
+            reducedTransparencyFallbackColor="white"
+        />
+    );
+};
+
 const ButtonCheckJoined = (item: TypeGroupBuying, theme: TypeTheme) => {
     if (item.relationship === RELATIONSHIP.self) {
         return null;
@@ -81,7 +93,6 @@ const ButtonCheckJoined = (item: TypeGroupBuying, theme: TypeTheme) => {
                             color: isJoined
                                 ? theme.backgroundColor
                                 : theme.textHightLight,
-                            fontWeight: isJoined ? 'bold' : 'normal',
                         },
                     ]}
                 />
@@ -146,7 +157,7 @@ const ItemGroupBuying = (props: Props) => {
                 <StyleTouchable
                     customStyle={styles.creatorView}
                     onPress={() => onGoToProfile(item.creator)}>
-                    <BlurView style={styles.blurView} blurType="light" />
+                    <CustomBlurView />
                     <StyleIcon
                         source={{uri: item.creatorAvatar}}
                         size={20}
@@ -161,7 +172,7 @@ const ItemGroupBuying = (props: Props) => {
 
                 <View style={styles.bottomView}>
                     <View style={styles.numberJoinedBox}>
-                        <BlurView style={styles.blurView} blurType="light" />
+                        <CustomBlurView />
                         <StyleIcon
                             source={Images.icons.createGroup}
                             size={15}
@@ -174,7 +185,7 @@ const ItemGroupBuying = (props: Props) => {
                     </View>
 
                     <View style={styles.locationBox}>
-                        <BlurView style={styles.blurView} blurType="light" />
+                        <CustomBlurView />
                         <Entypo
                             name="location-pin"
                             style={styles.iconLocation}
@@ -350,7 +361,6 @@ const styles = ScaledSheet.create({
     },
     textInfo: {
         fontSize: FONT_SIZE.small,
-        fontWeight: 'bold',
         marginLeft: '8@s',
     },
     boughtBox: {
@@ -378,6 +388,7 @@ const styles = ScaledSheet.create({
     },
     textTellJoin: {
         fontSize: FONT_SIZE.small,
+        fontWeight: 'bold',
     },
 });
 
