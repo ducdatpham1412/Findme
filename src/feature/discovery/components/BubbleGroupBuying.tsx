@@ -30,7 +30,7 @@ import isEqual from 'react-fast-compare';
 import {StyleSheet, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Share from 'react-native-share';
-import {moderateScale, ScaledSheet} from 'react-native-size-matters';
+import {ScaledSheet} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {SharedElement} from 'react-navigation-shared-element';
 import {onGoToProfile} from 'utility/assistant';
@@ -218,10 +218,9 @@ const BubbleGroupBuying = (props: Props) => {
         <StyleTouchable
             key={item.id}
             style={[
-                styles.itemView,
+                styles.container,
                 {
                     backgroundColor: theme.backgroundColor,
-                    shadowColor: theme.borderColor,
                 },
             ]}
             onPress={() => onGoToDetailGroupBuying(item)}
@@ -477,20 +476,15 @@ const BubbleGroupBuying = (props: Props) => {
 };
 
 const styles = ScaledSheet.create({
-    itemView: {
+    container: {
         width,
-        marginBottom: '8@vs',
-        borderRadius: '15@ms',
-        shadowOpacity: 0.1,
-        shadowOffset: {
-            height: moderateScale(1),
-            width: 0,
-        },
+        paddingVertical: '20@vs',
+        marginTop: '-1@vs',
     },
     imagePreview: {
         width: '100%',
-        borderTopLeftRadius: '15@ms',
-        borderTopRightRadius: '15@ms',
+        borderTopLeftRadius: '8@ms',
+        borderTopRightRadius: '8@ms',
         height: width * ratioImageGroupBuying,
     },
     creatorView: {
@@ -639,7 +633,6 @@ const styles = ScaledSheet.create({
         flexDirection: 'row-reverse',
         alignItems: 'center',
         marginTop: '5@vs',
-        marginBottom: '10@vs',
     },
     iconLike: {
         fontSize: '30@ms',

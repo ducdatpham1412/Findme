@@ -38,7 +38,7 @@ import React, {memo, useEffect, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import {StyleSheet, View} from 'react-native';
 import Share from 'react-native-share';
-import {moderateScale, ScaledSheet} from 'react-native-size-matters';
+import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -491,7 +491,11 @@ const Bubble = (props: Props) => {
             if (item.userReviewed) {
                 return (
                     <>
-                        <FontAwesome name="user" style={styles.iconLink} />
+                        <StyleIcon
+                            source={Images.icons.username}
+                            size={15}
+                            customStyle={styles.iconLink}
+                        />
                         <StyleText
                             originValue={item.userReviewed.name}
                             customStyle={styles.textStars}
@@ -504,7 +508,7 @@ const Bubble = (props: Props) => {
                     <>
                         <AntDesign name="link" style={styles.iconLink} />
                         <StyleText
-                            originValue="See more"
+                            i18Text="discovery.seeMore"
                             customStyle={styles.textStars}
                         />
                     </>
@@ -642,7 +646,6 @@ const Bubble = (props: Props) => {
                 styles.container,
                 {
                     backgroundColor: theme.backgroundColor,
-                    shadowColor: theme.borderColor,
                 },
             ]}
             onTouchEnd={() => onChangePostIdFocusing(item.id)}>
@@ -656,14 +659,8 @@ const Bubble = (props: Props) => {
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
-        paddingVertical: '10@vs',
-        borderRadius: '20@ms',
-        marginBottom: '10@vs',
-        shadowOpacity: 0.1,
-        shadowOffset: {
-            height: moderateScale(1),
-            width: 0,
-        },
+        paddingVertical: '20@vs',
+        marginTop: '-1@vs',
     },
     // header
     headerView: {
@@ -849,13 +846,14 @@ const styles = ScaledSheet.create({
     blurContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        borderRadius: '20@ms',
+        overflow: 'hidden',
     },
     blurView: {
         ...StyleSheet.absoluteFillObject,
-        borderRadius: '10@ms',
     },
     star: {
-        fontSize: '15@ms',
+        fontSize: '17@ms',
         marginHorizontal: '3@s',
         color: Theme.common.orange,
         marginLeft: '7@s',
@@ -871,6 +869,7 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginLeft: '5@s',
+        borderRadius: '20@ms',
     },
     iconLink: {
         fontSize: '15@ms',
@@ -878,6 +877,7 @@ const styles = ScaledSheet.create({
         color: Theme.common.white,
         marginLeft: '9@s',
         marginVertical: '3@s',
+        tintColor: Theme.common.white,
     },
     leftRight: {
         flexDirection: 'row',
