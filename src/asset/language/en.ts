@@ -175,6 +175,10 @@ const discovery = {
     letCreateCommunity: "Let's create a\ntrust travel community 🙌",
     topGroupBooking: 'Top group booking',
     discovery: 'Discovery',
+    resultFor: 'Result for',
+    averageStars: 'Average stars: {{value}}',
+    totalReviews: 'Total reviews: {{value}}',
+    totalCampaigns: 'Total group booking campaigns: {{value}}',
 };
 
 // REPUTATION

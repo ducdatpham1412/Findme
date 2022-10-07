@@ -25,3 +25,10 @@ export interface TypeCreateGroupBuying {
     prices: Array<TypePrice>;
     isDraft: boolean;
 }
+
+interface TypeResultSearchOk {
+    average_stars: number;
+    total_reviews: number;
+    total_group_bookings: number;
+}
+export type TypeResultSearch = TypeResultSearchOk | null;

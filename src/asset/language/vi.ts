@@ -179,6 +179,10 @@ const discovery = {
         'Cùng chúng tôi tạo lên một cộng đồng du lịch chân thực 🙌',
     topGroupBooking: 'Top đơn mua chung',
     discovery: 'Khám phá',
+    resultFor: 'Kết quả cho',
+    averageStars: ' Số sao trung bình: {{value}}',
+    totalReviews: ' Số bài review: {{value}}',
+    totalCampaigns: ' Số chiến dịch mua chung: {{value}}',
 };
 
 // REPUTATION
