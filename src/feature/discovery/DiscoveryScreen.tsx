@@ -1,6 +1,9 @@
 /* eslint-disable no-shadow */
 import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
-import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
+import {
+    TypeResultSearch,
+    TypeShowModalCommentOrLike,
+} from 'api/interface/discovery';
 import {apiGetListBubbleActive} from 'api/module';
 import {apiLikePost, apiUnLikePost} from 'api/post';
 import {POST_TYPE, TOPIC, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
@@ -14,7 +17,7 @@ import ROOT_SCREEN, {DISCOVERY_ROUTE} from 'navigation/config/routes';
 import {appAlert, goBack, navigate} from 'navigation/NavigationService';
 import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {FlatList, ImageBackground} from 'react-native';
+import {FlatList, ImageBackground, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {onGoToSignUp} from 'utility/assistant';
 import {useNotification} from 'utility/notification';
@@ -22,6 +25,7 @@ import Bubble from './components/Bubble';
 import BubbleGroupBuying, {ParamsLikeGB} from './components/BubbleGroupBuying';
 import HeaderDoffy from './components/HeaderDoffy';
 import ListTopGroupBuying, {spaceHeight} from './components/ListTopGroupBuying';
+import SearchBar from './components/SearchBar';
 import HeaderFilterTopic from './HeaderFilterTopic';
 
 export interface TypeMoreOptionsMe {
@@ -29,6 +33,7 @@ export interface TypeMoreOptionsMe {
 }
 
 let modalOptions: TypeBubblePalace | TypeGroupBuying;
+let footerHeight = 0;
 
 const onGoToSignUpFromAlert = () => {
     goBack();
@@ -43,6 +48,7 @@ const DiscoveryScreen = () => {
     const headerFilterRef = useRef<HeaderFilterTopic>(null);
     const headerRef = useRef<HeaderDoffy>(null);
     const topGroupBuyingRef = useRef<ListTopGroupBuying>(null);
+    const searchBarRef = useRef<SearchBar>(null);
 
     const theme = Redux.getTheme();
     const token = Redux.getToken();
@@ -62,6 +68,8 @@ const DiscoveryScreen = () => {
         POST_TYPE.groupBuying,
     ]);
     const [postIdFocusing, setPostIdFocusing] = useState('');
+    const [showTopGroupBooking, setShowTopGroupBooking] = useState(true);
+    const [resultSearch, setResultSearch] = useState<TypeResultSearch>(null);
 
     const {
         list,
@@ -77,6 +85,10 @@ const DiscoveryScreen = () => {
             take: 30,
             topics: undefined,
             postTypes: undefined,
+            search: '',
+        },
+        onSuccess: data => {
+            setResultSearch(data.result);
         },
     });
 
@@ -89,11 +101,11 @@ const DiscoveryScreen = () => {
             listTopics.length === 2 ? undefined : `[${String(listTopics)}]`;
         const paramsPostTypes =
             postTypes.length === 2 ? undefined : `[${String(postTypes)}]`;
-        setParams({
-            take: 30,
+        setParams(preValue => ({
+            ...preValue,
             topics: paramsTopic,
             postTypes: paramsPostTypes,
-        });
+        }));
     }, [listTopics, postTypes]);
 
     useEffect(() => {
@@ -241,8 +253,10 @@ const DiscoveryScreen = () => {
             return (
                 <StyleIcon
                     source={Images.images.successful}
-                    size={80}
-                    customStyle={{alignSelf: 'center'}}
+                    size={50}
+                    customStyle={{
+                        alignSelf: 'center',
+                    }}
                 />
             );
         }
@@ -266,45 +280,74 @@ const DiscoveryScreen = () => {
                 onPressFilterIcon={() => headerFilterRef.current?.show()}
             />
 
-            <StyleList
-                ref={listRef}
-                data={list}
-                renderItem={({item}) => RenderItemBubble(item)}
-                keyExtractor={(_, index) => String(index)}
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                onLoadMore={onLoadMore}
-                ListHeaderComponent={
-                    <ListTopGroupBuying
-                        ref={topGroupBuyingRef}
-                        theme={theme}
-                        onSearch={text => text}
-                    />
-                }
-                ListFooterComponent={FooterComponent}
-                ListFooterComponentStyle={{
-                    backgroundColor: theme.backgroundColor,
-                    paddingVertical: 20,
-                }}
-                maxToRenderPerBatch={20}
-                onScroll={({nativeEvent}) => {
-                    const {y} = nativeEvent.contentOffset;
-                    if (y >= 0 && y < spaceHeight / 3) {
-                        headerRef.current?.setOpacity(0);
-                        topGroupBuyingRef.current?.setOpacity(1);
-                    } else if (y >= spaceHeight / 3 && y <= spaceHeight) {
-                        const ratio =
-                            (y - spaceHeight / 3) / ((spaceHeight * 2) / 3);
-                        headerRef.current?.setOpacity(ratio);
-                        topGroupBuyingRef.current?.setOpacity(1 - ratio);
-                    } else if (y > spaceHeight && y < spaceHeight * 2) {
-                        headerRef.current?.setOpacity(1);
-                        topGroupBuyingRef.current?.setOpacity(0);
+            <View
+                style={{flex: 1, overflow: 'hidden'}}
+                onLayout={e => {
+                    footerHeight = e.nativeEvent.layout.height - spaceHeight;
+                }}>
+                <StyleList
+                    ref={listRef}
+                    data={list}
+                    renderItem={({item}) => RenderItemBubble(item)}
+                    keyExtractor={(_, index) => String(index)}
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    onLoadMore={onLoadMore}
+                    ListHeaderComponent={
+                        <ListTopGroupBuying
+                            ref={topGroupBuyingRef}
+                            showTopGroupBooking={showTopGroupBooking}
+                        />
                     }
-                }}
-                keyboardDismissMode="on-drag"
-                keyboardShouldPersistTaps="handled"
-            />
+                    ListFooterComponent={FooterComponent}
+                    ListFooterComponentStyle={{
+                        backgroundColor: theme.backgroundColor,
+                        paddingVertical: 20,
+                        marginTop: -1,
+                        height: list.length > 0 ? undefined : footerHeight,
+                    }}
+                    ListEmptyComponent={null}
+                    maxToRenderPerBatch={20}
+                    onScroll={({nativeEvent}) => {
+                        const {y} = nativeEvent.contentOffset;
+                        if (y >= 0 && y < spaceHeight / 3) {
+                            searchBarRef.current?.setTranslateY(0);
+                            searchBarRef.current?.setOpacity(
+                                1 - y / spaceHeight,
+                            );
+                            headerRef.current?.setOpacity(0);
+                            topGroupBuyingRef.current?.setOpacity(1);
+                        } else if (y >= spaceHeight / 3 && y <= spaceHeight) {
+                            searchBarRef.current?.setTranslateY(-y);
+                            searchBarRef.current?.setOpacity(0);
+                            const ratio =
+                                (y - spaceHeight / 3) / ((spaceHeight * 2) / 3);
+                            headerRef.current?.setOpacity(ratio);
+                            topGroupBuyingRef.current?.setOpacity(1 - ratio);
+                        } else if (y > spaceHeight && y < spaceHeight * 2) {
+                            headerRef.current?.setOpacity(1);
+                            topGroupBuyingRef.current?.setOpacity(0);
+                            searchBarRef.current?.setTranslateY(-y);
+                        }
+                    }}
+                    keyboardDismissMode="on-drag"
+                    stickyHeaderIndices={[0]}
+                    invertStickyHeaders
+                />
+
+                <SearchBar
+                    ref={searchBarRef}
+                    theme={theme}
+                    onSearch={text => {
+                        setParams(preValue => ({...preValue, search: text}));
+                    }}
+                    onChangeShowTopGroupBooking={value =>
+                        setShowTopGroupBooking(value)
+                    }
+                    resultSearch={resultSearch}
+                    topics={listTopics}
+                />
+            </View>
 
             <StyleActionSheet
                 ref={optionsRef}
