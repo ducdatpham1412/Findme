@@ -22,6 +22,10 @@
 		CEE0445328886C3B00F547AF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEE0445128886C3B00F547AF /* GoogleService-Info.plist */; };
 		E1EDA080285E236800AC739E /* chim_cu_gay.wav in Resources */ = {isa = PBXBuildFile; fileRef = E1EDA07F285E236800AC739E /* chim_cu_gay.wav */; };
 		E1EDA081285E236800AC739E /* chim_cu_gay.wav in Resources */ = {isa = PBXBuildFile; fileRef = E1EDA07F285E236800AC739E /* chim_cu_gay.wav */; };
+		6BFB3FD80BC04769A4257FDF /* AvenirLTStd-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = DFEB043743EA465F8B7A9518 /* AvenirLTStd-Black.otf */; };
+		4844E9A6A5BE474A97040E8A /* AvenirLTStd-Book.otf in Resources */ = {isa = PBXBuildFile; fileRef = F84B3C7CF7BB477DA4828BB1 /* AvenirLTStd-Book.otf */; };
+		1E78372C4C4243A9895E359B /* AvenirLTStd-Roman.otf in Resources */ = {isa = PBXBuildFile; fileRef = C5D73E123BB84FA7AE5F5678 /* AvenirLTStd-Roman.otf */; };
+		6E5EBAA7C1DD45E88C8C6D64 /* GT Super Display Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B6D1C7191D7340A7899EBCE7 /* GT Super Display Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +77,10 @@
 		F06E9410E771B3FF4D8A898E /* libPods-Findme.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Findme.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5DEC439240D9F267F234E9C /* Pods-Findme-FindmeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Findme-FindmeTests.release.xcconfig"; path = "Target Support Files/Pods-Findme-FindmeTests/Pods-Findme-FindmeTests.release.xcconfig"; sourceTree = "<group>"; };
 		F71A571A84D7CAC01D961C6B /* Pods-Findme.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Findme.release.xcconfig"; path = "Target Support Files/Pods-Findme/Pods-Findme.release.xcconfig"; sourceTree = "<group>"; };
+		DFEB043743EA465F8B7A9518 /* AvenirLTStd-Black.otf */ = {isa = PBXFileReference; name = "AvenirLTStd-Black.otf"; path = "../src/asset/fonts/AvenirLTStd-Black.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		F84B3C7CF7BB477DA4828BB1 /* AvenirLTStd-Book.otf */ = {isa = PBXFileReference; name = "AvenirLTStd-Book.otf"; path = "../src/asset/fonts/AvenirLTStd-Book.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		C5D73E123BB84FA7AE5F5678 /* AvenirLTStd-Roman.otf */ = {isa = PBXFileReference; name = "AvenirLTStd-Roman.otf"; path = "../src/asset/fonts/AvenirLTStd-Roman.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		B6D1C7191D7340A7899EBCE7 /* GT Super Display Regular.ttf */ = {isa = PBXFileReference; name = "GT Super Display Regular.ttf"; path = "../src/asset/fonts/GT Super Display Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +219,10 @@
 		F0660F1F8A0C4C0BBA4FB2B6 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				DFEB043743EA465F8B7A9518 /* AvenirLTStd-Black.otf */,
+				F84B3C7CF7BB477DA4828BB1 /* AvenirLTStd-Book.otf */,
+				C5D73E123BB84FA7AE5F5678 /* AvenirLTStd-Roman.otf */,
+				B6D1C7191D7340A7899EBCE7 /* GT Super Display Regular.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -320,6 +332,10 @@
 				E1EDA080285E236800AC739E /* chim_cu_gay.wav in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				CEE0445228886C3B00F547AF /* GoogleService-Info.plist in Resources */,
+				6BFB3FD80BC04769A4257FDF /* AvenirLTStd-Black.otf in Resources */,
+				4844E9A6A5BE474A97040E8A /* AvenirLTStd-Book.otf in Resources */,
+				1E78372C4C4243A9895E359B /* AvenirLTStd-Roman.otf in Resources */,
+				6E5EBAA7C1DD45E88C8C6D64 /* GT Super Display Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

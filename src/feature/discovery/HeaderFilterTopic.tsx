@@ -286,6 +286,7 @@ const styles = ScaledSheet.create({
     },
     title: {
         fontSize: FONT_SIZE.small,
+        fontWeight: 'bold',
         alignSelf: 'center',
     },
     topicView: {

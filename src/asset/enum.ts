@@ -215,3 +215,10 @@ export enum GROUP_BUYING_STATUS {
     joinedNotBought = 2,
     bought = 3,
 }
+
+export enum FONT_FAMILY {
+    avenirRegular = 'AvenirLTStd-Book',
+    avenirBold = 'AvenirLTStd-Black',
+    avenirRoman = 'AvenirLTStd-Roman',
+    gtSuperRegular = 'GT Super Display Regular',
+}

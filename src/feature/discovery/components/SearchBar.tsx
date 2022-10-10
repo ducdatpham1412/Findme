@@ -1,18 +1,14 @@
 import {TypeResultSearch} from 'api/interface/discovery';
+import {FONT_FAMILY} from 'asset/enum';
 import Images from 'asset/img/images';
 import {FONT_SIZE} from 'asset/standardValue';
 import Theme, {TypeTheme} from 'asset/theme/Theme';
 import {StyleIcon, StyleText, StyleTouchable} from 'components/base';
+import AppInput from 'components/base/AppInput';
 import React, {Component, useEffect, useRef, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import {useTranslation} from 'react-i18next';
-import {
-    Animated,
-    Platform,
-    TextInput,
-    TextInputProps,
-    View,
-} from 'react-native';
+import {Animated, Platform, TextInputProps, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {I18Normalize} from 'utility/I18Next';
@@ -44,7 +40,7 @@ interface BannerProps {
 const CustomInput = (props: InputProps) => {
     const {t} = useTranslation();
     return (
-        <TextInput
+        <AppInput
             {...props}
             placeholder={props.i18PlaceHolder ? t(props.i18PlaceHolder) : ''}
         />
@@ -196,7 +192,13 @@ class SearchBar extends Component<Props, States> {
         this.translateY.setValue(value);
     }
 
-    shouldComponentUpdate(nextProps: Readonly<Props>) {
+    shouldComponentUpdate(nextProps: Readonly<Props>, nextStates: States) {
+        if (nextStates.textSearch !== this.state.textSearch) {
+            return true;
+        }
+        if (nextStates.textDisplayResult !== this.state.textDisplayResult) {
+            return true;
+        }
         if (!isEqual(nextProps.resultSearch, this.props.resultSearch)) {
             return true;
         }
@@ -293,7 +295,6 @@ const styles = ScaledSheet.create({
         alignSelf: 'center',
         height: '40@ms',
         width: '80%',
-        backgroundColor: 'green',
         borderRadius: '30@ms',
         borderWidth: Platform.select({
             ios: '0.25@ms',
@@ -333,6 +334,7 @@ const styles = ScaledSheet.create({
     titleBanner: {
         fontSize: '25@ms',
         color: Theme.common.white,
+        fontFamily: FONT_FAMILY.gtSuperRegular,
     },
     textBanner: {
         fontSize: FONT_SIZE.small,

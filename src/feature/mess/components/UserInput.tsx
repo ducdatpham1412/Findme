@@ -1,6 +1,7 @@
 import {Metrics} from 'asset/metrics';
-import {FONT_SIZE} from 'asset/standardValue';
+import {FONT_SIZE, LINE_HEIGHT} from 'asset/standardValue';
 import {StyleTouchable} from 'components/base';
+import AppInput from 'components/base/AppInput';
 import Redux from 'hook/useRedux';
 import {socketTyping, socketUnTyping} from 'hook/useSocketIO';
 import React, {
@@ -12,7 +13,7 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import {Animated, Keyboard, Platform, TextInput, View} from 'react-native';
+import {Animated, Keyboard, Platform, View} from 'react-native';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -232,7 +233,7 @@ const UserInput = (props: UserInputProps, inputRef: any) => {
                         backgroundColor: theme.backgroundTextInput,
                     },
                 ]}>
-                <TextInput
+                <AppInput
                     ref={inputRef}
                     value={text}
                     onChangeText={onChangeText}
@@ -257,7 +258,7 @@ const UserInput = (props: UserInputProps, inputRef: any) => {
                             userId: myId,
                         })
                     }
-                    placeholder="Hi"
+                    placeholder="Hello"
                     placeholderTextColor={theme.holderColorLighter}
                     selectionColor={borderMessRoute}
                 />
@@ -297,8 +298,8 @@ const styles = ScaledSheet.create({
     },
     inputView: {
         borderRadius: '30@ms',
-        paddingTop: '3@vs',
-        paddingBottom: isIOS ? '7@vs' : '2@vs',
+        // paddingTop: '3@vs',
+        // paddingBottom: isIOS ? '7@vs' : '2@vs',
         paddingHorizontal: Platform.select({
             ios: '12@s',
             android: '8@s',
@@ -314,7 +315,9 @@ const styles = ScaledSheet.create({
         width: '100%',
         color: 'white',
         fontSize: FONT_SIZE.normal,
-        paddingVertical: 0,
+        lineHeight: LINE_HEIGHT.normal,
+        paddingTop: '5@ms',
+        paddingBottom: '5@ms',
     },
     sendIcon: {
         fontSize: '20@ms',

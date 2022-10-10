@@ -1,3 +1,4 @@
+import {FONT_FAMILY} from 'asset/enum';
 import React, {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleProp, Text, TextProps, TextStyle} from 'react-native';
@@ -37,6 +38,7 @@ const styles = ScaledSheet.create({
     textDefaultStyle: {
         fontSize: '17@ms',
         color: 'lightgreen',
+        fontFamily: FONT_FAMILY.avenirRegular,
     },
 });
 
