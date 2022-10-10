@@ -11,6 +11,7 @@ import {useTranslation} from 'react-i18next';
 import {Animated, Platform, TextInputProps, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import {chooseIconPostType, chooseIconTopic} from 'utility/assistant';
 import {I18Normalize} from 'utility/I18Next';
 import {spaceHeight} from './ListTopGroupBuying';
 
@@ -20,6 +21,7 @@ interface Props {
     onChangeShowTopGroupBooking(value: boolean): void;
     resultSearch: TypeResultSearch;
     topics: Array<number>;
+    postTypes: Array<number>;
 }
 
 interface States {
@@ -103,7 +105,8 @@ const BannerBox = ({animateBanner, resultSearch, textSearch}: BannerProps) => {
                 <>
                     <StyleText
                         i18Text="discovery.resultFor"
-                        customStyle={styles.textTitleSearch}>
+                        customStyle={styles.textTitleSearch}
+                        numberOfLines={1}>
                         <StyleText
                             originValue={` '${textSearch}'`}
                             customStyle={[
@@ -205,6 +208,9 @@ class SearchBar extends Component<Props, States> {
         if (!isEqual(nextProps.topics, this.props.topics)) {
             return true;
         }
+        if (!isEqual(nextProps.postTypes, this.props.postTypes)) {
+            return true;
+        }
         if (
             nextProps.theme.backgroundColor !== this.props.theme.backgroundColor
         ) {
@@ -214,8 +220,14 @@ class SearchBar extends Component<Props, States> {
     }
 
     render() {
-        const {theme, onSearch, onChangeShowTopGroupBooking, resultSearch} =
-            this.props;
+        const {
+            theme,
+            onSearch,
+            onChangeShowTopGroupBooking,
+            resultSearch,
+            topics,
+            postTypes,
+        } = this.props;
         const {textSearch, textDisplayResult} = this.state;
 
         return (
@@ -278,6 +290,26 @@ class SearchBar extends Component<Props, States> {
                         }}
                     />
                 </Animated.View>
+
+                <View style={styles.topicPostTypeView}>
+                    {topics.map(topic => (
+                        <StyleIcon
+                            key={topic}
+                            source={chooseIconTopic(topic)}
+                            size={10}
+                            customStyle={styles.iconTopic}
+                        />
+                    ))}
+                    <StyleText originValue="・" customStyle={styles.textDot} />
+                    {postTypes.map(postType => (
+                        <StyleIcon
+                            key={postType}
+                            source={chooseIconPostType(postType)}
+                            size={10}
+                            customStyle={styles.iconTopic}
+                        />
+                    ))}
+                </View>
             </Animated.View>
         );
     }
@@ -293,7 +325,6 @@ const styles = ScaledSheet.create({
     // search
     searchView: {
         alignSelf: 'center',
-        height: '40@ms',
         width: '80%',
         borderRadius: '30@ms',
         borderWidth: Platform.select({
@@ -303,13 +334,12 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         overflow: 'hidden',
-        marginBottom: '10@vs',
+        marginBottom: '5@vs',
     },
     filterSearchBox: {
-        width: '40@ms',
-        height: '40@ms',
         alignItems: 'center',
         justifyContent: 'center',
+        paddingHorizontal: '6@ms',
     },
     iconSearch: {
         fontSize: '20@ms',
@@ -318,6 +348,8 @@ const styles = ScaledSheet.create({
     inputBox: {
         flex: 1,
         fontSize: FONT_SIZE.normal,
+        paddingTop: '8@ms',
+        paddingBottom: '8@ms',
     },
     // banner
     upperBox: {
@@ -353,6 +385,19 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: '8@vs',
+    },
+    topicPostTypeView: {
+        position: 'absolute',
+        top: '2@vs',
+        right: '15@s',
+        flexDirection: 'row',
+    },
+    iconTopic: {
+        marginHorizontal: '2.5@s',
+    },
+    textDot: {
+        fontSize: '10@ms',
+        color: Theme.common.white,
     },
 });
 

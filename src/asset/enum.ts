@@ -222,3 +222,9 @@ export enum FONT_FAMILY {
     avenirRoman = 'AvenirLTStd-Roman',
     gtSuperRegular = 'GT Super Display Regular',
 }
+
+export enum SESSION {
+    morning = 'morning',
+    afternoon = 'afternoon',
+    evening = 'evening',
+}

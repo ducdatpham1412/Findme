@@ -1,3 +1,4 @@
+import {SESSION} from 'asset/enum';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -95,4 +96,15 @@ export const formatLocaleNumber = (value: string) => {
 
 export const formatDayFromNow = (date: Date | string) => {
     return dayjs(date).diff(new Date(), 'day');
+};
+
+export const getSessionOfDay = () => {
+    const hour = dayjs().hour();
+    if (hour >= 5 && hour < 12) {
+        return SESSION.morning;
+    }
+    if (hour >= 12 && hour < 6) {
+        return SESSION.afternoon;
+    }
+    return SESSION.evening;
 };

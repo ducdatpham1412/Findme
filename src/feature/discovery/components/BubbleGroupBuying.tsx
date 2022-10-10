@@ -485,8 +485,7 @@ const styles = ScaledSheet.create({
     },
     imagePreview: {
         width: '100%',
-        borderTopLeftRadius: '8@ms',
-        borderTopRightRadius: '8@ms',
+        borderRadius: '8@ms',
         height: width * ratioImageGroupBuying,
     },
     creatorView: {

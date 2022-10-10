@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import Theme from 'asset/theme/Theme';
 import StyleTouchHaveDouble from 'components/base/StyleTouchHaveDouble';
+import StyleVideo from 'components/base/StyleVideo';
 import PinchImage from 'components/PinchImage';
 import React, {ReactNode, useEffect, useRef, useState} from 'react';
 import {
@@ -15,7 +16,6 @@ import {
     ViewStyle,
 } from 'react-native';
 import {scale, ScaledSheet} from 'react-native-size-matters';
-import Video from 'react-native-video';
 import {
     DEAD_ZONE,
     DefaultTransitionSpec,
@@ -263,7 +263,7 @@ const ScrollSyncSizeImage = (props: Props) => {
                     }
 
                     return (
-                        <Video
+                        <StyleVideo
                             key={url}
                             source={{uri: url}}
                             style={{
@@ -286,7 +286,6 @@ const ScrollSyncSizeImage = (props: Props) => {
                                 tempRatio = tempRatio > 1.3 ? 1.3 : tempRatio;
                                 setRatio(tempRatio);
                             }}
-                            controls
                             resizeMode="cover"
                             {...videoProps}
                         />

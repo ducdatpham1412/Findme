@@ -2,7 +2,7 @@
 import {Platform} from 'react-native';
 import Config from 'react-native-config';
 import {I18Normalize} from 'utility/I18Next';
-import {FEELING, TOPIC} from './enum';
+import {FEELING, POST_TYPE, TOPIC} from './enum';
 import Images from './img/images';
 
 export const standValue = {
@@ -138,6 +138,23 @@ export const LIST_TOPICS: Array<{
     //     text: 'profile.post.shopping',
     //     icon: Images.icons.shopping,
     // },
+];
+
+export const LIST_POST_TYPES: Array<{
+    id: number;
+    text: I18Normalize;
+    icon: any;
+}> = [
+    {
+        id: POST_TYPE.review,
+        text: 'profile.createReviewPost',
+        icon: Images.icons.star,
+    },
+    {
+        id: POST_TYPE.groupBuying,
+        text: 'profile.createGroupBuying',
+        icon: Images.icons.house,
+    },
 ];
 
 export enum FONT_SIZE {

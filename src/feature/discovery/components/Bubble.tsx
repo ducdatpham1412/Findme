@@ -773,7 +773,7 @@ const styles = ScaledSheet.create({
         width: '100%',
         flexDirection: 'row-reverse',
         alignItems: 'center',
-        marginTop: '5@vs',
+        marginTop: '15@vs',
     },
     footerViewDraft: {
         width: '100%',
