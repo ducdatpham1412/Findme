@@ -282,18 +282,20 @@ const BubbleGroupBuying = (props: Props) => {
                             />
                         </View>
 
-                        <View style={styles.locationBox}>
-                            <CustomBlurView />
-                            <Entypo
-                                name="location-pin"
-                                style={styles.iconLocation}
-                            />
-                            <StyleText
-                                originValue={item.creatorLocation}
-                                customStyle={styles.textLocation}
-                                numberOfLines={1}
-                            />
-                        </View>
+                        {!!item.creatorLocation && (
+                            <View style={styles.locationBox}>
+                                <CustomBlurView />
+                                <Entypo
+                                    name="location-pin"
+                                    style={styles.iconLocation}
+                                />
+                                <StyleText
+                                    originValue={item.creatorLocation}
+                                    customStyle={styles.textLocation}
+                                    numberOfLines={1}
+                                />
+                            </View>
+                        )}
                     </View>
 
                     <View style={styles.leftRight}>

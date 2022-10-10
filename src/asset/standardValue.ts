@@ -1,4 +1,5 @@
 /* eslint-disable no-shadow */
+import {Platform} from 'react-native';
 import Config from 'react-native-config';
 import {I18Normalize} from 'utility/I18Next';
 import {FEELING, TOPIC} from './enum';
@@ -144,5 +145,11 @@ export enum FONT_SIZE {
     normal = '14@ms',
     small = '11@ms',
 }
+export const LINE_HEIGHT = {
+    normal: Platform.select({
+        ios: '17@ms',
+        android: '17@ms',
+    }),
+};
 
 export const ratioImageGroupBuying = 0.5; // height / width

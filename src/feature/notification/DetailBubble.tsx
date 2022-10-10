@@ -29,9 +29,9 @@ import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
 import {appAlert} from 'navigation/NavigationService';
+import {showPreviewLink} from 'navigation/screen/AppStack';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {ScrollView, View} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import Share from 'react-native-share';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -310,15 +310,79 @@ const DetailBubble = ({route}: Props) => {
 
     const Footer = () => {
         const arrayStars = Array(bubble?.stars).fill(0);
+
+        const chooseLink = () => {
+            if (bubble?.userReviewed) {
+                return (
+                    <StyleTouchable
+                        customStyle={styles.linkBox}
+                        onPress={() => showPreviewLink(bubble)}>
+                        <View
+                            style={[
+                                styles.linkTouch,
+                                {
+                                    backgroundColor:
+                                        theme.backgroundButtonColor,
+                                },
+                            ]}>
+                            <StyleIcon
+                                source={Images.icons.username}
+                                size={15}
+                                customStyle={{tintColor: theme.textColor}}
+                            />
+                            <StyleText
+                                originValue={bubble.userReviewed?.name || ''}
+                                customStyle={[
+                                    styles.textSeeNow,
+                                    {color: theme.textColor},
+                                ]}
+                            />
+                        </View>
+                    </StyleTouchable>
+                );
+            }
+            if (bubble?.link) {
+                return (
+                    <StyleTouchable
+                        customStyle={styles.linkBox}
+                        onPress={() => showPreviewLink(bubble)}>
+                        <View
+                            style={[
+                                styles.linkTouch,
+                                {
+                                    backgroundColor:
+                                        theme.backgroundButtonColor,
+                                },
+                            ]}>
+                            <AntDesign
+                                name="link"
+                                style={[
+                                    styles.iconHouse,
+                                    {color: theme.textColor},
+                                ]}
+                            />
+                            <StyleText
+                                i18Text="discovery.seeMore"
+                                customStyle={[
+                                    styles.textSeeNow,
+                                    {color: theme.textColor},
+                                ]}
+                            />
+                        </View>
+                    </StyleTouchable>
+                );
+            }
+            return null;
+        };
+
         return (
             <View style={styles.footerView}>
                 <View style={styles.starLink}>
-                    <LinearGradient
-                        colors={[
-                            Theme.common.gradientTabBar1,
-                            Theme.common.gradientTabBar2,
-                        ]}
-                        style={styles.starBox}>
+                    <View
+                        style={[
+                            styles.starBox,
+                            {backgroundColor: theme.backgroundButtonColor},
+                        ]}>
                         {arrayStars.map((_, index) => (
                             <AntDesign
                                 key={index}
@@ -326,28 +390,8 @@ const DetailBubble = ({route}: Props) => {
                                 style={styles.star}
                             />
                         ))}
-                    </LinearGradient>
-                    {bubble?.link && (
-                        <StyleTouchable customStyle={styles.linkBox}>
-                            <LinearGradient
-                                colors={[
-                                    Theme.common.gradientTabBar1,
-                                    Theme.common.gradientTabBar2,
-                                ]}
-                                style={styles.linkTouch}>
-                                <View style={styles.iconHouseTouch}>
-                                    <StyleImage
-                                        source={Images.icons.house}
-                                        customStyle={styles.iconHouse}
-                                    />
-                                </View>
-                                <StyleText
-                                    originValue={'See now'}
-                                    customStyle={styles.textSeeNow}
-                                />
-                            </LinearGradient>
-                        </StyleTouchable>
-                    )}
+                    </View>
+                    {chooseLink()}
                 </View>
 
                 <View style={styles.likeCommentShareSave}>
@@ -466,14 +510,11 @@ const DetailBubble = ({route}: Props) => {
     };
 
     return (
-        <>
+        <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
             <ViewSafeTopPadding />
             <StyleHeader title={bubble?.creatorName || ''} />
             <ScrollView
-                contentContainerStyle={[
-                    styles.container,
-                    {backgroundColor: theme.backgroundColor},
-                ]}
+                contentContainerStyle={styles.container}
                 showsVerticalScrollIndicator={false}>
                 {Header()}
                 <ScrollSyncSizeImage
@@ -521,7 +562,7 @@ const DetailBubble = ({route}: Props) => {
                     });
                 }}
             />
-        </>
+        </View>
     );
 };
 
@@ -631,23 +672,14 @@ const styles = ScaledSheet.create({
         borderRadius: '5@ms',
         paddingHorizontal: '10@s',
     },
-    iconHouseTouch: {
-        width: '17@ms',
-        height: '17@ms',
-        backgroundColor: Theme.common.white,
-        borderRadius: '15@ms',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
     iconHouse: {
-        width: '8@ms',
-        height: '8@ms',
+        fontSize: '13@ms',
     },
     textSeeNow: {
         fontSize: '10@ms',
         fontWeight: 'bold',
         color: Theme.common.white,
-        marginLeft: '7@s',
+        marginLeft: '4@s',
     },
     likeCommentShareSave: {
         width: '100%',

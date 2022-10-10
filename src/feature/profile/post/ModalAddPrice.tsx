@@ -1,7 +1,8 @@
 import {TypePrice} from 'api/interface/discovery';
-import {FONT_SIZE} from 'asset/standardValue';
+import {FONT_SIZE, LINE_HEIGHT} from 'asset/standardValue';
 import Theme, {TypeTheme} from 'asset/theme/Theme';
 import {StyleButton, StyleText} from 'components/base';
+import AppInput from 'components/base/AppInput';
 import ButtonX from 'components/common/ButtonX';
 import React, {Component} from 'react';
 import {Platform, TextInput, View} from 'react-native';
@@ -84,7 +85,7 @@ class ModalAddPrice extends Component<Props, States> {
             return (
                 <>
                     <View style={styles.inputView}>
-                        <TextInput
+                        <AppInput
                             ref={this.inputNumberRef}
                             defaultValue={numberPeople}
                             onChangeText={value =>
@@ -123,7 +124,7 @@ class ModalAddPrice extends Component<Props, States> {
                                     borderWidth: borderWidthPrice,
                                 },
                             ]}>
-                            <TextInput
+                            <AppInput
                                 ref={this.inputPriceRef}
                                 value={priceValue}
                                 onChangeText={value => {
@@ -281,6 +282,7 @@ const styles = ScaledSheet.create({
         paddingBottom: '8@vs',
         paddingHorizontal: '7@s',
         fontSize: FONT_SIZE.normal,
+        lineHeight: LINE_HEIGHT.normal,
     },
     textVnd: {
         marginRight: '7@s',

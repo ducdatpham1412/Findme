@@ -529,7 +529,7 @@ const Bubble = (props: Props) => {
                         <CustomBlurView />
                         <StyleIcon
                             source={Images.icons.comment}
-                            size={14}
+                            size={16}
                             customStyle={{tintColor: Theme.common.white}}
                         />
                     </StyleTouchable>
@@ -541,7 +541,7 @@ const Bubble = (props: Props) => {
                         <CustomBlurView />
                         <StyleIcon
                             source={Images.icons.share}
-                            size={15}
+                            size={18}
                             customStyle={{tintColor: Theme.common.white}}
                         />
                     </StyleTouchable>
@@ -561,7 +561,7 @@ const Bubble = (props: Props) => {
                                 name="bookmark"
                                 style={[
                                     styles.save,
-                                    {color: Theme.common.comment},
+                                    {color: Theme.common.gradientTabBar1},
                                 ]}
                             />
                         ) : (
@@ -815,7 +815,7 @@ const styles = ScaledSheet.create({
         paddingHorizontal: '10@s',
     },
     save: {
-        fontSize: '14@ms',
+        fontSize: '17@ms',
     },
     likeTouch: {
         paddingLeft: '10@s',
