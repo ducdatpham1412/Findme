@@ -179,6 +179,9 @@ const discovery = {
     averageStars: 'Average stars: {{value}}',
     totalReviews: 'Total reviews: {{value}}',
     totalCampaigns: 'Total group booking campaigns: {{value}}',
+    goodMorning: 'Good morning 🌤',
+    goodAfternoon: 'Good afternoon ☀️',
+    goodEvening: 'Good evening 🌙',
 };
 
 // REPUTATION

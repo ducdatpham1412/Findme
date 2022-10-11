@@ -346,6 +346,7 @@ const DiscoveryScreen = () => {
                     }
                     resultSearch={resultSearch}
                     topics={listTopics}
+                    postTypes={postTypes}
                 />
             </View>
 

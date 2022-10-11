@@ -1,4 +1,5 @@
 import {TypeGetProfileResponse} from 'api/interface';
+import {SESSION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';
@@ -10,6 +11,8 @@ import React, {Component} from 'react';
 import isEqual from 'react-fast-compare';
 import {Animated, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
+import {getSessionOfDay} from 'utility/format';
+import {I18Normalize} from 'utility/I18Next';
 
 const {safeTopPadding} = Metrics;
 
@@ -40,6 +43,13 @@ class HeaderDoffy extends Component<Props> {
 
     render() {
         const {theme, profile, onPressFilterIcon} = this.props;
+        const session = getSessionOfDay();
+        let textSession: I18Normalize = 'discovery.goodMorning';
+        if (session === SESSION.afternoon) {
+            textSession = 'discovery.goodAfternoon';
+        } else if (session === SESSION.evening) {
+            textSession = 'discovery.goodEvening';
+        }
 
         return (
             <View style={styles.container}>
@@ -61,7 +71,7 @@ class HeaderDoffy extends Component<Props> {
                         />
                         <View>
                             <StyleText
-                                originValue="Good morning ❤️"
+                                i18Text={textSession}
                                 customStyle={[
                                     styles.textHello,
                                     {color: Theme.common.gradientTabBar2},
@@ -147,6 +157,7 @@ const styles = ScaledSheet.create({
     toolLeftView: {
         flexDirection: 'row',
         maxWidth: '70%',
+        alignItems: 'center',
     },
     toolRightView: {
         flexDirection: 'row',

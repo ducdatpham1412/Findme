@@ -9,3 +9,17 @@ fi
 if [ ./react-native-config/react-native-config.podspec ]; then
     cp ./react-native-config/react-native-config.podspec ../node_modules/react-native-config/react-native-config.podspec
 fi
+
+if [ ./react-native-video-controls/VideoPlayer.js ]; then
+    cp ./react-native-video-controls/VideoPlayer.js ../node_modules/react-native-video-controls/VideoPlayer.js
+fi
+
+if [ ./react-native-video-controls/assets/img/no_volume.png ]; then
+    cp ./react-native-video-controls/assets/img/no_volume.png ../node_modules/react-native-video-controls/assets/img/no_volume.png
+fi
+if [ ./react-native-video-controls/assets/img/no_volume@2x.png ]; then
+    cp ./react-native-video-controls/assets/img/no_volume@2x.png ../node_modules/react-native-video-controls/assets/img/no_volume@2x.png
+fi
+if [ ./react-native-video-controls/assets/img/no_volume@3x.png ]; then
+    cp ./react-native-video-controls/assets/img/no_volume@3x.png ../node_modules/react-native-video-controls/assets/img/no_volume@3x.png
+fi

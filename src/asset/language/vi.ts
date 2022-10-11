@@ -183,6 +183,9 @@ const discovery = {
     averageStars: ' Số sao trung bình: {{value}}',
     totalReviews: ' Số bài review: {{value}}',
     totalCampaigns: ' Số chiến dịch mua chung: {{value}}',
+    goodMorning: 'Chào buổi sáng 🌤',
+    goodAfternoon: 'Chào buổi chiều ☀️',
+    goodEvening: 'Chào buổi tối 🌙',
 };
 
 // REPUTATION

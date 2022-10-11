@@ -14,7 +14,7 @@ import {ScaledSheet} from 'react-native-size-matters';
 
 const {width} = Metrics;
 const itemWidth = width * 0.7;
-export const spaceHeight = width * 0.5;
+export const spaceHeight = width * 0.45;
 
 interface Props {
     showTopGroupBooking: boolean;
@@ -121,14 +121,14 @@ const styles = ScaledSheet.create({
         fontSize: FONT_SIZE.big,
         fontWeight: 'bold',
         left: '10@s',
-        marginTop: '20@vs',
+        marginTop: '10@vs',
         marginBottom: '15@vs',
     },
     titleDiscovery: {
         fontSize: FONT_SIZE.big,
         fontWeight: 'bold',
         left: '10@s',
-        marginTop: '15@vs',
+        marginTop: '20@vs',
     },
     itemView: {
         marginLeft: '5@s',
