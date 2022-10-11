@@ -13,7 +13,7 @@ import {Animated, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 
 const {width} = Metrics;
-const itemWidth = width * 0.7;
+const itemWidth = width * 0.55;
 export const spaceHeight = width * 0.45;
 
 interface Props {
@@ -59,6 +59,7 @@ const ListUnder = () => {
                         containerStyle={styles.itemView}
                         detailGroupTarget={DISCOVERY_ROUTE.detailGroupBuying}
                         syncWidth={itemWidth}
+                        isHorizontal={false}
                     />
                 )}
                 horizontal

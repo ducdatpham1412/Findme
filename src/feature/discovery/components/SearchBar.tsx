@@ -5,14 +5,21 @@ import {FONT_SIZE} from 'asset/standardValue';
 import Theme, {TypeTheme} from 'asset/theme/Theme';
 import {StyleIcon, StyleText, StyleTouchable} from 'components/base';
 import AppInput from 'components/base/AppInput';
-import React, {Component, useEffect, useRef, useState} from 'react';
+import React, {Component, forwardRef, useEffect, useRef, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import {useTranslation} from 'react-i18next';
-import {Animated, Platform, TextInputProps, View} from 'react-native';
+import {
+    Animated,
+    Platform,
+    TextInput,
+    TextInputProps,
+    View,
+} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {chooseIconPostType, chooseIconTopic} from 'utility/assistant';
 import {I18Normalize} from 'utility/I18Next';
+import Feather from 'react-native-vector-icons/Feather';
 import {spaceHeight} from './ListTopGroupBuying';
 
 interface Props {
@@ -39,15 +46,16 @@ interface BannerProps {
     textSearch: string;
 }
 
-const CustomInput = (props: InputProps) => {
+const CustomInput = forwardRef((props: InputProps, ref: any) => {
     const {t} = useTranslation();
     return (
         <AppInput
+            ref={ref}
             {...props}
             placeholder={props.i18PlaceHolder ? t(props.i18PlaceHolder) : ''}
         />
     );
-};
+});
 
 const BannerBox = ({animateBanner, resultSearch, textSearch}: BannerProps) => {
     const timeOutCheck = useRef<any>(null);
@@ -182,6 +190,8 @@ class SearchBar extends Component<Props, States> {
 
     translateY = new Animated.Value(0);
 
+    inputSearchRef = React.createRef<TextInput>();
+
     state: States = {
         textSearch: '',
         textDisplayResult: '',
@@ -271,6 +281,7 @@ class SearchBar extends Component<Props, States> {
                         />
                     </StyleTouchable>
                     <CustomInput
+                        ref={this.inputSearchRef}
                         style={[styles.inputBox, {color: theme.textHightLight}]}
                         i18PlaceHolder="discovery.whereShouldWeGo"
                         placeholderTextColor={theme.holderColorLighter}
@@ -289,6 +300,25 @@ class SearchBar extends Component<Props, States> {
                             });
                         }}
                     />
+                    <StyleTouchable
+                        customStyle={styles.clearBox}
+                        hitSlop={{top: 5, bottom: 5}}
+                        onPress={() => {
+                            this.inputSearchRef.current?.clear();
+                            this.setState({
+                                textSearch: '',
+                            });
+                        }}>
+                        {!!textSearch && (
+                            <Feather
+                                name="x"
+                                style={[
+                                    styles.iconClear,
+                                    {color: theme.borderColor},
+                                ]}
+                            />
+                        )}
+                    </StyleTouchable>
                 </Animated.View>
 
                 <View style={styles.topicPostTypeView}>
@@ -399,6 +429,14 @@ const styles = ScaledSheet.create({
     textDot: {
         fontSize: '10@ms',
         color: Theme.common.white,
+    },
+    clearBox: {
+        width: '30@ms',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    iconClear: {
+        fontSize: '20@ms',
     },
 });
 

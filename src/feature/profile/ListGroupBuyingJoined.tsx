@@ -26,6 +26,7 @@ const ListGroupBuyingJoined = (props: Props) => {
                         item={item}
                         setList={listPaging.setList}
                         detailGroupTarget={detailGroupTarget}
+                        isHorizontal
                     />
                 );
             })}
