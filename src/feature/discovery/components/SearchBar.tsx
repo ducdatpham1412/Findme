@@ -372,6 +372,7 @@ const styles = ScaledSheet.create({
         fontSize: FONT_SIZE.small,
         marginTop: '10@vs',
         color: Theme.common.textMe,
+        textAlign: 'center',
     },
     textTitleSearch: {
         fontSize: FONT_SIZE.normal,

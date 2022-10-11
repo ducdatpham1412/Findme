@@ -20,6 +20,7 @@ import CodePush from 'react-native-code-push';
 import Config from 'react-native-config';
 import SplashScreen from 'react-native-splash-screen';
 import {isIOS, logger} from 'utility/assistant';
+import {LanguageProvider} from 'utility/format';
 import {selectIsHaveActiveUser} from 'utility/login/selectScreen';
 import AppStack from './AppStack';
 import DynamicLink from './DynamicLink';
@@ -102,72 +103,77 @@ const RootScreen = () => {
 
     return (
         <NavigationContainer ref={navigationRef}>
-            <TabBarProvider>
-                <StatusBar barStyle={barStyle} />
+            <LanguageProvider>
+                <TabBarProvider>
+                    <StatusBar barStyle={barStyle} />
 
-                <RootStack.Navigator
-                    screenOptions={{
-                        headerShown: false,
-                    }}>
-                    <RootStack.Screen
-                        name="check"
-                        component={choosingRoute()}
-                    />
+                    <RootStack.Navigator
+                        screenOptions={{
+                            headerShown: false,
+                        }}>
+                        <RootStack.Screen
+                            name="check"
+                            component={choosingRoute()}
+                        />
 
-                    {/* Alert */}
-                    <RootStack.Screen
-                        options={{
-                            ...alertOption,
-                            cardStyle: {
-                                backgroundColor: theme.backgroundOpacity(),
-                            },
-                        }}
-                        name={ROOT_SCREEN.alert}
-                        component={Alert}
-                    />
-                    {/* Alert yes no */}
-                    <RootStack.Screen
-                        options={{
-                            ...alertOption,
-                            cardStyle: {
-                                backgroundColor: theme.backgroundOpacity(),
-                            },
-                        }}
-                        name={ROOT_SCREEN.alertYesNo}
-                        component={AlertYesNo}
-                    />
-
-                    {/* Web view */}
-                    <RootStack.Screen
-                        name={ROOT_SCREEN.webView}
-                        component={WebViewScreen}
-                        options={{
-                            cardStyle: [
-                                {
-                                    backgroundColor: theme.backgroundColor,
+                        {/* Alert */}
+                        <RootStack.Screen
+                            options={{
+                                ...alertOption,
+                                cardStyle: {
+                                    backgroundColor: theme.backgroundOpacity(),
                                 },
-                                cardSafe,
-                            ],
-                        }}
-                    />
+                            }}
+                            name={ROOT_SCREEN.alert}
+                            component={Alert}
+                        />
+                        {/* Alert yes no */}
+                        <RootStack.Screen
+                            options={{
+                                ...alertOption,
+                                cardStyle: {
+                                    backgroundColor: theme.backgroundOpacity(),
+                                },
+                            }}
+                            name={ROOT_SCREEN.alertYesNo}
+                            component={AlertYesNo}
+                        />
 
-                    {/* Picker */}
-                    <RootStack.Screen
-                        name={ROOT_SCREEN.picker}
-                        component={StylePicker}
-                        options={{
-                            cardStyle: [
-                                {backgroundColor: theme.backgroundOpacity()},
-                                cardSafe,
-                            ],
-                            cardStyleInterpolator:
-                                CardStyleInterpolators.forFadeFromBottomAndroid,
-                        }}
-                    />
-                </RootStack.Navigator>
+                        {/* Web view */}
+                        <RootStack.Screen
+                            name={ROOT_SCREEN.webView}
+                            component={WebViewScreen}
+                            options={{
+                                cardStyle: [
+                                    {
+                                        backgroundColor: theme.backgroundColor,
+                                    },
+                                    cardSafe,
+                                ],
+                            }}
+                        />
 
-                <DynamicLink />
-            </TabBarProvider>
+                        {/* Picker */}
+                        <RootStack.Screen
+                            name={ROOT_SCREEN.picker}
+                            component={StylePicker}
+                            options={{
+                                cardStyle: [
+                                    {
+                                        backgroundColor:
+                                            theme.backgroundOpacity(),
+                                    },
+                                    cardSafe,
+                                ],
+                                cardStyleInterpolator:
+                                    CardStyleInterpolators.forFadeFromBottomAndroid,
+                            }}
+                        />
+                    </RootStack.Navigator>
+
+                    <DynamicLink />
+                </TabBarProvider>
+            </LanguageProvider>
         </NavigationContainer>
     );
 };
