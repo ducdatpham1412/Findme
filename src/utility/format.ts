@@ -3,10 +3,14 @@ import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import utc from 'dayjs/plugin/utc';
+import vi from 'dayjs/locale/vi';
+import en from 'dayjs/locale/en';
+import {useTranslation} from 'react-i18next';
+import {useEffect} from 'react';
 import I18Next from './I18Next';
 
 dayjs.extend(relativeTime);
-dayjs.locale('en');
+dayjs.locale(vi);
 dayjs.extend(utc);
 dayjs.extend(isToday);
 
@@ -87,7 +91,7 @@ export const formatDayGroupBuying = (date: string) => {
     if (!date) {
         return '';
     }
-    return dayjs(date).format('dddd, DD/MM/YYYY');
+    return dayjs(date).locale('jp').format('dddd, DD/MM/YYYY');
 };
 
 export const formatLocaleNumber = (value: string) => {
@@ -107,4 +111,25 @@ export const getSessionOfDay = () => {
         return SESSION.afternoon;
     }
     return SESSION.evening;
+};
+
+export const LanguageProvider = ({children}: any) => {
+    const translation = useTranslation();
+    const {language} = translation[1];
+
+    useEffect(() => {
+        switch (language) {
+            case 'vi':
+                dayjs.locale(vi);
+                break;
+            case 'en':
+                dayjs.locale(en);
+                break;
+            default:
+                dayjs.locale(vi);
+                break;
+        }
+    }, [language]);
+
+    return children;
 };

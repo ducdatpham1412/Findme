@@ -172,7 +172,7 @@ const discovery = {
     bookTourWithOther: 'Group booking',
     travelWithReasonablePrice: 'Travel with the most reasonable price 😯🥳',
     travelReview: 'Review travel',
-    letCreateCommunity: "Let's create a\ntrust travel community 🙌",
+    letCreateCommunity: "Let's create a trust travel community 🙌",
     topGroupBooking: 'Top group booking',
     discovery: 'Discovery',
     resultFor: 'Result for',
