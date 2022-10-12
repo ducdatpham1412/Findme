@@ -50,6 +50,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SharedElement} from 'react-navigation-shared-element';
 import {
     fakeGroupBuying,
+    logger,
     modeExpUsePaging,
     onGoToProfile,
     onGoToSignUp,
@@ -63,6 +64,7 @@ import {
 } from 'utility/format';
 import {I18Normalize} from 'utility/I18Next';
 import {BlurView} from '@react-native-community/blur';
+import appPurchase from 'utility/appPurchase';
 import ModalPeopleJoined from './components/ModalPeopleJoined';
 
 interface Props {
@@ -237,6 +239,8 @@ const DetailGroupBuying = ({route}: Props) => {
           })
         : modeExpUsePaging();
 
+    const {requestPurchase} = appPurchase();
+
     const [isLiked, setIsLiked] = useState(item.isLiked);
     const [totalLikes, setTotalLikes] = useState(item.totalLikes);
     const [totalJoined, setTotalJoined] = useState(item.totalJoins);
@@ -292,6 +296,7 @@ const DetailGroupBuying = ({route}: Props) => {
 
     const onJoinGroupBuying = async () => {
         if (isModeExp) {
+            logger(requestPurchase);
             return;
         }
         const oldStatus = status;
@@ -660,16 +665,21 @@ const DetailGroupBuying = ({route}: Props) => {
                 <StyleTouchable
                     customStyle={styles.peopleJoinView}
                     onPress={() => modalJoinedRef.current?.open()}>
-                    {displayPeople.map((peopleJoin, index) => (
-                        <StyleImage
-                            key={index}
-                            source={{uri: peopleJoin.creatorAvatar}}
-                            customStyle={[
-                                styles.peopleJoinAvatar,
-                                {marginLeft: index > 0 ? -5 : 0},
-                            ]}
-                        />
-                    ))}
+                    {displayPeople.map(
+                        (
+                            peopleJoin: TypePeopleJoinedResponse,
+                            index: number,
+                        ) => (
+                            <StyleImage
+                                key={index}
+                                source={{uri: peopleJoin.creatorAvatar}}
+                                customStyle={[
+                                    styles.peopleJoinAvatar,
+                                    {marginLeft: index > 0 ? -5 : 0},
+                                ]}
+                            />
+                        ),
+                    )}
                     {isBiggerThanFive && (
                         <View
                             style={[

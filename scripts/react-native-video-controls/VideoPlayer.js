@@ -1031,15 +1031,9 @@ export default class VideoPlayer extends Component {
      * Render bottom control group and wrap it in a holder
      */
     renderBottomControls() {
-        const timerControl = this.props.disableTimer
-            ? this.renderNullControl()
-            : this.renderTimer();
         const seekbarControl = this.props.disableSeekbar
             ? this.renderNullControl()
             : this.renderSeekbar();
-        const playPauseControl = this.props.disablePlayPause
-            ? this.renderNullControl()
-            : this.renderPlayPause();
 
         return (
             <Animated.View
@@ -1055,12 +1049,6 @@ export default class VideoPlayer extends Component {
                     //   imageStyle={[styles.controls.vignette]}
                 >
                     {seekbarControl}
-                    {/* <SafeAreaView
-            style={[styles.controls.row, styles.controls.bottomControlGroup]}>
-            {playPauseControl}
-            {this.renderTitle()}
-            {timerControl}
-          </SafeAreaView> */}
                 </View>
             </Animated.View>
         );
@@ -1452,10 +1440,10 @@ const styles = {
             backgroundColor: '#333',
             height: 1,
             width: '100%',
-            top: 26.5,
+            top: 27,
         },
         fill: {
-            backgroundColor: '#FFF',
+            backgroundColor: 'red',
             height: 1,
             width: '100%',
         },
@@ -1468,7 +1456,7 @@ const styles = {
         circle: {
             borderRadius: 12,
             position: 'relative',
-            top: 23.5,
+            top: 25,
             left: 8,
             height: 5,
             width: 5,

@@ -524,13 +524,12 @@ const styles = ScaledSheet.create({
         bottom: '7@s',
         paddingHorizontal: '7@s',
         flexDirection: 'row',
-        alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
     },
     bottomLeft: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-end',
     },
     numberJoinedBox: {
         flexDirection: 'row',

@@ -17,7 +17,7 @@ import ROOT_SCREEN, {DISCOVERY_ROUTE} from 'navigation/config/routes';
 import {appAlert, goBack, navigate} from 'navigation/NavigationService';
 import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {FlatList, ImageBackground, View} from 'react-native';
+import {FlatList, ImageBackground, Vibration, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {onGoToSignUp} from 'utility/assistant';
 import {useNotification} from 'utility/notification';
@@ -133,6 +133,7 @@ const DiscoveryScreen = () => {
             type: TypeShowModalCommentOrLike,
         ) => {
             if (!hadLogan) {
+                Vibration.vibrate([0.1], false);
                 appAlert('discovery.bubble.goToSignUp', {
                     moreNotice: 'common.letGo',
                     moreAction: onGoToSignUpFromAlert,

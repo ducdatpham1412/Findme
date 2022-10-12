@@ -1,10 +1,7 @@
 import {Metrics} from 'asset/metrics';
-import {
-    StyleImage,
-    StyleInput,
-    StyleText,
-    StyleTouchable,
-} from 'components/base';
+import {FONT_SIZE, LINE_HEIGHT} from 'asset/standardValue';
+import {StyleImage, StyleText, StyleTouchable} from 'components/base';
+import AppInput from 'components/base/AppInput';
 import Redux from 'hook/useRedux';
 import React, {forwardRef, useMemo} from 'react';
 import {StyleProp, View, ViewStyle} from 'react-native';
@@ -117,24 +114,24 @@ const InputComment = (props: Props, inputRef: any) => {
                 ]}>
                 {RenderAvatar}
 
-                <StyleInput
+                <AppInput
                     ref={inputRef}
-                    hasUnderLine={false}
-                    hasErrorBox={false}
                     onPressOut={onPressOut}
                     editable={editable}
-                    i18Placeholder="Comment..."
+                    placeholder="Aa..."
                     placeholderTextColor={theme.holderColorLighter}
-                    containerStyle={[
+                    style={[
                         styles.containerInput,
-                        {backgroundColor: theme.backgroundColorSecond},
+                        {
+                            backgroundColor: theme.backgroundColorSecond,
+                            color: theme.textColor,
+                        },
                     ]}
-                    inputStyle={[styles.input, {color: theme.textColor}]}
                     onChangeText={onChangeText}
-                    isEffectTabBar={false}
                     multiline
                     onFocus={onFocus}
                     onBlur={onBlur}
+                    textAlignVertical="center"
                 />
 
                 <StyleTouchable
@@ -189,8 +186,12 @@ const styles = ScaledSheet.create({
     },
     containerInput: {
         flex: 1,
-        paddingVertical: '5@vs',
+        paddingTop: '5@ms',
+        paddingBottom: '5@ms',
         borderRadius: '5@ms',
+        fontSize: FONT_SIZE.normal,
+        lineHeight: LINE_HEIGHT.normal,
+        paddingHorizontal: '5@ms',
     },
     input: {
         fontSize: '15@ms',

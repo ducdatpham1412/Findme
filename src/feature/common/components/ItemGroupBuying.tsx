@@ -28,6 +28,7 @@ interface Props {
     containerStyle?: StyleProp<ViewStyle>;
     detailGroupTarget: string;
     syncWidth?: number;
+    isHorizontal: boolean;
 }
 
 const {width} = Metrics;
@@ -110,11 +111,36 @@ const ItemGroupBuying = (props: Props) => {
         containerStyle,
         detailGroupTarget,
         syncWidth = width * 0.8,
+        isHorizontal,
     } = props;
     const theme = Redux.getTheme();
 
     const lastPrice = item.prices[item.prices.length - 1];
     const iconSize = (syncWidth / width) * 15;
+
+    const LocationAndPeopleJoined = () => {
+        if (isHorizontal) {
+            return null;
+        }
+        return (
+            <>
+                <View style={styles.locationVerticalBox}>
+                    <Entypo
+                        name="location-pin"
+                        style={styles.iconLocationVertical}
+                    />
+                    <StyleText
+                        originValue={item.creatorLocation}
+                        customStyle={[
+                            styles.textInfo,
+                            {color: theme.textHightLight},
+                        ]}
+                        numberOfLines={1}
+                    />
+                </View>
+            </>
+        );
+    };
 
     return (
         <StyleTouchable
@@ -185,7 +211,7 @@ const ItemGroupBuying = (props: Props) => {
                         />
                     </View>
 
-                    {!!item.creatorLocation && (
+                    {!!item.creatorLocation && isHorizontal && (
                         <View style={styles.locationBox}>
                             <CustomBlurView />
                             <Entypo
@@ -203,7 +229,7 @@ const ItemGroupBuying = (props: Props) => {
             </SharedElement>
 
             {/* Content */}
-            {!!item.content && (
+            {!!item.content && isHorizontal && (
                 <StyleText
                     originValue={item.content}
                     customStyle={[
@@ -213,6 +239,8 @@ const ItemGroupBuying = (props: Props) => {
                     numberOfLines={1}
                 />
             )}
+
+            {LocationAndPeopleJoined()}
 
             <View style={styles.contentView}>
                 <View style={{flex: 1}}>
@@ -261,7 +289,7 @@ const ItemGroupBuying = (props: Props) => {
                         />
                     </View>
                 </View>
-                {ButtonCheckJoined(item, theme)}
+                {isHorizontal && ButtonCheckJoined(item, theme)}
             </View>
         </StyleTouchable>
     );
@@ -398,6 +426,23 @@ const styles = ScaledSheet.create({
     textTellJoin: {
         fontSize: FONT_SIZE.small,
         fontWeight: 'bold',
+    },
+    locationVerticalBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        overflow: 'hidden',
+        paddingLeft: '7@s',
+        paddingRight: '20@s',
+        marginVertical: '5@vs',
+    },
+    iconLocationVertical: {
+        fontSize: '13@ms',
+        color: Theme.common.commentGreen,
+    },
+    peopleJoinedBox: {
+        flexDirection: 'row',
+        marginTop: '5@vs',
+        paddingHorizontal: '10@s',
     },
 });
 
