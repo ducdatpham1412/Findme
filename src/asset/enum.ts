@@ -221,6 +221,7 @@ export enum FONT_FAMILY {
     avenirBold = 'AvenirLTStd-Black',
     avenirRoman = 'AvenirLTStd-Roman',
     gtSuperRegular = 'GT Super Display Regular',
+    openSans = 'OpenSans',
 }
 
 export enum SESSION {

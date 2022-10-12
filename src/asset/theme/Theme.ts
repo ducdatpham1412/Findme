@@ -45,7 +45,7 @@ const Theme = {
         holderColor: '#d3d3d3',
         holderColorLighter: '#a5c4ce',
         backgroundButtonColor: '#c5e3ff',
-        backgroundTextInput: '#cbe1ef',
+        backgroundTextInput: '#e6f5ff',
         tabBarIconColor: '#102a47',
         likeHeart: '#ffe106',
         unLikeHeart: '#102a47',

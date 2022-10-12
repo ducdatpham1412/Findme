@@ -410,7 +410,7 @@ const styles = ScaledSheet.create({
         flex: 1,
     },
     messageBox: {
-        borderRadius: '12@ms',
+        borderRadius: '10@ms',
         maxWidth: '70%',
         minWidth: '20%',
     },

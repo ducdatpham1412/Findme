@@ -1,5 +1,5 @@
 import {Metrics} from 'asset/metrics';
-import {FONT_SIZE, LINE_HEIGHT} from 'asset/standardValue';
+import {FONT_SIZE} from 'asset/standardValue';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import AppInput from 'components/base/AppInput';
 import Redux from 'hook/useRedux';
@@ -123,8 +123,8 @@ const InputComment = (props: Props, inputRef: any) => {
                     style={[
                         styles.containerInput,
                         {
-                            backgroundColor: theme.backgroundColorSecond,
-                            color: theme.textColor,
+                            backgroundColor: theme.backgroundTextInput,
+                            color: theme.textHightLight,
                         },
                     ]}
                     onChangeText={onChangeText}
@@ -188,9 +188,8 @@ const styles = ScaledSheet.create({
         flex: 1,
         paddingTop: '5@ms',
         paddingBottom: '5@ms',
-        borderRadius: '5@ms',
+        borderRadius: '8@ms',
         fontSize: FONT_SIZE.normal,
-        lineHeight: LINE_HEIGHT.normal,
         paddingHorizontal: '5@ms',
     },
     input: {

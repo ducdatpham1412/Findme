@@ -38,7 +38,7 @@ const styles = ScaledSheet.create({
     textDefaultStyle: {
         fontSize: '17@ms',
         color: 'lightgreen',
-        fontFamily: FONT_FAMILY.avenirRegular,
+        fontFamily: FONT_FAMILY.openSans,
     },
 });
 

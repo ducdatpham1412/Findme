@@ -10,7 +10,7 @@ const AppInput = (props: TextInputProps, ref: any) => {
 
 const styles = StyleSheet.create({
     text: {
-        fontFamily: FONT_FAMILY.avenirRegular,
+        fontFamily: FONT_FAMILY.openSans,
     },
 });
 
