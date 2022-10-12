@@ -364,7 +364,7 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         overflow: 'hidden',
-        marginBottom: '5@vs',
+        marginBottom: '8@vs',
     },
     filterSearchBox: {
         alignItems: 'center',

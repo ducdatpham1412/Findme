@@ -160,6 +160,7 @@ const ItemGroupBuying = (props: Props) => {
                 navigate(detailGroupTarget, {
                     item,
                     setList,
+                    isFromTopGroupBuying: !isHorizontal,
                 })
             }>
             {/* Image preview */}
@@ -170,7 +171,7 @@ const ItemGroupBuying = (props: Props) => {
                         height: syncWidth * ratioImageGroupBuying,
                     },
                 ]}
-                id={`item.group_buying.${item.id}`}>
+                id={`item.group_buying.${item.id}.${!isHorizontal}`}>
                 <StyleImage
                     source={{uri: item.images[0]}}
                     customStyle={[

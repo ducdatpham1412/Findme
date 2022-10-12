@@ -73,6 +73,7 @@ interface Props {
             item?: TypeGroupBuying;
             itemId?: string;
             setList?: any;
+            isFromTopGroupBuying?: boolean;
         };
         [key: string]: any;
     };
@@ -831,7 +832,8 @@ const DetailGroupBuying = ({route}: Props) => {
                 ]}
                 contentContainerStyle={styles.contentContainer}>
                 <SharedElement
-                    id={`item.group_buying.${item.id}`}
+                    id={`item.group_buying.${item.id}.${!!route.params
+                        ?.isFromTopGroupBuying}`}
                     style={styles.imageView}>
                     <ScrollSyncSizeImage
                         images={item.images}

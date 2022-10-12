@@ -28,7 +28,9 @@ const ProfileRoute = () => {
                     name={PROFILE_ROUTE.detailGroupBuying}
                     component={DetailGroupBuying}
                     sharedElementsConfig={route => {
-                        return [`item.group_buying.${route.params.item.id}`];
+                        return [
+                            `item.group_buying.${route.params.item.id}.false`,
+                        ];
                     }}
                 />
             </ProfileStack.Navigator>
