@@ -1,10 +1,16 @@
 import React, {Component, ReactNode} from 'react';
-import {Pressable, PressableProps, StyleProp, ViewStyle} from 'react-native';
+import {
+    GestureResponderEvent,
+    Pressable,
+    PressableProps,
+    StyleProp,
+    ViewStyle,
+} from 'react-native';
 
 export interface StyleTouchableProps extends PressableProps {
     customStyle?: StyleProp<ViewStyle>;
     disable?: boolean;
-    onPress?(): void;
+    onPress?(e: GestureResponderEvent): void;
     onLongPress?(): void;
     disableOpacity?: number;
     activeOpacity?: number;
