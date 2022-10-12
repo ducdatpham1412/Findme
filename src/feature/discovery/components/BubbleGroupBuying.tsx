@@ -228,7 +228,7 @@ const BubbleGroupBuying = (props: Props) => {
             {/* Image preview */}
             <SharedElement
                 style={styles.imagePreview}
-                id={`item.group_buying.${item.id}`}>
+                id={`item.group_buying.${item.id}.false`}>
                 <StyleImage
                     source={{uri: item.images[0]}}
                     customStyle={styles.imagePreview}

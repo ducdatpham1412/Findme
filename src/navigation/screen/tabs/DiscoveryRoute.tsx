@@ -23,7 +23,10 @@ const DiscoveryRoute = () => {
                 name={DISCOVERY_ROUTE.detailGroupBuying}
                 component={DetailGroupBuying}
                 sharedElementsConfig={route => {
-                    return [`item.group_buying.${route.params.item.id}`];
+                    return [
+                        `item.group_buying.${route.params.item.id}.${!!route
+                            .params?.isFromTopGroupBuying}`,
+                    ];
                 }}
             />
         </Stack.Navigator>
