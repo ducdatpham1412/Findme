@@ -1,5 +1,5 @@
 import {Metrics} from 'asset/metrics';
-import {FONT_SIZE, LINE_HEIGHT} from 'asset/standardValue';
+import {FONT_SIZE} from 'asset/standardValue';
 import {StyleTouchable} from 'components/base';
 import AppInput from 'components/base/AppInput';
 import Redux from 'hook/useRedux';
@@ -297,11 +297,11 @@ const styles = ScaledSheet.create({
         fontSize: '20@ms',
     },
     inputView: {
-        borderRadius: '30@ms',
+        borderRadius: '10@ms',
         // paddingTop: '3@vs',
         // paddingBottom: isIOS ? '7@vs' : '2@vs',
         paddingHorizontal: Platform.select({
-            ios: '12@s',
+            ios: '8@s',
             android: '8@s',
         }),
     },
@@ -315,9 +315,8 @@ const styles = ScaledSheet.create({
         width: '100%',
         color: 'white',
         fontSize: FONT_SIZE.normal,
-        lineHeight: LINE_HEIGHT.normal,
-        paddingTop: '5@ms',
-        paddingBottom: '5@ms',
+        paddingTop: '6@ms',
+        paddingBottom: '6@ms',
     },
     sendIcon: {
         fontSize: '20@ms',

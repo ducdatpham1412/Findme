@@ -94,6 +94,9 @@
 		<string>AvenirLTStd-Book.otf</string>
 		<string>AvenirLTStd-Roman.otf</string>
 		<string>GT Super Display Regular.ttf</string>
+		<string>OpenSans-Regular.ttf</string>
+		<string>OpenSans-Semibold.ttf</string>
+		<string>OpenSans-Bold.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

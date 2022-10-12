@@ -27,6 +27,9 @@
 		CEE0445328886C3B00F547AF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEE0445128886C3B00F547AF /* GoogleService-Info.plist */; };
 		E1EDA080285E236800AC739E /* chim_cu_gay.wav in Resources */ = {isa = PBXBuildFile; fileRef = E1EDA07F285E236800AC739E /* chim_cu_gay.wav */; };
 		E1EDA081285E236800AC739E /* chim_cu_gay.wav in Resources */ = {isa = PBXBuildFile; fileRef = E1EDA07F285E236800AC739E /* chim_cu_gay.wav */; };
+		E45B28B44F4D4EC4945E110F /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2EDD0F9AF81C41489AF9002C /* OpenSans-Regular.ttf */; };
+		177B886A772F47D09FE111C8 /* OpenSans-Semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E8BAFC156E594DD2BB40F8B8 /* OpenSans-Semibold.ttf */; };
+		AD0405FD876A489A938C64E0 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 91F53131D485474788B8813C /* OpenSans-Bold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +86,9 @@
 		F5DEC439240D9F267F234E9C /* Pods-Findme-FindmeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Findme-FindmeTests.release.xcconfig"; path = "Target Support Files/Pods-Findme-FindmeTests/Pods-Findme-FindmeTests.release.xcconfig"; sourceTree = "<group>"; };
 		F71A571A84D7CAC01D961C6B /* Pods-Findme.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Findme.release.xcconfig"; path = "Target Support Files/Pods-Findme/Pods-Findme.release.xcconfig"; sourceTree = "<group>"; };
 		F84B3C7CF7BB477DA4828BB1 /* AvenirLTStd-Book.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "AvenirLTStd-Book.otf"; path = "../src/asset/fonts/AvenirLTStd-Book.otf"; sourceTree = "<group>"; };
+		2EDD0F9AF81C41489AF9002C /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; name = "OpenSans-Regular.ttf"; path = "../src/asset/fonts/OpenSans-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		E8BAFC156E594DD2BB40F8B8 /* OpenSans-Semibold.ttf */ = {isa = PBXFileReference; name = "OpenSans-Semibold.ttf"; path = "../src/asset/fonts/OpenSans-Semibold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		91F53131D485474788B8813C /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; name = "OpenSans-Bold.ttf"; path = "../src/asset/fonts/OpenSans-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -227,6 +233,9 @@
 				F84B3C7CF7BB477DA4828BB1 /* AvenirLTStd-Book.otf */,
 				C5D73E123BB84FA7AE5F5678 /* AvenirLTStd-Roman.otf */,
 				B6D1C7191D7340A7899EBCE7 /* GT Super Display Regular.ttf */,
+				2EDD0F9AF81C41489AF9002C /* OpenSans-Regular.ttf */,
+				E8BAFC156E594DD2BB40F8B8 /* OpenSans-Semibold.ttf */,
+				91F53131D485474788B8813C /* OpenSans-Bold.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -340,6 +349,9 @@
 				4844E9A6A5BE474A97040E8A /* AvenirLTStd-Book.otf in Resources */,
 				1E78372C4C4243A9895E359B /* AvenirLTStd-Roman.otf in Resources */,
 				6E5EBAA7C1DD45E88C8C6D64 /* GT Super Display Regular.ttf in Resources */,
+				E45B28B44F4D4EC4945E110F /* OpenSans-Regular.ttf in Resources */,
+				177B886A772F47D09FE111C8 /* OpenSans-Semibold.ttf in Resources */,
+				AD0405FD876A489A938C64E0 /* OpenSans-Bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
