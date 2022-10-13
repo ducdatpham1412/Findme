@@ -25,6 +25,7 @@ import {appAlert} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
     Animated,
+    GestureResponderEvent,
     NativeScrollEvent,
     Platform,
     RefreshControl,
@@ -353,7 +354,7 @@ const ProfileAccount = () => {
     }, []);
 
     const onGoToDetailPost = useCallback(
-        (bubbleId: string) => {
+        (bubbleId: string, e: GestureResponderEvent) => {
             const initIndex = listShareElement.current.findIndex(
                 item => item.id === bubbleId,
             );
@@ -361,21 +362,25 @@ const ProfileAccount = () => {
                 myPostRef.current?.show({
                     index: initIndex === -1 ? 0 : initIndex,
                     postId: bubbleId,
+                    e,
                 });
             } else if (tabIndexRef.current === 1) {
                 postLikedRef.current?.show({
                     index: initIndex === -1 ? 0 : initIndex,
                     postId: bubbleId,
+                    e,
                 });
             } else if (tabIndexRef.current === 2) {
                 postSavedRef.current?.show({
                     index: initIndex === -1 ? 0 : initIndex,
                     postId: bubbleId,
+                    e,
                 });
             } else if (tabIndexRef.current === 3 && isShopAccount) {
                 tabFourSharedRef.current?.show({
                     index: initIndex === -1 ? 0 : initIndex,
                     postId: bubbleId,
+                    e,
                 });
             }
         },

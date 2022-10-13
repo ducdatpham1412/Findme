@@ -10,7 +10,7 @@ import {
 } from 'components/base';
 import React, {memo} from 'react';
 import isEqual from 'react-fast-compare';
-import {StyleProp, View, ViewStyle} from 'react-native';
+import {GestureResponderEvent, StyleProp, View, ViewStyle} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {moderateScale, scale, ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -21,7 +21,7 @@ import Video from 'react-native-video';
 
 interface Props {
     item: TypeBubblePalace & TypeGroupBuying;
-    onGoToDetailPost(bubble: string): void;
+    onGoToDetailPost(bubble: string, e: GestureResponderEvent): void;
     containerStyle?: StyleProp<ViewStyle>;
 }
 
@@ -56,7 +56,9 @@ const PostStatus = (props: Props) => {
     return (
         <StyleTouchable
             customStyle={[styles.container, containerStyle]}
-            onPress={() => onGoToDetailPost(item.id)}
+            onPress={e => {
+                onGoToDetailPost(item.id, e);
+            }}
             activeOpacity={0.95}>
             {ImagePreview()}
             <LinearGradient

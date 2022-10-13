@@ -25,7 +25,13 @@ import {
 } from 'navigation/NavigationService';
 import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {Component} from 'react';
-import {Animated, FlatList, StyleProp, ViewStyle} from 'react-native';
+import {
+    Animated,
+    FlatList,
+    GestureResponderEvent,
+    StyleProp,
+    ViewStyle,
+} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {DefaultTransitionSpec} from 'utility/animation';
 import {logger} from 'utility/assistant';
@@ -44,6 +50,7 @@ interface States {
 interface TypeShow {
     index: number;
     postId: string;
+    e: GestureResponderEvent;
 }
 
 let postModal: TypeBubblePalace | TypeGroupBuying;
