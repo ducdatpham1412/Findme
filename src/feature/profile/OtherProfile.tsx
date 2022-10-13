@@ -10,7 +10,7 @@ import {
     apiGetProfile,
     apiUnFollowUser,
 } from 'api/module';
-import {apiGetListReviewAboutUser} from 'api/post';
+import {apiGetListReviewAboutUser} from 'api/profile';
 import {ACCOUNT, RELATIONSHIP} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';

@@ -1,17 +1,19 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import {BlurView} from '@react-native-community/blur';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
-import {
-    apiGetListPeopleJoined,
-    apiJoinGroupBuying,
-    apiLeaveGroupBuying,
-} from 'api/discovery';
+import {apiGetListPeopleJoined, apiJoinGroupBuying} from 'api/discovery';
 import {TypeGroupBuying} from 'api/interface';
 import {
     TypePeopleJoinedResponse,
     TypeShowModalCommentOrLike,
 } from 'api/interface/discovery';
 import {apiGetDetailBubble} from 'api/module';
-import {apiLikePost, apiUnLikePost} from 'api/post';
+import {
+    apiCreateErrorLog,
+    apiCreatePurchaseHistory,
+    apiLikePost,
+    apiUnLikePost,
+} from 'api/profile';
 import {GROUP_BUYING_STATUS, RELATIONSHIP, TYPE_DYNAMIC_LINK} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
@@ -22,6 +24,7 @@ import {
     DYNAMIC_LINK_SHARE,
     FONT_SIZE,
     LANDING_PAGE_URL,
+    LIST_DEPOSIT_PRICES,
     ratioImageGroupBuying,
 } from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
@@ -34,7 +37,9 @@ import {
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
+import LoadingScreen from 'components/LoadingScreen';
 import ModalCommentLike from 'components/ModalCommentLike';
+import ModalConfirmJoinGb from 'feature/common/components/ModalConfirmJoinGb';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
@@ -48,6 +53,7 @@ import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SharedElement} from 'react-navigation-shared-element';
+import appPurchase from 'utility/appPurchase';
 import {
     fakeGroupBuying,
     logger,
@@ -63,8 +69,6 @@ import {
     isTimeBefore,
 } from 'utility/format';
 import {I18Normalize} from 'utility/I18Next';
-import {BlurView} from '@react-native-community/blur';
-import appPurchase from 'utility/appPurchase';
 import ModalPeopleJoined from './components/ModalPeopleJoined';
 
 interface Props {
@@ -224,11 +228,15 @@ const DetailGroupBuying = ({route}: Props) => {
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
     const {profile} = Redux.getPassport();
+    const isLoading = Redux.getIsLoading();
 
     const modalJoinedRef = useRef<Modalize>(null);
     const modalCommentLikeRef = useRef<ModalCommentLike>(null);
+    const modalConfirmJoin = useRef<Modalize>(null);
 
     const [item, setItem] = useState(route.params?.item || fakeGroupBuying);
+
+    const chosenDeposit = useRef(LIST_DEPOSIT_PRICES[0]);
 
     const listJoinedPaging: any = !isModeExp
         ? usePaging({
@@ -240,7 +248,9 @@ const DetailGroupBuying = ({route}: Props) => {
           })
         : modeExpUsePaging();
 
-    const {requestPurchase} = appPurchase();
+    const {requestPurchase} = appPurchase({
+        skus: LIST_DEPOSIT_PRICES.map(price => price.productId),
+    });
 
     const [isLiked, setIsLiked] = useState(item.isLiked);
     const [totalLikes, setTotalLikes] = useState(item.totalLikes);
@@ -250,6 +260,15 @@ const DetailGroupBuying = ({route}: Props) => {
 
     const isMyBubble = item.relationship === RELATIONSHIP.self;
     const isExpired = isTimeBefore(item.endDate, new Date());
+
+    useEffect(() => {
+        const standardPrice =
+            Number(item.prices[item.prices.length - 1].value) * 0.2;
+        const temp =
+            LIST_DEPOSIT_PRICES.find(price => price.value > standardPrice) ||
+            LIST_DEPOSIT_PRICES[LIST_DEPOSIT_PRICES.length - 1];
+        chosenDeposit.current = temp;
+    }, [item.prices]);
 
     useEffect(() => {
         const getData = async () => {
@@ -296,17 +315,22 @@ const DetailGroupBuying = ({route}: Props) => {
     };
 
     const onJoinGroupBuying = async () => {
-        if (isModeExp) {
-            logger(requestPurchase);
+        if (isModeExp || status !== GROUP_BUYING_STATUS.notJoined) {
             return;
         }
-        const oldStatus = status;
-        const oldListPeopleJoined = [...listJoinedPaging.list];
-        try {
-            let updateStatus = status;
-            let updateTotalJoins = 0;
 
-            if (status === GROUP_BUYING_STATUS.notJoined) {
+        try {
+            modalConfirmJoin.current?.close();
+            Redux.setIsLoading(true);
+            const oldStatus = status;
+            const oldListPeopleJoined = [...listJoinedPaging.list];
+            await requestPurchase(chosenDeposit.current.productId);
+
+            try {
+                await apiCreatePurchaseHistory(chosenDeposit.current.money);
+
+                let updateStatus = status;
+                let updateTotalJoins = 0;
                 setStatus(GROUP_BUYING_STATUS.joinedNotBought);
                 listJoinedPaging.setList(
                     (preValue: Array<TypePeopleJoinedResponse>) => {
@@ -325,37 +349,32 @@ const DetailGroupBuying = ({route}: Props) => {
                 updateStatus = GROUP_BUYING_STATUS.joinedNotBought;
                 updateTotalJoins = 1;
                 await apiJoinGroupBuying(item.id);
-            } else if (status === GROUP_BUYING_STATUS.joinedNotBought) {
-                setStatus(GROUP_BUYING_STATUS.notJoined);
-                listJoinedPaging.setList(
-                    (preValue: Array<TypePeopleJoinedResponse>) => {
-                        return preValue.filter(
-                            value => value.creator !== profile.id,
-                        );
-                    },
-                );
-                updateStatus = GROUP_BUYING_STATUS.notJoined;
-                updateTotalJoins = -1;
-                await apiLeaveGroupBuying(item.id);
-            }
 
-            setTotalJoined(totalJoined + updateTotalJoins);
-            setList((preValue: Array<TypeGroupBuying>) => {
-                return preValue.map(value => {
-                    if (value.id !== item.id) {
-                        return value;
-                    }
-                    return {
-                        ...value,
-                        totalJoins: value.totalJoins + updateTotalJoins,
-                        status: updateStatus,
-                    };
+                setTotalJoined(totalJoined + updateTotalJoins);
+                setList((preValue: Array<TypeGroupBuying>) => {
+                    return preValue.map(value => {
+                        if (value.id !== item.id) {
+                            return value;
+                        }
+                        return {
+                            ...value,
+                            totalJoins: value.totalJoins + updateTotalJoins,
+                            status: updateStatus,
+                        };
+                    });
                 });
-            });
+            } catch (err) {
+                setStatus(oldStatus);
+                listJoinedPaging.setList(oldListPeopleJoined);
+                await apiCreateErrorLog(
+                    `Error when deposit, gb: ${item.id}, money: ${chosenDeposit.current.money}`,
+                );
+                appAlert(err);
+            }
         } catch (err) {
-            setStatus(oldStatus);
-            listJoinedPaging.setList(oldListPeopleJoined);
-            appAlert(err);
+            logger(err);
+        } finally {
+            Redux.setIsLoading(false);
         }
     };
 
@@ -450,14 +469,18 @@ const DetailGroupBuying = ({route}: Props) => {
                             {color: theme.textColor},
                         ]}
                     />
-                    <StyleText
-                        originValue=":"
-                        customStyle={[
-                            styles.textTime,
-                            {color: theme.borderColor},
-                        ]}
-                    />
-                    {chooseTextRemaining()}
+                    {!isExpired && (
+                        <>
+                            <StyleText
+                                originValue=":"
+                                customStyle={[
+                                    styles.textTime,
+                                    {color: theme.borderColor},
+                                ]}
+                            />
+                            {chooseTextRemaining()}
+                        </>
+                    )}
                 </View>
 
                 <TitleInformation
@@ -718,11 +741,20 @@ const DetailGroupBuying = ({route}: Props) => {
         }
         if (status === GROUP_BUYING_STATUS.bought) {
             return (
-                <StyleIcon
-                    source={Images.images.successful}
-                    size={60}
-                    customStyle={{alignSelf: 'center', marginTop: 10}}
-                />
+                <>
+                    <StyleIcon
+                        source={Images.images.successful}
+                        size={60}
+                        customStyle={styles.iconSuccessfully}
+                    />
+                    <StyleText
+                        i18Text="discovery.thanksForJoin"
+                        customStyle={[
+                            styles.textSuccessfully,
+                            {color: theme.highlightColor},
+                        ]}
+                    />
+                </>
             );
         }
 
@@ -732,35 +764,33 @@ const DetailGroupBuying = ({route}: Props) => {
                 GROUP_BUYING_STATUS.joinedNotBought,
             ].includes(status)
         ) {
-            const hadJoined = status === GROUP_BUYING_STATUS.joinedNotBought;
+            const hadDeposited = status === GROUP_BUYING_STATUS.joinedNotBought;
             return (
                 <>
                     <LinearGradient
-                        colors={
-                            hadJoined
-                                ? [theme.holderColor, theme.holderColor]
-                                : [
-                                      Theme.common.gradientTabBar1,
-                                      Theme.common.gradientTabBar2,
-                                  ]
-                        }
-                        style={styles.groupBuyingBox}>
+                        colors={[
+                            Theme.common.gradientTabBar1,
+                            Theme.common.gradientTabBar2,
+                        ]}
+                        style={[
+                            styles.groupBuyingBox,
+                            {opacity: isExpired ? 0.5 : 1},
+                        ]}>
                         <StyleTouchable
                             customStyle={styles.touchGroupBuying}
-                            onPress={onJoinGroupBuying}
-                            disable={isExpired}>
+                            onPress={() => modalConfirmJoin.current?.open()}
+                            disable={isExpired || hadDeposited}
+                            disableOpacity={1}>
                             <StyleText
                                 i18Text={
-                                    hadJoined
-                                        ? 'discovery.unJoinGroupBuying'
+                                    hadDeposited
+                                        ? 'discovery.deposited'
                                         : 'discovery.joinGroupBuying'
                                 }
                                 customStyle={[
                                     styles.textGroupBuying,
                                     {
-                                        color: hadJoined
-                                            ? theme.textHightLight
-                                            : Theme.common.white,
+                                        color: Theme.common.white,
                                     },
                                 ]}
                             />
@@ -914,6 +944,13 @@ const DetailGroupBuying = ({route}: Props) => {
                     });
                 }}
             />
+            <ModalConfirmJoinGb
+                ref={modalConfirmJoin}
+                onConfirm={onJoinGroupBuying}
+                money={chosenDeposit.current.money}
+            />
+
+            {isLoading && <LoadingScreen />}
         </>
     );
 };
@@ -1105,6 +1142,14 @@ const styles = ScaledSheet.create({
     },
     iconLocation: {
         fontSize: '20@ms',
+    },
+    iconSuccessfully: {
+        alignSelf: 'center',
+        marginTop: '20@vs',
+    },
+    textSuccessfully: {
+        fontSize: FONT_SIZE.small,
+        alignSelf: 'center',
     },
 });
 

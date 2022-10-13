@@ -2,7 +2,7 @@
 import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {apiDeletePost} from 'api/module';
-import {apiArchivePost, apiLikePost, apiUnLikePost} from 'api/post';
+import {apiArchivePost, apiLikePost, apiUnLikePost} from 'api/profile';
 import FindmeStore from 'app-redux/store';
 import {POST_TYPE, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
