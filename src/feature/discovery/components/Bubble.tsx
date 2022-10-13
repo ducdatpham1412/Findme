@@ -494,7 +494,7 @@ const Bubble = (props: Props) => {
                         <StyleIcon
                             source={Images.icons.username}
                             size={15}
-                            customStyle={styles.iconLink}
+                            customStyle={styles.iconUsername}
                         />
                         <StyleText
                             originValue={item.userReviewed.name}
@@ -872,13 +872,19 @@ const styles = ScaledSheet.create({
         marginLeft: '5@s',
         borderRadius: '20@ms',
     },
-    iconLink: {
+    iconUsername: {
         fontSize: '15@ms',
-        marginHorizontal: '3@s',
-        color: Theme.common.white,
+        marginRight: '3@s',
         marginLeft: '9@s',
         marginVertical: '3@s',
         tintColor: Theme.common.white,
+    },
+    iconLink: {
+        fontSize: '15@ms',
+        marginRight: '3@s',
+        marginLeft: '9@s',
+        color: Theme.common.white,
+        marginVertical: '3@s',
     },
     leftRight: {
         flexDirection: 'row',
