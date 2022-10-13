@@ -2,7 +2,12 @@ import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeBubblePalace} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {apiGetDetailBubble} from 'api/module';
-import {apiLikePost, apiSavePost, apiUnLikePost, apiUnSavePost} from 'api/post';
+import {
+    apiLikePost,
+    apiSavePost,
+    apiUnLikePost,
+    apiUnSavePost,
+} from 'api/profile';
 import {TYPE_DYNAMIC_LINK} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';

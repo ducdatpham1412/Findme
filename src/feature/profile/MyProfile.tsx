@@ -7,7 +7,7 @@ import {
     apiGetListPostsSaved,
     apiGetProfile,
 } from 'api/module';
-import {apiGetListReviewAboutUser} from 'api/post';
+import {apiGetListReviewAboutUser} from 'api/profile';
 import {ACCOUNT, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';

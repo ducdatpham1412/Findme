@@ -41,3 +41,15 @@ export const apiGetListReviewAboutUser = ({params}: TypeParamsPaging) => {
         },
     });
 };
+
+export const apiCreatePurchaseHistory = (money: string) => {
+    return request.post('/profile/create-purchase-history', {
+        money,
+    });
+};
+
+export const apiCreateErrorLog = (error: string) => {
+    return request.post('/profile/create-error-log', {
+        error,
+    });
+};

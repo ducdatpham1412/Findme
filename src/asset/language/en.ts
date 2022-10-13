@@ -154,7 +154,7 @@ const discovery = {
     numberPeople: '{{value}} people',
     joinGroupBuying: 'Join now',
     joined: 'Joined',
-    unJoinGroupBuying: 'Leave group buying',
+    deposited: 'Deposited',
     numberPeopleJoin: '{{value}} people joined group buying',
     beTheFirstJoin: 'Be the first person join this campaign ^^',
     bought: 'Bought',
@@ -182,6 +182,11 @@ const discovery = {
     goodMorning: 'Good morning 🌤',
     goodAfternoon: 'Good afternoon ☀️',
     goodEvening: 'Good evening 🌙',
+    thanksForJoin: 'Thanks for joining with us ❤️',
+    titleDeposit:
+        'In order to join group booking with everyone\nYou need to deposit a small amount',
+    theMoneyIs: 'The money deposit is: ',
+    goToDeposit: 'Go to deposit',
 };
 
 // REPUTATION

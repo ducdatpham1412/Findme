@@ -8,7 +8,7 @@ import {
     apiUnArchivePost,
     apiUnLikePost,
     apiUnSavePost,
-} from 'api/post';
+} from 'api/profile';
 import {TYPE_BUBBLE_PALACE_ACTION, TYPE_DYNAMIC_LINK} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
@@ -604,7 +604,7 @@ const Bubble = (props: Props) => {
                             <CustomBlurView />
                             <Entypo
                                 name="location-pin"
-                                style={styles.iconLink}
+                                style={styles.iconLocation}
                             />
                             <StyleText
                                 originValue={item.location}
@@ -710,13 +710,15 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
         marginTop: '15@vs',
     },
-    iconLocationCaption: {
-        fontSize: '17@ms',
+    iconLocation: {
+        fontSize: '13@ms',
+        marginLeft: '5@s',
+        marginVertical: '2@s',
+        color: Theme.common.white,
     },
     textLocation: {
         fontSize: FONT_SIZE.small,
         color: Theme.common.white,
-        fontWeight: 'bold',
         marginRight: '9@s',
         maxWidth: screenWidth * 0.6,
     },
@@ -862,7 +864,6 @@ const styles = ScaledSheet.create({
     textStars: {
         fontSize: FONT_SIZE.small,
         color: Theme.common.white,
-        fontWeight: 'bold',
         marginRight: '9@s',
     },
     blurLink: {

@@ -170,3 +170,26 @@ export const LINE_HEIGHT = {
 };
 
 export const ratioImageGroupBuying = 0.5; // height / width
+
+export const LIST_DEPOSIT_PRICES = [
+    {
+        productId: 'doffy.development.deposit.50',
+        money: '49,000vnd',
+        value: 49000,
+    },
+    {
+        productId: 'doffy.development.deposit.100',
+        money: '99,000vnd',
+        value: 99000,
+    },
+    {
+        productId: 'doffy.development.deposit.150',
+        money: '149,000vnd',
+        value: 149000,
+    },
+    {
+        productId: 'doffy.development.deposit.200',
+        money: '199,000vnd',
+        value: 199000,
+    },
+];

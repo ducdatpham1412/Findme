@@ -3,15 +3,15 @@ import {useEffect, useRef, useState} from 'react';
 import * as RNIap from 'react-native-iap';
 import {logger} from './assistant';
 
-const listDonations = [
-    {
-        id: 0,
-        productId: 'doceo.donation.consumable.0',
-        value: 0,
-    },
-];
+interface Params {
+    skus: Array<string>;
+    onListenerSuccess?(purchase: RNIap.Purchase): void;
+    onListenerError?(error: RNIap.PurchaseError): void;
+}
 
-const appPurchase = () => {
+const appPurchase = (params: Params) => {
+    const {skus, onListenerError, onListenerSuccess} = params;
+
     const purchaseUpdateSubscription = useRef<any>(null);
     const purchaseErrorSubscription = useRef<any>(null);
     const [isLoading] = useState(false);
@@ -19,8 +19,7 @@ const appPurchase = () => {
     const listenerSuccess = () => {
         purchaseUpdateSubscription.current = RNIap.purchaseUpdatedListener(
             async purchase => {
-                const data = purchase.transactionReceipt;
-                logger('data purchase: ', data);
+                onListenerSuccess?.(purchase);
             },
         );
     };
@@ -28,7 +27,7 @@ const appPurchase = () => {
     const listenerError = () => {
         purchaseErrorSubscription.current = RNIap.purchaseErrorListener(
             (error: RNIap.PurchaseError) => {
-                logger('purchaseErrorListener', error);
+                onListenerError?.(error);
             },
         );
     };
@@ -36,14 +35,13 @@ const appPurchase = () => {
     const startConnection = async () => {
         try {
             await RNIap.initConnection();
-            const res = await RNIap.getProducts({
-                skus: ['doffy.purchase.test.01'],
+            await RNIap.getProducts({
+                skus,
             });
-            logger('list product: ', res);
             listenerSuccess();
             listenerError();
         } catch (err) {
-            logger('startConnection', false, err);
+            logger('error start connection purchase: ', err);
         }
     };
 
@@ -51,7 +49,7 @@ const appPurchase = () => {
         try {
             await RNIap.endConnection();
         } catch (err) {
-            logger('endConnections', false, err);
+            logger('error end connection purchase: ', err);
         }
     };
 
@@ -77,7 +75,6 @@ const appPurchase = () => {
     };
 
     return {
-        listDonations,
         requestPurchase,
         isLoading,
     };

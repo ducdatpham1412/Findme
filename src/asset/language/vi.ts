@@ -157,7 +157,7 @@ const discovery = {
     numberPeople: '{{value}} người',
     joinGroupBuying: 'Tham gia ngay',
     joined: 'Đã tham gia',
-    unJoinGroupBuying: 'Rời mua chung',
+    deposited: 'Đã đặt cọc',
     numberPeopleJoin: '{{value}} người đã tham gia mua chung',
     beTheFirstJoin: 'Hãy là người đầu tiên tham gia chiến dịch này nào ^^',
     bought: 'Đã mua',
@@ -186,6 +186,11 @@ const discovery = {
     goodMorning: 'Chào buổi sáng 🌤',
     goodAfternoon: 'Chào buổi chiều ☀️',
     goodEvening: 'Chào buổi tối 🌙',
+    thanksForJoin: 'Cảm ơn bạn đã tham gia cùng chúng mình ❤️',
+    titleDeposit:
+        'Để tham gia du lịch chung cùng mọi người\nBạn cần đặt cọc một khoản tiền cho người bán',
+    theMoneyIs: 'Số tiền đặt cọc là: ',
+    goToDeposit: 'Đi tới đặt cọc',
 };
 
 // REPUTATION

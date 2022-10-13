@@ -5,7 +5,7 @@ import {
     TypeShowModalCommentOrLike,
 } from 'api/interface/discovery';
 import {apiGetListBubbleActive} from 'api/module';
-import {apiLikePost, apiUnLikePost} from 'api/post';
+import {apiLikePost, apiUnLikePost} from 'api/profile';
 import {POST_TYPE, TOPIC, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {StyleIcon} from 'components/base';

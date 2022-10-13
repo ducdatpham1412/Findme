@@ -1,5 +1,5 @@
 import {TypeGroupBuying} from 'api/interface';
-import {apiGetListGroupBuying} from 'api/post';
+import {apiGetListGroupBuying} from 'api/profile';
 import {
     GROUP_BUYING_STATUS,
     RELATIONSHIP,
