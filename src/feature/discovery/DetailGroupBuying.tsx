@@ -895,7 +895,7 @@ const DetailGroupBuying = ({route}: Props) => {
             <StyleTouchable customStyle={styles.iconBackView} onPress={goBack}>
                 <BlurView
                     style={StyleSheet.absoluteFill}
-                    blurType="light"
+                    blurType="ultraThinMaterialLight"
                     blurAmount={3}
                     blurRadius={20}
                 />
