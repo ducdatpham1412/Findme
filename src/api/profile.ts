@@ -1,4 +1,5 @@
 import {TypeParamsPaging} from './interface';
+import {TypeCreatePurchaseRequest} from './interface/profile';
 import request from './request';
 
 export const apiSavePost = (postId: string) => {
@@ -42,10 +43,8 @@ export const apiGetListReviewAboutUser = ({params}: TypeParamsPaging) => {
     });
 };
 
-export const apiCreatePurchaseHistory = (money: string) => {
-    return request.post('/profile/create-purchase-history', {
-        money,
-    });
+export const apiCreatePurchaseHistory = (body: TypeCreatePurchaseRequest) => {
+    return request.post('/profile/create-purchase-history', body);
 };
 
 export const apiCreateErrorLog = (error: string) => {

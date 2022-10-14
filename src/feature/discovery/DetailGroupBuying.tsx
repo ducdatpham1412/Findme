@@ -327,7 +327,10 @@ const DetailGroupBuying = ({route}: Props) => {
             await requestPurchase(chosenDeposit.current.productId);
 
             try {
-                await apiCreatePurchaseHistory(chosenDeposit.current.money);
+                await apiCreatePurchaseHistory({
+                    money: chosenDeposit.current.money,
+                    postId: item.id,
+                });
 
                 let updateStatus = status;
                 let updateTotalJoins = 0;
