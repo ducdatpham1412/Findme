@@ -31,7 +31,7 @@ import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
 import Redux from 'hook/useRedux';
-import {PROFILE_ROUTE} from 'navigation/config/routes';
+import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {appAlert, goBack, navigate} from 'navigation/NavigationService';
 import {showPreviewLink} from 'navigation/screen/AppStack';
 import React, {memo, useEffect, useState} from 'react';
@@ -209,6 +209,12 @@ const onShowModalShare = async (
     }
 };
 
+const onGoToDetailPost = (bubble: TypeBubblePalace) => {
+    navigate(ROOT_SCREEN.detailBubble, {
+        bubble,
+    });
+};
+
 const CustomBlurView = () => {
     return (
         <BlurView
@@ -293,7 +299,8 @@ const Bubble = (props: Props) => {
                             customStyle={[
                                 styles.textTopic,
                                 {color: theme.textColor},
-                            ]}>
+                            ]}
+                            onPress={() => onGoToDetailPost(item)}>
                             <StyleText
                                 i18Text={chooseTextTopic(topic)}
                                 customStyle={[
@@ -328,6 +335,7 @@ const Bubble = (props: Props) => {
                             {color: theme.textHightLight},
                         ]}
                         numberOfLines={1}
+                        onPress={() => onGoToDetailPost(item)}
                     />
                 ) : (
                     <View style={styles.spaceCaption} />

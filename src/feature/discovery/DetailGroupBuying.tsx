@@ -46,7 +46,13 @@ import ROOT_SCREEN from 'navigation/config/routes';
 import {appAlert, goBack} from 'navigation/NavigationService';
 import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {useEffect, useRef, useState} from 'react';
-import {Platform, ScrollView, StyleSheet, View} from 'react-native';
+import {
+    Platform,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    View,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {Modalize} from 'react-native-modalize';
 import Share from 'react-native-share';
@@ -233,12 +239,12 @@ const DetailGroupBuying = ({route}: Props) => {
     const modalJoinedRef = useRef<Modalize>(null);
     const modalCommentLikeRef = useRef<ModalCommentLike>(null);
     const modalConfirmJoin = useRef<Modalize>(null);
-
+    const [load, setLoad] = useState(false);
     const [item, setItem] = useState(route.params?.item || fakeGroupBuying);
 
     const chosenDeposit = useRef(LIST_DEPOSIT_PRICES[0]);
 
-    const listJoinedPaging: any = !isModeExp
+    const listJoinedPaging = !isModeExp
         ? usePaging({
               request: apiGetListPeopleJoined,
               params: {
@@ -261,6 +267,26 @@ const DetailGroupBuying = ({route}: Props) => {
     const isMyBubble = item.relationship === RELATIONSHIP.self;
     const isExpired = isTimeBefore(item.endDate, new Date());
 
+    const onRefresh = async () => {
+        if (item) {
+            try {
+                setLoad(true);
+                const res = await apiGetDetailBubble(item.id);
+                const {data} = res;
+                setItem(data);
+                setIsLiked(data.isLiked);
+                setTotalLikes(data.totalLikes);
+                setTotalJoined(data.totalJoins);
+                setStatus(data.status);
+                listJoinedPaging.onRefresh();
+            } catch (err) {
+                appAlert(err);
+            } finally {
+                setLoad(false);
+            }
+        }
+    };
+
     useEffect(() => {
         const standardPrice =
             Number(item.prices[item.prices.length - 1].value) * 0.2;
@@ -277,6 +303,7 @@ const DetailGroupBuying = ({route}: Props) => {
             }
             if (route.params.itemId) {
                 try {
+                    setLoad(true);
                     const res = await apiGetDetailBubble(route.params.itemId);
                     const {data} = res;
                     setItem(data);
@@ -286,6 +313,8 @@ const DetailGroupBuying = ({route}: Props) => {
                     setStatus(data.status);
                 } catch (err) {
                     appAlert(err);
+                } finally {
+                    setLoad(false);
                 }
             }
         };
@@ -768,13 +797,13 @@ const DetailGroupBuying = ({route}: Props) => {
             ].includes(status)
         ) {
             const hadDeposited = status === GROUP_BUYING_STATUS.joinedNotBought;
+            const colorGradient = hadDeposited
+                ? [Theme.common.orange, Theme.common.orange]
+                : [Theme.common.gradientTabBar1, Theme.common.gradientTabBar2];
             return (
                 <>
                     <LinearGradient
-                        colors={[
-                            Theme.common.gradientTabBar1,
-                            Theme.common.gradientTabBar2,
-                        ]}
+                        colors={colorGradient}
                         style={[
                             styles.groupBuyingBox,
                             {opacity: isExpired ? 0.5 : 1},
@@ -790,12 +819,7 @@ const DetailGroupBuying = ({route}: Props) => {
                                         ? 'discovery.deposited'
                                         : 'discovery.joinGroupBuying'
                                 }
-                                customStyle={[
-                                    styles.textGroupBuying,
-                                    {
-                                        color: Theme.common.white,
-                                    },
-                                ]}
+                                customStyle={styles.textGroupBuying}
                             />
                         </StyleTouchable>
                     </LinearGradient>
@@ -863,7 +887,16 @@ const DetailGroupBuying = ({route}: Props) => {
                     styles.container,
                     {backgroundColor: theme.backgroundColor},
                 ]}
-                contentContainerStyle={styles.contentContainer}>
+                contentContainerStyle={styles.contentContainer}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={load}
+                        onRefresh={onRefresh}
+                        tintColor={theme.highlightColor}
+                        colors={[theme.highlightColor]}
+                    />
+                }
+                showsVerticalScrollIndicator={false}>
                 <SharedElement
                     id={`item.group_buying.${item.id}.${!!route.params
                         ?.isFromTopGroupBuying}`}
