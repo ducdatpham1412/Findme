@@ -36,7 +36,7 @@ import StyleHeader from 'navigation/components/StyleHeader';
 import {appAlert} from 'navigation/NavigationService';
 import {showPreviewLink} from 'navigation/screen/AppStack';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {ScrollView, View} from 'react-native';
+import {RefreshControl, ScrollView, View} from 'react-native';
 import Share from 'react-native-share';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -53,7 +53,8 @@ import {formatFromNow} from 'utility/format';
 interface Props {
     route: {
         params: {
-            bubbleId: string;
+            bubbleId?: string;
+            bubble?: TypeBubblePalace;
             displayComment?: boolean;
             displayLike?: boolean;
         };
@@ -66,8 +67,10 @@ const DetailBubble = ({route}: Props) => {
 
     const optionsRef = useRef<any>(null);
     const modalRef = useRef<ModalCommentLike>(null);
-
-    const [bubble, setBubble] = useState<TypeBubblePalace>();
+    const [isLoading, setIsLoading] = useState(false);
+    const [bubble, setBubble] = useState<TypeBubblePalace | undefined>(
+        route.params.bubble,
+    );
 
     const onShowModalComment = useCallback(
         (post: TypeBubblePalace, type: TypeShowModalCommentOrLike) => {
@@ -79,21 +82,44 @@ const DetailBubble = ({route}: Props) => {
         [],
     );
 
-    const getData = async () => {
-        try {
-            const res = await apiGetDetailBubble(bubbleId);
-            setBubble(res.data);
-            if (displayComment) {
-                onShowModalComment(res.data, 'comment');
-            } else if (displayLike) {
-                onShowModalComment(res.data, 'like');
+    const onRefresh = async () => {
+        if (bubble) {
+            try {
+                setIsLoading(true);
+                const res = await apiGetDetailBubble(bubble.id);
+                setBubble(res.data);
+                if (displayComment) {
+                    onShowModalComment(res.data, 'comment');
+                } else if (displayLike) {
+                    onShowModalComment(res.data, 'like');
+                }
+            } catch (err) {
+                appAlert(err);
+            } finally {
+                setIsLoading(false);
             }
-        } catch (err) {
-            appAlert(err);
         }
     };
 
     useEffect(() => {
+        const getData = async () => {
+            if (bubbleId) {
+                try {
+                    setIsLoading(true);
+                    const res = await apiGetDetailBubble(bubbleId);
+                    setBubble(res.data);
+                    if (displayComment) {
+                        onShowModalComment(res.data, 'comment');
+                    } else if (displayLike) {
+                        onShowModalComment(res.data, 'like');
+                    }
+                } catch (err) {
+                    appAlert(err);
+                } finally {
+                    setIsLoading(false);
+                }
+            }
+        };
         getData();
     }, []);
 
@@ -520,7 +546,15 @@ const DetailBubble = ({route}: Props) => {
             <StyleHeader title={bubble?.creatorName || ''} />
             <ScrollView
                 contentContainerStyle={styles.container}
-                showsVerticalScrollIndicator={false}>
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={isLoading}
+                        onRefresh={onRefresh}
+                        tintColor={theme.highlightColor}
+                        colors={[theme.highlightColor]}
+                    />
+                }>
                 {Header()}
                 <ScrollSyncSizeImage
                     images={bubble?.images || []}

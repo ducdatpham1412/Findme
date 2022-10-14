@@ -245,11 +245,11 @@ const ScrollSyncSizeImage = (props: Props) => {
                     transform: [{translateX}],
                 }}
                 {...panResponder.panHandlers}>
-                {images.map(url => {
+                {images.map((url, ind) => {
                     if (!checkIsVideo(url)) {
                         return (
                             <PinchImage
-                                key={url}
+                                key={ind}
                                 containerStyle={{
                                     width: syncWidth,
                                     height,
@@ -264,7 +264,7 @@ const ScrollSyncSizeImage = (props: Props) => {
 
                     return (
                         <StyleVideo
-                            key={url}
+                            key={ind}
                             source={{uri: url}}
                             style={{
                                 width: syncWidth,
