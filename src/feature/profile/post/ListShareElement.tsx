@@ -8,6 +8,7 @@ import {POST_TYPE, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
+import {TypeModalCommentPost} from 'components/ModalCommentLike';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import Bubble from 'feature/discovery/components/Bubble';
 import BubbleGroupBuying, {
@@ -41,6 +42,7 @@ interface Props {
     listPaging: any;
     containerStyle?: StyleProp<ViewStyle>;
     isSaveTop?: boolean;
+    onShowModalComment?(params: TypeModalCommentPost): void;
 }
 
 interface States {
@@ -50,7 +52,7 @@ interface States {
 interface TypeShow {
     index: number;
     postId: string;
-    e: GestureResponderEvent;
+    e?: GestureResponderEvent;
 }
 
 let postModal: TypeBubblePalace | TypeGroupBuying;
@@ -211,11 +213,19 @@ export default class ListShareElement extends Component<Props, States> {
         post: TypeBubblePalace | TypeGroupBuying,
         type: TypeShowModalCommentOrLike,
     ) {
-        showCommentDiscovery({
-            post,
-            setList: this.props.listPaging.setList,
-            type,
-        });
+        if (this.props.onShowModalComment) {
+            this.props.onShowModalComment({
+                post,
+                setList: this.props.listPaging.setList,
+                type,
+            });
+        } else {
+            showCommentDiscovery({
+                post,
+                setList: this.props.listPaging.setList,
+                type,
+            });
+        }
     }
 
     private async onHandleLike(params: ParamsLikeGB) {
