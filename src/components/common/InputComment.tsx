@@ -5,7 +5,7 @@ import AppInput from 'components/base/AppInput';
 import Redux from 'hook/useRedux';
 import React, {forwardRef, useMemo} from 'react';
 import {StyleProp, View, ViewStyle} from 'react-native';
-import {ScaledSheet, verticalScale} from 'react-native-size-matters';
+import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 
 interface Props {
@@ -149,12 +149,11 @@ const InputComment = (props: Props, inputRef: any) => {
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
-        maxHeight: '120@vs',
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: '12@s',
         paddingTop: '10@ms',
-        paddingBottom: verticalScale(7) + Metrics.safeBottomPadding,
+        paddingBottom: moderateScale(10) + Metrics.safeBottomPadding,
         shadowOpacity: 0.1,
         shadowOffset: {
             width: 0,
