@@ -107,7 +107,7 @@ export const getSessionOfDay = () => {
     if (hour >= 5 && hour < 12) {
         return SESSION.morning;
     }
-    if (hour >= 12 && hour < 6) {
+    if (hour >= 12 && hour < 18) {
         return SESSION.afternoon;
     }
     return SESSION.evening;

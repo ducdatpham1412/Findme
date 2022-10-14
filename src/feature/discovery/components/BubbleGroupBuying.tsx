@@ -289,11 +289,13 @@ const BubbleGroupBuying = (props: Props) => {
                                     name="location-pin"
                                     style={styles.iconLocation}
                                 />
-                                <StyleText
-                                    originValue={item.creatorLocation}
-                                    customStyle={styles.textLocation}
-                                    numberOfLines={1}
-                                />
+                                <View style={styles.textLocationTouch}>
+                                    <StyleText
+                                        originValue={item.creatorLocation}
+                                        customStyle={styles.textLocation}
+                                        numberOfLines={1}
+                                    />
+                                </View>
                             </View>
                         )}
                     </View>
@@ -530,6 +532,7 @@ const styles = ScaledSheet.create({
     bottomLeft: {
         flexDirection: 'row',
         alignItems: 'flex-end',
+        flex: 1,
     },
     numberJoinedBox: {
         flexDirection: 'row',
@@ -552,7 +555,7 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginLeft: '10@s',
-        maxWidth: '80%',
+        maxWidth: '70%',
         overflow: 'hidden',
         borderRadius: '20@ms',
     },
@@ -562,11 +565,14 @@ const styles = ScaledSheet.create({
         marginVertical: '2@s',
         color: Theme.common.white,
     },
+    textLocationTouch: {
+        justifyContent: 'center',
+        paddingRight: '10@s',
+        marginLeft: '3@s',
+    },
     textLocation: {
         fontSize: FONT_SIZE.small,
         color: Theme.common.white,
-        marginLeft: '3@s',
-        maxWidth: '80%',
     },
     // content
     contentView: {
