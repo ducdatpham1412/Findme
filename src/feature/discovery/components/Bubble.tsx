@@ -881,7 +881,6 @@ const styles = ScaledSheet.create({
         borderRadius: '20@ms',
     },
     iconUsername: {
-        fontSize: '15@ms',
         marginRight: '3@s',
         marginLeft: '9@s',
         marginVertical: '3@s',
