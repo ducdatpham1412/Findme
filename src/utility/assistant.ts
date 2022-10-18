@@ -299,12 +299,6 @@ export const modalizeMyProfile: Array<{
             }),
     },
     {
-        text: 'profile.postsArchived',
-        action: () => {
-            push(ROOT_SCREEN.postsArchived);
-        },
-    },
-    {
         text: 'profile.upgradeAccount',
         action: () => {
             push(ROOT_SCREEN.upgradeAccount);
@@ -330,18 +324,6 @@ export const modalizeMyProfileShop: Array<{
             navigate(PROFILE_ROUTE.settingRoute, {
                 screen: SETTING_ROUTE.personalInformation,
             }),
-    },
-    {
-        text: 'profile.postsArchived',
-        action: () => {
-            push(ROOT_SCREEN.postsArchived);
-        },
-    },
-    {
-        text: 'profile.groupBuyingJoined',
-        action: () => {
-            push(ROOT_SCREEN.gBJoined);
-        },
     },
     {
         text: 'common.cancel',

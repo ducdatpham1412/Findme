@@ -2,13 +2,16 @@ import {useIsFocused, useRoute} from '@react-navigation/native';
 import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
 import {
     apiGetListGBJoined,
-    apiGetListPost,
     apiGetListPostsLiked,
-    apiGetListPostsSaved,
     apiGetProfile,
 } from 'api/module';
-import {apiGetListReviewAboutUser} from 'api/profile';
-import {ACCOUNT, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
+import {
+    apiGetListGroupBuying,
+    apiGetListReviewAboutUser,
+    apiLikePost,
+    apiUnLikePost,
+} from 'api/profile';
+import {ACCOUNT, POST_TYPE, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
@@ -16,16 +19,20 @@ import LoadingIndicator from 'components/common/LoadingIndicator';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import StyleTabView from 'components/StyleTabView';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
+import Bubble from 'feature/discovery/components/Bubble';
+import BubbleGroupBuying, {
+    ParamsLikeGB,
+} from 'feature/discovery/components/BubbleGroupBuying';
 import ListShareElement from 'feature/profile/post/ListShareElement';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import {tabBarViewHeight} from 'navigation/components/TabNavigator';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
-import {appAlert} from 'navigation/NavigationService';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {appAlert, navigate} from 'navigation/NavigationService';
+import {showCommentDiscovery} from 'navigation/screen/MainTabs';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
     Animated,
-    GestureResponderEvent,
     NativeScrollEvent,
     Platform,
     RefreshControl,
@@ -39,15 +46,11 @@ import {
     modalizeMyProfileShop,
     onGoToSignUp,
 } from 'utility/assistant';
-import AvatarBackground from './components/AvatarBackground';
 import InformationProfile from './components/InformationProfile';
 import SearchAndSetting, {
     searchSettingHeight,
 } from './components/SearchAndSetting';
 import ToolMyProfile, {toolProfileHeight} from './components/ToolMyProfile';
-import ListGroupBuyingJoined from './ListGroupBuyingJoined';
-import MyListGroupBuying from './MyListGroupBuying';
-import PostStatus from './post/PostStatus';
 
 const {width, safeBottomPadding} = Metrics;
 
@@ -69,14 +72,6 @@ const ProfileEnjoy = () => {
         <>
             <ViewSafeTopPadding />
             <View style={{flex: 1}}>
-                <AvatarBackground avatar={profile.avatar} />
-                <View
-                    style={[
-                        styles.overlayView,
-                        {backgroundColor: theme.backgroundColor},
-                    ]}
-                />
-
                 <SearchAndSetting
                     onShowOptions={onShowOption}
                     hasBackBtn={false}
@@ -84,7 +79,7 @@ const ProfileEnjoy = () => {
                 />
 
                 <ScrollView contentContainerStyle={styles.contentContainer}>
-                    <InformationProfile profile={profile} havingEditProfile />
+                    <InformationProfile profile={profile} />
                     <ToolMyProfile
                         index={0}
                         onChangeTab={() => null}
@@ -136,6 +131,40 @@ const safeLoadMoreStyle: any = {
         searchSettingHeight, // check to remove this
 };
 
+let modalBubbleOption: TypeBubblePalace | TypeGroupBuying;
+
+const onHandleLike = async (params: ParamsLikeGB, setList: any) => {
+    const {isLiked, setIsLiked, totalLikes, setTotalLikes, postId} = params;
+    const currentLike = isLiked;
+    const currentNumberLikes = totalLikes;
+    try {
+        setIsLiked(!currentLike);
+        setTotalLikes(currentNumberLikes + (currentLike ? -1 : 1));
+        if (currentLike) {
+            await apiUnLikePost(postId);
+        } else {
+            await apiLikePost(postId);
+        }
+
+        setList((preValue: Array<TypeGroupBuying>) => {
+            return preValue.map(value => {
+                if (value.id !== postId) {
+                    return value;
+                }
+                return {
+                    ...value,
+                    isLiked: !currentLike,
+                    totalLikes: value.totalLikes + (currentLike ? -1 : 1),
+                };
+            });
+        });
+    } catch (err) {
+        setIsLiked(currentLike);
+        setTotalLikes(currentNumberLikes);
+        appAlert(err);
+    }
+};
+
 const ProfileAccount = () => {
     const route = useRoute();
     const isFocused = useIsFocused();
@@ -146,8 +175,6 @@ const ProfileAccount = () => {
     const isShopAccount = profile.account_type === ACCOUNT.shop;
     const isInTabProfile = route.name === PROFILE_ROUTE.myProfile;
 
-    const listShareElement = useRef<Array<TypeBubblePalace>>([]);
-    const tabIndexRef = useRef(0);
     const checkIsFocus = useRef(true);
     const listCheckTabLazy = useRef<Array<boolean>>([
         true,
@@ -156,12 +183,8 @@ const ProfileAccount = () => {
         false,
     ]);
 
-    const apiFour = useMemo(() => {
-        return isShopAccount ? apiGetListReviewAboutUser : apiGetListGBJoined;
-    }, [isShopAccount]);
-
-    const myPostsPaging = usePaging({
-        request: apiGetListPost,
+    const myGbPaging = usePaging({
+        request: apiGetListGroupBuying,
         params: {
             userId: profile.id,
         },
@@ -170,20 +193,24 @@ const ProfileAccount = () => {
         request: apiGetListPostsLiked,
         isInitNotRunRequest: true,
     });
-    const postsSavedPaging = usePaging({
-        request: apiGetListPostsSaved,
+    const gbJoinedPaging = usePaging({
+        request: apiGetListGBJoined,
         isInitNotRunRequest: true,
     });
-    const tabFourPaging = usePaging({
-        request: apiFour,
+    const postReviewPaging = usePaging({
+        request: apiGetListReviewAboutUser,
         isInitNotRunRequest: true,
         params: {
             userId: profile.id,
         },
     });
 
-    const translateXIndicator = useRef(new Animated.Value(0)).current;
+    const initIndex = useRef(isShopAccount ? 0 : 1).current;
+    const translateXIndicator = useRef(
+        new Animated.Value(initIndex * (width / 4)),
+    ).current;
     const optionRef = useRef<any>(null);
+    const optionPostReviewRef = useRef<any>(null);
     const myPostRef = useRef<ListShareElement>(null);
     const postLikedRef = useRef<ListShareElement>(null);
     const postSavedRef = useRef<ListShareElement>(null);
@@ -191,7 +218,8 @@ const ProfileAccount = () => {
     const tabViewRef = useRef<StyleTabView>(null);
     const scrollRef = useRef<ScrollView>(null);
 
-    const [tabIndex, setTabIndex] = useState(0);
+    const [tabIndex, setTabIndex] = useState(initIndex);
+    const [postIdFocusing, setPostIdFocusing] = useState('');
     const isFocusMyPost = tabIndex === 0;
     const isFocusPostLiked = tabIndex === 1;
     const isFocusPostSaved = tabIndex === 2;
@@ -202,7 +230,7 @@ const ProfileAccount = () => {
             bubblePalaceAction.action ===
             TYPE_BUBBLE_PALACE_ACTION.createNewPost
         ) {
-            myPostsPaging.setList((preValue: Array<TypeBubblePalace>) =>
+            myGbPaging.setList((preValue: Array<TypeBubblePalace>) =>
                 [bubblePalaceAction.payload].concat(preValue),
             );
             Redux.setBubblePalaceAction({
@@ -213,7 +241,7 @@ const ProfileAccount = () => {
             bubblePalaceAction.action ===
             TYPE_BUBBLE_PALACE_ACTION.editPostFromProfile
         ) {
-            myPostsPaging.setList((preValue: Array<TypeBubblePalace>) =>
+            myGbPaging.setList((preValue: Array<TypeBubblePalace>) =>
                 preValue.map(item => {
                     if (item.id !== bubblePalaceAction.payload.id) {
                         return item;
@@ -256,7 +284,7 @@ const ProfileAccount = () => {
         ) {
             const postArchived: TypeBubblePalace = bubblePalaceAction.payload;
 
-            myPostsPaging.setList(preValue =>
+            myGbPaging.setList(preValue =>
                 preValue.filter(item => {
                     if (item.id !== postArchived.id) {
                         return true;
@@ -276,7 +304,7 @@ const ProfileAccount = () => {
                 );
             }
             if (listCheckTabLazy.current[2]) {
-                postsSavedPaging.setList(preValue =>
+                gbJoinedPaging.setList(preValue =>
                     preValue.filter(item => {
                         if (item.id !== postArchived.id) {
                             return true;
@@ -295,14 +323,14 @@ const ProfileAccount = () => {
             TYPE_BUBBLE_PALACE_ACTION.unArchivePost
         ) {
             const archivedPost: TypeBubblePalace = bubblePalaceAction.payload;
-            myPostsPaging.setList(preValue => [archivedPost].concat(preValue));
+            myGbPaging.setList(preValue => [archivedPost].concat(preValue));
             if (archivedPost.isLiked) {
                 postsLikedPaging.setList(preValue =>
                     [archivedPost].concat(preValue),
                 );
             }
             if (archivedPost.isSaved) {
-                postsSavedPaging.setList(preValue =>
+                gbJoinedPaging.setList(preValue =>
                     [archivedPost].concat(preValue),
                 );
             }
@@ -327,66 +355,9 @@ const ProfileAccount = () => {
         };
     }, [isFocused]);
 
-    useEffect(() => {
-        if (tabIndex === 0) {
-            listShareElement.current = myPostsPaging.list;
-        } else if (tabIndex === 1) {
-            listShareElement.current = postsLikedPaging.list;
-        } else if (tabIndex === 2) {
-            listShareElement.current = postsSavedPaging.list;
-        } else if (tabIndex === 3) {
-            listShareElement.current = tabFourPaging.list;
-        }
-        tabIndexRef.current = tabIndex;
-    }, [
-        tabIndex,
-        myPostsPaging.list,
-        postsLikedPaging.list,
-        postsSavedPaging.list,
-        tabFourPaging.list,
-    ]);
-
     /**
      * Functions
      */
-    const onShowOption = useCallback(() => {
-        optionRef.current.show();
-    }, []);
-
-    const onGoToDetailPost = useCallback(
-        (bubbleId: string, e: GestureResponderEvent) => {
-            const initIndex = listShareElement.current.findIndex(
-                item => item.id === bubbleId,
-            );
-            if (tabIndexRef.current === 0) {
-                myPostRef.current?.show({
-                    index: initIndex === -1 ? 0 : initIndex,
-                    postId: bubbleId,
-                    e,
-                });
-            } else if (tabIndexRef.current === 1) {
-                postLikedRef.current?.show({
-                    index: initIndex === -1 ? 0 : initIndex,
-                    postId: bubbleId,
-                    e,
-                });
-            } else if (tabIndexRef.current === 2) {
-                postSavedRef.current?.show({
-                    index: initIndex === -1 ? 0 : initIndex,
-                    postId: bubbleId,
-                    e,
-                });
-            } else if (tabIndexRef.current === 3 && isShopAccount) {
-                tabFourSharedRef.current?.show({
-                    index: initIndex === -1 ? 0 : initIndex,
-                    postId: bubbleId,
-                    e,
-                });
-            }
-        },
-        [isShopAccount],
-    );
-
     const onRefreshPage = async () => {
         try {
             const res = await apiGetProfile(profile.id);
@@ -395,13 +366,13 @@ const ProfileAccount = () => {
             });
 
             if (isFocusMyPost) {
-                myPostsPaging.onRefresh();
+                myGbPaging.onRefresh();
             } else if (isFocusPostLiked) {
                 postsLikedPaging.onRefresh();
             } else if (isFocusPostSaved) {
-                postsSavedPaging.onRefresh();
+                gbJoinedPaging.onRefresh();
             } else if (isFocusGbJoined) {
-                tabFourPaging.onRefresh();
+                postReviewPaging.onRefresh();
             }
         } catch (err) {
             appAlert(err);
@@ -411,13 +382,13 @@ const ProfileAccount = () => {
     const checkScrollEnd = (nativeEvent: NativeScrollEvent) => {
         if (isScrollCloseToBottom(nativeEvent)) {
             if (isFocusMyPost) {
-                myPostsPaging.onLoadMore();
+                myGbPaging.onLoadMore();
             } else if (isFocusPostLiked) {
                 postsLikedPaging.onLoadMore();
             } else if (isFocusPostSaved) {
-                postsSavedPaging.onLoadMore();
+                gbJoinedPaging.onLoadMore();
             } else if (isFocusGbJoined) {
-                tabFourPaging.onLoadMore();
+                postReviewPaging.onLoadMore();
             }
         }
 
@@ -433,33 +404,102 @@ const ProfileAccount = () => {
     /**
      * Render views
      */
-    const RenderItemPost = useCallback(
-        (item: TypeBubblePalace & TypeGroupBuying) => {
+    const RenderItemMyGb = useCallback(
+        (item: TypeGroupBuying) => {
             return (
-                <PostStatus
-                    key={item.id}
+                <BubbleGroupBuying
                     item={item}
-                    onGoToDetailPost={onGoToDetailPost}
-                    containerStyle={styles.itemPostView}
+                    onGoToDetailGroupBuying={() => {
+                        navigate(PROFILE_ROUTE.detailGroupBuying, {
+                            item,
+                            setList: myGbPaging.setList,
+                        });
+                    }}
+                    onShowMoreOption={() => null}
+                    onHandleLike={() => null}
+                    onShowModalComment={() => null}
+                    onChangePostIdFocusing={() => null}
+                    detailGroupTarget={PROFILE_ROUTE.detailGroupBuying}
+                    containerWidth={isShopAccount ? width * 0.485 : width * 0.9}
+                    showReactView={!isShopAccount}
+                    showTopView={!isShopAccount}
+                    showBottomView={!isShopAccount}
+                    showButtonJoined={!isShopAccount}
+                    containerStyle={
+                        isShopAccount
+                            ? {
+                                  marginVertical: width * 0.01,
+                              }
+                            : {}
+                    }
                 />
             );
         },
         [isShopAccount],
     );
 
+    const RenderItemGbFavoriteJoined = useCallback(
+        (item: TypeGroupBuying, setList: any) => {
+            if (item.postType === POST_TYPE.groupBuying) {
+                return (
+                    <BubbleGroupBuying
+                        item={item}
+                        onGoToDetailGroupBuying={() => {
+                            navigate(PROFILE_ROUTE.detailGroupBuying, {
+                                item,
+                                setList,
+                            });
+                        }}
+                        onShowMoreOption={() => null}
+                        onHandleLike={params => onHandleLike(params, setList)}
+                        onShowModalComment={(post, type) =>
+                            showCommentDiscovery({
+                                post,
+                                type,
+                                setList,
+                            })
+                        }
+                        onChangePostIdFocusing={() => null}
+                        detailGroupTarget={PROFILE_ROUTE.detailGroupBuying}
+                        containerWidth={width * 0.9}
+                    />
+                );
+            }
+            return null;
+        },
+        [isShopAccount],
+    );
+
+    const RenderItemReview = useCallback(
+        (item: TypeBubblePalace) => {
+            return (
+                <Bubble
+                    item={item}
+                    onShowMoreOption={params => {
+                        modalBubbleOption = params.postModal;
+                        optionPostReviewRef.current?.show();
+                    }}
+                    onShowModalComment={(post, type) =>
+                        showCommentDiscovery({
+                            post,
+                            type,
+                            setList: postReviewPaging.setList,
+                        })
+                    }
+                    isFocusing={item.id === postIdFocusing}
+                    onChangePostIdFocusing={postId => setPostIdFocusing(postId)}
+                />
+            );
+        },
+        [postIdFocusing],
+    );
+
     return (
         <>
             <ViewSafeTopPadding />
-            <View style={{flex: 1}}>
-                <AvatarBackground avatar={profile.avatar} />
-                <View
-                    style={[
-                        styles.overlayView,
-                        {backgroundColor: theme.backgroundColorSecond},
-                    ]}
-                />
+            <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
                 <SearchAndSetting
-                    onShowOptions={onShowOption}
+                    onShowOptions={() => optionRef.current.show()}
                     hasBackBtn={!isInTabProfile}
                     hasGuideButton={isInTabProfile}
                 />
@@ -471,7 +511,7 @@ const ProfileAccount = () => {
                     }}
                     refreshControl={
                         <RefreshControl
-                            refreshing={!!myPostsPaging.refreshing}
+                            refreshing={!!myGbPaging.refreshing}
                             onRefresh={onRefreshPage}
                             tintColor={theme.highlightColor}
                             colors={[theme.highlightColor]}
@@ -481,7 +521,7 @@ const ProfileAccount = () => {
                     contentContainerStyle={{
                         paddingBottom: isInTabProfile ? 0 : safeBottomPadding,
                     }}>
-                    <InformationProfile profile={profile} havingEditProfile />
+                    <InformationProfile profile={profile} />
                     <>
                         <ToolMyProfile
                             index={tabIndex}
@@ -501,13 +541,20 @@ const ProfileAccount = () => {
                                     styles.indicator,
                                     {
                                         flex: 1 / 4,
-                                        borderTopColor: theme.borderColor,
                                         transform: [
                                             {translateX: translateXIndicator},
                                         ],
                                     },
-                                ]}
-                            />
+                                ]}>
+                                <View
+                                    style={[
+                                        styles.indicatorIn,
+                                        {
+                                            borderTopColor: theme.borderColor,
+                                        },
+                                    ]}
+                                />
+                            </Animated.View>
                         </View>
                     </>
 
@@ -518,11 +565,14 @@ const ProfileAccount = () => {
                             if (index === 1) {
                                 postsLikedPaging.onLoadMore();
                             } else if (index === 2) {
-                                postsSavedPaging.onLoadMore();
+                                gbJoinedPaging.onLoadMore();
                             } else if (index === 3) {
-                                tabFourPaging.onLoadMore();
+                                if (isShopAccount) {
+                                    postReviewPaging.onLoadMore();
+                                }
                             }
                         }}
+                        initIndex={initIndex}
                         onScroll={e => {
                             translateXIndicator.setValue(e.position * width);
                             if (e.index !== tabIndex) {
@@ -533,25 +583,14 @@ const ProfileAccount = () => {
                             style={[
                                 styles.contentContainerPost,
                                 isFocusMyPost ? {} : safeLoadMoreStyle,
+                                {
+                                    justifyContent: isShopAccount
+                                        ? 'space-between'
+                                        : 'center',
+                                },
                             ]}>
-                            {isShopAccount && (
-                                <MyListGroupBuying
-                                    userId={profile.id}
-                                    onTouchEnd={() =>
-                                        tabViewRef.current?.enableTouchable()
-                                    }
-                                    onTouchStart={() =>
-                                        tabViewRef.current?.disableTouchable()
-                                    }
-                                    detailGroupBuyingName={
-                                        isInTabProfile
-                                            ? PROFILE_ROUTE.detailGroupBuying
-                                            : ROOT_SCREEN.detailGroupBuying
-                                    }
-                                />
-                            )}
-                            {myPostsPaging.list.map(RenderItemPost)}
-                            {myPostsPaging.loading && (
+                            {myGbPaging.list.map(RenderItemMyGb)}
+                            {myGbPaging.loading && (
                                 <LoadingIndicator
                                     color={theme.textHightLight}
                                 />
@@ -562,7 +601,12 @@ const ProfileAccount = () => {
                                 styles.contentContainerPost,
                                 isFocusPostLiked ? {} : safeLoadMoreStyle,
                             ]}>
-                            {postsLikedPaging.list.map(RenderItemPost)}
+                            {postsLikedPaging.list.map(item =>
+                                RenderItemGbFavoriteJoined(
+                                    item,
+                                    postsLikedPaging.setList,
+                                ),
+                            )}
                             {postsLikedPaging.loading && (
                                 <LoadingIndicator
                                     color={theme.textHightLight}
@@ -574,8 +618,13 @@ const ProfileAccount = () => {
                                 styles.contentContainerPost,
                                 isFocusPostSaved ? {} : safeLoadMoreStyle,
                             ]}>
-                            {postsSavedPaging.list.map(RenderItemPost)}
-                            {postsSavedPaging.loading && (
+                            {gbJoinedPaging.list.map(item =>
+                                RenderItemGbFavoriteJoined(
+                                    item,
+                                    gbJoinedPaging.setList,
+                                ),
+                            )}
+                            {gbJoinedPaging.loading && (
                                 <LoadingIndicator
                                     color={theme.textHightLight}
                                 />
@@ -586,15 +635,12 @@ const ProfileAccount = () => {
                                 styles.contentContainerPost,
                                 isFocusGbJoined ? {} : safeLoadMoreStyle,
                             ]}>
-                            {isShopAccount ? (
-                                tabFourPaging.list.map(RenderItemPost)
-                            ) : (
-                                <ListGroupBuyingJoined
-                                    listPaging={tabFourPaging}
-                                    isInProfileTab={isInTabProfile}
-                                />
-                            )}
-                            {tabFourPaging.loading && (
+                            {isShopAccount
+                                ? postReviewPaging.list.map(item =>
+                                      RenderItemReview(item),
+                                  )
+                                : null}
+                            {postReviewPaging.loading && (
                                 <LoadingIndicator
                                     color={theme.textHightLight}
                                 />
@@ -603,44 +649,6 @@ const ProfileAccount = () => {
                     </StyleTabView>
                 </ScrollView>
 
-                <ListShareElement
-                    ref={myPostRef}
-                    title={profile.name}
-                    listPaging={myPostsPaging}
-                    containerStyle={{
-                        backgroundColor: theme.backgroundColorSecond,
-                    }}
-                />
-
-                <ListShareElement
-                    ref={postLikedRef}
-                    title={profile.name}
-                    listPaging={postsLikedPaging}
-                    containerStyle={{
-                        backgroundColor: theme.backgroundColorSecond,
-                    }}
-                />
-
-                <ListShareElement
-                    ref={postSavedRef}
-                    title={profile.name}
-                    listPaging={postsSavedPaging}
-                    containerStyle={{
-                        backgroundColor: theme.backgroundColorSecond,
-                    }}
-                />
-
-                {isShopAccount && (
-                    <ListShareElement
-                        ref={tabFourSharedRef}
-                        title={profile.name}
-                        listPaging={tabFourPaging}
-                        containerStyle={{
-                            backgroundColor: theme.backgroundColorSecond,
-                        }}
-                    />
-                )}
-
                 <StyleActionSheet
                     ref={optionRef}
                     listTextAndAction={
@@ -648,6 +656,27 @@ const ProfileAccount = () => {
                             ? modalizeMyProfileShop
                             : modalizeMyProfile
                     }
+                />
+
+                <StyleActionSheet
+                    ref={optionPostReviewRef}
+                    listTextAndAction={[
+                        {
+                            text: 'discovery.report.title',
+                            action: () => {
+                                if (modalBubbleOption) {
+                                    navigate(ROOT_SCREEN.reportUser, {
+                                        idUser: modalBubbleOption.creator,
+                                        nameUser: modalBubbleOption.creatorName,
+                                    });
+                                }
+                            },
+                        },
+                        {
+                            text: 'common.cancel',
+                            action: () => null,
+                        },
+                    ]}
                 />
             </View>
         </>
@@ -671,12 +700,6 @@ const styles = ScaledSheet.create({
     contentContainer: {
         paddingBottom: '100@vs',
         flexGrow: 1,
-    },
-    overlayView: {
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        opacity: 0.75,
     },
     signUpBox: {
         width: '100%',
@@ -704,6 +727,8 @@ const styles = ScaledSheet.create({
         width,
         flexDirection: 'row',
         flexWrap: 'wrap',
+        justifyContent: 'center',
+        paddingHorizontal: '2@s',
     },
     itemPostView: {
         marginHorizontal: '0.25@ms',
@@ -719,8 +744,12 @@ const styles = ScaledSheet.create({
     },
     indicator: {
         flex: 1 / 3,
+        alignItems: 'center',
+    },
+    indicatorIn: {
+        width: '60%',
         borderTopWidth: Platform.select({
-            ios: '1@ms',
+            ios: '1.5@ms',
             android: '2@ms',
         }),
     },

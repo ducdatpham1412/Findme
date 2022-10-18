@@ -9,23 +9,27 @@ import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {navigate, push} from 'navigation/NavigationService';
 import React from 'react';
-import {Platform, View} from 'react-native';
+import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface Props {
     profile: TypeGetProfileResponse;
-    havingEditProfile?: boolean;
 }
+
+const avatarSize = Metrics.width / 3.5;
+const buttonWidth = Metrics.width * 0.25;
 
 const InformationProfile = (props: Props) => {
     const route = useRoute();
-    const {profile, havingEditProfile} = props;
+    const {profile} = props;
     const theme = Redux.getTheme();
+    const myId = Redux.getPassport().profile.id;
     const {name, description, followers, followings, avatar, account_type} =
         profile;
+
+    const isMyProfile = myId === profile.id;
+    const isShopAccount = account_type === ACCOUNT.shop;
 
     const onNavigateFollow = (type: number) => {
         push(ROOT_SCREEN.listFollows, {
@@ -36,166 +40,74 @@ const InformationProfile = (props: Props) => {
         });
     };
 
-    /**
-     * Render view
-     */
-    const Follows = () => {
-        return (
-            <View
-                style={[
-                    styles.followBox,
-                    {
-                        borderTopColor: theme.holderColor,
-                        width: profile.reputations ? '90%' : '70%',
-                    },
-                ]}>
-                {/* Follower */}
+    const Button = () => {
+        if (isMyProfile) {
+            return (
                 <StyleTouchable
-                    customStyle={styles.elementFollow}
-                    onPress={() => onNavigateFollow(TYPE_FOLLOW.follower)}>
+                    customStyle={[
+                        styles.buttonTouch,
+                        {backgroundColor: Theme.common.gradientTabBar1},
+                    ]}
+                    onPress={() => {
+                        navigate(PROFILE_ROUTE.editProfile);
+                    }}>
                     <StyleText
-                        i18Text="profile.component.infoProfile.follower"
+                        i18Text="profile.post.edit"
                         customStyle={[
-                            styles.titleFollow,
-                            {color: theme.borderColor},
-                        ]}
-                    />
-                    <StyleText
-                        originValue={String(followers)}
-                        customStyle={[
-                            styles.numberFollow,
-                            {color: theme.textHightLight},
+                            styles.textButton,
+                            {color: Theme.common.white},
                         ]}
                     />
                 </StyleTouchable>
+            );
+        }
 
-                {/* Following */}
+        if (isShopAccount) {
+            return (
                 <StyleTouchable
-                    customStyle={styles.elementFollow}
-                    onPress={() => onNavigateFollow(TYPE_FOLLOW.following)}>
+                    customStyle={[
+                        styles.buttonTouch,
+                        {backgroundColor: Theme.common.gradientTabBar1},
+                    ]}
+                    onPress={() => {
+                        navigate(PROFILE_ROUTE.createPostPickImg, {
+                            userReviewed: {
+                                id: profile.id,
+                                name: profile.name,
+                                avatar: profile.avatar,
+                            },
+                        });
+                    }}>
                     <StyleText
-                        i18Text="profile.component.infoProfile.following"
+                        i18Text="profile.reviewProvider"
                         customStyle={[
-                            styles.titleFollow,
-                            {color: theme.borderColor},
-                        ]}
-                    />
-                    <StyleText
-                        originValue={String(followings)}
-                        customStyle={[
-                            styles.numberFollow,
-                            {color: theme.textHightLight},
+                            styles.textButton,
+                            {color: Theme.common.white},
                         ]}
                     />
                 </StyleTouchable>
+            );
+        }
 
-                {/* Reputations */}
-                {!!profile.reputations && (
-                    <View style={styles.elementFollow}>
-                        <StyleText
-                            originValue="TrustPoint"
-                            customStyle={[
-                                styles.titleFollow,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                        <StyleText
-                            originValue={profile.reputations}
-                            customStyle={[
-                                styles.numberFollow,
-                                {color: theme.textHightLight},
-                            ]}
-                        />
-                    </View>
-                )}
-            </View>
-        );
-    };
-
-    const ButtonEditProfile = () => {
-        return (
-            <>
-                {havingEditProfile && (
-                    <StyleTouchable
-                        customStyle={[
-                            styles.editProfileBox,
-                            {borderColor: theme.tabBarIconColor},
-                        ]}
-                        onPress={() => navigate(PROFILE_ROUTE.editProfile)}>
-                        <AntDesign
-                            name="edit"
-                            style={[
-                                styles.editProfileIcon,
-                                {color: theme.tabBarIconColor},
-                            ]}
-                        />
-                    </StyleTouchable>
-                )}
-
-                {account_type === ACCOUNT.shop && (
-                    <View
-                        style={[
-                            styles.shopButtonBox,
-                            {borderColor: theme.borderColor},
-                        ]}>
-                        <Entypo
-                            name="shop"
-                            style={[
-                                styles.editProfileIcon,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                    </View>
-                )}
-            </>
-        );
+        return null;
     };
 
     return (
         <View style={styles.container}>
             <View style={styles.introduceView}>
-                <View
-                    style={[
-                        styles.introduceBackground,
-                        {backgroundColor: theme.backgroundColor},
-                    ]}
-                />
-
-                <View
-                    style={[
-                        styles.indicatorBox,
-                        {backgroundColor: theme.borderColor},
-                    ]}
-                />
-
                 <StyleImage
                     source={{uri: avatar}}
                     customStyle={styles.avatarHeader}
                 />
-
                 <View style={styles.boxNameAndDescription}>
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                        }}>
-                        <StyleText
-                            customStyle={[
-                                styles.textName,
-                                {color: theme.textHightLight},
-                            ]}
-                            originValue={name}
-                        />
-                    </View>
-                    {!!description && (
-                        <StyleText
-                            originValue={description}
-                            customStyle={[
-                                styles.textDescription,
-                                {color: theme.textHightLight},
-                            ]}
-                        />
-                    )}
+                    <StyleText
+                        customStyle={[
+                            styles.textName,
+                            {color: theme.textHightLight},
+                        ]}
+                        originValue={name}
+                        numberOfLines={1}
+                    />
                     {!!profile.location && (
                         <View style={styles.locationBox}>
                             <Ionicons
@@ -208,12 +120,67 @@ const InformationProfile = (props: Props) => {
                                     styles.textLocation,
                                     {color: theme.borderColor},
                                 ]}
+                                numberOfLines={1}
                             />
                         </View>
                     )}
+                    {!!description && (
+                        <StyleText
+                            originValue={description}
+                            customStyle={[
+                                styles.textDescription,
+                                {color: theme.textColor},
+                            ]}
+                            numberOfLines={1}
+                        />
+                    )}
                 </View>
-                {Follows()}
-                {ButtonEditProfile()}
+            </View>
+
+            <View style={styles.bottomView}>
+                <View style={styles.followBox}>
+                    {/* Follower */}
+                    <StyleTouchable
+                        customStyle={styles.elementFollow}
+                        onPress={() => onNavigateFollow(TYPE_FOLLOW.follower)}>
+                        <StyleText
+                            i18Text="profile.component.infoProfile.follower"
+                            customStyle={[
+                                styles.titleFollow,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                        <StyleText
+                            originValue={String(followers)}
+                            customStyle={[
+                                styles.numberFollow,
+                                {color: theme.textHightLight},
+                            ]}
+                        />
+                    </StyleTouchable>
+
+                    {/* Following */}
+                    <StyleTouchable
+                        customStyle={styles.elementFollow}
+                        onPress={() => onNavigateFollow(TYPE_FOLLOW.following)}>
+                        <StyleText
+                            i18Text="profile.component.infoProfile.following"
+                            customStyle={[
+                                styles.titleFollow,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                        <StyleText
+                            originValue={String(followings)}
+                            customStyle={[
+                                styles.numberFollow,
+                                {color: theme.textHightLight},
+                            ]}
+                        />
+                    </StyleTouchable>
+                </View>
+
+                <View style={styles.buttonBox}>{Button()}</View>
             </View>
         </View>
     );
@@ -222,110 +189,77 @@ const InformationProfile = (props: Props) => {
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
-        marginTop: Metrics.width / 2.5,
-    },
-    avatarHeader: {
-        width: '70@s',
-        height: '70@s',
-        borderRadius: '50@s',
-        alignSelf: 'center',
-        marginTop: '10@vs',
-    },
-    indicatorBox: {
-        width: '50%',
-        height: '2.5@vs',
-        borderRadius: '20@s',
-        alignSelf: 'center',
-    },
-    editProfileBox: {
-        position: 'absolute',
-        padding: '7@ms',
-        borderRadius: '50@s',
-        top: '17@s',
-        right: '17@s',
-        borderWidth: '1@ms',
-    },
-    shopButtonBox: {
-        position: 'absolute',
-        padding: '7@ms',
-        borderRadius: '50@s',
-        top: '17@s',
-        left: '17@s',
-        borderWidth: '1@ms',
-    },
-    editProfileIcon: {
-        fontSize: '16@ms',
+        paddingHorizontal: '20@s',
     },
     // avatar - cover
     introduceView: {
-        width: Metrics.width,
-        minHeight: Metrics.width / 2,
-    },
-    introduceBackground: {
-        position: 'absolute',
         width: '100%',
-        height: '100%',
-        borderTopLeftRadius: '20@s',
-        borderTopRightRadius: '20@s',
-        opacity: 0.95,
+        flexDirection: 'row',
+        marginTop: '10@vs',
     },
-    // box name
+    avatarHeader: {
+        width: avatarSize,
+        height: avatarSize,
+        borderRadius: '30@ms',
+    },
     boxNameAndDescription: {
-        width: '100%',
-        alignItems: 'center',
-        paddingHorizontal: '15@s',
-        marginTop: '5@vs',
+        flex: 1,
+        paddingLeft: '15@s',
+        justifyContent: 'center',
     },
     textName: {
         fontSize: FONT_SIZE.big,
         fontWeight: 'bold',
     },
-    nameAnonymousBox: {
-        marginTop: '7@vs',
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
     textDescription: {
-        fontSize: FONT_SIZE.normal,
-        marginTop: '10@vs',
+        fontSize: FONT_SIZE.small,
+        marginTop: '7@vs',
     },
     locationBox: {
+        width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: '10@vs',
-        maxWidth: '80%',
+        marginTop: '3@vs',
     },
     iconLocation: {
-        fontSize: '17@ms',
+        fontSize: '13@ms',
         color: Theme.common.commentGreen,
     },
     textLocation: {
         fontSize: FONT_SIZE.small,
-        marginLeft: '5@s',
+        marginLeft: '2@s',
     },
     // box follow
-    followBox: {
-        alignSelf: 'center',
+    bottomView: {
         flexDirection: 'row',
-        paddingTop: '10@vs',
-        marginVertical: '15@vs',
-        borderTopWidth: Platform.select({
-            ios: '0.25@ms',
-            android: '0.5@ms',
-        }),
+        marginTop: '10@vs',
+    },
+    followBox: {
+        flex: 1,
+        flexDirection: 'row',
     },
     elementFollow: {
-        flex: 1,
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
+        marginRight: '15@s',
     },
     titleFollow: {
         fontSize: FONT_SIZE.small,
     },
     numberFollow: {
-        fontSize: FONT_SIZE.normal,
+        fontSize: FONT_SIZE.small,
+        marginLeft: '5@ms',
+    },
+    buttonBox: {},
+    buttonTouch: {
+        width: buttonWidth,
+        paddingVertical: '10@ms',
+        alignItems: 'center',
+        borderRadius: '10@ms',
+    },
+    textButton: {
+        fontSize: FONT_SIZE.small,
         fontWeight: 'bold',
-        marginTop: '8@vs',
     },
 });
 

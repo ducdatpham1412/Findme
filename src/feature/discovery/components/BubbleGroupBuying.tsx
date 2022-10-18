@@ -27,7 +27,7 @@ import Redux from 'hook/useRedux';
 import {appAlert} from 'navigation/NavigationService';
 import React, {memo, useEffect, useState} from 'react';
 import isEqual from 'react-fast-compare';
-import {StyleSheet, View} from 'react-native';
+import {StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
@@ -56,6 +56,12 @@ interface Props {
     ): void;
     onChangePostIdFocusing(postId: string): void;
     detailGroupTarget: string;
+    containerWidth?: number;
+    containerStyle?: StyleProp<ViewStyle>;
+    showTopView?: boolean;
+    showBottomView?: boolean;
+    showReactView?: boolean;
+    showButtonJoined?: boolean;
 }
 
 const onShowModalShare = async (
@@ -193,10 +199,15 @@ const BubbleGroupBuying = (props: Props) => {
     const {
         item,
         onGoToDetailGroupBuying,
-        onShowMoreOption,
         onHandleLike,
         onShowModalComment,
         onChangePostIdFocusing,
+        containerWidth = width * 0.9,
+        showTopView = true,
+        showBottomView = true,
+        showReactView = true,
+        showButtonJoined = true,
+        containerStyle,
     } = props;
     const theme = Redux.getTheme();
 
@@ -221,37 +232,53 @@ const BubbleGroupBuying = (props: Props) => {
                 styles.container,
                 {
                     backgroundColor: theme.backgroundColor,
+                    shadowColor: theme.textColor,
+                },
+                containerStyle,
+                {
+                    width: containerWidth,
                 },
             ]}
             onPress={() => onGoToDetailGroupBuying(item)}
             onTouchEnd={() => onChangePostIdFocusing(item.id)}>
             {/* Image preview */}
             <SharedElement
-                style={styles.imagePreview}
+                style={[
+                    styles.imagePreview,
+                    {
+                        height: containerWidth * ratioImageGroupBuying,
+                    },
+                ]}
                 id={`item.group_buying.${item.id}.false`}>
                 <StyleImage
                     source={{uri: item.images[0]}}
-                    customStyle={styles.imagePreview}
+                    customStyle={[
+                        styles.imagePreview,
+                        {
+                            height: containerWidth * ratioImageGroupBuying,
+                        },
+                    ]}
                 />
 
-                <View style={styles.topView}>
-                    <StyleTouchable
-                        customStyle={styles.creatorView}
-                        onPress={() => onGoToProfile(item.creator)}>
-                        <CustomBlurView />
-                        <StyleIcon
-                            source={{uri: item.creatorAvatar}}
-                            size={20}
-                            customStyle={styles.avatar}
-                        />
-                        <StyleText
-                            originValue={item.creatorName}
-                            numberOfLines={1}
-                            customStyle={styles.textName}
-                        />
-                    </StyleTouchable>
+                {showTopView && (
+                    <View style={styles.topView}>
+                        <StyleTouchable
+                            customStyle={styles.creatorView}
+                            onPress={() => onGoToProfile(item.creator)}>
+                            <CustomBlurView />
+                            <StyleIcon
+                                source={{uri: item.creatorAvatar}}
+                                size={20}
+                                customStyle={styles.avatar}
+                            />
+                            <StyleText
+                                originValue={item.creatorName}
+                                numberOfLines={1}
+                                customStyle={styles.textName}
+                            />
+                        </StyleTouchable>
 
-                    <StyleTouchable
+                        {/* <StyleTouchable
                         customStyle={styles.iconMoreView}
                         onPress={() =>
                             onShowMoreOption({
@@ -264,82 +291,89 @@ const BubbleGroupBuying = (props: Props) => {
                             size={15}
                             customStyle={styles.iconMore}
                         />
-                    </StyleTouchable>
-                </View>
+                    </StyleTouchable> */}
+                    </View>
+                )}
 
-                <View style={styles.bottomView}>
-                    <View style={styles.bottomLeft}>
-                        <View style={styles.numberJoinedBox}>
-                            <CustomBlurView />
-                            <StyleIcon
-                                source={Images.icons.createGroup}
-                                size={15}
-                                customStyle={styles.iconNumberPeople}
-                            />
-                            <StyleText
-                                originValue={item.totalJoins}
-                                customStyle={styles.textNumberPeople}
-                            />
+                {showBottomView && (
+                    <View style={styles.bottomView}>
+                        <View style={styles.bottomLeft}>
+                            <View style={styles.numberJoinedBox}>
+                                <CustomBlurView />
+                                <StyleIcon
+                                    source={Images.icons.createGroup}
+                                    size={15}
+                                    customStyle={styles.iconNumberPeople}
+                                />
+                                <StyleText
+                                    originValue={item.totalJoins}
+                                    customStyle={styles.textNumberPeople}
+                                />
+                            </View>
+
+                            {!!item.creatorLocation && (
+                                <View style={styles.locationBox}>
+                                    <CustomBlurView />
+                                    <Entypo
+                                        name="location-pin"
+                                        style={styles.iconLocation}
+                                    />
+                                    <View style={styles.textLocationTouch}>
+                                        <StyleText
+                                            originValue={item.creatorLocation}
+                                            customStyle={styles.textLocation}
+                                            numberOfLines={1}
+                                        />
+                                    </View>
+                                </View>
+                            )}
                         </View>
 
-                        {!!item.creatorLocation && (
-                            <View style={styles.locationBox}>
+                        <View style={styles.leftRight}>
+                            <StyleTouchable
+                                customStyle={styles.contractBox}
+                                onPress={() =>
+                                    onShowModalComment(item, 'comment')
+                                }>
                                 <CustomBlurView />
-                                <Entypo
-                                    name="location-pin"
-                                    style={styles.iconLocation}
+                                <StyleIcon
+                                    source={Images.icons.comment}
+                                    size={14}
+                                    customStyle={{
+                                        tintColor: Theme.common.white,
+                                    }}
                                 />
-                                <View style={styles.textLocationTouch}>
-                                    <StyleText
-                                        originValue={item.creatorLocation}
-                                        customStyle={styles.textLocation}
-                                        numberOfLines={1}
-                                    />
-                                </View>
-                            </View>
-                        )}
+                            </StyleTouchable>
+                            <StyleTouchable
+                                customStyle={styles.contractBox}
+                                disableOpacity={0.85}
+                                onPress={() =>
+                                    onShowModalShare(item, setDisableShare)
+                                }
+                                disable={disableShare}>
+                                <CustomBlurView />
+                                <StyleIcon
+                                    source={Images.icons.share}
+                                    size={15}
+                                    customStyle={{
+                                        tintColor: Theme.common.white,
+                                    }}
+                                />
+                            </StyleTouchable>
+                        </View>
                     </View>
-
-                    <View style={styles.leftRight}>
-                        <StyleTouchable
-                            customStyle={styles.contractBox}
-                            onPress={() => onShowModalComment(item, 'comment')}>
-                            <CustomBlurView />
-                            <StyleIcon
-                                source={Images.icons.comment}
-                                size={14}
-                                customStyle={{tintColor: Theme.common.white}}
-                            />
-                        </StyleTouchable>
-                        <StyleTouchable
-                            customStyle={styles.contractBox}
-                            disableOpacity={0.85}
-                            onPress={() =>
-                                onShowModalShare(item, setDisableShare)
-                            }
-                            disable={disableShare}>
-                            <CustomBlurView />
-                            <StyleIcon
-                                source={Images.icons.share}
-                                size={15}
-                                customStyle={{tintColor: Theme.common.white}}
-                            />
-                        </StyleTouchable>
-                    </View>
-                </View>
+                )}
             </SharedElement>
 
             {/* Content */}
-            {!!item.content && (
-                <StyleText
-                    originValue={item.content}
-                    customStyle={[
-                        styles.textContent,
-                        {color: theme.textHightLight},
-                    ]}
-                    numberOfLines={1}
-                />
-            )}
+            <StyleText
+                originValue={item.content}
+                customStyle={[
+                    styles.textContent,
+                    {color: theme.textHightLight},
+                ]}
+                numberOfLines={1}
+            />
 
             <View style={styles.contentView}>
                 <View style={{flex: 1}}>
@@ -382,113 +416,121 @@ const BubbleGroupBuying = (props: Props) => {
                         />
                     </View>
                 </View>
-                {ButtonCheckJoined(item, theme)}
+                {showButtonJoined && ButtonCheckJoined(item, theme)}
             </View>
 
             {/* Footer */}
-            <View style={styles.footerView}>
-                {isLiked ? (
-                    <IconLiked
-                        customStyle={[
-                            styles.iconLike,
-                            {color: theme.likeHeart},
-                        ]}
-                        touchableStyle={styles.touchIconLike}
-                        onPress={() =>
-                            onHandleLike({
-                                isLiked,
-                                setIsLiked,
-                                totalLikes,
-                                setTotalLikes,
-                                postId: item.id,
-                            })
-                        }
-                    />
-                ) : (
-                    <IconNotLiked
-                        customStyle={[
-                            styles.iconLike,
-                            {color: theme.borderColor},
-                        ]}
-                        touchableStyle={styles.touchIconLike}
-                        onPress={() =>
-                            onHandleLike({
-                                isLiked,
-                                setIsLiked,
-                                totalLikes,
-                                setTotalLikes,
-                                postId: item.id,
-                            })
-                        }
-                    />
-                )}
+            {showReactView && (
+                <View style={styles.footerView}>
+                    {isLiked ? (
+                        <IconLiked
+                            customStyle={[
+                                styles.iconLike,
+                                {color: theme.likeHeart},
+                            ]}
+                            touchableStyle={styles.touchIconLike}
+                            onPress={() =>
+                                onHandleLike({
+                                    isLiked,
+                                    setIsLiked,
+                                    totalLikes,
+                                    setTotalLikes,
+                                    postId: item.id,
+                                })
+                            }
+                        />
+                    ) : (
+                        <IconNotLiked
+                            customStyle={[
+                                styles.iconLike,
+                                {color: theme.borderColor},
+                            ]}
+                            touchableStyle={styles.touchIconLike}
+                            onPress={() =>
+                                onHandleLike({
+                                    isLiked,
+                                    setIsLiked,
+                                    totalLikes,
+                                    setTotalLikes,
+                                    postId: item.id,
+                                })
+                            }
+                        />
+                    )}
 
-                <StyleTouchable
-                    customStyle={styles.likeTouch}
-                    onPress={() => {
-                        if (totalLikes) {
-                            onShowModalComment(item, 'like');
-                        } else {
-                            onHandleLike({
-                                isLiked,
-                                setIsLiked,
-                                totalLikes,
-                                setTotalLikes,
-                                postId: item.id,
-                            });
-                        }
-                    }}
-                    hitSlop={{top: 10, bottom: 10}}>
-                    <StyleText
-                        i18Text={
-                            totalLikes
-                                ? 'discovery.numberLike'
-                                : 'discovery.like'
-                        }
-                        i18Params={{
-                            value: totalLikes,
+                    <StyleTouchable
+                        customStyle={styles.likeTouch}
+                        onPress={() => {
+                            if (totalLikes) {
+                                onShowModalComment(item, 'like');
+                            } else {
+                                onHandleLike({
+                                    isLiked,
+                                    setIsLiked,
+                                    totalLikes,
+                                    setTotalLikes,
+                                    postId: item.id,
+                                });
+                            }
                         }}
-                        customStyle={[
-                            styles.textLike,
-                            {color: theme.borderColor},
-                        ]}
-                    />
-                </StyleTouchable>
+                        hitSlop={{top: 10, bottom: 10}}>
+                        <StyleText
+                            i18Text={
+                                totalLikes
+                                    ? 'discovery.numberLike'
+                                    : 'discovery.like'
+                            }
+                            i18Params={{
+                                value: totalLikes,
+                            }}
+                            customStyle={[
+                                styles.textLike,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                    </StyleTouchable>
 
-                <StyleTouchable
-                    customStyle={styles.commentTouch}
-                    onPress={() => onShowModalComment(item, 'comment')}
-                    hitSlop={{top: 10, bottom: 10}}>
-                    <StyleText
-                        i18Text={
-                            item.totalComments
-                                ? 'discovery.numberComments'
-                                : 'discovery.comment'
-                        }
-                        i18Params={{
-                            numberComments: item.totalComments,
-                        }}
-                        customStyle={[
-                            styles.textComment,
-                            {color: theme.borderColor},
-                        ]}
-                    />
-                </StyleTouchable>
-            </View>
+                    <StyleTouchable
+                        customStyle={styles.commentTouch}
+                        onPress={() => onShowModalComment(item, 'comment')}
+                        hitSlop={{top: 10, bottom: 10}}>
+                        <StyleText
+                            i18Text={
+                                item.totalComments
+                                    ? 'discovery.numberComments'
+                                    : 'discovery.comment'
+                            }
+                            i18Params={{
+                                numberComments: item.totalComments,
+                            }}
+                            customStyle={[
+                                styles.textComment,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                    </StyleTouchable>
+                </View>
+            )}
         </StyleTouchable>
     );
 };
 
 const styles = ScaledSheet.create({
     container: {
-        width,
-        paddingVertical: '20@vs',
-        marginTop: '-1@vs',
+        alignSelf: 'center',
+        shadowOpacity: 0.2,
+        marginVertical: '10@vs',
+        shadowOffset: {
+            width: 0,
+            height: -1,
+        },
+        paddingBottom: '10@vs',
+        borderRadius: '20@ms',
     },
     imagePreview: {
         width: '100%',
-        borderRadius: '8@ms',
-        height: width * ratioImageGroupBuying,
+        borderTopLeftRadius: '20@ms',
+        borderTopRightRadius: '20@ms',
     },
     creatorView: {
         flexDirection: 'row',

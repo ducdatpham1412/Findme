@@ -6,12 +6,11 @@ import {
 import {
     apiBlockUser,
     apiFollowUser,
-    apiGetListPost,
     apiGetProfile,
     apiUnFollowUser,
 } from 'api/module';
-import {apiGetListReviewAboutUser} from 'api/profile';
-import {ACCOUNT, RELATIONSHIP} from 'asset/enum';
+import {apiGetListGroupBuying, apiGetListReviewAboutUser} from 'api/profile';
+import {ACCOUNT, POST_TYPE, RELATIONSHIP} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';
 import {StyleText, StyleTouchable} from 'components/base';
@@ -22,9 +21,11 @@ import LoadingScreen from 'components/LoadingScreen';
 import ModalCommentLike from 'components/ModalCommentLike';
 import StyleTabView from 'components/StyleTabView';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
+import Bubble from 'feature/discovery/components/Bubble';
+import BubbleGroupBuying from 'feature/discovery/components/BubbleGroupBuying';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
-import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
+import ROOT_SCREEN from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
@@ -45,9 +46,6 @@ import AvatarBackground from './components/AvatarBackground';
 import InformationProfile from './components/InformationProfile';
 import SearchAndSetting from './components/SearchAndSetting';
 import ToolOtherProfile from './components/ToolOtherProfile';
-import MyListGroupBuying from './MyListGroupBuying';
-import ListShareElement from './post/ListShareElement';
-import PostStatus from './post/PostStatus';
 
 interface Props {
     route: {
@@ -60,6 +58,8 @@ interface Props {
 }
 
 const {width} = Metrics;
+
+let modalBubbleOption: TypeBubblePalace | TypeGroupBuying;
 
 const onBlockUser = async (userId: number) => {
     try {
@@ -94,18 +94,15 @@ const OtherProfile = ({route}: Props) => {
 
     const modalRef = useRef<ModalCommentLike>(null);
     const optionsRef = useRef<any>(null);
-    const actionReviewRef = useRef<any>(null);
+    const optionPostReviewRef = useRef<any>(null);
     const tabViewRef = useRef<StyleTabView>(null);
-    const listUserPostsRef = useRef<ListShareElement>(null);
-    const listPostReviewRef = useRef<ListShareElement>(null);
     const translateXIndicator = useRef(new Animated.Value(0)).current;
-    const listPosts = useRef<Array<TypeBubblePalace>>([]);
-    const tabIndexRef = useRef(0);
 
     const [profile, setProfile] = useState<TypeGetProfileResponse>();
     const [isFollowing, setIsFollowing] = useState(false);
     const [bubbleFocusing, setBubbleFocusing] = useState<TypeBubblePalace>();
     const [tabIndex, setTabIndex] = useState(0);
+    const [postIdFocusing, setPostIdFocusing] = useState('');
 
     const isBlock = profile?.relationship === RELATIONSHIP.block;
     const isShopAccount = profile?.account_type === ACCOUNT.shop;
@@ -113,7 +110,7 @@ const OtherProfile = ({route}: Props) => {
     const isFocusPostReviewed = tabIndex === 1;
 
     const listPostsPaging = usePaging({
-        request: apiGetListPost,
+        request: apiGetListGroupBuying,
         params: {
             userId: id,
         },
@@ -123,7 +120,7 @@ const OtherProfile = ({route}: Props) => {
         params: {
             userId: id,
         },
-        isInitNotRunRequest: true,
+        isInitNotRunRequest: !isShopAccount,
     });
 
     const getData = async () => {
@@ -138,15 +135,6 @@ const OtherProfile = ({route}: Props) => {
             Redux.setIsLoading(false);
         }
     };
-
-    useEffect(() => {
-        if (tabIndex === 0) {
-            listPosts.current = listPostsPaging.list;
-        } else if (tabIndex === 1) {
-            listPosts.current = listPostsReviewAbout.list;
-        }
-        tabIndexRef.current = tabIndex;
-    }, [tabIndex, listPostsPaging.list, listPostsReviewAbout.list]);
 
     useEffect(() => {
         getData();
@@ -201,49 +189,77 @@ const OtherProfile = ({route}: Props) => {
         }
     };
 
-    const onGoToDetailPost = (bubbleId: string) => {
-        const initIndex = listPosts.current.findIndex(
-            item => item.id === bubbleId,
-        );
-        if (tabIndexRef.current === 0) {
-            listUserPostsRef.current?.show({
-                index: initIndex === -1 ? 0 : initIndex,
-                postId: bubbleId,
-            });
-        } else if (tabIndexRef.current === 1) {
-            listPostReviewRef.current?.show({
-                index: initIndex === -1 ? 0 : initIndex,
-                postId: bubbleId,
-            });
-        }
-    };
-
     const checkScrollEnd = (nativeEvent: NativeScrollEvent) => {
         if (isScrollCloseToBottom(nativeEvent)) {
             if (isFocusListPost) {
                 listPostsPaging.onLoadMore();
             }
         }
-        if (isFocusListPost) {
-            listUserPostsRef.current?.scrollToNearingEnd();
-        }
     };
 
     /**
      * Render_view
      */
-    const RenderItemPost = useCallback(
-        (item: TypeBubblePalace & TypeGroupBuying) => {
+    const RenderItemMyGb = useCallback(
+        (item: TypeGroupBuying) => {
             return (
-                <PostStatus
-                    key={item.id}
+                <BubbleGroupBuying
                     item={item}
-                    onGoToDetailPost={onGoToDetailPost}
-                    containerStyle={styles.postStatusView}
+                    onGoToDetailGroupBuying={() => {
+                        navigate(ROOT_SCREEN.detailGroupBuying, {
+                            item,
+                            setList: listPostsPaging.setList,
+                        });
+                    }}
+                    onShowMoreOption={() => null}
+                    onHandleLike={() => null}
+                    onShowModalComment={() => null}
+                    onChangePostIdFocusing={() => null}
+                    detailGroupTarget={ROOT_SCREEN.detailGroupBuying}
+                    containerWidth={width * 0.485}
+                    showReactView={false}
+                    showTopView={false}
+                    showBottomView={false}
+                    showButtonJoined={false}
+                    containerStyle={
+                        isShopAccount
+                            ? {
+                                  marginVertical: width * 0.01,
+                              }
+                            : {}
+                    }
                 />
             );
         },
-        [],
+        [isShopAccount],
+    );
+
+    const RenderItemReview = useCallback(
+        (item: TypeBubblePalace) => {
+            if (item.postType === POST_TYPE.review) {
+                return (
+                    <Bubble
+                        item={item}
+                        onShowMoreOption={params => {
+                            modalBubbleOption = params.postModal;
+                            optionPostReviewRef.current.show();
+                        }}
+                        onShowModalComment={(post, type) =>
+                            modalRef.current?.show({
+                                post,
+                                type,
+                            })
+                        }
+                        isFocusing={item.id === postIdFocusing}
+                        onChangePostIdFocusing={postId =>
+                            setPostIdFocusing(postId)
+                        }
+                    />
+                );
+            }
+            return null;
+        },
+        [isShopAccount, postIdFocusing],
     );
 
     if (isBlock) {
@@ -342,19 +358,23 @@ const OtherProfile = ({route}: Props) => {
                     style={[
                         styles.indicator,
                         {
-                            flex: 1 / 3,
-                            borderTopColor: theme.borderColor,
+                            flex: 1 / 2,
                             transform: [{translateX: translateXIndicator}],
                         },
-                    ]}
-                />
+                    ]}>
+                    <View
+                        style={[
+                            styles.indicatorIn,
+                            {borderTopColor: theme.borderColor},
+                        ]}
+                    />
+                </Animated.View>
             </View>
         );
     };
 
     return (
         <>
-            <AvatarBackground avatar={profile?.avatar || ''} />
             <View
                 style={[
                     styles.overlayView,
@@ -386,19 +406,16 @@ const OtherProfile = ({route}: Props) => {
                     contentContainerStyle={styles.contentContainer}
                     stickyHeaderIndices={[1]}>
                     {Header()}
-                    <ToolOtherProfile
-                        index={tabIndex}
-                        onChangeTab={index => {
-                            setTabIndex(index);
-                            tabViewRef.current?.navigateToIndex(index);
-                        }}
-                        disableReview={!isShopAccount}
-                        onShowModalReview={() =>
-                            actionReviewRef.current?.show()
-                        }
-                    />
-
-                    {Indicator()}
+                    <>
+                        <ToolOtherProfile
+                            index={tabIndex}
+                            onChangeTab={index => {
+                                setTabIndex(index);
+                                tabViewRef.current?.navigateToIndex(index);
+                            }}
+                        />
+                        {Indicator()}
+                    </>
 
                     <StyleTabView
                         ref={tabViewRef}
@@ -408,30 +425,14 @@ const OtherProfile = ({route}: Props) => {
                             }
                         }}
                         onScroll={e => {
-                            translateXIndicator.setValue(
-                                (e.position * width * 2) / 3,
-                            );
+                            translateXIndicator.setValue(e.position * width);
                             if (e.index !== tabIndex) {
                                 setTabIndex(e.index);
                             }
                         }}>
                         <View style={styles.tabView}>
-                            {isShopAccount && (
-                                <MyListGroupBuying
-                                    userId={profile.id}
-                                    onTouchStart={() =>
-                                        tabViewRef.current?.disableTouchable()
-                                    }
-                                    onTouchEnd={() =>
-                                        tabViewRef.current?.enableTouchable()
-                                    }
-                                    detailGroupBuyingName={
-                                        ROOT_SCREEN.detailGroupBuying
-                                    }
-                                />
-                            )}
                             {listPostsPaging.list.map(item =>
-                                RenderItemPost(item),
+                                RenderItemMyGb(item),
                             )}
                             {listPostsPaging.loading && (
                                 <LoadingIndicator
@@ -443,7 +444,7 @@ const OtherProfile = ({route}: Props) => {
                         <View style={styles.tabView}>
                             {isShopAccount &&
                                 listPostsReviewAbout.list.map(item =>
-                                    RenderItemPost(item),
+                                    RenderItemReview(item),
                                 )}
                             {isShopAccount && listPostsReviewAbout.loading && (
                                 <LoadingIndicator
@@ -456,32 +457,6 @@ const OtherProfile = ({route}: Props) => {
 
                 {isLoading && <LoadingScreen />}
             </View>
-
-            <ListShareElement
-                ref={listUserPostsRef}
-                title={profile?.name || ''}
-                listPaging={listPostsPaging}
-                containerStyle={{
-                    backgroundColor: theme.backgroundColorSecond,
-                }}
-                onShowModalComment={params => {
-                    modalRef.current?.show(params);
-                }}
-                isSaveTop
-            />
-
-            <ListShareElement
-                ref={listPostReviewRef}
-                title={profile?.name || ''}
-                listPaging={listPostsReviewAbout}
-                containerStyle={{
-                    backgroundColor: theme.backgroundColorSecond,
-                }}
-                onShowModalComment={params => {
-                    modalRef.current?.show(params);
-                }}
-                isSaveTop
-            />
 
             <ModalCommentLike
                 ref={modalRef}
@@ -542,18 +517,15 @@ const OtherProfile = ({route}: Props) => {
             />
 
             <StyleActionSheet
-                ref={actionReviewRef}
+                ref={optionPostReviewRef}
                 listTextAndAction={[
                     {
-                        text: 'profile.reviewProvider',
+                        text: 'discovery.report.title',
                         action: () => {
-                            if (profile) {
-                                navigate(PROFILE_ROUTE.createPostPickImg, {
-                                    userReviewed: {
-                                        id: profile.id,
-                                        name: profile.name,
-                                        avatar: profile.avatar,
-                                    },
+                            if (modalBubbleOption) {
+                                navigate(ROOT_SCREEN.reportUser, {
+                                    idUser: modalBubbleOption.creator,
+                                    nameUser: modalBubbleOption.creatorName,
                                 });
                             }
                         },
@@ -614,7 +586,7 @@ const styles = ScaledSheet.create({
             ios: '0.5@ms',
             android: '0.5@ms',
         }),
-        marginTop: -1,
+        marginTop: '10@vs',
     },
     buttonInteract: {
         flex: 1,
@@ -633,9 +605,13 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
     },
     indicator: {
-        flex: 1 / 3,
+        flex: 1 / 2,
+        alignItems: 'center',
+    },
+    indicatorIn: {
+        width: '40%',
         borderTopWidth: Platform.select({
-            ios: '1@ms',
+            ios: '1.5@ms',
             android: '2@ms',
         }),
     },
@@ -644,6 +620,7 @@ const styles = ScaledSheet.create({
         width,
         flexDirection: 'row',
         flexWrap: 'wrap',
+        paddingHorizontal: '2@s',
     },
 });
 
