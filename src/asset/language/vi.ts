@@ -197,6 +197,8 @@ const discovery = {
 const reputation = {
     topReviewer: 'Top reviewers',
     yourRank: 'Thứ hạng của bạn: {{value}}',
+    reviewCommunity: 'Cộng đồng review',
+    experience: 'Trải nghiệm',
 };
 
 // PROFILE SCREEN
@@ -236,7 +238,7 @@ const profile = {
         caption: 'Cảm nghĩ',
         post: 'Tải lên',
         draft: 'Lưu nháp',
-        edit: 'Chỉnhh sửa',
+        edit: 'Chỉnh sửa',
         archive: 'Tạm ẩn',
         unArchive: 'Hiện lại bảng tin',
         delete: 'Xoá',

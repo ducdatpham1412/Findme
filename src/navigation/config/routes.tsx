@@ -90,6 +90,17 @@ const SETTING_ROUTE = {
     setTheme: '@SETTING_ROUTE/setTheme',
 };
 
+const REPUTATION_ROUTE = {
+    reviewCommunity: '@REPUTATION_ROUTE/reviewCommunity',
+    topReviewers: '@REPUTATION_ROUTE/topReviewers',
+};
+
 export {LOGIN_ROUTE, MAIN_SCREEN};
-export {DISCOVERY_ROUTE, PROFILE_ROUTE, SETTING_ROUTE, MESS_ROUTE};
+export {
+    DISCOVERY_ROUTE,
+    PROFILE_ROUTE,
+    SETTING_ROUTE,
+    MESS_ROUTE,
+    REPUTATION_ROUTE,
+};
 export default ROOT_SCREEN;

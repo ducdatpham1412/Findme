@@ -2,9 +2,9 @@
 import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {apiDeletePost} from 'api/module';
-import {apiArchivePost, apiLikePost, apiUnLikePost} from 'api/profile';
+import {apiLikePost, apiUnLikePost} from 'api/profile';
 import FindmeStore from 'app-redux/store';
-import {POST_TYPE, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
+import {POST_TYPE} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
@@ -15,7 +15,6 @@ import BubbleGroupBuying, {
     ParamsLikeGB,
 } from 'feature/discovery/components/BubbleGroupBuying';
 import {TypeMoreOptionsMe} from 'feature/discovery/DiscoveryScreen';
-import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {
@@ -65,22 +64,22 @@ const onGoToEditPost = () => {
     }
 };
 
-const onArchivePost = async () => {
-    if (postModal) {
-        try {
-            await apiArchivePost(postModal.id);
-            Redux.setBubblePalaceAction({
-                action: TYPE_BUBBLE_PALACE_ACTION.archivePost,
-                payload: {
-                    ...postModal,
-                    isArchived: true,
-                },
-            });
-        } catch (err) {
-            appAlert(err);
-        }
-    }
-};
+// const onArchivePost = async () => {
+//     if (postModal) {
+//         try {
+//             await apiArchivePost(postModal.id);
+//             Redux.setBubblePalaceAction({
+//                 action: TYPE_BUBBLE_PALACE_ACTION.archivePost,
+//                 payload: {
+//                     ...postModal,
+//                     isArchived: true,
+//                 },
+//             });
+//         } catch (err) {
+//             appAlert(err);
+//         }
+//     }
+// };
 
 export default class ListShareElement extends Component<Props, States> {
     pan = new Animated.ValueXY();
@@ -314,10 +313,6 @@ export default class ListShareElement extends Component<Props, States> {
                         {
                             text: 'profile.post.edit',
                             action: onGoToEditPost,
-                        },
-                        {
-                            text: 'profile.post.archive',
-                            action: onArchivePost,
                         },
                         {
                             text: 'profile.post.delete',

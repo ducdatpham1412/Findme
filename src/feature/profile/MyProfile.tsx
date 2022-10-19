@@ -214,8 +214,9 @@ const ProfileAccount = () => {
     });
 
     const initIndex = useRef(isShopAccount ? 0 : 1).current;
+    const numberTabs = useRef(isShopAccount ? 4 : 3).current;
     const translateXIndicator = useRef(
-        new Animated.Value(initIndex * (width / 4)),
+        new Animated.Value(initIndex * (width / numberTabs)),
     ).current;
     const optionRef = useRef<any>(null);
     const optionPostReviewRef = useRef<any>(null);
@@ -568,7 +569,7 @@ const ProfileAccount = () => {
                                 style={[
                                     styles.indicator,
                                     {
-                                        flex: 1 / 4,
+                                        flex: 1 / numberTabs,
                                         transform: [
                                             {translateX: translateXIndicator},
                                         ],
@@ -680,6 +681,7 @@ const ProfileAccount = () => {
                                     keyExtractor={item => item.id}
                                     directionalLockEnabled
                                     showsHorizontalScrollIndicator={false}
+                                    ListEmptyComponent={() => null}
                                 />
                             </View>
 
@@ -706,22 +708,22 @@ const ProfileAccount = () => {
                             )}
                         </View>
 
-                        <View
-                            style={[
-                                styles.contentContainerPost,
-                                isFocusGbJoined ? {} : safeLoadMoreStyle,
-                            ]}>
-                            {isShopAccount
-                                ? postReviewPaging.list.map(item =>
-                                      RenderItemReview(item),
-                                  )
-                                : null}
-                            {postReviewPaging.loading && (
-                                <LoadingIndicator
-                                    color={theme.textHightLight}
-                                />
-                            )}
-                        </View>
+                        {isShopAccount && (
+                            <View
+                                style={[
+                                    styles.contentContainerPost,
+                                    isFocusGbJoined ? {} : safeLoadMoreStyle,
+                                ]}>
+                                {postReviewPaging.list.map(item =>
+                                    RenderItemReview(item),
+                                )}
+                                {postReviewPaging.loading && (
+                                    <LoadingIndicator
+                                        color={theme.textHightLight}
+                                    />
+                                )}
+                            </View>
+                        )}
                     </StyleTabView>
                 </ScrollView>
 

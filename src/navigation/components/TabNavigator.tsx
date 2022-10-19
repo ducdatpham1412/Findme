@@ -1,4 +1,4 @@
-import {ACCOUNT, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
+import {TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
@@ -14,8 +14,6 @@ import {
     ScaledSheet,
     verticalScale,
 } from 'react-native-size-matters';
-import Feather from 'react-native-vector-icons/Feather';
-import StyleActionSheet from 'components/common/StyleActionSheet';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const tabBarHeight = moderateScale(50);
@@ -29,16 +27,6 @@ const TabNavigator = (props: any) => {
     const theme = Redux.getTheme();
     const numberNewNotifications = Redux.getNumberNewNotifications();
     const numberNewMessages = Redux.getNumberNewMessages();
-    const {account_type} = Redux.getPassport().profile;
-
-    const typeCreateRef = useRef<any>(null);
-
-    // for animation all tab bar
-    // const aim = useRef(new Animated.Value(0)).current;
-    // const [height, setHeight] = useState(tabBarHeight);
-    // aim.addListener(({value}) => {
-    //     setHeight(value);
-    // });
 
     // for indicator
     const tabIndexFocus = props.state.index;
@@ -46,56 +34,12 @@ const TabNavigator = (props: any) => {
     const indicatorTranslateX = useRef(new Animated.Value(0)).current;
     const scale = useRef(new Animated.Value(1)).current;
 
-    // for add more view
-    // const addMoreWidth = useRef(new Animated.Value(0)).current;
-
-    // const controlTabBar = () => {
-    //     if (!showTabBar) {
-    //         Animated.timing(aim, {
-    //             toValue: 0,
-    //             duration: 150,
-    //             useNativeDriver: true,
-    //         }).start();
-    //     } else {
-    //         Animated.timing(aim, {
-    //             toValue: tabBarHeight,
-    //             duration: 120,
-    //             useNativeDriver: true,
-    //         }).start();
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     controlTabBar();
-    // }, [showTabBar]);
-
     useEffect(() => {
         Animated.spring(indicatorTranslateX, {
             toValue: indicatorWidth * tabIndexFocus,
             useNativeDriver: true,
         }).start();
-        if (tabIndexFocus === 2) {
-            Animated.spring(scale, {
-                toValue: 0,
-                useNativeDriver: true,
-            }).start();
-        } else {
-            Animated.spring(scale, {
-                toValue: 1,
-                useNativeDriver: true,
-            }).start();
-        }
     }, [tabIndexFocus]);
-
-    const onGoToCreatePost = () => {
-        if (account_type === ACCOUNT.user) {
-            navigate(PROFILE_ROUTE.createPostPickImg);
-        } else if (account_type === ACCOUNT.shop) {
-            typeCreateRef.current?.show();
-        } else if (account_type === 2) {
-            typeCreateRef.current?.show();
-        }
-    };
 
     /**
      * Render view
@@ -158,19 +102,17 @@ const TabNavigator = (props: any) => {
         );
     };
 
-    const CreatePostButton = () => {
+    const ReviewCommunityButton = () => {
+        const isFocus = tabIndexFocus === 2;
+        const tintColor = isFocus ? Theme.common.white : theme.tabBarIconColor;
         return (
             <StyleTouchable
                 customStyle={styles.buttonView}
-                onPress={onGoToCreatePost}>
-                <LinearGradient
-                    colors={[
-                        Theme.common.gradientTabBar1,
-                        Theme.common.gradientTabBar2,
-                    ]}
-                    style={styles.createBox}>
-                    <Feather name="plus" style={styles.iconCreate} />
-                </LinearGradient>
+                onPress={() => navigate(MAIN_SCREEN.reputation)}>
+                <StyleImage
+                    source={Images.icons.reputation}
+                    customStyle={[styles.iconTabBar, {tintColor}]}
+                />
             </StyleTouchable>
         );
     };
@@ -301,7 +243,7 @@ const TabNavigator = (props: any) => {
                 {TabBarIndicator()}
                 {DiscoveryButton()}
                 {MessageButton()}
-                {CreatePostButton()}
+                {ReviewCommunityButton()}
                 {NotificationButton()}
                 {ProfileButton()}
             </Animated.View>
@@ -309,26 +251,6 @@ const TabNavigator = (props: any) => {
                 style={[
                     styles.safeBottom,
                     {backgroundColor: theme.backgroundColor},
-                ]}
-            />
-            <StyleActionSheet
-                ref={typeCreateRef}
-                listTextAndAction={[
-                    {
-                        text: 'profile.createReviewPost',
-                        action: () => navigate(PROFILE_ROUTE.createPostPickImg),
-                    },
-                    {
-                        text: 'profile.createGroupBuying',
-                        action: () =>
-                            navigate(PROFILE_ROUTE.createPostPickImg, {
-                                isCreateGB: true,
-                            }),
-                    },
-                    {
-                        text: 'common.cancel',
-                        action: () => null,
-                    },
                 ]}
             />
         </>

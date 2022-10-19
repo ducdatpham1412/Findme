@@ -7,7 +7,7 @@ import ModalCommentLike, {
     TypeModalCommentPost,
 } from 'components/ModalCommentLike';
 import NotificationScreen from 'feature/notification/NotificationScreen';
-import ReputationScreen from 'feature/reputation/ReputationScreen';
+import RootReputation from 'feature/reputation/RootReputation';
 import Redux from 'hook/useRedux';
 import TabNavigator from 'navigation/components/TabNavigator';
 import {MAIN_SCREEN} from 'navigation/config/routes';
@@ -61,7 +61,7 @@ const MainTabs: React.FunctionComponent = () => {
 
                 <BottomTab.Screen
                     name={MAIN_SCREEN.reputation}
-                    component={ReputationScreen}
+                    component={RootReputation}
                 />
 
                 <BottomTab.Screen

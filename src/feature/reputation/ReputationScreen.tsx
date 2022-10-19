@@ -8,12 +8,11 @@ import FindmeStore from 'app-redux/store';
 import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
-import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import AvatarBackground from 'feature/profile/components/AvatarBackground';
 import Redux from 'hook/useRedux';
 import {appAlert, goBack} from 'navigation/NavigationService';
 import React, {useEffect, useState} from 'react';
-import {Platform, View} from 'react-native';
+import {View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {ScaledSheet} from 'react-native-size-matters';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -89,6 +88,7 @@ const renderItem = (
 
 const ReputationScreen = () => {
     const {imageBackground, gradient} = Redux.getResource();
+    const theme = Redux.getTheme();
     const [isLoading, setIsLoading] = useState(false);
     const [data, setData] = useState<TypeGetTopReviewerResponse>({
         list: [],
@@ -112,15 +112,12 @@ const ReputationScreen = () => {
     }, []);
 
     return (
-        <View style={styles.container}>
-            <ViewSafeTopPadding />
+        <View
+            style={[
+                styles.container,
+                {backgroundColor: theme.backgroundColor},
+            ]}>
             <AvatarBackground avatar={imageBackground} />
-            <View style={styles.headerView}>
-                <StyleText
-                    i18Text="reputation.topReviewer"
-                    customStyle={styles.textHeader}
-                />
-            </View>
 
             <View style={styles.myRankView}>
                 <FontAwesome5 name="medal" style={styles.iconMedal} />
@@ -152,21 +149,6 @@ const styles = ScaledSheet.create({
     container: {
         flex: 1,
         backgroundColor: Theme.darkTheme.backgroundColor,
-    },
-    headerView: {
-        width: '100%',
-        paddingVertical: '5@vs',
-        borderBottomWidth: Platform.select({
-            ios: '0.25@ms',
-            android: '0.5@ms',
-        }),
-        borderBottomColor: Theme.lightTheme.borderColor,
-        alignItems: 'center',
-    },
-    textHeader: {
-        fontSize: '17@ms',
-        fontWeight: 'bold',
-        color: Theme.common.white,
     },
     myRankView: {
         flexDirection: 'row',
