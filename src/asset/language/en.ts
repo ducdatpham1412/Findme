@@ -296,10 +296,9 @@ const profile = {
     draftPost: 'Draft',
     thisPostInDraft: 'This post is in draft',
     goToPost: 'Go to post',
-    reviewProvider: 'Review this provider',
+    reviewProvider: 'Write review',
     postsArchived: 'Post archived',
     upgradeAccount: 'Supplier account',
-    groupBuyingJoined: 'Group buying joined',
     gotToCreateGb: 'Create first group buying campaign',
     createReviewPost: 'Review post',
     createGroupBuying: 'Group booking campaign',
@@ -321,6 +320,11 @@ const profile = {
     phoneNumber: 'Your phone number',
     requestUpgradeSuccess: 'Send request successfully',
     description: 'Description about you',
+    shop: 'Shop',
+    favorite: 'Favorite',
+    rating: 'Rating',
+    joining: 'Joining',
+    gbOrder: 'Group booking orders',
 };
 
 // SETTING ROUTE

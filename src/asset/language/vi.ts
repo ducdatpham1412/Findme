@@ -270,10 +270,9 @@ const profile = {
     draftPost: 'Bài nháp',
     thisPostInDraft: 'Bạn đang lưu nháp bài này',
     goToPost: 'Đi tới đăng bài',
-    reviewProvider: 'Review nhà cung cấp',
+    reviewProvider: 'Viết review',
     postsArchived: 'Bài viết lưu trữ',
     upgradeAccount: 'Chế độ nhà cung cấp',
-    groupBuyingJoined: 'Mua chung đã tham gia',
     gotToCreateGb: 'Tạo chiến dịch mua chung đầu tiên',
     createReviewPost: 'Bài review',
     createGroupBuying: 'Chiến dịch mua chung',
@@ -295,6 +294,11 @@ const profile = {
     phoneNumber: 'Số điện thoại của bạn',
     requestUpgradeSuccess: 'Gửi yêu cầu thành công',
     description: 'Mô tả về bạn',
+    shop: 'Shop',
+    favorite: 'Ưa thích',
+    rating: 'Đánh giá',
+    joining: 'Đang tham gia',
+    gbOrder: 'Đơn mua chung',
 };
 
 // MESS ROUTE

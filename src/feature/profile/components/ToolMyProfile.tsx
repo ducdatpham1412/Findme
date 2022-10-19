@@ -1,4 +1,5 @@
-import {StyleTouchable} from 'components/base';
+import {FONT_SIZE} from 'asset/standardValue';
+import {StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import React from 'react';
 import {View} from 'react-native';
@@ -13,6 +14,7 @@ interface Props {
 }
 
 const unFocusOpacity = 0.3;
+export const toolProfileHeight = moderateScale(60);
 
 const ToolMyProfile = (props: Props) => {
     const {index, onChangeTab, isShopAccount} = props;
@@ -35,12 +37,21 @@ const ToolMyProfile = (props: Props) => {
                 onPress={() => onChangeTab(0)}
                 customStyle={styles.buttonBox}>
                 <Entypo
-                    name="list"
+                    name="shop"
                     style={[
                         styles.icon,
                         {
                             color: theme.textHightLight,
                             opacity: isInMyPosts ? 1 : unFocusOpacity,
+                        },
+                    ]}
+                />
+                <StyleText
+                    i18Text="profile.shop"
+                    customStyle={[
+                        styles.textDescription,
+                        {
+                            color: theme.borderColor,
                         },
                     ]}
                 />
@@ -52,11 +63,18 @@ const ToolMyProfile = (props: Props) => {
                 <Feather
                     name="star"
                     style={[
-                        styles.icon,
+                        styles.iconStar,
                         {
                             color: theme.textHightLight,
                             opacity: isPostsLiked ? 1 : unFocusOpacity,
                         },
+                    ]}
+                />
+                <StyleText
+                    i18Text="profile.favorite"
+                    customStyle={[
+                        styles.textDescription,
+                        {color: theme.borderColor},
                     ]}
                 />
             </StyleTouchable>
@@ -65,36 +83,51 @@ const ToolMyProfile = (props: Props) => {
                 customStyle={styles.buttonBox}
                 onPress={() => onChangeTab(2)}>
                 <Feather
-                    name="bookmark"
+                    name="shopping-bag"
                     style={[
-                        styles.iconBookMark,
+                        styles.icon,
                         {
                             color: theme.textHightLight,
                             opacity: isPostsSaved ? 1 : unFocusOpacity,
                         },
                     ]}
                 />
-            </StyleTouchable>
-
-            <StyleTouchable
-                customStyle={styles.buttonBox}
-                onPress={() => onChangeTab(3)}>
-                <Feather
-                    name={isShopAccount ? 'tag' : 'shopping-bag'}
-                    style={[
-                        styles.iconArchive,
-                        {
-                            color: theme.textHightLight,
-                            opacity: isPostArchive ? 1 : unFocusOpacity,
-                        },
+                <StyleText
+                    i18Text="profile.gbOrder"
+                    customStyle={[
+                        styles.textDescription,
+                        {color: theme.borderColor},
                     ]}
                 />
             </StyleTouchable>
+
+            {isShopAccount && (
+                <StyleTouchable
+                    customStyle={styles.buttonBox}
+                    onPress={() => onChangeTab(3)}>
+                    <Feather
+                        name="tag"
+                        style={[
+                            styles.icon,
+                            {
+                                color: theme.textHightLight,
+                                opacity: isPostArchive ? 1 : unFocusOpacity,
+                            },
+                        ]}
+                    />
+                    <StyleText
+                        i18Text="profile.rating"
+                        customStyle={[
+                            styles.textDescription,
+                            {color: theme.borderColor},
+                        ]}
+                    />
+                </StyleTouchable>
+            )}
         </View>
     );
 };
 
-export const toolProfileHeight = moderateScale(30);
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
@@ -116,13 +149,14 @@ const styles = ScaledSheet.create({
         justifyContent: 'center',
     },
     icon: {
-        fontSize: '20@ms',
+        fontSize: '25@ms',
     },
-    iconBookMark: {
-        fontSize: '18@ms',
+    iconStar: {
+        fontSize: '27@ms',
     },
-    iconArchive: {
-        fontSize: '16@ms',
+    textDescription: {
+        fontSize: FONT_SIZE.tiny,
+        marginTop: '3@vs',
     },
 });
 

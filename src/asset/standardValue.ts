@@ -161,6 +161,7 @@ export enum FONT_SIZE {
     big = '17@ms',
     normal = '14@ms',
     small = '11@ms',
+    tiny = '7@ms',
 }
 export const LINE_HEIGHT = {
     normal: Platform.select({

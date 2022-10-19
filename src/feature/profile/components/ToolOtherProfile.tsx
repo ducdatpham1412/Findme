@@ -1,22 +1,22 @@
-import {StyleTouchable} from 'components/base';
+import {FONT_SIZE} from 'asset/standardValue';
+import {StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import React from 'react';
 import {View} from 'react-native';
-import {moderateScale, ScaledSheet} from 'react-native-size-matters';
+import {ScaledSheet} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Feather from 'react-native-vector-icons/Feather';
+import {toolProfileHeight} from './ToolMyProfile';
 
 interface Props {
     index: number;
     onChangeTab(index: number): void;
-    disableReview: boolean;
-    onShowModalReview(): void;
 }
 
 const unFocusOpacity = 0.3;
 
 const ToolOtherProfile = (props: Props) => {
-    const {index, onChangeTab, disableReview, onShowModalReview} = props;
+    const {index, onChangeTab} = props;
     const theme = Redux.getTheme();
 
     const isInListPosts = index === 0;
@@ -34,12 +34,21 @@ const ToolOtherProfile = (props: Props) => {
                 onPress={() => onChangeTab(0)}
                 customStyle={styles.buttonBox}>
                 <Entypo
-                    name="list"
+                    name="shop"
                     style={[
                         styles.icon,
                         {
                             color: theme.textHightLight,
                             opacity: isInListPosts ? 1 : unFocusOpacity,
+                        },
+                    ]}
+                />
+                <StyleText
+                    i18Text="profile.shop"
+                    customStyle={[
+                        styles.textDescription,
+                        {
+                            color: theme.borderColor,
                         },
                     ]}
                 />
@@ -51,26 +60,18 @@ const ToolOtherProfile = (props: Props) => {
                 <Feather
                     name="tag"
                     style={[
-                        styles.iconTag,
+                        styles.icon,
                         {
                             color: theme.textHightLight,
                             opacity: isPostReview ? 1 : unFocusOpacity,
                         },
                     ]}
                 />
-            </StyleTouchable>
-
-            <StyleTouchable
-                customStyle={styles.buttonBox}
-                onPress={onShowModalReview}
-                disable={disableReview}>
-                <Feather
-                    name="plus-square"
-                    style={[
-                        styles.iconTag,
-                        {
-                            color: theme.textColor,
-                        },
+                <StyleText
+                    i18Text="profile.rating"
+                    customStyle={[
+                        styles.textDescription,
+                        {color: theme.borderColor},
                     ]}
                 />
             </StyleTouchable>
@@ -78,7 +79,6 @@ const ToolOtherProfile = (props: Props) => {
     );
 };
 
-export const toolProfileHeight = moderateScale(30);
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
@@ -100,10 +100,11 @@ const styles = ScaledSheet.create({
         justifyContent: 'center',
     },
     icon: {
-        fontSize: '20@ms',
+        fontSize: '25@ms',
     },
-    iconTag: {
-        fontSize: '18@ms',
+    textDescription: {
+        fontSize: FONT_SIZE.tiny,
+        marginTop: '3@vs',
     },
 });
 

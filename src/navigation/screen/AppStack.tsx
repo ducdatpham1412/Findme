@@ -5,7 +5,6 @@ import {
 import {TypeBubblePalace} from 'api/interface';
 import ModalPreviewLink from 'components/ModalPreviewLink';
 import SwipeImages from 'components/SwipeImages';
-import GroupBuyingJoined from 'feature/common/GroupBuyingJoined';
 import PostsArchived from 'feature/common/PostsArchived';
 import UpgradeAccount from 'feature/common/UpgradeAccount';
 import DetailGroupBuying from 'feature/discovery/DetailGroupBuying';
@@ -153,10 +152,6 @@ const AppStack = () => {
                 <Stack.Screen
                     name={ROOT_SCREEN.postsArchived}
                     component={PostsArchived}
-                />
-                <Stack.Screen
-                    name={ROOT_SCREEN.gBJoined}
-                    component={GroupBuyingJoined}
                 />
                 <Stack.Screen
                     name={ROOT_SCREEN.upgradeAccount}

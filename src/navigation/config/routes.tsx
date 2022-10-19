@@ -15,7 +15,6 @@ const ROOT_SCREEN = {
     detailGroupBuying: '@ROOT_SCREEN/detailGroupBuying',
     myProfile: '@ROOT_SCREEN/myProfile',
     postsArchived: '@ROOT_SCREEN/postsArchived',
-    gBJoined: '@ROOT_SCREEN/gbJoined',
     upgradeAccount: '@ROOT_SCREEN/upgradeAccount',
 };
 /**

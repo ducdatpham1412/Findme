@@ -336,17 +336,6 @@ export const apiDeleteGroup = (bubbleId: string) => {
     return request.put(`profile/delete-group/${bubbleId}`);
 };
 
-export const apiGetListPost = ({
-    params,
-}: TypeParamsPaging): Promise<{
-    success: boolean;
-    data: Array<TypeBubblePalace>;
-}> => {
-    return request.get(`/profile/list-posts/${params.userId}`, {
-        params,
-    });
-};
-
 export const apiGetListPostsLiked = ({
     params,
 }: TypeParamsPaging): Promise<{
