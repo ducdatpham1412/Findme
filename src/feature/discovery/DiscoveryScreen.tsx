@@ -334,6 +334,7 @@ const DiscoveryScreen = () => {
                     keyboardDismissMode="on-drag"
                     stickyHeaderIndices={[0]}
                     invertStickyHeaders
+                    directionalLockEnabled
                 />
 
                 <SearchBar

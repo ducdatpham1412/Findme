@@ -324,6 +324,7 @@ const profile = {
     favorite: 'Favorite',
     rating: 'Rating',
     joining: 'Joining',
+    joinedSuccess: 'Joined successfully',
     gbOrder: 'Group booking orders',
 };
 

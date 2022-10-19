@@ -364,6 +364,12 @@ export const apiGetListPostsArchived = ({params}: TypeParamsPaging) => {
     });
 };
 
+export const apiGetListGbJoining = ({params}: TypeParamsPaging) => {
+    return request.get('/profile/list-gb-joining', {
+        params,
+    });
+};
+
 export const apiGetListGBJoined = ({params}: TypeParamsPaging) => {
     return request.get('/profile/list-gb-joined', {
         params,
