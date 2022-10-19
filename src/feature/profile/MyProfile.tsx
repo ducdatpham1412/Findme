@@ -2,6 +2,7 @@ import {useIsFocused, useRoute} from '@react-navigation/native';
 import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
 import {
     apiGetListGBJoined,
+    apiGetListGbJoining,
     apiGetListPostsLiked,
     apiGetProfile,
 } from 'api/module';
@@ -14,11 +15,14 @@ import {
 import {ACCOUNT, POST_TYPE, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
+import {FONT_SIZE} from 'asset/standardValue';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
+import StyleList from 'components/base/StyleList';
 import LoadingIndicator from 'components/common/LoadingIndicator';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import StyleTabView from 'components/StyleTabView';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
+import ItemGroupBuying from 'feature/common/components/ItemGroupBuying';
 import Bubble from 'feature/discovery/components/Bubble';
 import BubbleGroupBuying, {
     ParamsLikeGB,
@@ -191,6 +195,10 @@ const ProfileAccount = () => {
     });
     const postsLikedPaging = usePaging({
         request: apiGetListPostsLiked,
+        isInitNotRunRequest: true,
+    });
+    const gbJoiningPaging = usePaging({
+        request: apiGetListGbJoining,
         isInitNotRunRequest: true,
     });
     const gbJoinedPaging = usePaging({
@@ -470,6 +478,25 @@ const ProfileAccount = () => {
         [isShopAccount],
     );
 
+    const RenderItemGbJoining = useCallback(
+        (item: TypeGroupBuying, setList: any) => {
+            if (item.postType === POST_TYPE.groupBuying) {
+                return (
+                    <ItemGroupBuying
+                        item={item}
+                        setList={setList}
+                        isHorizontal={false}
+                        syncWidth={width * 0.6}
+                        detailGroupTarget={PROFILE_ROUTE.detailGroupBuying}
+                        containerStyle={styles.itemJoiningContainer}
+                    />
+                );
+            }
+            return null;
+        },
+        [isShopAccount],
+    );
+
     const RenderItemReview = useCallback(
         (item: TypeBubblePalace) => {
             return (
@@ -509,6 +536,7 @@ const ProfileAccount = () => {
                     onMomentumScrollEnd={({nativeEvent}) => {
                         checkScrollEnd(nativeEvent);
                     }}
+                    directionalLockEnabled
                     refreshControl={
                         <RefreshControl
                             refreshing={!!myGbPaging.refreshing}
@@ -565,6 +593,7 @@ const ProfileAccount = () => {
                             if (index === 1) {
                                 postsLikedPaging.onLoadMore();
                             } else if (index === 2) {
+                                gbJoiningPaging.onLoadMore();
                                 gbJoinedPaging.onLoadMore();
                             } else if (index === 3) {
                                 if (isShopAccount) {
@@ -587,6 +616,8 @@ const ProfileAccount = () => {
                                     justifyContent: isShopAccount
                                         ? 'space-between'
                                         : 'center',
+                                    flexDirection: 'row',
+                                    flexWrap: 'wrap',
                                 },
                             ]}>
                             {myGbPaging.list.map(RenderItemMyGb)}
@@ -596,6 +627,7 @@ const ProfileAccount = () => {
                                 />
                             )}
                         </View>
+
                         <View
                             style={[
                                 styles.contentContainerPost,
@@ -613,11 +645,54 @@ const ProfileAccount = () => {
                                 />
                             )}
                         </View>
+
                         <View
                             style={[
                                 styles.contentContainerPost,
                                 isFocusPostSaved ? {} : safeLoadMoreStyle,
+                                {
+                                    flexDirection: 'column',
+                                },
                             ]}>
+                            <View style={{width: '100%'}}>
+                                <StyleText
+                                    i18Text="profile.joining"
+                                    customStyle={[
+                                        styles.textJoining,
+                                        {color: theme.borderColor},
+                                    ]}
+                                />
+                                <StyleList
+                                    onTouchStart={() =>
+                                        tabViewRef.current?.disableTouchable()
+                                    }
+                                    onTouchEnd={() =>
+                                        tabViewRef.current?.enableTouchable()
+                                    }
+                                    horizontal
+                                    data={gbJoiningPaging.list}
+                                    renderItem={({item}) =>
+                                        RenderItemGbJoining(
+                                            item,
+                                            gbJoiningPaging.setList,
+                                        )
+                                    }
+                                    keyExtractor={item => item.id}
+                                    directionalLockEnabled
+                                    showsHorizontalScrollIndicator={false}
+                                />
+                            </View>
+
+                            <StyleText
+                                i18Text="profile.joinedSuccess"
+                                customStyle={[
+                                    styles.textJoinedSuccess,
+                                    {
+                                        color: theme.borderColor,
+                                        alignSelf: 'flex-start',
+                                    },
+                                ]}
+                            />
                             {gbJoinedPaging.list.map(item =>
                                 RenderItemGbFavoriteJoined(
                                     item,
@@ -630,6 +705,7 @@ const ProfileAccount = () => {
                                 />
                             )}
                         </View>
+
                         <View
                             style={[
                                 styles.contentContainerPost,
@@ -725,9 +801,7 @@ const styles = ScaledSheet.create({
     },
     contentContainerPost: {
         width,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
+        alignItems: 'center',
         paddingHorizontal: '2@s',
     },
     itemPostView: {
@@ -752,6 +826,25 @@ const styles = ScaledSheet.create({
             ios: '1.5@ms',
             android: '2@ms',
         }),
+    },
+    itemJoiningContainer: {
+        marginLeft: '10@s',
+        marginRight: '5@s',
+        marginTop: 0,
+    },
+    textJoining: {
+        fontSize: FONT_SIZE.big,
+        fontWeight: 'bold',
+        marginLeft: '20@s',
+        marginTop: '5@vs',
+        marginBottom: '10@vs',
+    },
+    textJoinedSuccess: {
+        fontSize: FONT_SIZE.big,
+        fontWeight: 'bold',
+        marginLeft: '20@s',
+        marginTop: '15@vs',
+        marginBottom: '0@vs',
     },
 });
 

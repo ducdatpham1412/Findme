@@ -298,6 +298,7 @@ const profile = {
     favorite: 'Ưa thích',
     rating: 'Đánh giá',
     joining: 'Đang tham gia',
+    joinedSuccess: 'Tham gia thành công',
     gbOrder: 'Đơn mua chung',
 };
 

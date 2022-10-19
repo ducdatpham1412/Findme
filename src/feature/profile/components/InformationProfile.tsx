@@ -12,6 +12,7 @@ import React from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 interface Props {
     profile: TypeGetProfileResponse;
@@ -25,8 +26,15 @@ const InformationProfile = (props: Props) => {
     const {profile} = props;
     const theme = Redux.getTheme();
     const myId = Redux.getPassport().profile.id;
-    const {name, description, followers, followings, avatar, account_type} =
-        profile;
+    const {
+        name,
+        description,
+        followers,
+        followings,
+        avatar,
+        account_type,
+        reputations,
+    } = profile;
 
     const isMyProfile = myId === profile.id;
     const isShopAccount = account_type === ACCOUNT.shop;
@@ -92,6 +100,33 @@ const InformationProfile = (props: Props) => {
         return null;
     };
 
+    const NumberStars = () => {
+        if (reputations <= 0 || reputations > 5) {
+            return null;
+        }
+        const arrayStars = Array(Math.floor(reputations)).fill(0);
+        return (
+            <View style={styles.starBox}>
+                {arrayStars.map((_, index) => {
+                    return (
+                        <AntDesign
+                            key={index}
+                            name="star"
+                            style={[styles.iconStar, {color: theme.likeHeart}]}
+                        />
+                    );
+                })}
+                <StyleText
+                    originValue={`${reputations} / 5`}
+                    customStyle={[
+                        styles.textNumberStar,
+                        {color: theme.textHightLight},
+                    ]}
+                />
+            </View>
+        );
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.introduceView}>
@@ -138,46 +173,54 @@ const InformationProfile = (props: Props) => {
             </View>
 
             <View style={styles.bottomView}>
-                <View style={styles.followBox}>
-                    {/* Follower */}
-                    <StyleTouchable
-                        customStyle={styles.elementFollow}
-                        onPress={() => onNavigateFollow(TYPE_FOLLOW.follower)}>
-                        <StyleText
-                            i18Text="profile.component.infoProfile.follower"
-                            customStyle={[
-                                styles.titleFollow,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                        <StyleText
-                            originValue={String(followers)}
-                            customStyle={[
-                                styles.numberFollow,
-                                {color: theme.textHightLight},
-                            ]}
-                        />
-                    </StyleTouchable>
+                <View style={styles.infoPart}>
+                    <View style={styles.followBox}>
+                        {/* Follower */}
+                        <StyleTouchable
+                            customStyle={styles.elementFollow}
+                            onPress={() =>
+                                onNavigateFollow(TYPE_FOLLOW.follower)
+                            }>
+                            <StyleText
+                                i18Text="profile.component.infoProfile.follower"
+                                customStyle={[
+                                    styles.titleFollow,
+                                    {color: theme.borderColor},
+                                ]}
+                            />
+                            <StyleText
+                                originValue={String(followers)}
+                                customStyle={[
+                                    styles.numberFollow,
+                                    {color: theme.textHightLight},
+                                ]}
+                            />
+                        </StyleTouchable>
 
-                    {/* Following */}
-                    <StyleTouchable
-                        customStyle={styles.elementFollow}
-                        onPress={() => onNavigateFollow(TYPE_FOLLOW.following)}>
-                        <StyleText
-                            i18Text="profile.component.infoProfile.following"
-                            customStyle={[
-                                styles.titleFollow,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                        <StyleText
-                            originValue={String(followings)}
-                            customStyle={[
-                                styles.numberFollow,
-                                {color: theme.textHightLight},
-                            ]}
-                        />
-                    </StyleTouchable>
+                        {/* Following */}
+                        <StyleTouchable
+                            customStyle={styles.elementFollow}
+                            onPress={() =>
+                                onNavigateFollow(TYPE_FOLLOW.following)
+                            }>
+                            <StyleText
+                                i18Text="profile.component.infoProfile.following"
+                                customStyle={[
+                                    styles.titleFollow,
+                                    {color: theme.borderColor},
+                                ]}
+                            />
+                            <StyleText
+                                originValue={String(followings)}
+                                customStyle={[
+                                    styles.numberFollow,
+                                    {color: theme.textHightLight},
+                                ]}
+                            />
+                        </StyleTouchable>
+                    </View>
+
+                    {NumberStars()}
                 </View>
 
                 <View style={styles.buttonBox}>{Button()}</View>
@@ -234,8 +277,11 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         marginTop: '10@vs',
     },
-    followBox: {
+    infoPart: {
         flex: 1,
+    },
+    followBox: {
+        width: '100%',
         flexDirection: 'row',
     },
     elementFollow: {
@@ -249,6 +295,19 @@ const styles = ScaledSheet.create({
     numberFollow: {
         fontSize: FONT_SIZE.small,
         marginLeft: '5@ms',
+    },
+    starBox: {
+        width: '100%',
+        flexDirection: 'row',
+        marginTop: '5@vs',
+        alignItems: 'flex-end',
+    },
+    iconStar: {
+        fontSize: '17@ms',
+        marginRight: '3@s',
+    },
+    textNumberStar: {
+        fontSize: '8@ms',
     },
     buttonBox: {},
     buttonTouch: {
