@@ -212,6 +212,8 @@ class StyleTabView extends Component<Props, States> {
             layOutWidth,
         });
 
+        this.props.onFirstNavigateToIndex?.(initIndex);
+
         this.panX.addListener(({value}) => {
             if (this.props.onScroll) {
                 const position = Math.abs(value / layOutWidth);

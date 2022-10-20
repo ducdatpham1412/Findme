@@ -193,6 +193,8 @@ const discovery = {
 const reputation = {
     topReviewer: 'Top reviewers',
     yourRank: 'Your rank: {{value}}',
+    reviewCommunity: 'Review community',
+    experience: 'Experience',
 };
 
 // MESS ROUTE
