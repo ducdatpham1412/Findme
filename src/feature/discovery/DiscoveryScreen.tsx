@@ -64,7 +64,6 @@ const DiscoveryScreen = () => {
         TOPIC.cuisine,
     ]);
     const [postTypes, setPostTypes] = useState<Array<number>>([
-        POST_TYPE.review,
         POST_TYPE.groupBuying,
     ]);
     const [postIdFocusing, setPostIdFocusing] = useState('');
@@ -84,7 +83,7 @@ const DiscoveryScreen = () => {
         params: {
             take: 30,
             topics: undefined,
-            postTypes: undefined,
+            postTypes: `[${String(postTypes)}]`,
             search: '',
         },
         onSuccess: data => {

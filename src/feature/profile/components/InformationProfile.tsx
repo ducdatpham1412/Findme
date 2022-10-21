@@ -11,15 +11,15 @@ import {navigate, push} from 'navigation/NavigationService';
 import React from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import Entypo from 'react-native-vector-icons/Entypo';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface Props {
     profile: TypeGetProfileResponse;
 }
 
 const avatarSize = Metrics.width / 3.5;
-const buttonWidth = Metrics.width * 0.25;
 
 const InformationProfile = (props: Props) => {
     const route = useRoute();
@@ -51,22 +51,46 @@ const InformationProfile = (props: Props) => {
     const Button = () => {
         if (isMyProfile) {
             return (
-                <StyleTouchable
-                    customStyle={[
-                        styles.buttonTouch,
-                        {backgroundColor: Theme.common.gradientTabBar1},
-                    ]}
-                    onPress={() => {
-                        navigate(PROFILE_ROUTE.editProfile);
-                    }}>
-                    <StyleText
-                        i18Text="profile.post.edit"
+                <>
+                    <StyleTouchable
                         customStyle={[
-                            styles.textButton,
-                            {color: Theme.common.white},
+                            styles.buttonTouch,
+                            {backgroundColor: Theme.common.gradientTabBar1},
                         ]}
-                    />
-                </StyleTouchable>
+                        onPress={() => {
+                            navigate(PROFILE_ROUTE.editProfile);
+                        }}>
+                        <StyleText
+                            i18Text="profile.post.edit"
+                            customStyle={[
+                                styles.textButton,
+                                {color: Theme.common.white},
+                            ]}
+                        />
+                    </StyleTouchable>
+                    <StyleTouchable
+                        customStyle={[
+                            styles.buttonTouch,
+                            {
+                                backgroundColor: Theme.common.commentGreen,
+                                marginLeft: 5,
+                            },
+                        ]}
+                        onPress={() => {
+                            navigate(PROFILE_ROUTE.createPostPickImg, {
+                                isCreateGB: true,
+                            });
+                        }}
+                        hitSlop={{right: 20}}>
+                        <Entypo
+                            name="plus"
+                            style={[
+                                styles.iconPlus,
+                                {color: Theme.common.white},
+                            ]}
+                        />
+                    </StyleTouchable>
+                </>
             );
         }
 
@@ -309,16 +333,22 @@ const styles = ScaledSheet.create({
     textNumberStar: {
         fontSize: '8@ms',
     },
-    buttonBox: {},
-    buttonTouch: {
-        width: buttonWidth,
-        paddingVertical: '10@ms',
+    buttonBox: {
+        flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: '10@ms',
+    },
+    buttonTouch: {
+        paddingHorizontal: '5@s',
+        paddingVertical: '5@ms',
+        alignItems: 'center',
+        borderRadius: '5@ms',
     },
     textButton: {
         fontSize: FONT_SIZE.small,
         fontWeight: 'bold',
+    },
+    iconPlus: {
+        fontSize: '14.4@ms',
     },
 });
 

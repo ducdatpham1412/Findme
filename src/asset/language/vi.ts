@@ -439,6 +439,9 @@ const alert = {
     invalidLink: 'Đường dẫn URL không hợp lệ',
     numberPeopleMoreThan: 'Số lượng người phải nhiều hơn {{value}}',
     priceLessThan: 'Giá tiền phải ít hơn {{value}}',
+    deadlineDateBefore: 'Ngày hết hạn phải trước ngày bắt đầu: {{value}}',
+    canNotEditStartTimeAndPrice:
+        'Bạn không thể chỉnh ngày bắt đầu và giá mua chung',
 
     // PERMISSION
     permissionCamera: 'Cho phép Doffy truy cập vào máy ảnh',

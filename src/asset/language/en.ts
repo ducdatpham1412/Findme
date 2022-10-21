@@ -432,6 +432,9 @@ const alert = {
     invalidLink: 'Invalid link',
     numberPeopleMoreThan: 'Number people have to be more than {{value}}',
     priceLessThan: 'Price have to be less {{value}}',
+    deadlineDateBefore:
+        'Joining deadline has to be before starting date: {{value}}',
+    canNotEditStartTimeAndPrice: 'You can not edit start time and prices',
 
     // PERMISSION
     permissionCamera: 'Access camera',

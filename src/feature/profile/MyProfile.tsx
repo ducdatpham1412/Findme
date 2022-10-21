@@ -27,7 +27,6 @@ import Bubble from 'feature/discovery/components/Bubble';
 import BubbleGroupBuying, {
     ParamsLikeGB,
 } from 'feature/discovery/components/BubbleGroupBuying';
-import ListShareElement from 'feature/profile/post/ListShareElement';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import {tabBarViewHeight} from 'navigation/components/TabNavigator';
@@ -220,10 +219,6 @@ const ProfileAccount = () => {
     ).current;
     const optionRef = useRef<any>(null);
     const optionPostReviewRef = useRef<any>(null);
-    const myPostRef = useRef<ListShareElement>(null);
-    const postLikedRef = useRef<ListShareElement>(null);
-    const postSavedRef = useRef<ListShareElement>(null);
-    const tabFourSharedRef = useRef<ListShareElement>(null);
     const tabViewRef = useRef<StyleTabView>(null);
     const scrollRef = useRef<ScrollView>(null);
 
@@ -231,8 +226,8 @@ const ProfileAccount = () => {
     const [postIdFocusing, setPostIdFocusing] = useState('');
     const isFocusMyPost = tabIndex === 0;
     const isFocusPostLiked = tabIndex === 1;
-    const isFocusPostSaved = tabIndex === 2;
-    const isFocusGbJoined = tabIndex === 3;
+    const isFocusJoinOrder = tabIndex === 2;
+    const isFocusListReview = tabIndex === 3;
 
     useEffect(() => {
         if (
@@ -270,20 +265,10 @@ const ProfileAccount = () => {
             bubblePalaceAction.action ===
                 TYPE_BUBBLE_PALACE_ACTION.scrollToTopMyProfile
         ) {
-            if (myPostRef.current?.isShowing()) {
-                myPostRef.current?.hide();
-            } else if (postLikedRef.current?.isShowing()) {
-                postLikedRef.current?.hide();
-            } else if (postSavedRef.current?.isShowing()) {
-                postSavedRef.current?.hide();
-            } else if (tabFourSharedRef.current?.isShowing()) {
-                tabFourSharedRef.current?.hide();
-            } else {
-                scrollRef.current?.scrollTo({
-                    y: 0,
-                    animated: true,
-                });
-            }
+            scrollRef.current?.scrollTo({
+                y: 0,
+                animated: true,
+            });
             Redux.setBubblePalaceAction({
                 action: TYPE_BUBBLE_PALACE_ACTION.null,
                 payload: null,
@@ -378,9 +363,10 @@ const ProfileAccount = () => {
                 myGbPaging.onRefresh();
             } else if (isFocusPostLiked) {
                 postsLikedPaging.onRefresh();
-            } else if (isFocusPostSaved) {
+            } else if (isFocusJoinOrder) {
+                gbJoiningPaging.onRefresh();
                 gbJoinedPaging.onRefresh();
-            } else if (isFocusGbJoined) {
+            } else if (isFocusListReview) {
                 postReviewPaging.onRefresh();
             }
         } catch (err) {
@@ -394,19 +380,11 @@ const ProfileAccount = () => {
                 myGbPaging.onLoadMore();
             } else if (isFocusPostLiked) {
                 postsLikedPaging.onLoadMore();
-            } else if (isFocusPostSaved) {
+            } else if (isFocusJoinOrder) {
                 gbJoinedPaging.onLoadMore();
-            } else if (isFocusGbJoined) {
+            } else if (isFocusListReview) {
                 postReviewPaging.onLoadMore();
             }
-        }
-
-        if (isFocusMyPost) {
-            myPostRef.current?.scrollToNearingEnd();
-        } else if (isFocusPostLiked) {
-            postLikedRef.current?.scrollToNearingEnd();
-        } else if (isFocusPostSaved) {
-            postSavedRef.current?.scrollToNearingEnd();
         }
     };
 
@@ -650,7 +628,7 @@ const ProfileAccount = () => {
                         <View
                             style={[
                                 styles.contentContainerPost,
-                                isFocusPostSaved ? {} : safeLoadMoreStyle,
+                                isFocusJoinOrder ? {} : safeLoadMoreStyle,
                                 {
                                     flexDirection: 'column',
                                 },
@@ -712,7 +690,7 @@ const ProfileAccount = () => {
                             <View
                                 style={[
                                     styles.contentContainerPost,
-                                    isFocusGbJoined ? {} : safeLoadMoreStyle,
+                                    isFocusListReview ? {} : safeLoadMoreStyle,
                                 ]}>
                                 {postReviewPaging.list.map(item =>
                                     RenderItemReview(item),
