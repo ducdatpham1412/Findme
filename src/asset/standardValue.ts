@@ -161,7 +161,7 @@ export enum FONT_SIZE {
     big = '17@ms',
     normal = '14@ms',
     small = '11@ms',
-    tiny = '7@ms',
+    tiny = '8@ms',
 }
 export const LINE_HEIGHT = {
     normal: Platform.select({
@@ -170,7 +170,7 @@ export const LINE_HEIGHT = {
     }),
 };
 
-export const ratioImageGroupBuying = 0.5; // height / width
+export const ratioImageGroupBuying = 0.8; // height / width
 
 export const LIST_DEPOSIT_PRICES = [
     {

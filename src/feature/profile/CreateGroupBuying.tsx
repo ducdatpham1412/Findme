@@ -141,10 +141,10 @@ class AddInfoButton extends Component<AddInfoProps> {
 }
 
 const CreateGroupBuying = ({route}: Props) => {
-    const itemNew = route.params?.itemNew;
-    const itemEdit = route.params?.itemEdit;
-    const itemError = route.params?.itemError;
-    const itemDraft = route.params?.itemDraft;
+    const itemNew = useRef(route.params?.itemNew).current;
+    const itemEdit = useRef(route.params?.itemEdit).current;
+    const itemError = useRef(route.params?.itemError).current;
+    const itemDraft = useRef(route.params?.itemDraft).current;
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
     const token = Redux.getToken();
@@ -413,25 +413,45 @@ const CreateGroupBuying = ({route}: Props) => {
             );
         }
         return (
-            <View style={styles.topicView}>
-                <StyleTouchable
-                    customStyle={[
-                        styles.chooseTopicView,
-                        {borderColor: theme.borderColor},
-                    ]}
-                    onPress={() => {
-                        modalDeadlineRef.current?.show();
-                    }}>
-                    <StyleIcon source={Images.icons.deadline} size={15} />
-                    <StyleText
-                        originValue={formatDayGroupBuying(deadlineDate)}
+            <>
+                <View style={styles.topicView}>
+                    <StyleTouchable
                         customStyle={[
-                            styles.textTopic,
-                            {color: theme.textColor},
+                            styles.chooseTopicView,
+                            {borderColor: theme.borderColor},
+                        ]}
+                        onPress={() => {
+                            modalDeadlineRef.current?.show();
+                        }}>
+                        <StyleIcon source={Images.icons.deadline} size={15} />
+                        <StyleText
+                            originValue={formatDayGroupBuying(deadlineDate)}
+                            customStyle={[
+                                styles.textTopic,
+                                {color: theme.textColor},
+                            ]}
+                        />
+                    </StyleTouchable>
+                </View>
+                <View style={styles.noteBox}>
+                    {/* <AntDesign
+                        name="pushpino"
+                        style={[styles.iconPin, {color: theme.highlightColor}]}
+                    /> */}
+                    <StyleText
+                        i18Text="alert.deadlineDateBefore"
+                        i18Params={{
+                            value: startDate
+                                ? formatDayGroupBuying(startDate)
+                                : '',
+                        }}
+                        customStyle={[
+                            styles.textNote,
+                            {color: theme.highlightColor},
                         ]}
                     />
-                </StyleTouchable>
-            </View>
+                </View>
+            </>
         );
     };
 
@@ -448,27 +468,47 @@ const CreateGroupBuying = ({route}: Props) => {
             );
         }
         return (
-            <View style={styles.topicView}>
-                <StyleTouchable
-                    customStyle={[
-                        styles.chooseTopicView,
-                        {borderColor: theme.borderColor},
-                    ]}
-                    onPress={() => {
-                        modalApplicationRef.current?.show();
-                    }}>
-                    <StyleIcon source={Images.icons.calendar} size={15} />
-                    <StyleText
-                        originValue={`${formatDayGroupBuying(
-                            startDate,
-                        )} ~ ${formatDayGroupBuying(endDate)}`}
+            <>
+                <View style={styles.topicView}>
+                    <StyleTouchable
                         customStyle={[
-                            styles.textTopic,
-                            {color: theme.textHightLight},
+                            styles.chooseTopicView,
+                            {borderColor: theme.borderColor},
                         ]}
-                    />
-                </StyleTouchable>
-            </View>
+                        onPress={() => {
+                            modalApplicationRef.current?.show();
+                        }}
+                        disable={!!itemEdit}
+                        disableOpacity={1}>
+                        <StyleIcon source={Images.icons.calendar} size={15} />
+                        <StyleText
+                            originValue={`${formatDayGroupBuying(
+                                startDate,
+                            )} ~ ${formatDayGroupBuying(endDate)}`}
+                            customStyle={[
+                                styles.textTopic,
+                                {color: theme.textHightLight},
+                            ]}
+                        />
+                    </StyleTouchable>
+                </View>
+
+                {!!itemEdit && (
+                    <View style={styles.noteBox}>
+                        {/* <AntDesign
+                        name="pushpino"
+                        style={[styles.iconPin, {color: theme.highlightColor}]}
+                    /> */}
+                        <StyleText
+                            i18Text="alert.canNotEditStartTimeAndPrice"
+                            customStyle={[
+                                styles.textNote,
+                                {color: theme.holderColorLighter},
+                            ]}
+                        />
+                    </View>
+                )}
+            </>
         );
     };
 
@@ -534,29 +574,33 @@ const CreateGroupBuying = ({route}: Props) => {
                                     ]}
                                 />
                             </View>
-                            <StyleTouchable
-                                customStyle={styles.deleteBox}
-                                hitSlop={10}
-                                onPress={() => onDeletePrice(price.value)}>
-                                <Feather
-                                    name="x"
-                                    style={[
-                                        styles.iconDelete,
-                                        {color: theme.borderColor},
-                                    ]}
-                                />
-                            </StyleTouchable>
+                            {!itemEdit && (
+                                <StyleTouchable
+                                    customStyle={styles.deleteBox}
+                                    hitSlop={10}
+                                    onPress={() => onDeletePrice(price.value)}>
+                                    <Feather
+                                        name="x"
+                                        style={[
+                                            styles.iconDelete,
+                                            {color: theme.borderColor},
+                                        ]}
+                                    />
+                                </StyleTouchable>
+                            )}
                         </View>
                     );
                 })}
 
-                <AddInfoButton
-                    ref={buttonAddPriceRef}
-                    title="profile.addPrice"
-                    titleColor={theme.textHightLight}
-                    borderColor={theme.borderColor}
-                    onPress={() => modalPriceRef.current?.show()}
-                />
+                {!itemEdit && (
+                    <AddInfoButton
+                        ref={buttonAddPriceRef}
+                        title="profile.addPrice"
+                        titleColor={theme.textHightLight}
+                        borderColor={theme.borderColor}
+                        onPress={() => modalPriceRef.current?.show()}
+                    />
+                )}
             </View>
         );
     };
@@ -571,6 +615,7 @@ const CreateGroupBuying = ({route}: Props) => {
                     placeholder={t('common.writeSomething')}
                     placeholderTextColor={theme.borderColor}
                     style={[styles.inputContent, {color: theme.textHightLight}]}
+                    defaultValue={initValue.content}
                 />
             </View>
         );
@@ -590,8 +635,8 @@ const CreateGroupBuying = ({route}: Props) => {
                 {ImagePreview}
                 <View style={styles.contentView}>
                     {Topic()}
-                    {RenderDeadline()}
                     {TouringTime()}
+                    {RenderDeadline()}
                     {GroupBuyingPrices()}
                     {Content()}
                 </View>
@@ -609,6 +654,7 @@ const CreateGroupBuying = ({route}: Props) => {
                 ref={modalDeadlineRef}
                 initDate={deadlineDate ? new Date(deadlineDate) : new Date()}
                 minimumDate={new Date()}
+                maximumDate={startDate ? new Date(startDate) : undefined}
                 onChangeDateTime={value => setDeadlineDate(String(value))}
                 theme={theme}
             />
@@ -774,6 +820,19 @@ const styles = ScaledSheet.create({
     },
     textNumberPeople: {
         fontSize: FONT_SIZE.small,
+    },
+    noteBox: {
+        width: '100%',
+        flexDirection: 'row',
+        marginTop: '5@vs',
+        alignItems: 'center',
+    },
+    iconPin: {
+        fontSize: '10@ms',
+    },
+    textNote: {
+        fontSize: FONT_SIZE.tiny,
+        marginLeft: '5@s',
     },
 });
 

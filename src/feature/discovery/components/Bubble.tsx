@@ -2,13 +2,7 @@ import {BlurView} from '@react-native-community/blur';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeBubblePalace} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
-import {
-    apiLikePost,
-    apiSavePost,
-    apiUnArchivePost,
-    apiUnLikePost,
-    apiUnSavePost,
-} from 'api/profile';
+import {apiLikePost, apiUnArchivePost, apiUnLikePost} from 'api/profile';
 import {TYPE_BUBBLE_PALACE_ACTION, TYPE_DYNAMIC_LINK} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
@@ -41,7 +35,6 @@ import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {
     chooseIconFeeling,
     chooseTextTopic,
@@ -87,37 +80,6 @@ const onHandleLike = async (params: {
         } catch (err) {
             setIsLiked(currentLike);
             setTotalLikes(currentNumberLikes);
-            appAlert(err);
-        }
-    } else {
-        appAlert('discovery.bubble.goToSignUp', {
-            moreNotice: 'common.letGo',
-            moreAction: () => {
-                goBack();
-                onGoToSignUp();
-            },
-        });
-    }
-};
-
-const onHandleSave = async (params: {
-    isModeExp: boolean;
-    isSaved: boolean;
-    setIsSaved: Function;
-    postId: string;
-}) => {
-    const {isModeExp, isSaved, setIsSaved, postId} = params;
-    if (!isModeExp) {
-        const currenSaved = isSaved;
-        try {
-            setIsSaved(!currenSaved);
-            if (currenSaved) {
-                await apiUnSavePost(postId);
-            } else {
-                await apiSavePost(postId);
-            }
-        } catch (err) {
-            setIsSaved(currenSaved);
             appAlert(err);
         }
     } else {
@@ -243,7 +205,6 @@ const Bubble = (props: Props) => {
     const [isLiked, setIsLiked] = useState(item.isLiked);
     const [totalLikes, setTotalLikes] = useState(item.totalLikes);
     const [disableShare, setDisableShare] = useState(false);
-    const [isSaved, setIsSaved] = useState(item.isSaved);
 
     useEffect(() => {
         setIsLiked(item.isLiked);
@@ -552,35 +513,6 @@ const Bubble = (props: Props) => {
                             size={18}
                             customStyle={{tintColor: Theme.common.white}}
                         />
-                    </StyleTouchable>
-                    <StyleTouchable
-                        customStyle={styles.contractBox}
-                        onPress={() => {
-                            onHandleSave({
-                                isModeExp,
-                                isSaved,
-                                setIsSaved,
-                                postId: item.id,
-                            });
-                        }}>
-                        <CustomBlurView />
-                        {isSaved ? (
-                            <FontAwesome
-                                name="bookmark"
-                                style={[
-                                    styles.save,
-                                    {color: Theme.common.gradientTabBar1},
-                                ]}
-                            />
-                        ) : (
-                            <FontAwesome
-                                name="bookmark-o"
-                                style={[
-                                    styles.save,
-                                    {color: Theme.common.white},
-                                ]}
-                            />
-                        )}
                     </StyleTouchable>
                 </View>
             );

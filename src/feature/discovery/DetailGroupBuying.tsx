@@ -25,7 +25,6 @@ import {
     FONT_SIZE,
     LANDING_PAGE_URL,
     LIST_DEPOSIT_PRICES,
-    ratioImageGroupBuying,
 } from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
 import {
@@ -37,13 +36,14 @@ import {
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
+import StyleActionSheet from 'components/common/StyleActionSheet';
 import LoadingScreen from 'components/LoadingScreen';
 import ModalCommentLike from 'components/ModalCommentLike';
 import ModalConfirmJoinGb from 'feature/common/components/ModalConfirmJoinGb';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
-import ROOT_SCREEN from 'navigation/config/routes';
-import {appAlert, goBack} from 'navigation/NavigationService';
+import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
+import {appAlert, goBack, navigate} from 'navigation/NavigationService';
 import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {useEffect, useRef, useState} from 'react';
 import {
@@ -236,6 +236,7 @@ const DetailGroupBuying = ({route}: Props) => {
     const {profile} = Redux.getPassport();
     const isLoading = Redux.getIsLoading();
 
+    const modalOptionRef = useRef<any>(null);
     const modalJoinedRef = useRef<Modalize>(null);
     const modalCommentLikeRef = useRef<ModalCommentLike>(null);
     const modalConfirmJoin = useRef<Modalize>(null);
@@ -919,6 +920,20 @@ const DetailGroupBuying = ({route}: Props) => {
                         }}
                         containerStyle={styles.imagePreview}
                     />
+
+                    {isMyBubble && (
+                        <StyleTouchable
+                            customStyle={styles.iconOptionView}
+                            onPress={() => modalOptionRef.current?.show()}>
+                            <BlurView
+                                style={StyleSheet.absoluteFill}
+                                blurType="ultraThinMaterialLight"
+                                blurAmount={3}
+                                blurRadius={20}
+                            />
+                            <StyleIcon source={Images.icons.more} size={15} />
+                        </StyleTouchable>
+                    )}
                 </SharedElement>
 
                 {Information()}
@@ -987,6 +1002,23 @@ const DetailGroupBuying = ({route}: Props) => {
             />
 
             {isLoading && <LoadingScreen />}
+
+            <StyleActionSheet
+                ref={modalOptionRef}
+                listTextAndAction={[
+                    {
+                        text: 'profile.post.edit',
+                        action: () =>
+                            navigate(PROFILE_ROUTE.createGroupBuying, {
+                                itemEdit: item,
+                            }),
+                    },
+                    {
+                        text: 'common.cancel',
+                        action: () => null,
+                    },
+                ]}
+            />
         </>
     );
 };
@@ -1003,7 +1035,6 @@ const styles = ScaledSheet.create({
     },
     imagePreview: {
         width: screenWidth,
-        height: screenWidth * ratioImageGroupBuying,
     },
     iconBackView: {
         position: 'absolute',
@@ -1015,6 +1046,13 @@ const styles = ScaledSheet.create({
     iconBack: {
         fontSize: '20@ms',
         color: Theme.common.white,
+    },
+    iconOptionView: {
+        position: 'absolute',
+        right: '10@s',
+        top: Metrics.safeTopPadding,
+        paddingHorizontal: '7@ms',
+        borderRadius: '15@ms',
     },
     avatar: {
         borderRadius: '30@s',

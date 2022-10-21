@@ -14,6 +14,7 @@ interface Props {
     initDate: Date;
     onChangeDateTime(selectedDate: Date): void;
     minimumDate?: Date;
+    maximumDate?: Date;
     theme: TypeTheme;
 }
 
@@ -53,7 +54,7 @@ class ClassDateTimePicker extends Component<Props, States> {
     }
 
     render() {
-        const {initDate, minimumDate, theme} = this.props;
+        const {initDate, minimumDate, maximumDate, theme} = this.props;
         const dateTheme =
             theme.backgroundColor === Theme.darkTheme.backgroundColor
                 ? 'dark'
@@ -94,6 +95,7 @@ class ClassDateTimePicker extends Component<Props, States> {
                                 })
                             }
                             minimumDate={minimumDate}
+                            maximumDate={maximumDate}
                             themeVariant={dateTheme}
                             locale={chooseLanguageFromId(language)}
                         />
@@ -152,6 +154,7 @@ class ClassDateTimePicker extends Component<Props, States> {
                     })
                 }
                 minimumDate={minimumDate}
+                maximumDate={maximumDate}
             />
         );
     }
