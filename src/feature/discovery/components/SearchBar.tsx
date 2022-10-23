@@ -247,6 +247,7 @@ class SearchBar extends Component<Props, States> {
                     {
                         opacity: this.opacity,
                         transform: [{translateY: this.translateY}],
+                        backgroundColor: 'green',
                     },
                 ]}>
                 <BannerBox

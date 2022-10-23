@@ -1,3 +1,4 @@
+import {useIsFocused} from '@react-navigation/native';
 import {
     CardStyleInterpolators,
     createStackNavigator,
@@ -10,12 +11,27 @@ import React, {useEffect} from 'react';
 
 const MessStack = createStackNavigator();
 
+let x: any;
+
 const MessRoute = () => {
     const theme = Redux.getTheme();
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         Redux.setBorderMessRoute(theme.borderColor);
     }, []);
+
+    useEffect(() => {
+        if (isFocused) {
+            x = setTimeout(() => {
+                Redux.setScrollMainAndChatEnable(true);
+            }, 100);
+        }
+
+        return () => {
+            clearTimeout(x);
+        };
+    }, [isFocused]);
 
     return (
         <MessStack.Navigator

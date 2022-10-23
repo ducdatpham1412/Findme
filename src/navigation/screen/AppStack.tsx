@@ -23,7 +23,7 @@ import Redux from 'hook/useRedux';
 import StatusPostCreated from 'navigation/components/StatusPostCreated';
 import ROOT_SCREEN, {MESS_ROUTE, PROFILE_ROUTE} from 'navigation/config/routes';
 import React from 'react';
-import MainTabs from './MainTabs';
+import MainAndChat from './MainAndChat';
 import SettingRoute from './tabs/SettingRoute';
 
 const modalPreviewLinkRef = React.createRef<ModalPreviewLink>();
@@ -44,8 +44,8 @@ const AppStack = () => {
         <>
             <Stack.Navigator screenOptions={{headerShown: false}}>
                 <Stack.Screen
-                    name={ROOT_SCREEN.mainScreen}
-                    component={MainTabs}
+                    name="main_and_chat"
+                    component={MainAndChat}
                     options={{
                         cardStyleInterpolator:
                             CardStyleInterpolators.forHorizontalIOS,

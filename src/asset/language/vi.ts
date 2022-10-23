@@ -297,7 +297,7 @@ const profile = {
     requestUpgradeSuccess: 'Gửi yêu cầu thành công',
     description: 'Mô tả về bạn',
     shop: 'Shop',
-    favorite: 'Ưa thích',
+    favorite: 'Yêu thích',
     rating: 'Đánh giá',
     joining: 'Đang tham gia',
     joinedSuccess: 'Tham gia thành công',

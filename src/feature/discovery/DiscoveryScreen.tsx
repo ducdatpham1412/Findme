@@ -1,4 +1,5 @@
 /* eslint-disable no-shadow */
+import {useIsFocused} from '@react-navigation/native';
 import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
 import {
     TypeResultSearch,
@@ -17,11 +18,10 @@ import ROOT_SCREEN, {DISCOVERY_ROUTE} from 'navigation/config/routes';
 import {appAlert, goBack, navigate} from 'navigation/NavigationService';
 import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {FlatList, ImageBackground, Vibration, View} from 'react-native';
+import {FlatList, Vibration, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {onGoToSignUp} from 'utility/assistant';
 import {useNotification} from 'utility/notification';
-import Bubble from './components/Bubble';
 import BubbleGroupBuying, {ParamsLikeGB} from './components/BubbleGroupBuying';
 import HeaderDoffy from './components/HeaderDoffy';
 import ListTopGroupBuying, {spaceHeight} from './components/ListTopGroupBuying';
@@ -42,6 +42,7 @@ const onGoToSignUpFromAlert = () => {
 
 const DiscoveryScreen = () => {
     useNotification();
+    const isFocused = useIsFocused();
 
     const listRef = useRef<FlatList>(null);
     const optionsRef = useRef<any>(null);
@@ -55,17 +56,9 @@ const DiscoveryScreen = () => {
     const isModeExp = Redux.getModeExp();
     const bubblePalace = Redux.getBubblePalaceAction();
     const {profile} = Redux.getPassport();
-    const {imageBackground} = Redux.getResource();
 
     const hadLogan = token && !isModeExp;
 
-    const [listTopics, setListTopics] = useState<Array<number>>([
-        TOPIC.travel,
-        TOPIC.cuisine,
-    ]);
-    const [postTypes, setPostTypes] = useState<Array<number>>([
-        POST_TYPE.groupBuying,
-    ]);
     const [postIdFocusing, setPostIdFocusing] = useState('');
     const [showTopGroupBooking, setShowTopGroupBooking] = useState(true);
     const [resultSearch, setResultSearch] = useState<TypeResultSearch>(null);
@@ -83,29 +76,13 @@ const DiscoveryScreen = () => {
         params: {
             take: 30,
             topics: undefined,
-            postTypes: `[${String(postTypes)}]`,
+            postTypes: `[${String([POST_TYPE.groupBuying])}]`,
             search: '',
         },
         onSuccess: data => {
             setResultSearch(data.result);
         },
     });
-
-    useEffect(() => {
-        listRef.current?.scrollToOffset({
-            offset: 0,
-            animated: false,
-        });
-        const paramsTopic =
-            listTopics.length === 2 ? undefined : `[${String(listTopics)}]`;
-        const paramsPostTypes =
-            postTypes.length === 2 ? undefined : `[${String(postTypes)}]`;
-        setParams(preValue => ({
-            ...preValue,
-            topics: paramsTopic,
-            postTypes: paramsPostTypes,
-        }));
-    }, [listTopics, postTypes]);
 
     useEffect(() => {
         if (
@@ -122,6 +99,14 @@ const DiscoveryScreen = () => {
             });
         }
     }, [bubblePalace.action]);
+
+    useEffect(() => {
+        if (isFocused) {
+            Redux.setScrollMainAndChatEnable(true);
+        } else {
+            Redux.setScrollMainAndChatEnable(false);
+        }
+    }, [isFocused]);
 
     /**
      * Functions
@@ -206,21 +191,6 @@ const DiscoveryScreen = () => {
 
     const RenderItemBubble = useCallback(
         (item: TypeBubblePalace & TypeGroupBuying) => {
-            if (item.postType === POST_TYPE.review) {
-                return (
-                    <Bubble
-                        item={item}
-                        onShowMoreOption={onShowOptions}
-                        onShowModalComment={(post, type) =>
-                            onShowModalComment(post, type)
-                        }
-                        isFocusing={postIdFocusing === item.id}
-                        onChangePostIdFocusing={postId =>
-                            setPostIdFocusing(postId)
-                        }
-                    />
-                );
-            }
             if (item.postType === POST_TYPE.groupBuying) {
                 return (
                     <BubbleGroupBuying
@@ -264,14 +234,10 @@ const DiscoveryScreen = () => {
     };
 
     return (
-        <ImageBackground
-            source={{uri: imageBackground}}
-            imageStyle={{
-                top: -470,
-            }}
+        <View
             style={[
                 styles.container,
-                {backgroundColor: theme.backgroundColorSecond},
+                {backgroundColor: theme.backgroundColor},
             ]}>
             <HeaderDoffy
                 ref={headerRef}
@@ -346,8 +312,8 @@ const DiscoveryScreen = () => {
                         setShowTopGroupBooking(value)
                     }
                     resultSearch={resultSearch}
-                    topics={listTopics}
-                    postTypes={postTypes}
+                    topics={[TOPIC.travel]}
+                    postTypes={[POST_TYPE.groupBuying]}
                 />
             </View>
 
@@ -371,16 +337,7 @@ const DiscoveryScreen = () => {
                     },
                 ]}
             />
-
-            <HeaderFilterTopic
-                ref={headerFilterRef}
-                listTopics={listTopics}
-                listPostTypes={postTypes}
-                theme={theme}
-                onChangeTopic={list => setListTopics(list)}
-                onChangePostType={list => setPostTypes(list)}
-            />
-        </ImageBackground>
+        </View>
     );
 };
 
@@ -389,4 +346,5 @@ const styles = ScaledSheet.create({
         flex: 1,
     },
 });
+
 export default DiscoveryScreen;

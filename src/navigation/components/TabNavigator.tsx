@@ -26,7 +26,6 @@ export const tabBarViewHeight = tabBarHeight + safeBottomHeight + addMoreHeight;
 const TabNavigator = (props: any) => {
     const theme = Redux.getTheme();
     const numberNewNotifications = Redux.getNumberNewNotifications();
-    const numberNewMessages = Redux.getNumberNewMessages();
 
     // for indicator
     const tabIndexFocus = props.state.index;
@@ -74,30 +73,16 @@ const TabNavigator = (props: any) => {
     };
 
     const MessageButton = () => {
-        let tintColor = theme.tabBarIconColor;
-        if (tabIndexFocus === 1) {
-            tintColor = Theme.common.white;
-        } else if (numberNewMessages > 0) {
-            tintColor = theme.highlightColor;
-        }
+        const isFocus = tabIndexFocus === 1;
+        const tintColor = isFocus ? Theme.common.white : theme.tabBarIconColor;
         return (
             <StyleTouchable
                 customStyle={styles.buttonView}
-                onPress={() => navigate(MAIN_SCREEN.messRoute)}>
-                <View>
-                    <StyleImage
-                        source={Images.icons.chat}
-                        customStyle={[styles.iconTabBar, {tintColor}]}
-                    />
-                    {numberNewMessages > 0 && (
-                        <View style={styles.newMessagesBox}>
-                            <StyleText
-                                originValue={numberNewMessages}
-                                customStyle={styles.textNewMessages}
-                            />
-                        </View>
-                    )}
-                </View>
+                onPress={() => navigate(MAIN_SCREEN.favorite)}>
+                <FontAwesome
+                    name="heart-o"
+                    style={[styles.profile, {color: tintColor}]}
+                />
             </StyleTouchable>
         );
     };

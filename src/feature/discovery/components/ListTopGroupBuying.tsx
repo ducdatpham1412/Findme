@@ -13,7 +13,7 @@ import {Animated, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 
 const {width} = Metrics;
-const itemWidth = width * 0.55;
+const itemWidth = width * 0.43;
 export const spaceHeight = width * 0.45;
 
 interface Props {
@@ -38,11 +38,7 @@ const ListUnder = () => {
     }, []);
 
     return (
-        <View
-            style={[
-                styles.underContainer,
-                {backgroundColor: theme.backgroundColor},
-            ]}>
+        <View style={styles.underContainer}>
             <StyleText
                 i18Text="discovery.topGroupBooking"
                 customStyle={[
@@ -132,7 +128,7 @@ const styles = ScaledSheet.create({
         marginTop: '20@vs',
     },
     itemView: {
-        marginLeft: '5@s',
+        marginLeft: width * 0.03,
         marginRight: '10@s',
         marginTop: 0,
     },

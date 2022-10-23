@@ -14,7 +14,7 @@ import {MAIN_SCREEN} from 'navigation/config/routes';
 import React from 'react';
 import {View} from 'react-native';
 import DiscoveryRoute from './tabs/DiscoveryRoute';
-import MessRoute from './tabs/MessRoute';
+import FavoriteRoute from './tabs/FavoriteRoute';
 import ProfileRoute from './tabs/ProfileRoute';
 
 const BottomTab = createBottomTabNavigator();
@@ -52,8 +52,8 @@ const MainTabs: React.FunctionComponent = () => {
                 />
 
                 <BottomTab.Screen
-                    name={MAIN_SCREEN.messRoute}
-                    component={MessRoute}
+                    name={MAIN_SCREEN.favorite}
+                    component={FavoriteRoute}
                     options={{
                         lazy: false,
                     }}
@@ -79,7 +79,7 @@ const MainTabs: React.FunctionComponent = () => {
                 ref={modalRef}
                 theme={theme}
                 bubbleFocusing={bubbleFocusing}
-                updateBubbleFocusing={value =>
+                updateBubbleFocusing={(value: any) =>
                     Redux.updateBubbleFocusing(value)
                 }
                 setTotalComments={value => {

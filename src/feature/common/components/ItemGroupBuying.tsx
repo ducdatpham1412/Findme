@@ -14,9 +14,9 @@ import {
 import Redux from 'hook/useRedux';
 import {navigate} from 'navigation/NavigationService';
 import React from 'react';
-import {StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
+import {Platform, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {moderateScale, ScaledSheet} from 'react-native-size-matters';
+import {ScaledSheet} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {SharedElement} from 'react-navigation-shared-element';
 import {onGoToProfile} from 'utility/assistant';
@@ -29,6 +29,7 @@ interface Props {
     detailGroupTarget: string;
     syncWidth?: number;
     isHorizontal: boolean;
+    showName?: boolean;
 }
 
 const {width} = Metrics;
@@ -112,6 +113,7 @@ const ItemGroupBuying = (props: Props) => {
         detailGroupTarget,
         syncWidth = width * 0.8,
         isHorizontal,
+        showName = true,
     } = props;
     const theme = Redux.getTheme();
 
@@ -150,6 +152,7 @@ const ItemGroupBuying = (props: Props) => {
                 {
                     backgroundColor: theme.backgroundColor,
                     shadowColor: theme.borderColor,
+                    borderColor: theme.holderColor,
                 },
                 containerStyle,
                 {
@@ -182,21 +185,23 @@ const ItemGroupBuying = (props: Props) => {
                     ]}
                 />
 
-                <StyleTouchable
-                    customStyle={styles.creatorView}
-                    onPress={() => onGoToProfile(item.creator)}>
-                    <CustomBlurView />
-                    <StyleIcon
-                        source={{uri: item.creatorAvatar}}
-                        size={20}
-                        customStyle={styles.avatar}
-                    />
-                    <StyleText
-                        originValue={item.creatorName}
-                        numberOfLines={1}
-                        customStyle={styles.textName}
-                    />
-                </StyleTouchable>
+                {showName && (
+                    <StyleTouchable
+                        customStyle={styles.creatorView}
+                        onPress={() => onGoToProfile(item.creator)}>
+                        <CustomBlurView />
+                        <StyleIcon
+                            source={{uri: item.creatorAvatar}}
+                            size={20}
+                            customStyle={styles.avatar}
+                        />
+                        <StyleText
+                            originValue={item.creatorName}
+                            numberOfLines={1}
+                            customStyle={styles.textName}
+                        />
+                    </StyleTouchable>
+                )}
 
                 <View style={styles.bottomView}>
                     <View style={styles.numberJoinedBox}>
@@ -299,17 +304,21 @@ const ItemGroupBuying = (props: Props) => {
 const styles = ScaledSheet.create({
     itemView: {
         marginVertical: '10@vs',
-        borderRadius: '15@ms',
-        shadowOpacity: 0.3,
+        borderRadius: '5@ms',
+        shadowOpacity: 0,
         shadowOffset: {
-            height: moderateScale(1),
+            height: 2,
             width: 0,
         },
+        borderWidth: Platform.select({
+            ios: '0.25@ms',
+            android: '0.5@ms',
+        }),
     },
     imagePreview: {
         width: '100%',
-        borderTopLeftRadius: '15@ms',
-        borderTopRightRadius: '15@ms',
+        borderTopLeftRadius: '5@ms',
+        borderTopRightRadius: '5@ms',
     },
     creatorView: {
         position: 'absolute',

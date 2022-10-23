@@ -188,6 +188,11 @@ export const Redux = {
     setIsLogOut: (value: boolean) => {
         FindmeStore.dispatch(logicSliceAction.setIsLogOut(value));
     },
+    setScrollMainAndChatEnable: (value: boolean) => {
+        FindmeStore.dispatch(
+            logicSliceAction.setScrollMainAndChatEnable(value),
+        );
+    },
 
     /**
      *

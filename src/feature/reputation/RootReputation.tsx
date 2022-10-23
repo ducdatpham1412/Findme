@@ -31,10 +31,17 @@ const RootReputation = () => {
                     styles.headerView,
                     {borderBottomColor: theme.holderColor},
                 ]}>
-                <StyleIcon source={Images.icons.star} size={20} />
+                <StyleIcon
+                    source={Images.icons.reputation}
+                    size={20}
+                    customStyle={{tintColor: theme.textHightLight}}
+                />
                 <StyleText
                     i18Text="reputation.reviewCommunity"
-                    customStyle={[styles.textTitle, {color: theme.borderColor}]}
+                    customStyle={[
+                        styles.textTitle,
+                        {color: theme.textHightLight},
+                    ]}
                 />
             </View>
 
@@ -64,8 +71,8 @@ const styles = ScaledSheet.create({
         paddingTop: Metrics.safeTopPadding,
     },
     headerView: {
-        paddingHorizontal: '30@s',
-        paddingVertical: '5@vs',
+        paddingHorizontal: '20@s',
+        paddingVertical: '3@vs',
         borderBottomWidth: Platform.select({
             ios: '0.25@ms',
             android: '0.5@ms',

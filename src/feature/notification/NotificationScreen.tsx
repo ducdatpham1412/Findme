@@ -1,8 +1,10 @@
 import {TypeNotificationResponse} from 'api/interface';
 import {apiReadNotification} from 'api/module';
 import {TYPE_FOLLOW, TYPE_NOTIFICATION} from 'asset/enum';
+import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
-import {StyleText} from 'components/base';
+import {FONT_SIZE} from 'asset/standardValue';
+import {StyleIcon, StyleText} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import Redux from 'hook/useRedux';
 import {useSocketNotification} from 'hook/useSocketIO';
@@ -32,6 +34,11 @@ const NotificationEnjoy = () => {
                     styles.titleView,
                     {borderBottomColor: theme.holderColor},
                 ]}>
+                <StyleIcon
+                    source={Images.icons.notification}
+                    size={20}
+                    customStyle={{tintColor: theme.textHightLight}}
+                />
                 <StyleText
                     i18Text="notification.title"
                     customStyle={[styles.textTitle, {color: theme.borderColor}]}
@@ -122,6 +129,11 @@ const NotificationAccount = () => {
                     styles.titleView,
                     {borderBottomColor: theme.holderColor},
                 ]}>
+                <StyleIcon
+                    source={Images.icons.notification}
+                    size={20}
+                    customStyle={{tintColor: theme.textHightLight}}
+                />
                 <StyleText
                     i18Text="notification.title"
                     customStyle={[
@@ -164,16 +176,19 @@ const styles = ScaledSheet.create({
         paddingTop: Metrics.safeTopPadding,
     },
     titleView: {
-        paddingVertical: '5@vs',
-        paddingHorizontal: '30@s',
+        paddingVertical: '3@vs',
+        paddingHorizontal: '20@s',
         borderBottomWidth: Platform.select({
             ios: '0.25@ms',
             android: '0.5@ms',
         }),
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     textTitle: {
-        fontSize: '25@ms',
+        fontSize: FONT_SIZE.big,
         fontWeight: 'bold',
+        marginLeft: '10@s',
     },
     listContainer: {
         paddingBottom: '20@vs',
