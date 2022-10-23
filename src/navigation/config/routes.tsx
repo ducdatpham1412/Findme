@@ -1,6 +1,7 @@
 const ROOT_SCREEN = {
     loginRoute: '@ROOT_SCREEN/loginRoute',
     mainScreen: '@ROOT_SCREEN/mainScreen',
+    chatRoute: '@ROOT_SCREEN/chatRoute',
     // others
     alert: '@ROOT_SCREEN/alert',
     alertYesNo: '@ROOT_SCREEN/alertYesNo',
@@ -42,10 +43,10 @@ const LOGIN_ROUTE = {
 };
 const MAIN_SCREEN = {
     discoveryRoute: '@MAIN_SCREEN/discoveryRoute',
+    favorite: '@MAIN_SCREEN/favorite',
     reputation: '@MAIN_SCREEN/reputation',
     profileRoute: '@MAIN_SCREEN/profileRoute',
     settingRoute: '@MAIN_SCREEN/settingRoute',
-    messRoute: '@MAIN_SCREEN/messRoute',
     notificationRoute: '@MAIN_SCREEN/notificationRoute',
 };
 
@@ -95,6 +96,11 @@ const REPUTATION_ROUTE = {
     topReviewers: '@REPUTATION_ROUTE/topReviewers',
 };
 
+const FAVORITE_ROUTE = {
+    favoriteScreen: '@FAVORITE_ROUTE/favoriteScreen',
+    detailGroupBuying: '@FAVORITE_ROUTE/detailGroupBuying',
+};
+
 export {LOGIN_ROUTE, MAIN_SCREEN};
 export {
     DISCOVERY_ROUTE,
@@ -102,5 +108,6 @@ export {
     SETTING_ROUTE,
     MESS_ROUTE,
     REPUTATION_ROUTE,
+    FAVORITE_ROUTE,
 };
 export default ROOT_SCREEN;

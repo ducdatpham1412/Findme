@@ -170,7 +170,7 @@ export const LINE_HEIGHT = {
     }),
 };
 
-export const ratioImageGroupBuying = 0.8; // height / width
+export const ratioImageGroupBuying = 1; // height / width
 
 export const LIST_DEPOSIT_PRICES = [
     {

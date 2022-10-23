@@ -1,19 +1,10 @@
 import {BlurView} from '@react-native-community/blur';
-import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeGroupBuying} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
-import {GROUP_BUYING_STATUS, RELATIONSHIP, TYPE_DYNAMIC_LINK} from 'asset/enum';
+import {GROUP_BUYING_STATUS, RELATIONSHIP} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
-import {
-    ANDROID_APP_LINK,
-    DYNAMIC_LINK_ANDROID,
-    DYNAMIC_LINK_IOS,
-    DYNAMIC_LINK_SHARE,
-    FONT_SIZE,
-    LANDING_PAGE_URL,
-    ratioImageGroupBuying,
-} from 'asset/standardValue';
+import {FONT_SIZE, ratioImageGroupBuying} from 'asset/standardValue';
 import Theme, {TypeTheme} from 'asset/theme/Theme';
 import {
     StyleIcon,
@@ -24,12 +15,10 @@ import {
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import Redux from 'hook/useRedux';
-import {appAlert} from 'navigation/NavigationService';
 import React, {memo, useEffect, useState} from 'react';
 import isEqual from 'react-fast-compare';
-import {StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
+import {Platform, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import Share from 'react-native-share';
 import {ScaledSheet} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {SharedElement} from 'react-navigation-shared-element';
@@ -64,62 +53,62 @@ interface Props {
     showButtonJoined?: boolean;
 }
 
-const onShowModalShare = async (
-    item: TypeGroupBuying,
-    setDisableShare: Function,
-) => {
-    try {
-        setDisableShare(true);
-        const link = await dynamicLinks().buildShortLink({
-            link: `${item?.images?.[0] || LANDING_PAGE_URL}?type=${
-                TYPE_DYNAMIC_LINK.groupBuying
-            }&post_id=${item.id}`,
-            domainUriPrefix: DYNAMIC_LINK_SHARE,
-            ios: {
-                bundleId: DYNAMIC_LINK_IOS,
-                appStoreId: '570060128',
-            },
-            android: {
-                packageName: DYNAMIC_LINK_ANDROID,
-                fallbackUrl: ANDROID_APP_LINK,
-            },
-            analytics: {
-                campaign: 'banner',
-            },
-        });
+// const onShowModalShare = async (
+//     item: TypeGroupBuying,
+//     setDisableShare: Function,
+// ) => {
+//     try {
+//         setDisableShare(true);
+//         const link = await dynamicLinks().buildShortLink({
+//             link: `${item?.images?.[0] || LANDING_PAGE_URL}?type=${
+//                 TYPE_DYNAMIC_LINK.groupBuying
+//             }&post_id=${item.id}`,
+//             domainUriPrefix: DYNAMIC_LINK_SHARE,
+//             ios: {
+//                 bundleId: DYNAMIC_LINK_IOS,
+//                 appStoreId: '570060128',
+//             },
+//             android: {
+//                 packageName: DYNAMIC_LINK_ANDROID,
+//                 fallbackUrl: ANDROID_APP_LINK,
+//             },
+//             analytics: {
+//                 campaign: 'banner',
+//             },
+//         });
 
-        // const imagePath: any = null;
-        // let base64Data = '';
-        // if (isIOS) {
-        //     const resp = await RNFetchBlob.config({
-        //         fileCache: true,
-        //     }).fetch('GET', item.images[0]);
-        //     base64Data = await resp.readFile('base64');
-        // } else {
-        //     base64Data = await RNFetchBlob.fs.readFile(
-        //         item.images[0],
-        //         'base64',
-        //     );
-        // }
-        // const base64Image = `data:image/png;base64,${base64Data}`;
-        // await Share.open({
-        //     title: 'Title',
-        //     url: base64Image,
-        //     message: link,
-        //     subject: 'Subject',
-        // });
-        // return RNFetchBlob.fs.unlink(imagePath);
+//         // const imagePath: any = null;
+//         // let base64Data = '';
+//         // if (isIOS) {
+//         //     const resp = await RNFetchBlob.config({
+//         //         fileCache: true,
+//         //     }).fetch('GET', item.images[0]);
+//         //     base64Data = await resp.readFile('base64');
+//         // } else {
+//         //     base64Data = await RNFetchBlob.fs.readFile(
+//         //         item.images[0],
+//         //         'base64',
+//         //     );
+//         // }
+//         // const base64Image = `data:image/png;base64,${base64Data}`;
+//         // await Share.open({
+//         //     title: 'Title',
+//         //     url: base64Image,
+//         //     message: link,
+//         //     subject: 'Subject',
+//         // });
+//         // return RNFetchBlob.fs.unlink(imagePath);
 
-        Share.open({
-            message: 'Doffy share',
-            url: link,
-        });
-    } catch (err) {
-        appAlert(err);
-    } finally {
-        setDisableShare(false);
-    }
-};
+//         Share.open({
+//             message: 'Doffy share',
+//             url: link,
+//         });
+//     } catch (err) {
+//         appAlert(err);
+//     } finally {
+//         setDisableShare(false);
+//     }
+// };
 
 const {width} = Metrics;
 
@@ -202,7 +191,7 @@ const BubbleGroupBuying = (props: Props) => {
         onHandleLike,
         onShowModalComment,
         onChangePostIdFocusing,
-        containerWidth = width * 0.9,
+        containerWidth = width * 0.93,
         showTopView = true,
         showBottomView = true,
         showReactView = true,
@@ -213,7 +202,7 @@ const BubbleGroupBuying = (props: Props) => {
 
     const [isLiked, setIsLiked] = useState(item.isLiked);
     const [totalLikes, setTotalLikes] = useState(item.totalLikes);
-    const [disableShare, setDisableShare] = useState(false);
+    // const [disableShare, setDisableShare] = useState(false);
 
     useEffect(() => {
         setIsLiked(item.isLiked);
@@ -224,38 +213,23 @@ const BubbleGroupBuying = (props: Props) => {
     }, [item.totalLikes]);
 
     const lastPrice = item.prices[item.prices.length - 1];
+    const imageWidth = containerWidth * 0.4;
 
-    return (
-        <StyleTouchable
-            key={item.id}
-            style={[
-                styles.container,
-                {
-                    backgroundColor: theme.backgroundColor,
-                    shadowColor: theme.textColor,
-                },
-                containerStyle,
-                {
-                    width: containerWidth,
-                },
-            ]}
-            onPress={() => onGoToDetailGroupBuying(item)}
-            onTouchEnd={() => onChangePostIdFocusing(item.id)}>
-            {/* Image preview */}
+    const Image = () => {
+        return (
             <SharedElement
-                style={[
-                    styles.imagePreview,
-                    {
-                        height: containerWidth * ratioImageGroupBuying,
-                    },
-                ]}
+                style={{
+                    width: imageWidth,
+                    height: imageWidth * ratioImageGroupBuying,
+                }}
                 id={`item.group_buying.${item.id}.false`}>
                 <StyleImage
                     source={{uri: item.images[0]}}
                     customStyle={[
                         styles.imagePreview,
                         {
-                            height: containerWidth * ratioImageGroupBuying,
+                            width: imageWidth,
+                            height: imageWidth * ratioImageGroupBuying,
                         },
                     ]}
                 />
@@ -277,21 +251,6 @@ const BubbleGroupBuying = (props: Props) => {
                                 customStyle={styles.textName}
                             />
                         </StyleTouchable>
-
-                        {/* <StyleTouchable
-                        customStyle={styles.iconMoreView}
-                        onPress={() =>
-                            onShowMoreOption({
-                                postModal: item,
-                            })
-                        }
-                        hitSlop={{left: 5, right: 5, top: 10, bottom: 10}}>
-                        <StyleIcon
-                            source={Images.icons.more}
-                            size={15}
-                            customStyle={styles.iconMore}
-                        />
-                    </StyleTouchable> */}
                     </View>
                 )}
 
@@ -310,23 +269,6 @@ const BubbleGroupBuying = (props: Props) => {
                                     customStyle={styles.textNumberPeople}
                                 />
                             </View>
-
-                            {!!item.creatorLocation && (
-                                <View style={styles.locationBox}>
-                                    <CustomBlurView />
-                                    <Entypo
-                                        name="location-pin"
-                                        style={styles.iconLocation}
-                                    />
-                                    <View style={styles.textLocationTouch}>
-                                        <StyleText
-                                            originValue={item.creatorLocation}
-                                            customStyle={styles.textLocation}
-                                            numberOfLines={1}
-                                        />
-                                    </View>
-                                </View>
-                            )}
                         </View>
 
                         <View style={styles.leftRight}>
@@ -334,17 +276,18 @@ const BubbleGroupBuying = (props: Props) => {
                                 customStyle={styles.contractBox}
                                 onPress={() =>
                                     onShowModalComment(item, 'comment')
-                                }>
+                                }
+                                hitSlop={10}>
                                 <CustomBlurView />
                                 <StyleIcon
                                     source={Images.icons.comment}
-                                    size={14}
+                                    size={12}
                                     customStyle={{
                                         tintColor: Theme.common.white,
                                     }}
                                 />
                             </StyleTouchable>
-                            <StyleTouchable
+                            {/* <StyleTouchable
                                 customStyle={styles.contractBox}
                                 disableOpacity={0.85}
                                 onPress={() =>
@@ -359,158 +302,156 @@ const BubbleGroupBuying = (props: Props) => {
                                         tintColor: Theme.common.white,
                                     }}
                                 />
-                            </StyleTouchable>
+                            </StyleTouchable> */}
                         </View>
                     </View>
                 )}
             </SharedElement>
+        );
+    };
 
-            {/* Content */}
-            <StyleText
-                originValue={item.content}
-                customStyle={[
-                    styles.textContent,
-                    {color: theme.textHightLight},
-                ]}
-                numberOfLines={1}
-            />
-
+    const Content = () => {
+        return (
             <View style={styles.contentView}>
-                <View style={{flex: 1}}>
+                {!!item.creatorLocation && (
                     <View style={styles.infoView}>
-                        <StyleIcon source={Images.icons.deadline} size={15} />
+                        <Entypo
+                            name="location-pin"
+                            style={styles.iconLocation}
+                        />
+                        <View style={styles.textLocationTouch}>
+                            <StyleText
+                                originValue={item.creatorLocation}
+                                customStyle={[
+                                    styles.textLocation,
+                                    {color: theme.borderColor},
+                                ]}
+                                numberOfLines={1}
+                            />
+                        </View>
+                    </View>
+                )}
+
+                {!!item.content && (
+                    <View style={styles.infoView}>
                         <StyleText
-                            originValue={formatDayGroupBuying(
-                                item.deadlineDate,
-                            )}
+                            originValue={item.content}
                             customStyle={[
-                                styles.textInfo,
-                                {color: theme.borderColor},
+                                styles.textContent,
+                                {color: theme.textHightLight},
                             ]}
+                            numberOfLines={1}
                         />
                     </View>
-                    <View style={styles.infoView}>
-                        <StyleIcon source={Images.icons.dollar} size={15} />
-                        <StyleText
-                            originValue={`${lastPrice.number_people}`}
-                            customStyle={[
-                                styles.textInfo,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                        <StyleText
-                            originValue=" - "
-                            customStyle={[
-                                styles.textInfo,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                        <StyleText
-                            originValue={`${formatLocaleNumber(
-                                lastPrice.value,
-                            )}vnd`}
-                            customStyle={[
-                                styles.textInfo,
-                                {color: theme.highlightColor},
-                            ]}
-                        />
-                    </View>
+                )}
+
+                <View style={styles.infoView}>
+                    <StyleIcon source={Images.icons.deadline} size={10} />
+                    <StyleText
+                        originValue={formatDayGroupBuying(item.deadlineDate)}
+                        customStyle={[
+                            styles.textInfo,
+                            {color: theme.borderColor},
+                        ]}
+                    />
                 </View>
-                {showButtonJoined && ButtonCheckJoined(item, theme)}
-            </View>
 
-            {/* Footer */}
-            {showReactView && (
-                <View style={styles.footerView}>
-                    {isLiked ? (
-                        <IconLiked
-                            customStyle={[
-                                styles.iconLike,
-                                {color: theme.likeHeart},
-                            ]}
-                            touchableStyle={styles.touchIconLike}
-                            onPress={() =>
-                                onHandleLike({
-                                    isLiked,
-                                    setIsLiked,
-                                    totalLikes,
-                                    setTotalLikes,
-                                    postId: item.id,
-                                })
-                            }
-                        />
-                    ) : (
-                        <IconNotLiked
-                            customStyle={[
-                                styles.iconLike,
-                                {color: theme.borderColor},
-                            ]}
-                            touchableStyle={styles.touchIconLike}
-                            onPress={() =>
-                                onHandleLike({
-                                    isLiked,
-                                    setIsLiked,
-                                    totalLikes,
-                                    setTotalLikes,
-                                    postId: item.id,
-                                })
-                            }
-                        />
-                    )}
-
-                    <StyleTouchable
-                        customStyle={styles.likeTouch}
-                        onPress={() => {
-                            if (totalLikes) {
-                                onShowModalComment(item, 'like');
-                            } else {
-                                onHandleLike({
-                                    isLiked,
-                                    setIsLiked,
-                                    totalLikes,
-                                    setTotalLikes,
-                                    postId: item.id,
-                                });
-                            }
+                <View style={styles.infoView}>
+                    <StyleIcon source={Images.icons.dollar} size={10} />
+                    <StyleText
+                        i18Text="discovery.numberPeople"
+                        i18Params={{
+                            value: lastPrice.number_people,
                         }}
-                        hitSlop={{top: 10, bottom: 10}}>
-                        <StyleText
-                            i18Text={
-                                totalLikes
-                                    ? 'discovery.numberLike'
-                                    : 'discovery.like'
-                            }
-                            i18Params={{
-                                value: totalLikes,
-                            }}
-                            customStyle={[
-                                styles.textLike,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                    </StyleTouchable>
-
-                    <StyleTouchable
-                        customStyle={styles.commentTouch}
-                        onPress={() => onShowModalComment(item, 'comment')}
-                        hitSlop={{top: 10, bottom: 10}}>
-                        <StyleText
-                            i18Text={
-                                item.totalComments
-                                    ? 'discovery.numberComments'
-                                    : 'discovery.comment'
-                            }
-                            i18Params={{
-                                numberComments: item.totalComments,
-                            }}
-                            customStyle={[
-                                styles.textComment,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                    </StyleTouchable>
+                        customStyle={[
+                            styles.textInfo,
+                            {color: theme.borderColor},
+                        ]}
+                    />
+                    <StyleText
+                        originValue=" - "
+                        customStyle={[
+                            styles.textInfo,
+                            {color: theme.borderColor},
+                        ]}
+                    />
+                    <StyleText
+                        originValue={`${formatLocaleNumber(
+                            lastPrice.value,
+                        )}vnd`}
+                        customStyle={[
+                            styles.textInfo,
+                            {color: theme.highlightColor},
+                        ]}
+                    />
                 </View>
-            )}
+
+                {/* Footer */}
+                {showReactView && (
+                    <View style={styles.footerView}>
+                        {isLiked ? (
+                            <IconLiked
+                                customStyle={[
+                                    styles.iconLike,
+                                    {color: theme.likeHeart},
+                                ]}
+                                touchableStyle={styles.touchIconLike}
+                                onPress={() =>
+                                    onHandleLike({
+                                        isLiked,
+                                        setIsLiked,
+                                        totalLikes,
+                                        setTotalLikes,
+                                        postId: item.id,
+                                    })
+                                }
+                            />
+                        ) : (
+                            <IconNotLiked
+                                customStyle={[
+                                    styles.iconLike,
+                                    {color: theme.borderColor},
+                                ]}
+                                touchableStyle={styles.touchIconLike}
+                                onPress={() =>
+                                    onHandleLike({
+                                        isLiked,
+                                        setIsLiked,
+                                        totalLikes,
+                                        setTotalLikes,
+                                        postId: item.id,
+                                    })
+                                }
+                            />
+                        )}
+
+                        {showButtonJoined && ButtonCheckJoined(item, theme)}
+                    </View>
+                )}
+            </View>
+        );
+    };
+
+    return (
+        <StyleTouchable
+            key={item.id}
+            style={[
+                styles.container,
+                {
+                    backgroundColor: theme.backgroundColor,
+                    shadowColor: theme.textColor,
+                    borderColor: theme.holderColor,
+                },
+                containerStyle,
+                {
+                    width: containerWidth,
+                    height: imageWidth * ratioImageGroupBuying,
+                },
+            ]}
+            onPress={() => onGoToDetailGroupBuying(item)}
+            onTouchEnd={() => onChangePostIdFocusing(item.id)}>
+            {Image()}
+            {Content()}
         </StyleTouchable>
     );
 };
@@ -518,19 +459,22 @@ const BubbleGroupBuying = (props: Props) => {
 const styles = ScaledSheet.create({
     container: {
         alignSelf: 'center',
-        shadowOpacity: 0.2,
-        marginVertical: '10@vs',
+        shadowOpacity: 0,
         shadowOffset: {
             width: 0,
-            height: -1,
+            height: 2,
         },
-        paddingBottom: '10@vs',
-        borderRadius: '20@ms',
+        borderRadius: '5@ms',
+        borderWidth: Platform.select({
+            ios: '0.25@ms',
+            android: '0.25@ms',
+        }),
+        flexDirection: 'row',
+        marginTop: '10@vs',
+        marginBottom: '20@vs',
     },
     imagePreview: {
-        width: '100%',
-        borderTopLeftRadius: '20@ms',
-        borderTopRightRadius: '20@ms',
+        borderRadius: '5@ms',
     },
     creatorView: {
         flexDirection: 'row',
@@ -596,16 +540,14 @@ const styles = ScaledSheet.create({
     locationBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginLeft: '10@s',
-        maxWidth: '70%',
+        maxWidth: '90%',
         overflow: 'hidden',
-        borderRadius: '20@ms',
+        marginBottom: '5@vs',
     },
     iconLocation: {
         fontSize: '13@ms',
-        marginLeft: '5@s',
         marginVertical: '2@s',
-        color: Theme.common.white,
+        color: Theme.common.commentGreen,
     },
     textLocationTouch: {
         justifyContent: 'center',
@@ -618,20 +560,21 @@ const styles = ScaledSheet.create({
     },
     // content
     contentView: {
+        flex: 1,
+        paddingHorizontal: '10@s',
+        paddingVertical: '5@s',
+    },
+    textContent: {
+        fontSize: FONT_SIZE.small,
+    },
+    contentBox: {
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
     },
-    textContent: {
-        fontSize: FONT_SIZE.small,
-        marginHorizontal: '10@s',
-        marginVertical: '5@vs',
-    },
     infoView: {
-        width: '100%',
+        flex: 1,
         flexDirection: 'row',
-        paddingHorizontal: '10@s',
-        marginVertical: '5@vs',
         alignItems: 'center',
     },
     textInfo: {
@@ -650,7 +593,7 @@ const styles = ScaledSheet.create({
         color: Theme.common.white,
     },
     textBought: {
-        fontSize: FONT_SIZE.small,
+        fontSize: FONT_SIZE.tiny,
         fontWeight: 'bold',
         color: Theme.common.white,
         marginHorizontal: '3@s',
@@ -658,21 +601,20 @@ const styles = ScaledSheet.create({
     joinGroupBuyingBox: {
         marginRight: '5@s',
         paddingHorizontal: '10@s',
-        paddingVertical: '5@vs',
+        paddingVertical: '3@vs',
         borderRadius: '20@ms',
     },
     textTellJoin: {
-        fontSize: FONT_SIZE.small,
+        fontSize: FONT_SIZE.tiny,
     },
     leftRight: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     contractBox: {
-        width: '33@ms',
-        height: '33@ms',
-        borderRadius: '20@ms',
-        marginLeft: '8@s',
+        width: '25@ms',
+        height: '25@ms',
+        borderRadius: '15@ms',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -680,15 +622,13 @@ const styles = ScaledSheet.create({
         width: '100%',
         flexDirection: 'row-reverse',
         alignItems: 'center',
-        marginTop: '5@vs',
+        paddingTop: '5@vs',
     },
     iconLike: {
-        fontSize: '30@ms',
+        fontSize: '25@ms',
     },
     touchIconLike: {
-        paddingLeft: '10@s',
-        paddingRight: '10@s',
-        marginLeft: '10@s',
+        marginLeft: '20@s',
     },
     likeTouch: {
         paddingLeft: '10@s',
@@ -702,16 +642,6 @@ const styles = ScaledSheet.create({
     },
     commentTouch: {
         paddingLeft: '10@s',
-    },
-    iconMoreView: {
-        position: 'absolute',
-        right: '10@s',
-        borderRadius: '10@ms',
-        backgroundColor: Theme.common.black,
-    },
-    iconMore: {
-        marginHorizontal: '3@s',
-        tintColor: Theme.common.white,
     },
 });
 

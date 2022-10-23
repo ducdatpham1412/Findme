@@ -36,6 +36,7 @@ export const initialLogicState = {
 
     // is use when user block other and OtherProfile should re-render
     shouldRenderOtherProfile: true,
+    scrollMainAndChatEnable: true,
 
     postCreatedHandling: <ReduxPostCreatedHandle>{
         status: 'done',
@@ -93,6 +94,9 @@ const logicSlice = createSlice({
         },
         setIsLogOut: (state, action) => {
             state.isLogOut = action.payload;
+        },
+        setScrollMainAndChatEnable: (state, action) => {
+            state.scrollMainAndChatEnable = action.payload;
         },
     },
 });

@@ -5,7 +5,7 @@ import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';
 import Theme, {TypeTheme} from 'asset/theme/Theme';
 import {StyleIcon, StyleText, StyleTouchable} from 'components/base';
-import {MAIN_SCREEN} from 'navigation/config/routes';
+import ROOT_SCREEN from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
 import React, {Component} from 'react';
 import isEqual from 'react-fast-compare';
@@ -42,7 +42,7 @@ class HeaderDoffy extends Component<Props> {
     }
 
     render() {
-        const {theme, profile, onPressFilterIcon} = this.props;
+        const {theme, profile} = this.props;
         const session = getSessionOfDay();
         let textSession: I18Normalize = 'discovery.goodMorning';
         if (session === SESSION.afternoon) {
@@ -88,34 +88,14 @@ class HeaderDoffy extends Component<Props> {
 
                     <View style={styles.toolRightView}>
                         <StyleTouchable
-                            onPress={() => onPressFilterIcon()}
-                            hitSlop={10}
-                            customStyle={[
-                                styles.filterBox,
-                                {
-                                    backgroundColor:
-                                        theme.backgroundButtonColor,
-                                    marginRight: 8,
-                                },
-                            ]}>
-                            <StyleIcon
-                                source={Images.icons.category}
-                                customStyle={[
-                                    styles.iconCategory,
-                                    {tintColor: theme.textHightLight},
-                                ]}
-                                size={15}
-                            />
-                        </StyleTouchable>
-                        <StyleTouchable
-                            onPress={() => navigate(MAIN_SCREEN.reputation)}
+                            onPress={() => navigate(ROOT_SCREEN.chatRoute)}
                             hitSlop={10}
                             customStyle={[
                                 styles.filterBox,
                                 {backgroundColor: theme.backgroundButtonColor},
                             ]}>
                             <StyleIcon
-                                source={Images.icons.reputation}
+                                source={Images.icons.chat}
                                 customStyle={[
                                     styles.iconCategory,
                                     {tintColor: theme.textHightLight},
@@ -149,10 +129,9 @@ const styles = ScaledSheet.create({
         fontSize: FONT_SIZE.small,
     },
     doffyText: {
-        fontSize: FONT_SIZE.normal,
+        fontSize: FONT_SIZE.small,
         fontWeight: 'bold',
         color: Theme.common.gradientTabBar1,
-        marginTop: '2@vs',
     },
     toolLeftView: {
         flexDirection: 'row',

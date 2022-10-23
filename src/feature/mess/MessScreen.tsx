@@ -1,15 +1,16 @@
 import {TypeChatTagResponse} from 'api/interface';
 import {apiGetDetailConversation} from 'api/module';
-import {StyleText} from 'components/base';
+import {StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import Redux from 'hook/useRedux';
 import {useSocketChatTagBubble} from 'hook/useSocketIO';
-import {MESS_ROUTE} from 'navigation/config/routes';
+import ROOT_SCREEN, {MESS_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {memo, useCallback, useEffect} from 'react';
 import {Platform, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {isTimeBefore} from 'utility/format';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import ChatTag from './components/ChatTag';
 
 const RenderMessages = () => {
@@ -121,6 +122,14 @@ const MessScreen = () => {
                     styles.headerView,
                     {borderBottomColor: theme.holderColor},
                 ]}>
+                <StyleTouchable
+                    onPress={() => navigate(ROOT_SCREEN.mainScreen)}
+                    hitSlop={10}>
+                    <Ionicons
+                        name="chevron-back-outline"
+                        style={[styles.iconBack, {color: borderMessRoute}]}
+                    />
+                </StyleTouchable>
                 <StyleText
                     i18Text="mess.messScreen.headerTitle"
                     customStyle={[styles.textTitle, {color: borderMessRoute}]}
@@ -139,16 +148,22 @@ const styles = ScaledSheet.create({
         backgroundColor: 'transparent',
     },
     headerView: {
-        paddingHorizontal: '30@s',
-        paddingVertical: '5@vs',
+        paddingHorizontal: '10@s',
+        paddingVertical: '3@vs',
         borderBottomWidth: Platform.select({
             ios: '0.25@ms',
             android: '0.5@ms',
         }),
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    iconBack: {
+        fontSize: '22@ms',
     },
     textTitle: {
-        fontSize: '25@ms',
+        fontSize: '20@ms',
         fontWeight: 'bold',
+        marginLeft: '10@s',
     },
     contentList: {
         paddingBottom: '50@vs',

@@ -394,31 +394,14 @@ const ProfileAccount = () => {
     const RenderItemMyGb = useCallback(
         (item: TypeGroupBuying) => {
             return (
-                <BubbleGroupBuying
+                <ItemGroupBuying
                     item={item}
-                    onGoToDetailGroupBuying={() => {
-                        navigate(PROFILE_ROUTE.detailGroupBuying, {
-                            item,
-                            setList: myGbPaging.setList,
-                        });
-                    }}
-                    onShowMoreOption={() => null}
-                    onHandleLike={() => null}
-                    onShowModalComment={() => null}
-                    onChangePostIdFocusing={() => null}
+                    setList={myGbPaging.setList}
+                    isHorizontal={false}
+                    syncWidth={width * 0.485}
                     detailGroupTarget={PROFILE_ROUTE.detailGroupBuying}
-                    containerWidth={isShopAccount ? width * 0.485 : width * 0.9}
-                    showReactView={!isShopAccount}
-                    showTopView={!isShopAccount}
-                    showBottomView={!isShopAccount}
-                    showButtonJoined={!isShopAccount}
-                    containerStyle={
-                        isShopAccount
-                            ? {
-                                  marginVertical: width * 0.01,
-                              }
-                            : {}
-                    }
+                    containerStyle={styles.itemMyGroupBuying}
+                    showName={false}
                 />
             );
         },
@@ -426,7 +409,7 @@ const ProfileAccount = () => {
     );
 
     const RenderItemGbFavoriteJoined = useCallback(
-        (item: TypeGroupBuying, setList: any) => {
+        (item: TypeGroupBuying & TypeBubblePalace, setList: any) => {
             if (item.postType === POST_TYPE.groupBuying) {
                 return (
                     <BubbleGroupBuying
@@ -448,7 +431,30 @@ const ProfileAccount = () => {
                         }
                         onChangePostIdFocusing={() => null}
                         detailGroupTarget={PROFILE_ROUTE.detailGroupBuying}
-                        containerWidth={width * 0.9}
+                        containerWidth={width * 0.93}
+                    />
+                );
+            }
+            if (item.postType === POST_TYPE.review) {
+                return (
+                    <Bubble
+                        item={item}
+                        onShowMoreOption={params => {
+                            modalBubbleOption = params.postModal;
+                            optionPostReviewRef.current?.show();
+                        }}
+                        onShowModalComment={(post, type) =>
+                            showCommentDiscovery({
+                                post,
+                                type,
+                                setList: postReviewPaging.setList,
+                            })
+                        }
+                        isFocusing={item.id === postIdFocusing}
+                        onChangePostIdFocusing={postId =>
+                            setPostIdFocusing(postId)
+                        }
+                        containerWidth={width * 0.93}
                     />
                 );
             }
@@ -494,6 +500,7 @@ const ProfileAccount = () => {
                     }
                     isFocusing={item.id === postIdFocusing}
                     onChangePostIdFocusing={postId => setPostIdFocusing(postId)}
+                    containerWidth={width * 0.93}
                 />
             );
         },
@@ -825,6 +832,12 @@ const styles = ScaledSheet.create({
         marginLeft: '20@s',
         marginTop: '15@vs',
         marginBottom: '0@vs',
+    },
+    itemMyGroupBuying: {
+        marginLeft: 0,
+        marginRight: 0,
+        marginTop: 0,
+        marginBottom: '7@vs',
     },
 });
 

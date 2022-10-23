@@ -53,6 +53,7 @@ interface Props {
     ): void;
     isFocusing: boolean;
     onChangePostIdFocusing(postId: string): void;
+    containerWidth?: number;
 }
 
 const onHandleLike = async (params: {
@@ -189,8 +190,6 @@ const CustomBlurView = () => {
     );
 };
 
-const screenWidth = Metrics.width;
-
 const Bubble = (props: Props) => {
     const {
         item,
@@ -198,6 +197,7 @@ const Bubble = (props: Props) => {
         onShowModalComment,
         isFocusing = false,
         onChangePostIdFocusing,
+        containerWidth = Metrics.width,
     } = props;
     const isModeExp = Redux.getModeExp();
     const theme = Redux.getTheme();
@@ -521,7 +521,7 @@ const Bubble = (props: Props) => {
         return (
             <ScrollSyncSizeImage
                 images={item.images}
-                syncWidth={screenWidth}
+                syncWidth={containerWidth}
                 onDoublePress={() => {
                     if (!isLiked && !item.isArchived) {
                         onHandleLike({
@@ -538,7 +538,7 @@ const Bubble = (props: Props) => {
                 videoProps={{
                     paused: !isFocusing,
                 }}>
-                <View style={styles.topView}>
+                <View style={[styles.topView, {width: containerWidth - 50}]}>
                     {!!item.location && (
                         <View style={styles.blurContainer}>
                             <CustomBlurView />
@@ -548,7 +548,12 @@ const Bubble = (props: Props) => {
                             />
                             <StyleText
                                 originValue={item.location}
-                                customStyle={styles.textLocation}
+                                customStyle={[
+                                    styles.textLocation,
+                                    {
+                                        maxWidth: containerWidth * 0.6,
+                                    },
+                                ]}
                                 numberOfLines={1}
                             />
                         </View>
@@ -586,6 +591,7 @@ const Bubble = (props: Props) => {
                 styles.container,
                 {
                     backgroundColor: theme.backgroundColor,
+                    width: containerWidth,
                 },
             ]}
             onTouchEnd={() => onChangePostIdFocusing(item.id)}>
@@ -599,8 +605,8 @@ const Bubble = (props: Props) => {
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
-        paddingVertical: '20@vs',
-        marginTop: '-1@vs',
+        marginTop: '10@vs',
+        marginBottom: '20@vs',
     },
     // header
     headerView: {
@@ -660,7 +666,6 @@ const styles = ScaledSheet.create({
         fontSize: FONT_SIZE.small,
         color: Theme.common.white,
         marginRight: '9@s',
-        maxWidth: screenWidth * 0.6,
     },
     // image
     imageView: {
@@ -830,7 +835,6 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
     },
     topView: {
-        width: screenWidth - 50,
         position: 'absolute',
         flexDirection: 'row',
         top: '10@s',

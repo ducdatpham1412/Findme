@@ -27,7 +27,7 @@ const IconLiked = ({onPress, customStyle, touchableStyle}: Props) => {
                 hitSlop={14}
                 customStyle={touchableStyle}>
                 <AntDesign
-                    name="star"
+                    name="heart"
                     style={[styles.heartIcon, customStyle]}
                 />
             </StyleTouchable>
