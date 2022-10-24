@@ -7,6 +7,7 @@ import {
 import {
     logicSliceAction,
     ReduxPostCreatedHandle,
+    TypeHotLocation,
 } from 'app-redux/account/logicSlice';
 import FindmeStore, {RootState, useAppSelector} from 'app-redux/store';
 import {THEME_TYPE} from 'asset/enum';
@@ -46,16 +47,11 @@ export interface PassportType {
     };
 }
 
-export interface HobbyType {
-    id: number;
-    name: string;
-    icon: string;
-    liked?: boolean;
-}
-
 interface ResourceType {
-    listHobbies?: Array<HobbyType>;
     imageBackground?: string;
+    gradients?: Array<string>;
+    banners?: Array<string>;
+    hotLocations?: Array<TypeHotLocation>;
 }
 
 interface TypeBubblePalaceUpdate {

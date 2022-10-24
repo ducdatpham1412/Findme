@@ -87,7 +87,7 @@ const renderItem = (
 };
 
 const ReputationScreen = () => {
-    const {imageBackground, gradient} = Redux.getResource();
+    const {imageBackground, gradients} = Redux.getResource();
     const theme = Redux.getTheme();
     const [isLoading, setIsLoading] = useState(false);
     const [data, setData] = useState<TypeGetTopReviewerResponse>({
@@ -134,7 +134,7 @@ const ReputationScreen = () => {
                 <StyleList
                     data={data.list}
                     renderItem={({item, index}) =>
-                        renderItem(item, index, gradient)
+                        renderItem(item, index, gradients)
                     }
                     keyExtractor={item => item.id}
                     refreshing={isLoading}

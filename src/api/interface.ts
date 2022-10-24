@@ -1,5 +1,4 @@
 import {TYPE_OS_LOGIN_SOCIAL, TYPE_SOCIAL_LOGIN} from 'asset/enum';
-import {HobbyType} from 'hook/useRedux';
 
 // OTP
 export interface TypeRequestOTPRequest {
@@ -446,8 +445,10 @@ export interface TypeSeenMessageEnjoyResponse {
 export interface TypeResourceResponse {
     success: boolean;
     data: {
-        listHobbies: Array<HobbyType>;
         imageBackground: string;
+        gradients: Array<string>;
+        banners: Array<string>;
+        hotLocations: Array<any>;
     };
 }
 

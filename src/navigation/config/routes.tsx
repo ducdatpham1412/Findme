@@ -57,6 +57,7 @@ const MAIN_SCREEN = {
 const DISCOVERY_ROUTE = {
     discoveryScreen: '@DISCOVERY_ROUTE/discoveryScreen',
     detailGroupBuying: '@DISCOVERY_ROUTE/detailGroupBuying',
+    searchScreen: '@DISCOVERY_ROUTE/searchScreen',
 };
 
 const MESS_ROUTE = {

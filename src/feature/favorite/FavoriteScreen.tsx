@@ -33,7 +33,7 @@ const FavoriteEnjoy = () => {
                     {borderBottomColor: theme.holderColor},
                 ]}>
                 <AntDesign
-                    name="heart"
+                    name="hearto"
                     style={[styles.iconHeart, {color: theme.likeHeart}]}
                 />
                 <StyleText
@@ -97,7 +97,7 @@ const FavoriteAccount = () => {
                     {borderBottomColor: theme.holderColor},
                 ]}>
                 <AntDesign
-                    name="heart"
+                    name="hearto"
                     style={[styles.iconHeart, {color: theme.likeHeart}]}
                 />
                 <StyleText

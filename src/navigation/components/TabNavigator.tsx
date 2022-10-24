@@ -250,7 +250,7 @@ const styles = ScaledSheet.create({
         borderRadius: '10@ms',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'red',
+        backgroundColor: Theme.common.red,
         top: '9@ms',
         right: '-5@ms',
     },
@@ -290,17 +290,6 @@ const styles = ScaledSheet.create({
     iconCreate: {
         fontSize: '20@ms',
         color: Theme.common.white,
-    },
-    newMessagesBox: {
-        position: 'absolute',
-        width: '15@ms',
-        height: '15@ms',
-        right: '-5@ms',
-        top: '-3@ms',
-        borderRadius: '10@ms',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'red',
     },
     textNewMessages: {
         fontSize: '8@ms',

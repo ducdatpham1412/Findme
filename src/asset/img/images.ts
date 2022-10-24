@@ -65,6 +65,14 @@ const Images = {
         defaultImage: require('./img_default_image.png'),
         defaultAvatar: require('./img_default_avatar.png'),
         loadingPlane: require('./img_loading_plane.json'),
+        travelCamping: require('./img_travel_camping.png'),
+        travelVolunteer: require('./img_travel_volunteer.png'),
+        travelTeamBuilding: require('./img_travel_teambuilding.png'),
+        travelFood: require('./img_travel_food.png'),
+        travelCulture: require('./img_travel_culture.png'),
+        travelGreen: require('./img_travel_green.png'),
+        travelVisit: require('./img_travel_visit.png'),
+        travelAll: require('./img_travel_all.png'),
     },
 };
 
