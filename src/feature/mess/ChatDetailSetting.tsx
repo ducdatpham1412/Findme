@@ -54,8 +54,8 @@ const ChatDetailSetting = ({route}: Props) => {
     const borderMessRoute = Redux.getBorderMessRoute();
     const theme = Redux.getTheme();
     const {profile, information} = Redux.getPassport();
-    const {gradient} = Redux.getResource();
-    const gradientAny: any = gradient;
+    const {gradients} = Redux.getResource();
+    const gradientAny: any = gradients;
 
     const modalizeThemeRef = useRef<Modalize>(null);
     const modalizeNameRef = useRef<Modalize>(null);
@@ -177,7 +177,7 @@ const ChatDetailSetting = ({route}: Props) => {
         return (
             <LinearGradient
                 colors={chooseColorGradient({
-                    listGradients: gradient,
+                    listGradients: gradients,
                     colorChoose: itemChatTag.color,
                 })}
                 style={styles.iconAvatar}

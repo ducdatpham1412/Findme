@@ -1,4 +1,3 @@
-import {TypeCreateGroupBuying} from 'api/interface/discovery';
 import {createSlice} from '@reduxjs/toolkit';
 import {
     TypeBubblePalace,
@@ -7,13 +6,19 @@ import {
     TypeCreatePostRequest,
     TypeGradient,
 } from 'api/interface';
+import {TypeCreateGroupBuying} from 'api/interface/discovery';
 import {DEFAULT_IMAGE_BACKGROUND} from 'asset/standardValue';
-import {HobbyType} from 'hook/useRedux';
 
 export type ReduxPostCreatedHandle = {
     status: 'loading' | 'success' | 'error' | 'done';
     data: TypeCreatePostRequest | TypeCreateGroupBuying | undefined;
 };
+
+export interface TypeHotLocation {
+    location: string;
+    total_posts: number;
+    images: Array<string>;
+}
 
 export const initialLogicState = {
     isLoading: false,
@@ -43,9 +48,10 @@ export const initialLogicState = {
     },
 
     resource: {
-        listHobbies: <Array<HobbyType>>[],
         imageBackground: DEFAULT_IMAGE_BACKGROUND,
-        gradient: <TypeGradient>{},
+        gradients: <TypeGradient>{},
+        banners: [],
+        hotLocations: <Array<TypeHotLocation>>[],
     },
 };
 

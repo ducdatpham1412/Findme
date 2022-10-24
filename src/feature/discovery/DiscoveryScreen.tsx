@@ -1,13 +1,10 @@
 /* eslint-disable no-shadow */
 import {useIsFocused} from '@react-navigation/native';
 import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
-import {
-    TypeResultSearch,
-    TypeShowModalCommentOrLike,
-} from 'api/interface/discovery';
+import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {apiGetListBubbleActive} from 'api/module';
 import {apiLikePost, apiUnLikePost} from 'api/profile';
-import {POST_TYPE, TOPIC, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
+import {POST_TYPE, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {StyleIcon} from 'components/base';
 import StyleList from 'components/base/StyleList';
@@ -24,9 +21,7 @@ import {onGoToSignUp} from 'utility/assistant';
 import {useNotification} from 'utility/notification';
 import BubbleGroupBuying, {ParamsLikeGB} from './components/BubbleGroupBuying';
 import HeaderDoffy from './components/HeaderDoffy';
-import ListTopGroupBuying, {spaceHeight} from './components/ListTopGroupBuying';
-import SearchBar from './components/SearchBar';
-import HeaderFilterTopic from './HeaderFilterTopic';
+import BannerTopGb, {spaceHeight} from './components/BannerTopGb';
 
 export interface TypeMoreOptionsMe {
     postModal: TypeBubblePalace | TypeGroupBuying;
@@ -46,43 +41,28 @@ const DiscoveryScreen = () => {
 
     const listRef = useRef<FlatList>(null);
     const optionsRef = useRef<any>(null);
-    const headerFilterRef = useRef<HeaderFilterTopic>(null);
     const headerRef = useRef<HeaderDoffy>(null);
-    const topGroupBuyingRef = useRef<ListTopGroupBuying>(null);
-    const searchBarRef = useRef<SearchBar>(null);
 
     const theme = Redux.getTheme();
     const token = Redux.getToken();
     const isModeExp = Redux.getModeExp();
     const bubblePalace = Redux.getBubblePalaceAction();
     const {profile} = Redux.getPassport();
+    const numberNewMessages = Redux.getNumberNewMessages();
 
     const hadLogan = token && !isModeExp;
 
     const [postIdFocusing, setPostIdFocusing] = useState('');
-    const [showTopGroupBooking, setShowTopGroupBooking] = useState(true);
-    const [resultSearch, setResultSearch] = useState<TypeResultSearch>(null);
 
-    const {
-        list,
-        setList,
-        setParams,
-        onLoadMore,
-        refreshing,
-        onRefresh,
-        noMore,
-    } = usePaging({
-        request: apiGetListBubbleActive,
-        params: {
-            take: 30,
-            topics: undefined,
-            postTypes: `[${String([POST_TYPE.groupBuying])}]`,
-            search: '',
-        },
-        onSuccess: data => {
-            setResultSearch(data.result);
-        },
-    });
+    const {list, setList, onLoadMore, refreshing, onRefresh, noMore} =
+        usePaging({
+            request: apiGetListBubbleActive,
+            params: {
+                take: 30,
+                topics: undefined,
+                postTypes: `[${String([POST_TYPE.groupBuying])}]`,
+            },
+        });
 
     useEffect(() => {
         if (
@@ -243,7 +223,7 @@ const DiscoveryScreen = () => {
                 ref={headerRef}
                 theme={theme}
                 profile={profile}
-                onPressFilterIcon={() => headerFilterRef.current?.show()}
+                numberNewMessages={numberNewMessages}
             />
 
             <View
@@ -259,12 +239,7 @@ const DiscoveryScreen = () => {
                     refreshing={refreshing}
                     onRefresh={onRefresh}
                     onLoadMore={onLoadMore}
-                    ListHeaderComponent={
-                        <ListTopGroupBuying
-                            ref={topGroupBuyingRef}
-                            showTopGroupBooking={showTopGroupBooking}
-                        />
-                    }
+                    ListHeaderComponent={BannerTopGb}
                     ListFooterComponent={FooterComponent}
                     ListFooterComponentStyle={{
                         backgroundColor: theme.backgroundColor,
@@ -274,46 +249,19 @@ const DiscoveryScreen = () => {
                     }}
                     ListEmptyComponent={null}
                     maxToRenderPerBatch={20}
-                    onScroll={({nativeEvent}) => {
-                        const {y} = nativeEvent.contentOffset;
-                        if (y >= 0 && y < spaceHeight / 3) {
-                            searchBarRef.current?.setTranslateY(0);
-                            searchBarRef.current?.setOpacity(
-                                1 - y / spaceHeight,
-                            );
-                            headerRef.current?.setOpacity(0);
-                            topGroupBuyingRef.current?.setOpacity(1);
-                        } else if (y >= spaceHeight / 3 && y <= spaceHeight) {
-                            searchBarRef.current?.setTranslateY(-y);
-                            searchBarRef.current?.setOpacity(0);
-                            const ratio =
-                                (y - spaceHeight / 3) / ((spaceHeight * 2) / 3);
-                            headerRef.current?.setOpacity(ratio);
-                            topGroupBuyingRef.current?.setOpacity(1 - ratio);
-                        } else if (y > spaceHeight && y < spaceHeight * 2) {
-                            headerRef.current?.setOpacity(1);
-                            topGroupBuyingRef.current?.setOpacity(0);
-                            searchBarRef.current?.setTranslateY(-y);
-                        }
-                    }}
-                    keyboardDismissMode="on-drag"
-                    stickyHeaderIndices={[0]}
-                    invertStickyHeaders
+                    // onScroll={({nativeEvent}) => {
+                    //     const {y} = nativeEvent.contentOffset;
+                    //     if (y >= 0 && y < spaceHeight / 3) {
+                    //         headerRef.current?.setOpacity(0);
+                    //     } else if (y >= spaceHeight / 3 && y <= spaceHeight) {
+                    //         const ratio =
+                    //             (y - spaceHeight / 3) / ((spaceHeight * 2) / 3);
+                    //         headerRef.current?.setOpacity(ratio);
+                    //     } else if (y > spaceHeight && y < spaceHeight * 2) {
+                    //         headerRef.current?.setOpacity(1);
+                    //     }
+                    // }}
                     directionalLockEnabled
-                />
-
-                <SearchBar
-                    ref={searchBarRef}
-                    theme={theme}
-                    onSearch={text => {
-                        setParams(preValue => ({...preValue, search: text}));
-                    }}
-                    onChangeShowTopGroupBooking={value =>
-                        setShowTopGroupBooking(value)
-                    }
-                    resultSearch={resultSearch}
-                    topics={[TOPIC.travel]}
-                    postTypes={[POST_TYPE.groupBuying]}
                 />
             </View>
 

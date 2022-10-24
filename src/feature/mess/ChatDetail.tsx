@@ -83,7 +83,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
     const theme = Redux.getTheme();
     const listChatTag = Redux.getListChatTag();
     const numberNewMessages = Redux.getNumberNewMessages();
-    const {gradient} = Redux.getResource();
+    const {gradients} = Redux.getResource();
     const borderMessRoute = Redux.getBorderMessRoute();
 
     const listRef = useRef<FlatList>(null);
@@ -142,7 +142,7 @@ const ChatDetail = ({route}: ChatDetailProps) => {
 
     const chatColor = useMemo(() => {
         const color = chooseColorGradient({
-            listGradients: gradient,
+            listGradients: gradients,
             colorChoose: itemChatTag.color,
         });
         Redux.setBorderMessRoute(color[2]);

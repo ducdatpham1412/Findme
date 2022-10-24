@@ -181,9 +181,14 @@ export enum FEELING {
 }
 
 export enum TOPIC {
-    travel = 0,
-    cuisine = 1,
-    shopping = 2,
+    camping = 0,
+    volunteer = 1,
+    teamBuilding = 2,
+    food = 3,
+    culture = 4,
+    green = 5,
+    sightseeing = 6,
+    all = 7,
 }
 
 export enum REACT {
