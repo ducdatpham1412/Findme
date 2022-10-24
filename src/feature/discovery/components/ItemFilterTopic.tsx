@@ -1,8 +1,10 @@
+import {FONT_SIZE} from 'asset/standardValue';
 import {StyleIcon, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
-import React, {useEffect, useRef} from 'react';
-import {Animated, ImageStyle, StyleProp} from 'react-native';
+import React from 'react';
+import {ImageStyle, Platform, StyleProp, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import {I18Normalize} from 'utility/I18Next';
 
 interface Props {
@@ -15,46 +17,68 @@ interface Props {
 
 const ItemFilterTopic = (props: Props) => {
     const {isChosen, icon, title, onPressTopic, iconStyle} = props;
-    const scale = useRef(new Animated.Value(1)).current;
     const theme = Redux.getTheme();
 
-    useEffect(() => {
-        Animated.spring(scale, {
-            toValue: isChosen ? 1 : 0.7,
-            useNativeDriver: true,
-            stiffness: 200,
-        }).start();
-    }, [isChosen]);
-
     return (
-        <StyleTouchable
-            customStyle={styles.container}
-            onPress={onPressTopic}
-            activeOpacity={0.6}>
-            <Animated.View
-                style={[
-                    styles.container,
-                    {transform: [{scale}], opacity: isChosen ? 1 : 0.5},
-                ]}>
-                <StyleIcon source={icon} size={27} customStyle={iconStyle} />
+        <View style={styles.container}>
+            <View style={styles.titleView}>
+                <StyleIcon source={icon} size={30} customStyle={iconStyle} />
                 <StyleText
                     i18Text={title}
                     customStyle={[styles.title, {color: theme.textColor}]}
                 />
-            </Animated.View>
-        </StyleTouchable>
+            </View>
+            <StyleTouchable
+                customStyle={[
+                    styles.checkBox,
+                    {borderColor: theme.borderColor},
+                ]}
+                onPress={onPressTopic}
+                hitSlop={{
+                    top: 5,
+                    bottom: 5,
+                    left: 15,
+                    right: 15,
+                }}>
+                {isChosen && (
+                    <AntDesign
+                        name="check"
+                        style={[styles.iconCheck, {color: theme.textColor}]}
+                    />
+                )}
+            </StyleTouchable>
+        </View>
     );
 };
 
 const styles = ScaledSheet.create({
     container: {
-        flex: 1,
+        width: '90%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignSelf: 'center',
         alignItems: 'center',
-        justifyContent: 'center',
+        marginVertical: '10@vs',
+    },
+    titleView: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     title: {
-        fontSize: '7@ms',
-        marginTop: '5@vs',
+        fontSize: FONT_SIZE.small,
+        marginLeft: '10@s',
+    },
+    iconCheck: {
+        fontSize: '15@ms',
+    },
+    checkBox: {
+        width: '18@ms',
+        height: '18@ms',
+        borderWidth: Platform.select({
+            ios: '1.5@ms',
+            android: '1.5@ms',
+        }),
+        borderRadius: '2@ms',
     },
 });
 

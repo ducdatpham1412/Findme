@@ -592,7 +592,7 @@ const DetailGroupBuying = ({route}: Props) => {
                         <IconLiked
                             customStyle={[
                                 styles.star,
-                                {color: theme.highlightColor},
+                                {color: theme.likeHeart},
                             ]}
                             onPress={() =>
                                 onHandleLike({
@@ -614,7 +614,7 @@ const DetailGroupBuying = ({route}: Props) => {
                         <IconNotLiked
                             customStyle={[
                                 styles.star,
-                                {color: theme.textColor},
+                                {color: theme.unLikeHeart},
                             ]}
                             onPress={() =>
                                 onHandleLike({

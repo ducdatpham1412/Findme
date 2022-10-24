@@ -124,20 +124,45 @@ export const LIST_TOPICS: Array<{
     icon: any;
 }> = [
     {
-        id: TOPIC.travel,
-        text: 'profile.post.travel',
-        icon: Images.icons.travel,
+        id: TOPIC.camping,
+        text: 'discovery.travelCamping',
+        icon: Images.images.travelCamping,
     },
     {
-        id: TOPIC.cuisine,
-        text: 'profile.post.cuisine',
-        icon: Images.icons.cuisine,
+        id: TOPIC.volunteer,
+        text: 'discovery.travelVolunteer',
+        icon: Images.images.travelVolunteer,
     },
-    // {
-    //     id: TOPIC.shopping,
-    //     text: 'profile.post.shopping',
-    //     icon: Images.icons.shopping,
-    // },
+    {
+        id: TOPIC.teamBuilding,
+        text: 'discovery.travelTeamBuilding',
+        icon: Images.images.travelTeamBuilding,
+    },
+    {
+        id: TOPIC.food,
+        text: 'discovery.travelFood',
+        icon: Images.images.travelFood,
+    },
+    {
+        id: TOPIC.culture,
+        text: 'discovery.travelCulture',
+        icon: Images.images.travelCulture,
+    },
+    {
+        id: TOPIC.green,
+        text: 'discovery.travelGreen',
+        icon: Images.images.travelGreen,
+    },
+    {
+        id: TOPIC.sightseeing,
+        text: 'discovery.travelSightSeeing',
+        icon: Images.images.travelVisit,
+    },
+    {
+        id: TOPIC.all,
+        text: 'discovery.travelAll',
+        icon: Images.images.travelAll,
+    },
 ];
 
 export const LIST_POST_TYPES: Array<{

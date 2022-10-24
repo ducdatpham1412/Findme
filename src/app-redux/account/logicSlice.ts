@@ -20,6 +20,12 @@ export interface TypeHotLocation {
     images: Array<string>;
 }
 
+export interface TypePriceResource {
+    id: number;
+    value: null | Array<number | string>;
+    text: null | string;
+}
+
 export const initialLogicState = {
     isLoading: false,
 
@@ -52,6 +58,7 @@ export const initialLogicState = {
         gradients: <TypeGradient>{},
         banners: [],
         hotLocations: <Array<TypeHotLocation>>[],
+        listPrices: <Array<TypePriceResource>>[],
     },
 };
 

@@ -14,7 +14,6 @@ import {
     GENDER_TYPE,
     LANGUAGE_TYPE,
     SIGN_UP_TYPE,
-    TOPIC,
     TYPE_COLOR,
 } from 'asset/enum';
 import Images from 'asset/img/images';
@@ -57,13 +56,6 @@ export const choosePrivateAvatar = (_gender?: number) => {
         default:
             return '';
     }
-};
-
-export const chooseIconHobby = (idHobby: number) => {
-    const {listHobbies} = FindmeStore.getState().logicSlice.resource;
-    const temp =
-        listHobbies.find(item => item.id === idHobby) || listHobbies[0];
-    return temp?.icon || '';
 };
 
 /**
@@ -503,50 +495,3 @@ export const seeDetailImage = (params: {
         allowSaveImage: true,
     });
 };
-
-export const listCategories: Array<{
-    id: number;
-    text: I18Normalize;
-    icon: any;
-}> = [
-    {
-        id: TOPIC.camping,
-        text: 'discovery.travelCamping',
-        icon: Images.images.travelCamping,
-    },
-    {
-        id: TOPIC.volunteer,
-        text: 'discovery.travelVolunteer',
-        icon: Images.images.travelVolunteer,
-    },
-    {
-        id: TOPIC.teamBuilding,
-        text: 'discovery.travelTeamBuilding',
-        icon: Images.images.travelTeamBuilding,
-    },
-    {
-        id: TOPIC.food,
-        text: 'discovery.travelFood',
-        icon: Images.images.travelFood,
-    },
-    {
-        id: TOPIC.culture,
-        text: 'discovery.travelCulture',
-        icon: Images.images.travelCulture,
-    },
-    {
-        id: TOPIC.green,
-        text: 'discovery.travelGreen',
-        icon: Images.images.travelGreen,
-    },
-    {
-        id: TOPIC.sightseeing,
-        text: 'discovery.travelSightSeeing',
-        icon: Images.images.travelVisit,
-    },
-    {
-        id: TOPIC.all,
-        text: 'discovery.travelAll',
-        icon: Images.images.travelAll,
-    },
-];

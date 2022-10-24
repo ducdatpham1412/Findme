@@ -136,7 +136,10 @@ const InformationProfile = (props: Props) => {
                         <AntDesign
                             key={index}
                             name="star"
-                            style={[styles.iconStar, {color: theme.likeHeart}]}
+                            style={[
+                                styles.iconStar,
+                                {color: Theme.common.orange},
+                            ]}
                         />
                     );
                 })}
