@@ -151,7 +151,7 @@ const discovery = {
     numberLike: '{{value}} sao',
     comment: 'Bình luận',
     numberComments: '{{numberComments}} bình luận',
-    chooseTopic: 'Chủ đề',
+    chooseTopic: 'Loại hình du lịch',
     applicationPeriod: 'Thời gian áp dụng',
     groupBuyingPrice: 'Bảng giá mua chung',
     numberPeople: '{{value}} người',
@@ -201,6 +201,7 @@ const discovery = {
     travelSightSeeing: 'Tham quan',
     travelAll: 'Tất cả',
     searchAround: 'Tìm kiếm mọi người hoặc nơi đến',
+    category: 'Loại hình ({{value}})',
 };
 
 // REPUTATION

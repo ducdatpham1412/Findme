@@ -148,7 +148,7 @@ const discovery = {
     numberLike: '{{value}} stars',
     comment: 'Comment',
     numberComments: '{{numberComments}} comments',
-    chooseTopic: 'Topics',
+    chooseTopic: 'Travel categories',
     applicationPeriod: 'Application period',
     groupBuyingPrice: 'Group buying prices',
     numberPeople: '{{value}} people',
@@ -197,6 +197,7 @@ const discovery = {
     travelSightSeeing: 'Sightseeing',
     travelAll: 'All',
     searchAround: 'Search people or destination',
+    category: 'Categories ({{value}})',
 };
 
 // REPUTATION

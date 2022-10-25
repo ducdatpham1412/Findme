@@ -1,30 +1,34 @@
+import {TypePriceResource} from 'app-redux/account/logicSlice';
 import {Metrics} from 'asset/metrics';
-import {FONT_SIZE, LIST_TOPICS} from 'asset/standardValue';
+import {FONT_SIZE} from 'asset/standardValue';
 import {TypeTheme} from 'asset/theme/Theme';
 import {StyleText, StyleTouchable} from 'components/base';
 import React, {Component} from 'react';
 import isEqual from 'react-fast-compare';
 import {Animated, Platform, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
-import ItemFilterTopic from './components/ItemFilterTopic';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 interface Props {
-    listTopics: Array<number>;
-    onChangeTopic(listTopic: Array<number>): void;
+    price: TypePriceResource;
+    listPrices: Array<TypePriceResource>;
+    onChangePrice(price: TypePriceResource): void;
     theme: TypeTheme;
 }
 
 interface States {
-    tempListTopics: Array<number>;
+    tempPrice: TypePriceResource;
 }
 
 // const containerHeight = verticalScale(170) + Metrics.safeTopPadding;
 
-export default class HeaderFilterTopic extends Component<Props, States> {
+export default class HeaderFilterPrice extends Component<Props, States> {
     aim = new Animated.Value(0);
 
+    containerHeight = 0;
+
     state: States = {
-        tempListTopics: this.props.listTopics,
+        tempPrice: this.props.price,
     };
 
     turnOn = Animated.spring(this.aim, {
@@ -42,7 +46,7 @@ export default class HeaderFilterTopic extends Component<Props, States> {
             return true;
         }
         if (
-            !isEqual(nextProps.listTopics, this.props.listTopics) ||
+            !isEqual(nextProps.price, this.props.price) ||
             !isEqual(
                 nextProps.theme.backgroundColor,
                 this.props.theme.backgroundColor,
@@ -65,36 +69,30 @@ export default class HeaderFilterTopic extends Component<Props, States> {
 
     private onCancel() {
         this.setState({
-            tempListTopics: this.props.listTopics,
+            tempPrice: this.props.price,
         });
         this.hide();
     }
 
     private onSave() {
-        this.props.onChangeTopic(this.state.tempListTopics);
+        this.props.onChangePrice(this.state.tempPrice);
         this.hide();
     }
 
-    private onChooseTopic(topic: number) {
-        let temp = [];
-        if (this.state.tempListTopics.includes(topic)) {
-            temp = this.state.tempListTopics.filter(item => item !== topic);
-        } else {
-            temp = this.state.tempListTopics.concat(topic);
-        }
-
-        if (!temp.length) {
-            return;
-        }
-
-        this.setState({
-            tempListTopics: temp,
-        });
+    Divider() {
+        return (
+            <View
+                style={[
+                    styles.divider,
+                    {borderRightColor: this.props.theme.holderColorLighter},
+                ]}
+            />
+        );
     }
 
     render() {
-        const {theme} = this.props;
-        const {tempListTopics} = this.state;
+        const {theme, listPrices} = this.props;
+        const {tempPrice} = this.state;
 
         const translateY = this.aim.interpolate({
             inputRange: [0, 1],
@@ -115,22 +113,63 @@ export default class HeaderFilterTopic extends Component<Props, States> {
                         opacity,
                         borderColor: theme.holderColor,
                     },
-                ]}>
+                ]}
+                onLayout={e => {
+                    this.containerHeight = e.nativeEvent.layout.height;
+                }}>
                 <View style={styles.topicView}>
                     <StyleText
-                        i18Text="discovery.chooseTopic"
+                        i18Text="profile.price"
                         customStyle={[styles.title, {color: theme.borderColor}]}
                     />
-
-                    {LIST_TOPICS.map(item => {
+                    {listPrices.map(item => {
+                        const isChosen = item.id === tempPrice.id;
                         return (
-                            <ItemFilterTopic
-                                key={item.id}
-                                isChosen={tempListTopics.includes(item.id)}
-                                icon={item.icon}
-                                title={item.text}
-                                onPressTopic={() => this.onChooseTopic(item.id)}
-                            />
+                            <View key={item.id} style={styles.itemView}>
+                                {item.value !== null ? (
+                                    <StyleText
+                                        originValue={item.text}
+                                        customStyle={[
+                                            styles.textTitle,
+                                            {color: theme.textColor},
+                                        ]}
+                                    />
+                                ) : (
+                                    <StyleText
+                                        i18Text="discovery.all"
+                                        customStyle={[
+                                            styles.textTitle,
+                                            {color: theme.textColor},
+                                        ]}
+                                    />
+                                )}
+                                <StyleTouchable
+                                    customStyle={[
+                                        styles.checkBox,
+                                        {borderColor: theme.borderColor},
+                                    ]}
+                                    onPress={() => {
+                                        this.setState({
+                                            tempPrice: item,
+                                        });
+                                    }}
+                                    hitSlop={{
+                                        top: 5,
+                                        bottom: 5,
+                                        left: 15,
+                                        right: 15,
+                                    }}>
+                                    {isChosen && (
+                                        <AntDesign
+                                            name="check"
+                                            style={[
+                                                styles.iconCheck,
+                                                {color: theme.textColor},
+                                            ]}
+                                        />
+                                    )}
+                                </StyleTouchable>
+                            </View>
                         );
                     })}
                 </View>
@@ -212,5 +251,35 @@ const styles = ScaledSheet.create({
     },
     textCancelSave: {
         fontSize: FONT_SIZE.normal,
+    },
+    divider: {
+        height: '100%',
+        borderRightWidth: Platform.select({
+            ios: '0.5@ms',
+            android: '0.5@ms',
+        }),
+        alignSelf: 'center',
+    },
+    itemView: {
+        width: '70%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginVertical: '10@vs',
+        alignSelf: 'center',
+    },
+    textTitle: {
+        fontSize: FONT_SIZE.small,
+    },
+    checkBox: {
+        width: '18@ms',
+        height: '18@ms',
+        borderWidth: Platform.select({
+            ios: '1.5@ms',
+            android: '1.5@ms',
+        }),
+        borderRadius: '2@ms',
+    },
+    iconCheck: {
+        fontSize: '15@ms',
     },
 });

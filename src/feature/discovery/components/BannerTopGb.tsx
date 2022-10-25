@@ -1,7 +1,7 @@
 import {apiGetTopGroupBuying} from 'api/discovery';
 import {TypeGroupBuying} from 'api/interface';
 import {Metrics} from 'asset/metrics';
-import {FONT_SIZE} from 'asset/standardValue';
+import {FONT_SIZE, LIST_TOPICS} from 'asset/standardValue';
 import {
     StyleIcon,
     StyleImage,
@@ -18,7 +18,6 @@ import React, {memo, useEffect, useState} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {listCategories} from 'utility/assistant';
 
 const {width} = Metrics;
 const itemWidth = width * 0.43;
@@ -37,7 +36,7 @@ const Categories = memo(() => {
                 ]}
             />
             <View style={styles.categoriesView}>
-                {listCategories.map((item, index) => {
+                {LIST_TOPICS.map((item, index) => {
                     const isUnder = index >= 4;
                     return (
                         <View

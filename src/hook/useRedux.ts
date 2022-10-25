@@ -8,6 +8,7 @@ import {
     logicSliceAction,
     ReduxPostCreatedHandle,
     TypeHotLocation,
+    TypePriceResource,
 } from 'app-redux/account/logicSlice';
 import FindmeStore, {RootState, useAppSelector} from 'app-redux/store';
 import {THEME_TYPE} from 'asset/enum';
@@ -52,6 +53,7 @@ interface ResourceType {
     gradients?: Array<string>;
     banners?: Array<string>;
     hotLocations?: Array<TypeHotLocation>;
+    listPrices?: Array<TypePriceResource>;
 }
 
 interface TypeBubblePalaceUpdate {
