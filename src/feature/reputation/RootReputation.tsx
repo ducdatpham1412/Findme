@@ -34,7 +34,7 @@ const RootReputation = () => {
                 <StyleIcon
                     source={Images.icons.reputation}
                     size={20}
-                    customStyle={{tintColor: theme.textHightLight}}
+                    customStyle={{tintColor: theme.highlightColor}}
                 />
                 <StyleText
                     i18Text="reputation.reviewCommunity"

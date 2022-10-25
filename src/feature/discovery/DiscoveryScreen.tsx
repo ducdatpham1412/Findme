@@ -5,8 +5,6 @@ import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {apiGetListBubbleActive} from 'api/module';
 import {apiLikePost, apiUnLikePost} from 'api/profile';
 import {POST_TYPE, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
-import Images from 'asset/img/images';
-import {StyleIcon} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import usePaging from 'hook/usePaging';
@@ -19,16 +17,15 @@ import {FlatList, Vibration, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {onGoToSignUp} from 'utility/assistant';
 import {useNotification} from 'utility/notification';
+import BannerTopGb from './components/BannerTopGb';
 import BubbleGroupBuying, {ParamsLikeGB} from './components/BubbleGroupBuying';
 import HeaderDoffy from './components/HeaderDoffy';
-import BannerTopGb, {spaceHeight} from './components/BannerTopGb';
 
 export interface TypeMoreOptionsMe {
     postModal: TypeBubblePalace | TypeGroupBuying;
 }
 
 let modalOptions: TypeBubblePalace | TypeGroupBuying;
-let footerHeight = 0;
 
 const onGoToSignUpFromAlert = () => {
     goBack();
@@ -54,15 +51,14 @@ const DiscoveryScreen = () => {
 
     const [postIdFocusing, setPostIdFocusing] = useState('');
 
-    const {list, setList, onLoadMore, refreshing, onRefresh, noMore} =
-        usePaging({
-            request: apiGetListBubbleActive,
-            params: {
-                take: 30,
-                topics: undefined,
-                postTypes: `[${String([POST_TYPE.groupBuying])}]`,
-            },
-        });
+    const {list, setList, onLoadMore, refreshing, onRefresh} = usePaging({
+        request: apiGetListBubbleActive,
+        params: {
+            take: 30,
+            topics: undefined,
+            postTypes: `[${String([POST_TYPE.groupBuying])}]`,
+        },
+    });
 
     useEffect(() => {
         if (
@@ -198,21 +194,6 @@ const DiscoveryScreen = () => {
         [postIdFocusing],
     );
 
-    const FooterComponent = () => {
-        if (noMore) {
-            return (
-                <StyleIcon
-                    source={Images.images.successful}
-                    size={50}
-                    customStyle={{
-                        alignSelf: 'center',
-                    }}
-                />
-            );
-        }
-        return null;
-    };
-
     return (
         <View
             style={[
@@ -226,11 +207,7 @@ const DiscoveryScreen = () => {
                 numberNewMessages={numberNewMessages}
             />
 
-            <View
-                style={{flex: 1, overflow: 'hidden'}}
-                onLayout={e => {
-                    footerHeight = e.nativeEvent.layout.height - spaceHeight;
-                }}>
+            <View style={{flex: 1, overflow: 'hidden'}}>
                 <StyleList
                     ref={listRef}
                     data={list}
@@ -240,28 +217,12 @@ const DiscoveryScreen = () => {
                     onRefresh={onRefresh}
                     onLoadMore={onLoadMore}
                     ListHeaderComponent={BannerTopGb}
-                    ListFooterComponent={FooterComponent}
-                    ListFooterComponentStyle={{
-                        backgroundColor: theme.backgroundColor,
-                        paddingVertical: 20,
-                        marginTop: -1,
-                        height: list.length > 0 ? undefined : footerHeight,
-                    }}
                     ListEmptyComponent={null}
                     maxToRenderPerBatch={20}
-                    // onScroll={({nativeEvent}) => {
-                    //     const {y} = nativeEvent.contentOffset;
-                    //     if (y >= 0 && y < spaceHeight / 3) {
-                    //         headerRef.current?.setOpacity(0);
-                    //     } else if (y >= spaceHeight / 3 && y <= spaceHeight) {
-                    //         const ratio =
-                    //             (y - spaceHeight / 3) / ((spaceHeight * 2) / 3);
-                    //         headerRef.current?.setOpacity(ratio);
-                    //     } else if (y > spaceHeight && y < spaceHeight * 2) {
-                    //         headerRef.current?.setOpacity(1);
-                    //     }
-                    // }}
                     directionalLockEnabled
+                    contentContainerStyle={{
+                        paddingBottom: 40,
+                    }}
                 />
             </View>
 

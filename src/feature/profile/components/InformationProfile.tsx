@@ -61,35 +61,37 @@ const InformationProfile = (props: Props) => {
                             navigate(PROFILE_ROUTE.editProfile);
                         }}>
                         <StyleText
-                            i18Text="profile.post.edit"
+                            i18Text="profile.editProfile"
                             customStyle={[
                                 styles.textButton,
                                 {color: Theme.common.white},
                             ]}
                         />
                     </StyleTouchable>
-                    <StyleTouchable
-                        customStyle={[
-                            styles.buttonTouch,
-                            {
-                                backgroundColor: Theme.common.commentGreen,
-                                marginLeft: 5,
-                            },
-                        ]}
-                        onPress={() => {
-                            navigate(PROFILE_ROUTE.createPostPickImg, {
-                                isCreateGB: true,
-                            });
-                        }}
-                        hitSlop={{right: 20}}>
-                        <Entypo
-                            name="plus"
-                            style={[
-                                styles.iconPlus,
-                                {color: Theme.common.white},
+                    {isShopAccount && (
+                        <StyleTouchable
+                            customStyle={[
+                                styles.buttonTouch,
+                                {
+                                    backgroundColor: Theme.common.commentGreen,
+                                    marginLeft: 5,
+                                },
                             ]}
-                        />
-                    </StyleTouchable>
+                            onPress={() => {
+                                navigate(PROFILE_ROUTE.createPostPickImg, {
+                                    isCreateGB: true,
+                                });
+                            }}
+                            hitSlop={{right: 20}}>
+                            <Entypo
+                                name="plus"
+                                style={[
+                                    styles.iconPlus,
+                                    {color: Theme.common.white},
+                                ]}
+                            />
+                        </StyleTouchable>
+                    )}
                 </>
             );
         }

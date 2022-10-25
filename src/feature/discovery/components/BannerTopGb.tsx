@@ -100,16 +100,13 @@ const BannerTopGb = () => {
                 onPress={() => navigate(DISCOVERY_ROUTE.searchScreen)}>
                 <AntDesign
                     name="search1"
-                    style={[
-                        styles.iconSearch,
-                        {color: theme.holderColorLighter},
-                    ]}
+                    style={[styles.iconSearch, {color: theme.borderColor}]}
                 />
                 <StyleText
                     i18Text="discovery.searchAround"
                     customStyle={[
                         styles.textSearch,
-                        {color: theme.holderColorLighter},
+                        {color: theme.borderColor},
                     ]}
                 />
             </StyleTouchable>

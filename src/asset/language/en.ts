@@ -339,6 +339,7 @@ const profile = {
     joining: 'Joining',
     joinedSuccess: 'Joined successfully',
     gbOrder: 'Group booking orders',
+    editProfile: 'Edit profile',
 };
 
 // SETTING ROUTE

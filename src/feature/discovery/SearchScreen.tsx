@@ -260,6 +260,9 @@ const SearchScreen = ({route}: Props) => {
                         refreshing={refreshing}
                         onRefresh={onRefresh}
                         onLoadMore={onLoadMore}
+                        contentContainerStyle={{
+                            paddingBottom: 20,
+                        }}
                     />
 
                     {loading && <LoadingScreen />}
@@ -355,8 +358,8 @@ const styles = ScaledSheet.create({
         marginLeft: '7@s',
     },
     itemView: {
-        marginBottom: '20@vs',
         marginTop: 0,
+        marginBottom: '10@vs',
     },
 });
 

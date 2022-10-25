@@ -467,11 +467,10 @@ const styles = ScaledSheet.create({
         borderRadius: '5@ms',
         borderWidth: Platform.select({
             ios: '0.25@ms',
-            android: '0.25@ms',
+            android: '0.5@ms',
         }),
         flexDirection: 'row',
         marginTop: '10@vs',
-        marginBottom: '20@vs',
     },
     imagePreview: {
         borderRadius: '5@ms',

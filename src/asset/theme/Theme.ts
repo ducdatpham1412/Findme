@@ -31,7 +31,7 @@ const Theme = {
         backgroundTextInput: '#202E44',
         tabBarIconColor: '#75adcb',
         likeHeart: '#f94b68',
-        unLikeHeart: 'white',
+        unLikeHeart: '#9fcaed',
         joinGroupChat: '#90BEE9',
     },
     lightTheme: {

@@ -432,6 +432,7 @@ const ProfileAccount = () => {
                         onChangePostIdFocusing={() => null}
                         detailGroupTarget={PROFILE_ROUTE.detailGroupBuying}
                         containerWidth={width * 0.93}
+                        containerStyle={styles.itemGroupBuying}
                     />
                 );
             }
@@ -838,6 +839,9 @@ const styles = ScaledSheet.create({
         marginRight: 0,
         marginTop: 0,
         marginBottom: '7@vs',
+    },
+    itemGroupBuying: {
+        marginBottom: '20@vs',
     },
 });
 
