@@ -470,8 +470,7 @@ const styles = ScaledSheet.create({
             android: '0.25@ms',
         }),
         flexDirection: 'row',
-        marginTop: '10@vs',
-        marginBottom: '20@vs',
+        marginTop: '15@vs',
     },
     imagePreview: {
         borderRadius: '5@ms',

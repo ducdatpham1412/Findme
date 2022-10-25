@@ -313,6 +313,7 @@ const profile = {
     joining: 'Đang tham gia',
     joinedSuccess: 'Tham gia thành công',
     gbOrder: 'Đơn mua chung',
+    editProfile: 'Chỉnh sửa',
 };
 
 // MESS ROUTE

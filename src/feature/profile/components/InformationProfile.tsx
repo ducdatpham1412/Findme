@@ -61,7 +61,7 @@ const InformationProfile = (props: Props) => {
                             navigate(PROFILE_ROUTE.editProfile);
                         }}>
                         <StyleText
-                            i18Text="profile.post.edit"
+                            i18Text="profile.editProfile"
                             customStyle={[
                                 styles.textButton,
                                 {color: Theme.common.white},

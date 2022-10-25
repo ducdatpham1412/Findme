@@ -80,7 +80,6 @@ const FavoriteAccount = () => {
                 onChangePostIdFocusing={() => null}
                 detailGroupTarget={FAVORITE_ROUTE.detailGroupBuying}
                 containerWidth={width * 0.93}
-                containerStyle={styles.itemGroupBuyingBox}
             />
         );
     }, []);
@@ -149,9 +148,6 @@ const styles = ScaledSheet.create({
         fontSize: FONT_SIZE.big,
         fontWeight: 'bold',
         marginLeft: '10@s',
-    },
-    itemGroupBuyingBox: {
-        marginBottom: '10@vs',
     },
     iconHeart: {
         fontSize: '20@ms',
