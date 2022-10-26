@@ -312,10 +312,12 @@ export interface TypeGroupBuying {
     topic: Array<number>;
     content: string;
     images: Array<string>;
+    retailPrice: string;
     prices: Array<{
         number_people: number;
         value: string;
     }>;
+    maxGroups: number;
     totalLikes: number;
     totalComments: number;
     totalJoins: number;

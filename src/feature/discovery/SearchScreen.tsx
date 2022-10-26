@@ -1,5 +1,5 @@
 import {apiGetListBubbleActive} from 'api/module';
-import {POST_TYPE} from 'asset/enum';
+import {POST_TYPE, TOPIC} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE, LIST_TOPICS} from 'asset/standardValue';
@@ -45,7 +45,7 @@ const SearchScreen = ({route}: Props) => {
 
     const [price, setPrice] = useState(listPrices[0]);
     const [topics, setTopics] = useState(
-        topicRoute !== undefined
+        topicRoute !== undefined && topicRoute !== TOPIC.all
             ? [topicRoute]
             : LIST_TOPICS.map(item => item.id),
     );
@@ -126,6 +126,7 @@ const SearchScreen = ({route}: Props) => {
                             search,
                         }));
                     }}
+                    placeholderTextColor={theme.holderColorLighter}
                 />
                 <StyleTouchable
                     onPress={() => {

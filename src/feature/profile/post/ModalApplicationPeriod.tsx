@@ -8,7 +8,7 @@ import {Platform, View} from 'react-native';
 import {Modalize} from 'react-native-modalize';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {formatDayGroupBuying} from 'utility/format';
+import {addDate, formatDayGroupBuying} from 'utility/format';
 
 interface Props {
     startDate: string | null;
@@ -185,9 +185,21 @@ class ModalApplicatonPeriod extends Component<Props, States> {
                         initDate={
                             this.state.startDate
                                 ? new Date(this.state.startDate)
-                                : new Date()
+                                : new Date(
+                                      addDate(new Date(), {
+                                          value: 1,
+                                          unit: 'day',
+                                      }),
+                                  )
                         }
-                        minimumDate={new Date()}
+                        minimumDate={
+                            new Date(
+                                addDate(new Date(), {
+                                    value: 1,
+                                    unit: 'day',
+                                }),
+                            )
+                        }
                         onChangeDateTime={value =>
                             this.setState({
                                 startDate: String(value),
@@ -201,12 +213,27 @@ class ModalApplicatonPeriod extends Component<Props, States> {
                         initDate={
                             this.state.endDate
                                 ? new Date(this.state.endDate)
-                                : new Date()
+                                : new Date(
+                                      addDate(new Date(), {
+                                          value: 2,
+                                          unit: 'day',
+                                      }),
+                                  )
                         }
                         minimumDate={
                             this.state.startDate
-                                ? new Date(this.state.startDate)
-                                : new Date()
+                                ? new Date(
+                                      addDate(this.state.startDate, {
+                                          value: 1,
+                                          unit: 'day',
+                                      }),
+                                  )
+                                : new Date(
+                                      addDate(new Date(), {
+                                          value: 2,
+                                          unit: 'day',
+                                      }),
+                                  )
                         }
                         onChangeDateTime={value =>
                             this.setState({

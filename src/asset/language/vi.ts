@@ -20,7 +20,7 @@ const common = {
     continue: 'Tiếp tục',
     reply: 'Trả lời',
     anonymous: '@Ẩn danh',
-    writeSomething: 'Viết gì đó',
+    writeSomething: 'Nội dung',
     discard: 'Bỏ đi',
     stay: 'Ở lại',
     wantToDiscard: 'Bạn muốn bỏ những thay đổi vừa rồi?',
@@ -147,12 +147,13 @@ const discovery = {
         title: 'Chia sẻ',
     },
     all: 'Tất cả',
-    like: 'Thả sao',
-    numberLike: '{{value}} sao',
+    like: 'Thích',
+    numberLike: '{{value}} thích',
     comment: 'Bình luận',
     numberComments: '{{numberComments}} bình luận',
     chooseTopic: 'Loại hình du lịch',
     applicationPeriod: 'Thời gian áp dụng',
+    retailPrice: 'Giá mua riêng',
     groupBuyingPrice: 'Bảng giá mua chung',
     numberPeople: '{{value}} người',
     joinGroupBuying: 'Tham gia ngay',
@@ -259,7 +260,7 @@ const profile = {
         addLink: 'Thêm link',
         feeling: 'Cảm xúc',
         checkIn: 'Check in',
-        topic: 'Chủ đề review',
+        topic: 'Chủ đề',
         rating: 'Đánh giá',
         pasteLink: 'Dán đường dẫn URL',
         whereAreYouNow: 'Bạn đang ở đâu?',
@@ -314,6 +315,7 @@ const profile = {
     joinedSuccess: 'Tham gia thành công',
     gbOrder: 'Đơn mua chung',
     editProfile: 'Chỉnh sửa',
+    maxGroups: 'Số lượng nhóm tối đa',
 };
 
 // MESS ROUTE
@@ -450,10 +452,16 @@ const alert = {
     successUpdatePro: 'Cập nhật trang cá nhân thành công !',
     invalidLink: 'Đường dẫn URL không hợp lệ',
     numberPeopleMoreThan: 'Số lượng người phải nhiều hơn {{value}}',
+    numberPeopleLessThan: 'Số lượng người phải ít hơn {{value}}',
+    numberPeopleMoreAndLess:
+        'Số lượng người phải nhiều hơn {{start}} và ít hơn {{end}}',
     priceLessThan: 'Giá tiền phải ít hơn {{value}}',
+    priceMoreThan: 'Giá tiền phải nhiều hơn {{value}}',
+    priceMoreLessThan: 'Giá tiền phải nhiều hơn {{start}} và ít hơn {{end}}',
     deadlineDateBefore: 'Ngày hết hạn phải trước ngày bắt đầu: {{value}}',
     canNotEditStartTimeAndPrice:
         'Bạn không thể chỉnh ngày bắt đầu và giá mua chung',
+    canChooseMaximum3: 'Bạn chỉ có thể chọn tối đa 3 chủ đề',
 
     // PERMISSION
     permissionCamera: 'Cho phép Doffy truy cập vào máy ảnh',

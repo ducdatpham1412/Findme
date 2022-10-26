@@ -1,4 +1,7 @@
-import {TypeCreateGroupBuying} from 'api/interface/discovery';
+import {
+    TypeCreateGroupBuying,
+    TypeEditGroupBooking,
+} from 'api/interface/discovery';
 import {TypeParamsPaging} from './interface';
 import request from './request';
 
@@ -24,6 +27,14 @@ export const apiConfirmUserBought = (body: {
 
 export const apiCreateGroupBuying = (body: TypeCreateGroupBuying) => {
     return request.post('profile/create-group-buying', body);
+};
+
+export const apiEditGroupBooking = (body: TypeEditGroupBooking) => {
+    return request.put(`profile/edit-group-buying/${body.postId}`, {
+        topic: body.topic,
+        content: body.content,
+        is_public_from_draft: body.is_public_from_draft,
+    });
 };
 
 export const apiGetTopGroupBuying = () => {

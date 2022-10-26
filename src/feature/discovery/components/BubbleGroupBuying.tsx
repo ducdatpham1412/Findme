@@ -588,7 +588,7 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
     },
     iconBought: {
-        fontSize: '15@ms',
+        fontSize: '10@ms',
         color: Theme.common.white,
     },
     textBought: {

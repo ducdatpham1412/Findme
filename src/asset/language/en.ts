@@ -20,7 +20,7 @@ const common = {
     continue: 'Continue',
     reply: 'Reply',
     anonymous: '@Anonymous',
-    writeSomething: 'Write something',
+    writeSomething: 'Your caption',
     discard: 'Discard',
     stay: 'Stay',
     wantToDiscard: 'You want to discard the changes?',
@@ -144,13 +144,14 @@ const discovery = {
         title: 'Share',
     },
     all: 'All',
-    like: 'Rate star',
-    numberLike: '{{value}} stars',
+    like: 'Like',
+    numberLike: '{{value}} likes',
     comment: 'Comment',
     numberComments: '{{numberComments}} comments',
     chooseTopic: 'Travel categories',
     applicationPeriod: 'Application period',
-    groupBuyingPrice: 'Group buying prices',
+    retailPrice: 'Retail price',
+    groupBuyingPrice: 'Group prices',
     numberPeople: '{{value}} people',
     joinGroupBuying: 'Join now',
     joined: 'Joined',
@@ -340,6 +341,7 @@ const profile = {
     joinedSuccess: 'Joined successfully',
     gbOrder: 'Group booking orders',
     editProfile: 'Edit profile',
+    maxGroups: 'Maximum number of groups',
 };
 
 // SETTING ROUTE
@@ -443,10 +445,17 @@ const alert = {
     successUpdatePro: 'Update profile successful !',
     invalidLink: 'Invalid link',
     numberPeopleMoreThan: 'Number people have to be more than {{value}}',
-    priceLessThan: 'Price have to be less {{value}}',
+    numberPeopleLessThan: 'Number people have to be less than {{value}}',
+    numberPeopleMoreAndLess:
+        'Number people have to be more than {{start}} and less than {{end}}',
+    priceLessThan: 'Price have to be less than {{value}}',
+    priceMoreThan: 'Price have to be more than {{value}}',
+    priceMoreLessThan:
+        'Price have to be more than {{start}} and less than {{end}}',
     deadlineDateBefore:
         'Joining deadline has to be before starting date: {{value}}',
     canNotEditStartTimeAndPrice: 'You can not edit start time and prices',
+    canChooseMaximum3: 'You can only choose maximum 3 topics',
 
     // PERMISSION
     permissionCamera: 'Access camera',

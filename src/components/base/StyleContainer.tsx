@@ -21,7 +21,7 @@ interface ScrollContainerProps extends KeyboardAwareScrollViewProps {
 
 // let offsetY = 0;
 
-const StyleContainer = (props: ScrollContainerProps) => {
+const StyleContainer = (props: ScrollContainerProps, ref: any) => {
     const {
         children,
         containerStyle,
@@ -42,6 +42,7 @@ const StyleContainer = (props: ScrollContainerProps) => {
             {headerProps && <StyleHeader {...headerProps} />}
             {TopComponent}
             <KeyboardAwareScrollView
+                ref={ref}
                 contentContainerStyle={[
                     {width: '100%', minHeight: '100%'},
                     customStyle,
