@@ -1,4 +1,4 @@
-import {apiCreateGroupBuying} from 'api/discovery';
+import {apiCreateGroupBuying, apiEditGroupBooking} from 'api/discovery';
 import {TypeGroupBuying} from 'api/interface';
 import {TypeCreateGroupBuying} from 'api/interface/discovery';
 import {TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
@@ -14,20 +14,29 @@ import {
 } from 'components/base';
 import ClassDateTimePicker from 'components/base/picker/ClassDateTimePicker';
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
+import LoadingScreen from 'components/LoadingScreen';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
-import {appAlert, goBack, navigate} from 'navigation/NavigationService';
+import {
+    appAlert,
+    appAlertYesNo,
+    goBack,
+    navigate,
+} from 'navigation/NavigationService';
 import React, {Component, useMemo, useRef, useState} from 'react';
+import isEqual from 'react-fast-compare';
 import {useTranslation} from 'react-i18next';
 import {Animated, Platform, TextInput, Vibration, View} from 'react-native';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Modalize} from 'react-native-modalize';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {chooseIconTopic, logger, onGoToSignUp} from 'utility/assistant';
+import {chooseIconTopic, onGoToSignUp} from 'utility/assistant';
 import {
+    addDate,
     formatDayGroupBuying,
     formatLocaleNumber,
     formatUTCDate,
@@ -37,6 +46,8 @@ import ImageUploader from 'utility/ImageUploader';
 import PreviewVideo from './components/PreviewVideo';
 import ModalAddPrice from './post/ModalAddPrice';
 import ModalApplicationPeriod from './post/ModalApplicationPeriod';
+import ModalMaxGroups from './post/ModalMaxGroups';
+import ModalRetailPrice from './post/ModalRetailPrice';
 import ModalTopic from './post/ModalTopic';
 
 interface Props {
@@ -123,7 +134,7 @@ class AddInfoButton extends Component<AddInfoProps> {
                             name="plus"
                             style={[
                                 styles.iconTopic,
-                                {color: Theme.common.gradientTabBar2},
+                                {color: Theme.common.gradientTabBar1},
                             ]}
                         />
                         <StyleText
@@ -148,6 +159,7 @@ const CreateGroupBuying = ({route}: Props) => {
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
     const token = Redux.getToken();
+    const isLoading = Redux.getIsLoading();
     const {t} = useTranslation();
 
     const initValue = useMemo(() => {
@@ -165,16 +177,21 @@ const CreateGroupBuying = ({route}: Props) => {
                 itemDraft?.images ||
                 itemNew?.images ||
                 [],
-            prices:
+            retailPrice:
+                itemEdit?.retailPrice ||
+                itemError?.retailPrice ||
+                itemDraft?.retailPrice ||
+                '',
+            groupPrices:
                 itemEdit?.prices ||
                 itemError?.prices ||
                 itemDraft?.prices ||
                 [],
-            deadlineDate:
-                itemEdit?.deadlineDate ||
-                itemError?.deadlineDate ||
-                itemDraft?.deadlineDate ||
-                null,
+            maxGroups:
+                itemEdit?.maxGroups ||
+                itemError?.maxGroups ||
+                itemDraft?.maxGroups ||
+                1,
             startDate:
                 itemEdit?.startDate ||
                 itemError?.startDate ||
@@ -185,36 +202,59 @@ const CreateGroupBuying = ({route}: Props) => {
                 itemError?.endDate ||
                 itemDraft?.endDate ||
                 null,
+            deadlineDate:
+                itemEdit?.deadlineDate ||
+                itemError?.deadlineDate ||
+                itemDraft?.deadlineDate ||
+                null,
         };
     }, []);
 
     const [topics, setTopics] = useState(initValue.topics);
     const [content, setContent] = useState(initValue.content);
     const [images] = useState(initValue.images);
-    const [prices, setPrices] = useState(initValue.prices);
+    const [retailPrice, setRetailPrice] = useState(initValue.retailPrice);
+    const [groupPrices, setGroupPrices] = useState(initValue.groupPrices);
     const [deadlineDate, setDeadlineDate] = useState(initValue.deadlineDate);
     const [startDate, setStartDate] = useState(initValue.startDate);
     const [endDate, setEndDate] = useState(initValue.endDate);
 
     const modalTopicRef = useRef<Modalize>(null);
     const modalDeadlineRef = useRef<ClassDateTimePicker>(null);
+    const modalMaxGroups = ModalMaxGroups();
     const modalApplicationRef = useRef<ModalApplicationPeriod>(null);
+    const modalRetailPriceRef = useRef<ModalRetailPrice>(null);
     const modalPriceRef = useRef<ModalAddPrice>(null);
 
+    const buttonTopicRef = useRef<AddInfoButton>(null);
     const buttonDeadlineRef = useRef<AddInfoButton>(null);
     const buttonApplicationRef = useRef<AddInfoButton>(null);
+    const buttonRetailPriceRef = useRef<AddInfoButton>(null);
     const buttonAddPriceRef = useRef<AddInfoButton>(null);
 
     const onConfirmPost = async (isDraft: boolean) => {
-        if (!deadlineDate) {
-            buttonDeadlineRef.current?.slug();
+        if (!topics.length) {
+            Vibration.vibrate();
+            buttonTopicRef.current?.slug();
             return;
         }
         if (!startDate || !endDate) {
+            Vibration.vibrate();
             buttonApplicationRef.current?.slug();
             return;
         }
-        if (prices.length === 0) {
+        if (!deadlineDate) {
+            Vibration.vibrate();
+            buttonDeadlineRef.current?.slug();
+            return;
+        }
+        if (!retailPrice) {
+            Vibration.vibrate();
+            buttonRetailPriceRef.current?.slug();
+            return;
+        }
+        if (groupPrices.length === 0) {
+            Vibration.vibrate();
             buttonAddPriceRef.current?.slug();
             return;
         }
@@ -224,10 +264,12 @@ const CreateGroupBuying = ({route}: Props) => {
                 topic: topics,
                 content,
                 images,
-                deadlineDate: String(formatUTCDate(deadlineDate)),
+                retailPrice,
+                prices: groupPrices,
+                maxGroups: Number(modalMaxGroups.maxGroups),
                 startDate: String(formatUTCDate(startDate)),
                 endDate: String(formatUTCDate(endDate)),
-                prices,
+                deadlineDate: String(formatUTCDate(deadlineDate)),
                 isDraft,
             };
             try {
@@ -240,6 +282,7 @@ const CreateGroupBuying = ({route}: Props) => {
                     newGroupBuying.images,
                     1000,
                 );
+                // const listNameImages = ['21666863951481.jpeg'];
                 const res = await apiCreateGroupBuying({
                     ...newGroupBuying,
                     images: listNameImages,
@@ -270,8 +313,65 @@ const CreateGroupBuying = ({route}: Props) => {
         }
     };
 
-    const onEditPost = () => {
-        logger(content);
+    const onEditPost = async () => {
+        if (itemEdit) {
+            try {
+                Redux.setIsLoading(true);
+                await apiEditGroupBooking({
+                    postId: itemEdit.id,
+                    content,
+                    topic: topics,
+                });
+                goBack();
+            } catch (err) {
+                appAlert(err);
+            } finally {
+                Redux.setIsLoading(false);
+            }
+        } else if (itemDraft) {
+            try {
+                Redux.setIsLoading(true);
+                await apiEditGroupBooking({
+                    postId: itemDraft.id,
+                    content,
+                    topic: topics,
+                    is_public_from_draft: true,
+                });
+                goBack();
+            } catch (err) {
+                appAlert(err);
+            } finally {
+                Redux.setIsLoading(false);
+            }
+        }
+    };
+
+    const onGoBack = () => {
+        const temp: typeof initValue = {
+            topics,
+            content,
+            images,
+            retailPrice,
+            groupPrices,
+            maxGroups: Number(modalMaxGroups.maxGroups),
+            deadlineDate,
+            startDate,
+            endDate,
+        };
+        if (!isEqual(temp, initValue)) {
+            appAlertYesNo({
+                i18Title: 'common.wantToDiscard',
+                agreeText: 'common.discard',
+                refuseText: 'common.stay',
+                agreeChange: () => {
+                    goBack();
+                    goBack();
+                },
+                refuseChange: goBack,
+            });
+        } else {
+            goBack();
+        }
     };
 
     /**
@@ -289,7 +389,7 @@ const CreateGroupBuying = ({route}: Props) => {
                 ]}>
                 <StyleTouchable
                     customStyle={styles.iconCloseView}
-                    onPress={goBack}>
+                    onPress={onGoBack}>
                     <Ionicons
                         name="chevron-back"
                         style={[styles.iconClose, {color: theme.textColor}]}
@@ -301,7 +401,7 @@ const CreateGroupBuying = ({route}: Props) => {
                         customStyle={[
                             styles.postBox,
                             {
-                                borderColor: theme.highlightColor,
+                                backgroundColor: theme.highlightColor,
                             },
                         ]}
                         onPress={() => {
@@ -315,7 +415,7 @@ const CreateGroupBuying = ({route}: Props) => {
                             i18Text="profile.post.post"
                             customStyle={[
                                 styles.textPost,
-                                {color: theme.highlightColor},
+                                {color: theme.backgroundColor},
                             ]}
                         />
                     </StyleTouchable>
@@ -326,7 +426,7 @@ const CreateGroupBuying = ({route}: Props) => {
                         customStyle={[
                             styles.draftBox,
                             {
-                                borderColor: theme.borderColor,
+                                backgroundColor: theme.borderColor,
                             },
                         ]}
                         onPress={() => onConfirmPost(true)}>
@@ -334,7 +434,7 @@ const CreateGroupBuying = ({route}: Props) => {
                             i18Text="profile.post.draft"
                             customStyle={[
                                 styles.textDraft,
-                                {color: theme.borderColor},
+                                {color: theme.backgroundColor},
                             ]}
                         />
                     </StyleTouchable>
@@ -344,14 +444,14 @@ const CreateGroupBuying = ({route}: Props) => {
                     <StyleTouchable
                         customStyle={[
                             styles.postBox,
-                            {borderColor: theme.highlightColor},
+                            {backgroundColor: theme.highlightColor},
                         ]}
-                        onPress={onEditPost}>
+                        onPress={() => onEditPost()}>
                         <StyleText
                             i18Text="profile.post.edit"
                             customStyle={[
                                 styles.textPost,
-                                {color: theme.highlightColor},
+                                {color: theme.backgroundColor},
                             ]}
                         />
                     </StyleTouchable>
@@ -371,6 +471,7 @@ const CreateGroupBuying = ({route}: Props) => {
         if (topics.length === 0) {
             return (
                 <AddInfoButton
+                    ref={buttonTopicRef}
                     borderColor={theme.borderColor}
                     titleColor={theme.textHightLight}
                     title="profile.post.topic"
@@ -398,7 +499,7 @@ const CreateGroupBuying = ({route}: Props) => {
         );
     };
 
-    const RenderDeadline = () => {
+    const Deadline = () => {
         if (!deadlineDate) {
             return (
                 <AddInfoButton
@@ -447,11 +548,49 @@ const CreateGroupBuying = ({route}: Props) => {
                         }}
                         customStyle={[
                             styles.textNote,
-                            {color: theme.highlightColor},
+                            {color: theme.holderColorLighter},
                         ]}
                     />
                 </View>
             </>
+        );
+    };
+
+    const MaxGroups = () => {
+        return (
+            <View style={styles.topicView}>
+                <StyleTouchable
+                    customStyle={[
+                        styles.chooseTopicView,
+                        {borderColor: theme.borderColor},
+                    ]}
+                    onPress={() => modalMaxGroups.showModal()}>
+                    <StyleIcon
+                        source={Images.icons.createGroup}
+                        size={15}
+                        customStyle={{
+                            tintColor: Theme.common.gradientTabBar1,
+                        }}
+                    />
+                    <StyleText
+                        i18Text="profile.maxGroups"
+                        customStyle={[
+                            styles.textTopic,
+                            {color: theme.textHightLight},
+                        ]}>
+                        <StyleText
+                            originValue={`: ${modalMaxGroups.maxGroups}`}
+                            customStyle={[
+                                styles.textTopic,
+                                {
+                                    color: theme.textHightLight,
+                                    fontWeight: 'bold',
+                                },
+                            ]}
+                        />
+                    </StyleText>
+                </StyleTouchable>
+            </View>
         );
     };
 
@@ -512,9 +651,70 @@ const CreateGroupBuying = ({route}: Props) => {
         );
     };
 
+    const RetailPrice = () => {
+        return (
+            <View
+                style={[styles.priceView, {borderTopColor: theme.holderColor}]}>
+                <View style={styles.titlePriceView}>
+                    <StyleIcon source={Images.icons.dollar} size={18} />
+                    <StyleText
+                        i18Text="discovery.retailPrice"
+                        customStyle={[
+                            styles.textTitlePrice,
+                            {color: theme.textHightLight},
+                        ]}
+                    />
+                </View>
+
+                {retailPrice ? (
+                    <View style={styles.priceBox}>
+                        <StyleTouchable
+                            customStyle={[
+                                styles.priceValue,
+                                {
+                                    borderColor: theme.highlightColor,
+                                    flex: undefined,
+                                },
+                            ]}
+                            onPress={() => {
+                                if (!itemEdit) {
+                                    modalRetailPriceRef.current?.show();
+                                }
+                            }}>
+                            <StyleText
+                                originValue={`${formatLocaleNumber(
+                                    retailPrice,
+                                )} vnd`}
+                                customStyle={[
+                                    styles.textNumberPeople,
+                                    {
+                                        color: theme.highlightColor,
+                                        fontWeight: 'bold',
+                                    },
+                                ]}
+                            />
+                        </StyleTouchable>
+                    </View>
+                ) : (
+                    <AddInfoButton
+                        ref={buttonRetailPriceRef}
+                        title="profile.addPrice"
+                        titleColor={theme.textHightLight}
+                        borderColor={theme.borderColor}
+                        onPress={() => {
+                            if (!itemEdit) {
+                                modalRetailPriceRef.current?.show();
+                            }
+                        }}
+                    />
+                )}
+            </View>
+        );
+    };
+
     const GroupBuyingPrices = () => {
         const onDeletePrice = (valuePrice: string) => {
-            setPrices(preValue =>
+            setGroupPrices(preValue =>
                 preValue.filter(item => item.value !== valuePrice),
             );
         };
@@ -533,9 +733,18 @@ const CreateGroupBuying = ({route}: Props) => {
                     />
                 </View>
 
-                {prices.map(price => {
+                {groupPrices.map((price, index) => {
                     return (
-                        <View key={price.number_people} style={styles.priceBox}>
+                        <StyleTouchable
+                            key={price.number_people}
+                            customStyle={styles.priceBox}
+                            onPress={() => {
+                                modalPriceRef.current?.show({
+                                    numberPeople: String(price.number_people),
+                                    priceValue: price.value,
+                                    indexEdit: index,
+                                });
+                            }}>
                             <View
                                 style={[
                                     styles.priceNumberPeople,
@@ -588,7 +797,7 @@ const CreateGroupBuying = ({route}: Props) => {
                                     />
                                 </StyleTouchable>
                             )}
-                        </View>
+                        </StyleTouchable>
                     );
                 })}
 
@@ -605,12 +814,17 @@ const CreateGroupBuying = ({route}: Props) => {
         );
     };
 
+    const scrollRef = useRef<KeyboardAwareScrollView>(null);
+
     const Content = () => {
         return (
             <View
                 style={[styles.priceView, {borderTopColor: theme.holderColor}]}>
                 <TextInput
-                    onChangeText={text => setContent(text)}
+                    onChangeText={text => {
+                        scrollRef.current?.scrollToEnd();
+                        setContent(text);
+                    }}
                     multiline
                     placeholder={t('common.writeSomething')}
                     placeholderTextColor={theme.borderColor}
@@ -627,16 +841,20 @@ const CreateGroupBuying = ({route}: Props) => {
             {Header()}
 
             <StyleContainer
+                ref={scrollRef}
                 containerStyle={styles.container}
                 scrollEnabled
                 customStyle={styles.contentContainer}
                 extraHeight={80}
-                keyboardShouldPersistTaps="handled">
+                keyboardShouldPersistTaps="handled"
+                keyboardDismissMode="on-drag">
                 {ImagePreview}
                 <View style={styles.contentView}>
                     {Topic()}
                     {TouringTime()}
-                    {RenderDeadline()}
+                    {Deadline()}
+                    {MaxGroups()}
+                    {RetailPrice()}
                     {GroupBuyingPrices()}
                     {Content()}
                 </View>
@@ -650,30 +868,59 @@ const CreateGroupBuying = ({route}: Props) => {
                 }}
             />
 
-            <ClassDateTimePicker
-                ref={modalDeadlineRef}
-                initDate={deadlineDate ? new Date(deadlineDate) : new Date()}
-                minimumDate={new Date()}
-                maximumDate={startDate ? new Date(startDate) : undefined}
-                onChangeDateTime={value => setDeadlineDate(String(value))}
-                theme={theme}
-            />
             <ModalApplicationPeriod
                 ref={modalApplicationRef}
                 theme={theme}
                 startDate={startDate}
                 endDate={endDate}
                 onChangeDate={value => {
+                    setDeadlineDate(null);
                     setStartDate(String(value.startDate));
                     setEndDate(String(value.endDate));
                 }}
             />
+            <ClassDateTimePicker
+                ref={modalDeadlineRef}
+                initDate={deadlineDate ? new Date(deadlineDate) : new Date()}
+                minimumDate={new Date()}
+                maximumDate={
+                    startDate
+                        ? new Date(addDate(startDate, {value: -1, unit: 'day'}))
+                        : undefined
+                }
+                onChangeDateTime={value => setDeadlineDate(String(value))}
+                theme={theme}
+            />
+            <ModalRetailPrice
+                ref={modalRetailPriceRef}
+                theme={theme}
+                price={retailPrice}
+                onChangePrice={value => setRetailPrice(value)}
+            />
             <ModalAddPrice
                 ref={modalPriceRef}
                 theme={theme}
-                prices={prices}
-                onAddPrice={value => setPrices(prices.concat(value))}
+                prices={groupPrices}
+                onAddPrice={value => setGroupPrices(groupPrices.concat(value))}
+                onChangePrice={e => {
+                    setGroupPrices(preValue =>
+                        preValue.map((item, index) => {
+                            if (index !== e.indexEdit) {
+                                return item;
+                            }
+                            return {
+                                ...item,
+                                number_people: e.value.number_people,
+                                value: e.value.value,
+                            };
+                        }),
+                    );
+                }}
             />
+
+            {modalMaxGroups.jsx}
+
+            {isLoading && <LoadingScreen />}
         </>
     );
 };
@@ -706,10 +953,6 @@ const styles = ScaledSheet.create({
         fontSize: '25@ms',
     },
     postBox: {
-        borderWidth: Platform.select({
-            ios: '0.5@ms',
-            android: '1@ms',
-        }),
         paddingHorizontal: '25@s',
         paddingVertical: '3@vs',
         borderRadius: '8@ms',
@@ -719,10 +962,6 @@ const styles = ScaledSheet.create({
         fontWeight: 'bold',
     },
     draftBox: {
-        borderWidth: Platform.select({
-            ios: '0.5@ms',
-            android: '1@ms',
-        }),
         paddingHorizontal: '15@s',
         paddingVertical: '3@vs',
         borderRadius: '8@ms',

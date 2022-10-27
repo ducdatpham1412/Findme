@@ -5,15 +5,17 @@ import {StyleButton, StyleText} from 'components/base';
 import AppInput from 'components/base/AppInput';
 import ButtonX from 'components/common/ButtonX';
 import React, {Component} from 'react';
-import {Platform, TextInput, View} from 'react-native';
+import {TextInput, View} from 'react-native';
 import {Modalize} from 'react-native-modalize';
-import {moderateScale, ScaledSheet} from 'react-native-size-matters';
-import I18Next from 'utility/I18Next';
+import {ScaledSheet} from 'react-native-size-matters';
+import {borderWidthTiny} from 'utility/assistant';
+import I18Next, {I18Normalize} from 'utility/I18Next';
 import {validateIsNumber} from 'utility/validate';
 
 interface Props {
     prices: Array<TypePrice>;
     onAddPrice(value: TypePrice): void;
+    onChangePrice(params: {indexEdit: number; value: TypePrice}): void;
     theme: TypeTheme;
 }
 
@@ -22,12 +24,13 @@ interface States {
     priceValue: string;
 }
 
-let timeout: any;
+interface TypeShow {
+    numberPeople: string;
+    priceValue: string;
+    indexEdit: number;
+}
 
-const borderWidthError = Platform.select({
-    ios: moderateScale(0.25),
-    android: moderateScale(0.5),
-});
+let timeout: any;
 
 class ModalAddPrice extends Component<Props, States> {
     modalRef = React.createRef<Modalize>();
@@ -36,12 +39,21 @@ class ModalAddPrice extends Component<Props, States> {
 
     inputPriceRef = React.createRef<TextInput>();
 
+    indexEdit: number | null = null;
+
     state: States = {
         numberPeople: '',
         priceValue: '',
     };
 
-    show() {
+    show(params?: TypeShow) {
+        if (params) {
+            this.setState({
+                numberPeople: params.numberPeople,
+                priceValue: params.priceValue,
+            });
+            this.indexEdit = params.indexEdit;
+        }
         this.modalRef.current?.open();
         timeout = setTimeout(() => {
             this.inputNumberRef.current?.focus();
@@ -50,36 +62,124 @@ class ModalAddPrice extends Component<Props, States> {
     }
 
     private onConfirm = () => {
-        this.props.onAddPrice({
-            number_people: Number(this.state.numberPeople),
-            value: this.state.priceValue,
-        });
+        if (this.indexEdit === null) {
+            this.props.onAddPrice({
+                number_people: Number(this.state.numberPeople),
+                value: this.state.priceValue,
+            });
+        } else {
+            this.props.onChangePrice({
+                indexEdit: this.indexEdit,
+                value: {
+                    number_people: Number(this.state.numberPeople),
+                    value: this.state.priceValue,
+                },
+            });
+        }
         this.setState({
             numberPeople: '',
             priceValue: '',
         });
+        this.indexEdit = null;
         this.modalRef.current?.close();
+    };
+
+    private onCancel = () => {
+        if (this.indexEdit === null) {
+            this.modalRef.current?.close();
+        } else {
+            this.setState({
+                numberPeople: '',
+                priceValue: '',
+            });
+            this.modalRef.current?.close();
+        }
+        this.indexEdit = null;
     };
 
     render() {
         const {theme, prices} = this.props;
         const {numberPeople, priceValue} = this.state;
 
-        const lastPrice = prices[prices.length - 1];
+        let isValidNumberPeople = true;
+        let textAlertNumberPeople: I18Normalize = 'common.null';
+        const paramsNumberPeople: any = {};
 
-        const isValidNumberPeople =
-            lastPrice && numberPeople
-                ? Number(numberPeople) > lastPrice.number_people
-                : true;
-        const borderWidthNumberPeople = isValidNumberPeople
-            ? 0
-            : borderWidthError;
+        let isValidPriceValue = true;
+        let textAlertPrice: I18Normalize = 'common.null';
+        const paramsPrice: any = {};
 
-        const isValidPriceValue =
-            lastPrice && priceValue
-                ? Number(priceValue) < Number(lastPrice.value)
-                : true;
-        const borderWidthPrice = isValidPriceValue ? 0 : borderWidthError;
+        // add new one
+        if (this.indexEdit === null) {
+            const lastPrice = prices[prices.length - 1];
+            if (lastPrice) {
+                if (Number(numberPeople) < lastPrice.number_people) {
+                    isValidNumberPeople = false;
+                    paramsNumberPeople.value = lastPrice.number_people;
+                    textAlertNumberPeople = 'alert.numberPeopleMoreThan';
+                }
+
+                isValidPriceValue =
+                    Number(priceValue) < Number(lastPrice.value) &&
+                    !!priceValue;
+                paramsPrice.value = lastPrice.value;
+                textAlertPrice = 'alert.priceLessThan';
+            } else if (Number(numberPeople) <= 1) {
+                isValidNumberPeople = false;
+                paramsNumberPeople.value = 1;
+                textAlertNumberPeople = 'alert.numberPeopleMoreThan';
+            }
+        }
+        // edit an index price
+        else {
+            const start = prices[this.indexEdit - 1];
+            const end = prices[this.indexEdit + 1];
+            if (start && end) {
+                isValidNumberPeople =
+                    Number(numberPeople) > start.number_people &&
+                    Number(numberPeople) < end.number_people;
+                textAlertNumberPeople = 'alert.numberPeopleMoreAndLess';
+                paramsNumberPeople.start = start.number_people;
+                paramsNumberPeople.end = end.number_people;
+
+                isValidPriceValue =
+                    Number(priceValue) < Number(start.value) &&
+                    Number(priceValue) > Number(end.value);
+                textAlertPrice = 'alert.priceMoreLessThan';
+                paramsPrice.start = start.value;
+                paramsPrice.end = end.value;
+            } else if (start) {
+                isValidNumberPeople =
+                    Number(numberPeople) > start.number_people;
+                textAlertNumberPeople = 'alert.numberPeopleMoreThan';
+                paramsNumberPeople.value = start.number_people;
+
+                isValidPriceValue = Number(priceValue) < Number(start.value);
+                textAlertPrice = 'alert.priceLessThan';
+                paramsPrice.value = start.value;
+            } else if (end) {
+                isValidNumberPeople = Number(numberPeople) < end.number_people;
+                if (!isValidNumberPeople) {
+                    textAlertNumberPeople = 'alert.numberPeopleLessThan';
+                    paramsNumberPeople.value = end.number_people;
+                } else {
+                    isValidNumberPeople = Number(numberPeople) > 1;
+                    paramsNumberPeople.value = 1;
+                    textAlertNumberPeople = 'alert.numberPeopleMoreThan';
+                }
+
+                isValidPriceValue = Number(priceValue) > Number(end.value);
+                textAlertPrice = 'alert.priceMoreThan';
+                paramsPrice.value = end.value;
+            } else if (Number(numberPeople) <= 1) {
+                isValidNumberPeople = false;
+                paramsNumberPeople.value = 1;
+                textAlertNumberPeople = 'alert.numberPeopleMoreThan';
+            }
+        }
+
+        const borderWidthNumber = isValidNumberPeople ? 0 : borderWidthTiny;
+        const borderWidthPrice = isValidPriceValue ? 0 : borderWidthTiny;
 
         const Content = () => {
             return (
@@ -87,20 +187,22 @@ class ModalAddPrice extends Component<Props, States> {
                     <View style={styles.inputView}>
                         <AppInput
                             ref={this.inputNumberRef}
-                            defaultValue={numberPeople}
-                            onChangeText={value =>
-                                this.setState({
-                                    numberPeople: value,
-                                })
-                            }
+                            value={numberPeople}
+                            onChangeText={value => {
+                                if (validateIsNumber(value) || !value) {
+                                    this.setState({
+                                        numberPeople: value,
+                                    });
+                                }
+                            }}
                             placeholder={I18Next.t('profile.number')}
                             placeholderTextColor={theme.borderColor}
                             style={[
                                 styles.inputNumberPeople,
                                 {
-                                    color: theme.textColor,
+                                    color: theme.textHightLight,
                                     backgroundColor: theme.backgroundTextInput,
-                                    borderWidth: borderWidthNumberPeople,
+                                    borderWidth: borderWidthNumber,
                                 },
                             ]}
                             onSubmitEditing={() =>
@@ -128,7 +230,7 @@ class ModalAddPrice extends Component<Props, States> {
                                 ref={this.inputPriceRef}
                                 value={priceValue}
                                 onChangeText={value => {
-                                    if (validateIsNumber(value)) {
+                                    if (validateIsNumber(value) || !value) {
                                         this.setState({
                                             priceValue: value,
                                         });
@@ -139,7 +241,7 @@ class ModalAddPrice extends Component<Props, States> {
                                 style={[
                                     styles.inputPrice,
                                     {
-                                        color: theme.textColor,
+                                        color: theme.textHightLight,
                                     },
                                 ]}
                                 keyboardType="numeric"
@@ -157,10 +259,8 @@ class ModalAddPrice extends Component<Props, States> {
 
                     {!isValidNumberPeople && (
                         <StyleText
-                            i18Text="alert.numberPeopleMoreThan"
-                            i18Params={{
-                                value: lastPrice.number_people,
-                            }}
+                            i18Text={textAlertNumberPeople}
+                            i18Params={paramsNumberPeople}
                             customStyle={[
                                 styles.textInvalidLink,
                                 {color: theme.highlightColor},
@@ -170,10 +270,8 @@ class ModalAddPrice extends Component<Props, States> {
 
                     {!isValidPriceValue && (
                         <StyleText
-                            i18Text="alert.priceLessThan"
-                            i18Params={{
-                                value: lastPrice.value,
-                            }}
+                            i18Text={textAlertPrice}
+                            i18Params={paramsPrice}
                             customStyle={[
                                 styles.textInvalidLink,
                                 {color: theme.highlightColor},
@@ -196,12 +294,10 @@ class ModalAddPrice extends Component<Props, States> {
                     ]}>
                     <ButtonX
                         containerStyle={styles.buttonClose}
-                        onPress={() => {
-                            this.modalRef.current?.close();
-                        }}
+                        onPress={() => this.onCancel()}
                     />
                     <StyleText
-                        i18Text="profile.addPrice"
+                        i18Text={'profile.addPrice'}
                         customStyle={[styles.title, {color: theme.textColor}]}
                     />
                     {Content()}

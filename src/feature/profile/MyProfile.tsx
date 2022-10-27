@@ -232,7 +232,7 @@ const ProfileAccount = () => {
     useEffect(() => {
         if (
             bubblePalaceAction.action ===
-            TYPE_BUBBLE_PALACE_ACTION.createNewPost
+            TYPE_BUBBLE_PALACE_ACTION.createNewGroupBuying
         ) {
             myGbPaging.setList((preValue: Array<TypeBubblePalace>) =>
                 [bubblePalaceAction.payload].concat(preValue),
@@ -243,7 +243,7 @@ const ProfileAccount = () => {
             });
         } else if (
             bubblePalaceAction.action ===
-            TYPE_BUBBLE_PALACE_ACTION.editPostFromProfile
+            TYPE_BUBBLE_PALACE_ACTION.editGroupBuying
         ) {
             myGbPaging.setList((preValue: Array<TypeBubblePalace>) =>
                 preValue.map(item => {
@@ -269,65 +269,6 @@ const ProfileAccount = () => {
                 y: 0,
                 animated: true,
             });
-            Redux.setBubblePalaceAction({
-                action: TYPE_BUBBLE_PALACE_ACTION.null,
-                payload: null,
-            });
-        } else if (
-            bubblePalaceAction.action === TYPE_BUBBLE_PALACE_ACTION.archivePost
-        ) {
-            const postArchived: TypeBubblePalace = bubblePalaceAction.payload;
-
-            myGbPaging.setList(preValue =>
-                preValue.filter(item => {
-                    if (item.id !== postArchived.id) {
-                        return true;
-                    }
-                    return false;
-                }),
-            );
-
-            if (listCheckTabLazy.current[1]) {
-                postsLikedPaging.setList(preValue =>
-                    preValue.filter(item => {
-                        if (item.id !== postArchived.id) {
-                            return true;
-                        }
-                        return false;
-                    }),
-                );
-            }
-            if (listCheckTabLazy.current[2]) {
-                gbJoinedPaging.setList(preValue =>
-                    preValue.filter(item => {
-                        if (item.id !== postArchived.id) {
-                            return true;
-                        }
-                        return false;
-                    }),
-                );
-            }
-
-            Redux.setBubblePalaceAction({
-                action: TYPE_BUBBLE_PALACE_ACTION.null,
-                payload: null,
-            });
-        } else if (
-            bubblePalaceAction.action ===
-            TYPE_BUBBLE_PALACE_ACTION.unArchivePost
-        ) {
-            const archivedPost: TypeBubblePalace = bubblePalaceAction.payload;
-            myGbPaging.setList(preValue => [archivedPost].concat(preValue));
-            if (archivedPost.isLiked) {
-                postsLikedPaging.setList(preValue =>
-                    [archivedPost].concat(preValue),
-                );
-            }
-            if (archivedPost.isSaved) {
-                gbJoinedPaging.setList(preValue =>
-                    [archivedPost].concat(preValue),
-                );
-            }
             Redux.setBubblePalaceAction({
                 action: TYPE_BUBBLE_PALACE_ACTION.null,
                 payload: null,

@@ -31,7 +31,7 @@ import ROOT_SCREEN, {
 import {navigate, push, showSwipeImages} from 'navigation/NavigationService';
 import {useState} from 'react';
 import {DevSettings, NativeScrollEvent, Platform} from 'react-native';
-import {verticalScale} from 'react-native-size-matters';
+import {moderateScale, verticalScale} from 'react-native-size-matters';
 import {I18Normalize} from './I18Next';
 import ImageUploader, {ImagePickerParamsType} from './ImageUploader';
 import AuthenticateService from './login/loginService';
@@ -448,6 +448,7 @@ export const fakeGroupBuying: TypeGroupBuying = {
     topic: [],
     content: '',
     images: [],
+    retailPrice: '',
     prices: [],
     totalLikes: 0,
     totalComments: 0,
@@ -495,3 +496,8 @@ export const seeDetailImage = (params: {
         allowSaveImage: true,
     });
 };
+
+export const borderWidthTiny = Platform.select({
+    ios: moderateScale(0.25),
+    android: moderateScale(0.5),
+});

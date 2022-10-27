@@ -22,7 +22,9 @@ export interface TypeCreateGroupBuying {
     deadlineDate: string;
     startDate: string;
     endDate: string;
+    retailPrice: string;
     prices: Array<TypePrice>;
+    maxGroups: number;
     isDraft: boolean;
 }
 
@@ -32,3 +34,11 @@ interface TypeResultSearchOk {
     total_group_bookings: number;
 }
 export type TypeResultSearch = TypeResultSearchOk | null;
+
+export interface TypeEditGroupBooking {
+    postId: string;
+    topic: Array<number>;
+    content: string;
+    is_public_from_draft?: boolean;
+    // max_groups: number;
+}

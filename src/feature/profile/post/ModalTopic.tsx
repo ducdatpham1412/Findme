@@ -1,4 +1,7 @@
-import {LIST_FEELINGS, LIST_TOPICS} from 'asset/standardValue';
+import {TOPIC} from 'asset/enum';
+import {Metrics} from 'asset/metrics';
+import {FONT_SIZE, LIST_TOPICS} from 'asset/standardValue';
+import Theme from 'asset/theme/Theme';
 import {
     StyleButton,
     StyleIcon,
@@ -8,7 +11,7 @@ import {
 import ButtonX from 'components/common/ButtonX';
 import Redux from 'hook/useRedux';
 import React, {forwardRef, useEffect, useRef, useState} from 'react';
-import {Animated, Platform, View} from 'react-native';
+import {Animated, View} from 'react-native';
 import {Modalize} from 'react-native-modalize';
 import {ScaledSheet} from 'react-native-size-matters';
 
@@ -16,6 +19,8 @@ interface Props {
     topics: Array<number>;
     onChangeListTopics(value: Array<number>): void;
 }
+
+const {width, height} = Metrics;
 
 const IconChoose = ({item, textColor, isChosen}: any) => {
     const aim = useRef(new Animated.Value(1)).current;
@@ -54,13 +59,21 @@ const ModalTopic = (props: Props, ref: any) => {
     const theme = Redux.getTheme();
 
     const [tempTopics, setTempTopics] = useState(topics);
+    const [showWarning, setShowWarning] = useState(false);
+    const timeOut = useRef<any>(null);
 
     const onChoose = (topicId: any) => {
         if (tempTopics.includes(topicId)) {
             setTempTopics(tempTopics.filter(id => id !== topicId));
+        } else if (tempTopics.length === 3) {
+            setShowWarning(true);
+            timeOut.current = setTimeout(() => {
+                setShowWarning(false);
+            }, 2000);
         } else {
             setTempTopics(tempTopics.concat(topicId));
         }
+        return () => clearTimeout(timeOut.current);
     };
 
     const onSave = () => {
@@ -95,18 +108,14 @@ const ModalTopic = (props: Props, ref: any) => {
                     customStyle={[styles.title, {color: theme.textColor}]}
                 />
                 <View style={styles.topicView}>
-                    {LIST_TOPICS.map((item, index) => {
-                        const borderRightColor =
-                            index !== LIST_FEELINGS.length - 1
-                                ? theme.borderColor
-                                : 'transparent';
+                    {LIST_TOPICS.map(item => {
+                        if (item.id === TOPIC.all) {
+                            return null;
+                        }
                         return (
                             <StyleTouchable
                                 key={item.id}
-                                customStyle={[
-                                    styles.topicBox,
-                                    {borderRightColor},
-                                ]}
+                                customStyle={styles.topicBox}
                                 onPress={() => onChoose(item.id)}>
                                 <IconChoose
                                     item={item}
@@ -116,6 +125,15 @@ const ModalTopic = (props: Props, ref: any) => {
                             </StyleTouchable>
                         );
                     })}
+                </View>
+
+                <View style={styles.warningView}>
+                    {showWarning && (
+                        <StyleText
+                            i18Text="alert.canChooseMaximum3"
+                            customStyle={styles.textWarning}
+                        />
+                    )}
                 </View>
 
                 <StyleButton
@@ -133,10 +151,10 @@ const styles = ScaledSheet.create({
         backgroundColor: 'transparent',
     },
     container: {
-        width: '90%',
+        width: width * 0.9,
         paddingTop: '10@vs',
         paddingBottom: '20@vs',
-        marginTop: '100@vs',
+        marginTop: height * 0.1,
         alignSelf: 'center',
         borderRadius: '7@ms',
         alignItems: 'center',
@@ -153,15 +171,13 @@ const styles = ScaledSheet.create({
     topicView: {
         width: '100%',
         flexDirection: 'row',
-        marginTop: '25@vs',
-        justifyContent: 'space-between',
+        marginTop: '10@vs',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
     },
     topicBox: {
-        flex: 1,
-        borderRightWidth: Platform.select({
-            ios: '0.25@ms',
-            android: '0.5@ms',
-        }),
+        width: (width * 0.9) / 4,
+        paddingVertical: '10@vs',
     },
     topicTouch: {
         flex: 1,
@@ -171,9 +187,18 @@ const styles = ScaledSheet.create({
         fontSize: '8@ms',
         marginTop: '10@vs',
     },
+    warningView: {
+        width: '100%',
+        alignItems: 'center',
+        height: '20@ms',
+    },
+    textWarning: {
+        fontSize: FONT_SIZE.tiny,
+        color: Theme.common.red,
+    },
     buttonView: {
         paddingVertical: '8@vs',
-        marginTop: '30@vs',
+        marginTop: '10@vs',
     },
 });
 

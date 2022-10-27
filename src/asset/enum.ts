@@ -143,6 +143,7 @@ export enum TYPE_BUBBLE_PALACE_ACTION {
     null = -1,
     createNewPost = 0,
     createNewGroupBuying = 0.5,
+    editGroupBuying = 0.6,
     editPostFromProfile = 1,
     scrollToTopDiscovery = 2,
     scrollToTopMyProfile = 3,

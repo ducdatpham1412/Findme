@@ -113,6 +113,16 @@ export const getSessionOfDay = () => {
     return SESSION.evening;
 };
 
+export const addDate = (
+    date: Date | string,
+    params: {
+        value: number;
+        unit: dayjs.ManipulateType;
+    },
+) => {
+    return dayjs(date).add(params.value, params.unit).utc().format();
+};
+
 export const LanguageProvider = ({children}: any) => {
     const translation = useTranslation();
     const {language} = translation[1];
