@@ -122,6 +122,7 @@ const login = {
 
 // DISCOVERY ROUTE
 const discovery = {
+    home: 'Trang chủ',
     bubble: {
         goToSignUp:
             'Đi tới đăng nhập để có thể bắt đầu trò chuyện với mọi người nhé',
@@ -156,11 +157,14 @@ const discovery = {
     retailPrice: 'Giá mua riêng',
     groupBuyingPrice: 'Bảng giá mua chung',
     numberPeople: '{{value}} người',
-    joinGroupBuying: 'Tham gia ngay',
+    joinNow: 'Tham gia ngay',
+    joinGroupBuying: 'Mua theo nhóm',
+    buySeparately: 'Mua riêng',
+    continueJoin: 'Tiếp tục tham gia',
     joined: 'Đã tham gia',
     deposited: 'Đã đặt cọc',
-    numberPeopleJoin: '{{value}} người đã tham gia mua chung',
-    beTheFirstJoin: 'Hãy là người đầu tiên tham gia chiến dịch này nào ^^',
+    numberPeopleJoin: '{{value}} lượt tham gia mua chung',
+    beTheFirstJoin: 'Hãy là người đầu tiên tham gia nào',
     bought: 'Đã mua',
     confirmBought: 'Xác nhận đã mua',
     participators: '{{value}} người tham gia',
@@ -172,7 +176,7 @@ const discovery = {
     today: 'Hôm nay',
     postType: 'Bài đăng',
     seeMore: 'Xem thêm',
-    whereShouldWeGo: '🚌 Đi đâu nữa đây...',
+    whereShouldWeGo: '🚌 Loại hình du lịch',
     bookTourWithOther: 'Đặt tour nhóm',
     travelWithReasonablePrice: 'Đi du lịch với giá ưu đãi nhất 😯🥳',
     travelReview: 'Review trải nghiệm',
@@ -188,8 +192,9 @@ const discovery = {
     goodAfternoon: 'Chào buổi chiều ☀️',
     goodEvening: 'Chào buổi tối 🌙',
     thanksForJoin: 'Cảm ơn bạn đã tham gia cùng chúng mình ❤️',
-    titleDeposit:
-        'Để tham gia du lịch chung cùng mọi người\nBạn cần đặt cọc một khoản tiền cho người bán',
+    amountBookGb: 'Số lượng mua: {{value}}',
+    depositAmount: 'Số tiền đặt cọc: {{value}}vnd',
+    titleDeposit: 'Bạn cần đặt cọc một khoản tiền cho người bán',
     theMoneyIs: 'Số tiền đặt cọc là: ',
     goToDeposit: 'Đi tới đặt cọc',
     hotLocation: '🔥 Địa điểm hot',
@@ -203,10 +208,17 @@ const discovery = {
     travelAll: 'Tất cả',
     searchAround: 'Tìm kiếm mọi người hoặc nơi đến',
     category: 'Loại hình ({{value}})',
+    available: 'Có sẵn',
+    temporarilyClosed: 'Tạm đóng',
+    closed: 'Đã kết thúc',
+    amount: 'Số lượng:',
+    noteForMerchant: 'Ghi chú cho người bán',
+    arrivalTime: 'Thời gian đến:',
 };
 
 // REPUTATION
 const reputation = {
+    community: 'Cộng đồng',
     topReviewer: 'Top reviewers',
     yourRank: 'Thứ hạng của bạn: {{value}}',
     reviewCommunity: 'Cộng đồng review',
@@ -215,6 +227,7 @@ const reputation = {
 
 // PROFILE SCREEN
 const profile = {
+    title: 'Cá nhân',
     component: {
         infoProfile: {
             follower: 'Người theo dõi',
@@ -265,7 +278,7 @@ const profile = {
         pasteLink: 'Dán đường dẫn URL',
         whereAreYouNow: 'Bạn đang ở đâu?',
         willDebutSearchOnGoogleMap:
-            'Doffy đang phát triển tính năng tìm địa chỉ trên Google map\nBạn đợi xíu nhaaa^^',
+            'Doffy đang phát triển tính năng tìm địa chỉ trên Google map\nBạn đợi xíu nha',
         nice: 'Tốt',
         cute: 'Cute',
         wondering: 'Phân vân',

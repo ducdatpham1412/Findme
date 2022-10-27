@@ -120,6 +120,7 @@ const login = {
 
 // DISCOVERY ROUTE
 const discovery = {
+    home: 'Home',
     bubble: {
         goToSignUp: 'Go to login so you can start chatting with everyone',
         joinCommunity: 'Join community',
@@ -153,11 +154,14 @@ const discovery = {
     retailPrice: 'Retail price',
     groupBuyingPrice: 'Group prices',
     numberPeople: '{{value}} people',
-    joinGroupBuying: 'Join now',
+    joinNow: 'Join now',
+    joinGroupBuying: 'Group buying',
+    buySeparately: 'Buy separately',
+    continueJoin: 'Continue joining',
     joined: 'Joined',
     deposited: 'Deposited',
-    numberPeopleJoin: '{{value}} people joined group buying',
-    beTheFirstJoin: 'Be the first person join this campaign ^^',
+    numberPeopleJoin: '{{value}} turns joined buying',
+    beTheFirstJoin: 'Be the first person join this campaign',
     bought: 'Bought',
     confirmBought: 'Confirm bought',
     participators: '{{value}} participators',
@@ -169,7 +173,7 @@ const discovery = {
     today: 'Today',
     postType: 'Posts',
     seeMore: 'See more',
-    whereShouldWeGo: '🚌 Where should we go...',
+    whereShouldWeGo: '🚌 Travel categories',
     bookTourWithOther: 'Group booking',
     travelWithReasonablePrice: 'Travel with the most reasonable price 😯🥳',
     travelReview: 'Review travel',
@@ -184,8 +188,9 @@ const discovery = {
     goodAfternoon: 'Good afternoon ☀️',
     goodEvening: 'Good evening 🌙',
     thanksForJoin: 'Thanks for joining with us ❤️',
-    titleDeposit:
-        'In order to join group booking with everyone\nYou need to deposit a small amount',
+    amountBookGb: 'Quantities orders: {{value}}',
+    depositAmount: 'Deposit amount: {{value}}vnd',
+    titleDeposit: 'You need to deposit a small amount',
     theMoneyIs: 'The money deposit is: ',
     goToDeposit: 'Go to deposit',
     hotLocation: '🔥 Hot location',
@@ -199,10 +204,17 @@ const discovery = {
     travelAll: 'All',
     searchAround: 'Search people or destination',
     category: 'Categories ({{value}})',
+    available: 'Available',
+    temporarilyClosed: 'Temporarily closed',
+    closed: 'Closed',
+    amount: 'Amount:',
+    noteForMerchant: 'Note for merchant',
+    arrivalTime: 'Arrival time:',
 };
 
 // REPUTATION
 const reputation = {
+    community: 'Community',
     topReviewer: 'Top reviewers',
     yourRank: 'Your rank: {{value}}',
     reviewCommunity: 'Review community',
@@ -241,6 +253,7 @@ const mess = {
 
 // PROFILE ROUTE
 const profile = {
+    title: 'Profile',
     component: {
         infoProfile: {
             follower: 'Followers',
@@ -291,7 +304,7 @@ const profile = {
         pasteLink: 'Paste link here',
         whereAreYouNow: "Where're you now?",
         willDebutSearchOnGoogleMap:
-            "Doffy're developing searching on Google map\nLet's wait for us ^^",
+            "Doffy're developing searching on Google map\nLet's wait for us",
         nice: 'Nice',
         cute: 'Cute',
         wondering: 'Wondering',

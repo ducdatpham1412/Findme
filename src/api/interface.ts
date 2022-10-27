@@ -1,4 +1,5 @@
 import {TYPE_OS_LOGIN_SOCIAL, TYPE_SOCIAL_LOGIN} from 'asset/enum';
+import {TypePrice} from './interface/discovery';
 
 // OTP
 export interface TypeRequestOTPRequest {
@@ -306,6 +307,7 @@ export interface TypeBubblePalace {
     isArchived?: boolean;
     relationship: number;
 }
+
 export interface TypeGroupBuying {
     id: string;
     postType: number;
@@ -313,17 +315,13 @@ export interface TypeGroupBuying {
     content: string;
     images: Array<string>;
     retailPrice: string;
-    prices: Array<{
-        number_people: number;
-        value: string;
-    }>;
-    maxGroups: number;
+    prices: Array<TypePrice>;
+    deposit: string | null; // string  when status = joining / joined
+    amount: number | null; // number when status = joining / joined
+    note: string | null;
     totalLikes: number;
     totalComments: number;
     totalJoins: number;
-    deadlineDate: string;
-    startDate: string;
-    endDate: string;
     creator: number;
     creatorName: string;
     creatorAvatar: string;
@@ -333,6 +331,8 @@ export interface TypeGroupBuying {
     isDraft: boolean;
     status: number;
     relationship: number;
+    // other field follow on situation
+    joinId?: string; // in get_list_gb_joining and joined
 }
 
 export interface TypeBubblePalaceAction {

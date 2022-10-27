@@ -1,12 +1,19 @@
 import {
     TypeCreateGroupBuying,
     TypeEditGroupBooking,
+    TypeJoinGroupBookingRequest,
 } from 'api/interface/discovery';
 import {TypeParamsPaging} from './interface';
 import request from './request';
 
-export const apiJoinGroupBuying = (postId: string) => {
-    return request.put(`/profile/join-group-buying/${postId}`);
+export const apiJoinGroupBuying = (params: TypeJoinGroupBookingRequest) => {
+    return request.put(`/profile/join-group-buying/${params.postId}`, {
+        money: params.money,
+        amount: params.amount,
+        time_will_buy: params.time_will_buy,
+        note: params.note,
+        is_retail: params.is_retail,
+    });
 };
 
 export const apiGetListPeopleJoined = ({params}: TypeParamsPaging) => {

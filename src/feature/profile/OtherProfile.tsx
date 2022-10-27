@@ -21,8 +21,8 @@ import LoadingScreen from 'components/LoadingScreen';
 import ModalCommentLike from 'components/ModalCommentLike';
 import StyleTabView from 'components/StyleTabView';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
+import ItemGroupBuying from 'feature/common/components/ItemGroupBuying';
 import Bubble from 'feature/discovery/components/Bubble';
-import BubbleGroupBuying from 'feature/discovery/components/BubbleGroupBuying';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN from 'navigation/config/routes';
@@ -203,31 +203,14 @@ const OtherProfile = ({route}: Props) => {
     const RenderItemMyGb = useCallback(
         (item: TypeGroupBuying) => {
             return (
-                <BubbleGroupBuying
+                <ItemGroupBuying
                     item={item}
-                    onGoToDetailGroupBuying={() => {
-                        navigate(ROOT_SCREEN.detailGroupBuying, {
-                            item,
-                            setList: listPostsPaging.setList,
-                        });
-                    }}
-                    onShowMoreOption={() => null}
-                    onHandleLike={() => null}
-                    onShowModalComment={() => null}
-                    onChangePostIdFocusing={() => null}
+                    setList={listPostsPaging.setList}
+                    isHorizontal={false}
+                    syncWidth={width * 0.485}
                     detailGroupTarget={ROOT_SCREEN.detailGroupBuying}
-                    containerWidth={width * 0.485}
-                    showReactView={false}
-                    showTopView={false}
-                    showBottomView={false}
-                    showButtonJoined={false}
-                    containerStyle={
-                        isShopAccount
-                            ? {
-                                  marginVertical: width * 0.01,
-                              }
-                            : {}
-                    }
+                    showName={false}
+                    containerStyle={styles.itemMyGroupBuying}
                 />
             );
         },
@@ -254,6 +237,7 @@ const OtherProfile = ({route}: Props) => {
                         onChangePostIdFocusing={postId =>
                             setPostIdFocusing(postId)
                         }
+                        containerWidth={width * 0.93}
                     />
                 );
             }
@@ -441,7 +425,7 @@ const OtherProfile = ({route}: Props) => {
                             )}
                         </View>
 
-                        <View style={styles.tabView}>
+                        <View style={styles.tabReview}>
                             {isShopAccount &&
                                 listPostsReviewAbout.list.map(item =>
                                     RenderItemReview(item),
@@ -621,6 +605,17 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         paddingHorizontal: '2@s',
+        justifyContent: 'space-between',
+    },
+    tabReview: {
+        width,
+        alignItems: 'center',
+    },
+    itemMyGroupBuying: {
+        marginLeft: 0,
+        marginRight: 0,
+        marginTop: 0,
+        marginBottom: '7@vs',
     },
 });
 

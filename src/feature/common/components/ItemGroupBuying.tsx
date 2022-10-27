@@ -12,6 +12,7 @@ import {
     StyleTouchable,
 } from 'components/base';
 import Redux from 'hook/useRedux';
+import {PROFILE_ROUTE} from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
 import React from 'react';
 import {Platform, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
@@ -20,7 +21,7 @@ import {ScaledSheet} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {SharedElement} from 'react-navigation-shared-element';
 import {onGoToProfile} from 'utility/assistant';
-import {formatDayGroupBuying, formatLocaleNumber} from 'utility/format';
+import {formatLocaleNumber} from 'utility/format';
 
 interface Props {
     item: TypeGroupBuying;
@@ -85,9 +86,7 @@ const ButtonCheckJoined = (item: TypeGroupBuying, theme: TypeTheme) => {
                 ]}>
                 <StyleText
                     i18Text={
-                        isJoined
-                            ? 'discovery.joined'
-                            : 'discovery.joinGroupBuying'
+                        isJoined ? 'discovery.joined' : 'discovery.joinNow'
                     }
                     customStyle={[
                         styles.textTellJoin,
@@ -159,13 +158,19 @@ const ItemGroupBuying = (props: Props) => {
                     width: syncWidth,
                 },
             ]}
-            onPress={() =>
-                navigate(detailGroupTarget, {
-                    item,
-                    setList,
-                    isFromTopGroupBuying: !isHorizontal,
-                })
-            }>
+            onPress={() => {
+                if (item.isDraft) {
+                    navigate(PROFILE_ROUTE.createGroupBuying, {
+                        itemDraft: item,
+                    });
+                } else {
+                    navigate(detailGroupTarget, {
+                        item,
+                        setList,
+                        isFromTopGroupBuying: !isHorizontal,
+                    });
+                }
+            }}>
             {/* Image preview */}
             <SharedElement
                 style={[
@@ -232,6 +237,18 @@ const ItemGroupBuying = (props: Props) => {
                         </View>
                     )}
                 </View>
+
+                {item.isDraft && (
+                    <View style={styles.draftView}>
+                        <View>
+                            <CustomBlurView />
+                            <StyleText
+                                i18Text="profile.draftPost"
+                                customStyle={styles.textDraft}
+                            />
+                        </View>
+                    </View>
+                )}
             </SharedElement>
 
             {/* Content */}
@@ -250,21 +267,6 @@ const ItemGroupBuying = (props: Props) => {
 
             <View style={styles.contentView}>
                 <View style={{flex: 1}}>
-                    <View style={styles.infoView}>
-                        <StyleIcon
-                            source={Images.icons.deadline}
-                            size={iconSize}
-                        />
-                        <StyleText
-                            originValue={formatDayGroupBuying(
-                                item.deadlineDate,
-                            )}
-                            customStyle={[
-                                styles.textInfo,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                    </View>
                     <View style={styles.infoView}>
                         <StyleIcon
                             source={Images.icons.dollar}
@@ -453,6 +455,21 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         marginTop: '5@vs',
         paddingHorizontal: '10@s',
+    },
+    draftView: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundColor: Theme.darkTheme.backgroundOpacity(0.6),
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    textDraft: {
+        fontSize: FONT_SIZE.small,
+        fontWeight: 'bold',
+        color: Theme.common.white,
+        marginHorizontal: '10@ms',
+        marginVertical: '5@ms',
     },
 });
 

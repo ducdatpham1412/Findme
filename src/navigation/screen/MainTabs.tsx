@@ -54,9 +54,6 @@ const MainTabs: React.FunctionComponent = () => {
                 <BottomTab.Screen
                     name={MAIN_SCREEN.favorite}
                     component={FavoriteRoute}
-                    options={{
-                        lazy: false,
-                    }}
                 />
 
                 <BottomTab.Screen

@@ -24,7 +24,7 @@
         "android-build-aab-production": "rm -rf android/build && export ENVFILE=.env.production && cd android && ./gradlew bundleProductionRelease && cd ..",
         "code-push-ios-development": "appcenter codepush release-react -a Doffy-app/Doffy-App -d Development -t 2.1",
         "code-push-ios-staging": "appcenter codepush release-react -a Doffy-app/Doffy-App -d Staging -t 2.1",
-        "code-push-ios-production": "appcenter codepush release-react -a Doffy-app/Doffy-App -d Production -t 1.0",
+        "code-push-ios-production": "appcenter codepush release-react -a Doffy-app/Doffy-App -d Production -t 1.2",
         "code-push-android-development": "appcenter codepush release-react -a Doffy-app/Doffy-Android -d Development -t 1.3",
         "code-push-android-staging": "appcenter codepush release-react -a Doffy-app/Doffy-Android -d Staging -t 2.1",
         "code-push-android-production": "appcenter codepush release-react -a Doffy-app/Doffy-Android -d Production -t 1.2",
