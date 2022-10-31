@@ -23,7 +23,7 @@ import {ScaledSheet} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {SharedElement} from 'react-navigation-shared-element';
 import {onGoToProfile} from 'utility/assistant';
-import {formatDayGroupBuying, formatLocaleNumber} from 'utility/format';
+import {formatLocaleNumber} from 'utility/format';
 import {TypeMoreOptionsMe} from '../DiscoveryScreen';
 
 export interface ParamsLikeGB {
@@ -163,9 +163,7 @@ const ButtonCheckJoined = (item: TypeGroupBuying, theme: TypeTheme) => {
                 ]}>
                 <StyleText
                     i18Text={
-                        isJoined
-                            ? 'discovery.joined'
-                            : 'discovery.joinGroupBuying'
+                        isJoined ? 'discovery.joined' : 'discovery.joinNow'
                     }
                     customStyle={[
                         styles.textTellJoin,
@@ -317,7 +315,10 @@ const BubbleGroupBuying = (props: Props) => {
                     <View style={styles.infoView}>
                         <Entypo
                             name="location-pin"
-                            style={styles.iconLocation}
+                            style={[
+                                styles.iconLocation,
+                                {color: theme.borderColor},
+                            ]}
                         />
                         <View style={styles.textLocationTouch}>
                             <StyleText
@@ -346,9 +347,15 @@ const BubbleGroupBuying = (props: Props) => {
                 )}
 
                 <View style={styles.infoView}>
-                    <StyleIcon source={Images.icons.deadline} size={10} />
+                    <StyleIcon
+                        source={Images.icons.username}
+                        size={13}
+                        customStyle={{tintColor: theme.borderColor}}
+                    />
                     <StyleText
-                        originValue={formatDayGroupBuying(item.deadlineDate)}
+                        originValue={`${formatLocaleNumber(
+                            item.retailPrice,
+                        )}vnd`}
                         customStyle={[
                             styles.textInfo,
                             {color: theme.borderColor},
@@ -357,7 +364,7 @@ const BubbleGroupBuying = (props: Props) => {
                 </View>
 
                 <View style={styles.infoView}>
-                    <StyleIcon source={Images.icons.dollar} size={10} />
+                    <StyleIcon source={Images.icons.dollar} size={13} />
                     <StyleText
                         i18Text="discovery.numberPeople"
                         i18Params={{
@@ -381,7 +388,7 @@ const BubbleGroupBuying = (props: Props) => {
                         )}vnd`}
                         customStyle={[
                             styles.textInfo,
-                            {color: theme.highlightColor},
+                            {color: theme.highlightColor, fontWeight: 'bold'},
                         ]}
                     />
                 </View>
@@ -389,6 +396,8 @@ const BubbleGroupBuying = (props: Props) => {
                 {/* Footer */}
                 {showReactView && (
                     <View style={styles.footerView}>
+                        {showButtonJoined && ButtonCheckJoined(item, theme)}
+
                         {isLiked ? (
                             <IconLiked
                                 customStyle={[
@@ -424,8 +433,6 @@ const BubbleGroupBuying = (props: Props) => {
                                 }
                             />
                         )}
-
-                        {showButtonJoined && ButtonCheckJoined(item, theme)}
                     </View>
                 )}
             </View>
@@ -546,7 +553,6 @@ const styles = ScaledSheet.create({
     iconLocation: {
         fontSize: '13@ms',
         marginVertical: '2@s',
-        color: Theme.common.commentGreen,
     },
     textLocationTouch: {
         justifyContent: 'center',
@@ -619,9 +625,10 @@ const styles = ScaledSheet.create({
     },
     footerView: {
         width: '100%',
-        flexDirection: 'row-reverse',
+        flexDirection: 'row',
         alignItems: 'center',
-        paddingTop: '5@vs',
+        justifyContent: 'space-between',
+        paddingTop: '10@vs',
     },
     iconLike: {
         fontSize: '25@ms',

@@ -13,6 +13,7 @@ import StyleTouchable from '../StyleTouchable';
 interface Props {
     initDate: Date;
     onChangeDateTime(selectedDate: Date): void;
+    onCancel?(): void;
     minimumDate?: Date;
     maximumDate?: Date;
     theme: TypeTheme;
@@ -51,6 +52,7 @@ class ClassDateTimePicker extends Component<Props, States> {
             tempDate: this.props.initDate,
         });
         this.hide();
+        this.props.onCancel?.();
     }
 
     render() {

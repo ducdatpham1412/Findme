@@ -19,7 +19,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 const tabBarHeight = moderateScale(50);
 const addMoreHeight = moderateScale(3);
 const checkBottom = Metrics.safeBottomPadding - verticalScale(10);
-const indicatorHeight = moderateScale(37);
+const indicatorHeight = moderateScale(45);
 const safeBottomHeight = checkBottom <= 0 ? verticalScale(0) : checkBottom;
 export const tabBarViewHeight = tabBarHeight + safeBottomHeight + addMoreHeight;
 
@@ -68,6 +68,10 @@ const TabNavigator = (props: any) => {
                     source={Images.icons.home}
                     customStyle={[styles.iconTabBar, {tintColor}]}
                 />
+                <StyleText
+                    i18Text="discovery.home"
+                    customStyle={[styles.textTitle, {color: tintColor}]}
+                />
             </StyleTouchable>
         );
     };
@@ -83,6 +87,10 @@ const TabNavigator = (props: any) => {
                     name="heart-o"
                     style={[styles.profile, {color: tintColor}]}
                 />
+                <StyleText
+                    i18Text="profile.favorite"
+                    customStyle={[styles.textTitle, {color: tintColor}]}
+                />
             </StyleTouchable>
         );
     };
@@ -97,6 +105,10 @@ const TabNavigator = (props: any) => {
                 <StyleImage
                     source={Images.icons.reputation}
                     customStyle={[styles.iconTabBar, {tintColor}]}
+                />
+                <StyleText
+                    i18Text="reputation.community"
+                    customStyle={[styles.textTitle, {color: tintColor}]}
                 />
             </StyleTouchable>
         );
@@ -125,6 +137,10 @@ const TabNavigator = (props: any) => {
                     name="user-o"
                     style={[styles.profile, {color: tintColor}]}
                 />
+                <StyleText
+                    i18Text="profile.title"
+                    customStyle={[styles.textTitle, {color: tintColor}]}
+                />
             </StyleTouchable>
         );
     };
@@ -139,11 +155,7 @@ const TabNavigator = (props: any) => {
                     Redux.setNumberNewNotifications(0);
                     navigate(MAIN_SCREEN.notificationRoute);
                 }}>
-                <View
-                    style={{
-                        height: '100%',
-                        justifyContent: 'center',
-                    }}>
+                <View>
                     <StyleImage
                         source={Images.icons.notification}
                         customStyle={[styles.iconTabBar, {tintColor}]}
@@ -161,6 +173,10 @@ const TabNavigator = (props: any) => {
                         </View>
                     )}
                 </View>
+                <StyleText
+                    i18Text="notification.title"
+                    customStyle={[styles.textTitle, {color: tintColor}]}
+                />
             </StyleTouchable>
         );
     };
@@ -222,7 +238,6 @@ const TabNavigator = (props: any) => {
                     styles.tabBarDown,
                     {
                         height: tabBarHeight,
-                        backgroundColor: theme.backgroundColor,
                     },
                 ]}>
                 {TabBarIndicator()}
@@ -251,7 +266,7 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: Theme.common.red,
-        top: '9@ms',
+        top: '-3@ms',
         right: '-5@ms',
     },
     profile: {
@@ -312,6 +327,9 @@ const styles = ScaledSheet.create({
     safeBottom: {
         width: '100%',
         height: safeBottomHeight,
+    },
+    textTitle: {
+        fontSize: '7@ms',
     },
 });
 

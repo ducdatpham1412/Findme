@@ -349,6 +349,37 @@ const ProfileAccount = () => {
         [isShopAccount],
     );
 
+    const RenderItemGbJoined = useCallback(
+        (item: TypeGroupBuying) => {
+            return (
+                <BubbleGroupBuying
+                    item={item}
+                    onGoToDetailGroupBuying={() => {
+                        navigate(PROFILE_ROUTE.detailGroupBuying, {
+                            item,
+                            setList: gbJoinedPaging.setList,
+                        });
+                    }}
+                    onShowMoreOption={() => null}
+                    onHandleLike={params =>
+                        onHandleLike(params, gbJoinedPaging.setList)
+                    }
+                    onShowModalComment={(post, type) =>
+                        showCommentDiscovery({
+                            post,
+                            type,
+                            setList: gbJoinedPaging.setList,
+                        })
+                    }
+                    onChangePostIdFocusing={() => null}
+                    detailGroupTarget={PROFILE_ROUTE.detailGroupBuying}
+                    containerWidth={width * 0.93}
+                />
+            );
+        },
+        [isShopAccount],
+    );
+
     const RenderItemGbFavoriteJoined = useCallback(
         (item: TypeGroupBuying & TypeBubblePalace, setList: any) => {
             if (item.postType === POST_TYPE.groupBuying) {
@@ -413,7 +444,7 @@ const ProfileAccount = () => {
                         item={item}
                         setList={setList}
                         isHorizontal={false}
-                        syncWidth={width * 0.6}
+                        syncWidth={width * 0.43}
                         detailGroupTarget={PROFILE_ROUTE.detailGroupBuying}
                         containerStyle={styles.itemJoiningContainer}
                     />
@@ -605,7 +636,7 @@ const ProfileAccount = () => {
                                             gbJoiningPaging.setList,
                                         )
                                     }
-                                    keyExtractor={item => item.id}
+                                    keyExtractor={item => item?.joinId}
                                     directionalLockEnabled
                                     showsHorizontalScrollIndicator={false}
                                     ListEmptyComponent={() => null}
@@ -623,10 +654,7 @@ const ProfileAccount = () => {
                                 ]}
                             />
                             {gbJoinedPaging.list.map(item =>
-                                RenderItemGbFavoriteJoined(
-                                    item,
-                                    gbJoinedPaging.setList,
-                                ),
+                                RenderItemGbJoined(item),
                             )}
                             {gbJoinedPaging.loading && (
                                 <LoadingIndicator

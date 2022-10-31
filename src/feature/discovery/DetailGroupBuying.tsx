@@ -4,6 +4,7 @@ import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {apiGetListPeopleJoined, apiJoinGroupBuying} from 'api/discovery';
 import {TypeGroupBuying} from 'api/interface';
 import {
+    TypeJoinGroupBookingRequest,
     TypePeopleJoinedResponse,
     TypeShowModalCommentOrLike,
 } from 'api/interface/discovery';
@@ -14,7 +15,12 @@ import {
     apiLikePost,
     apiUnLikePost,
 } from 'api/profile';
-import {GROUP_BUYING_STATUS, RELATIONSHIP, TYPE_DYNAMIC_LINK} from 'asset/enum';
+import {
+    GROUP_BUYING_STATUS,
+    RELATIONSHIP,
+    STATUS,
+    TYPE_DYNAMIC_LINK,
+} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {
@@ -61,19 +67,14 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SharedElement} from 'react-navigation-shared-element';
 import appPurchase from 'utility/appPurchase';
 import {
+    borderWidthTiny,
     fakeGroupBuying,
     logger,
     modeExpUsePaging,
     onGoToProfile,
     onGoToSignUp,
 } from 'utility/assistant';
-import {
-    formatDayFromNow,
-    formatDayGroupBuying,
-    formatFromNow,
-    formatLocaleNumber,
-    isTimeBefore,
-} from 'utility/format';
+import {formatFromNow, formatLocaleNumber} from 'utility/format';
 import {I18Normalize} from 'utility/I18Next';
 import ModalPeopleJoined from './components/ModalPeopleJoined';
 
@@ -239,11 +240,8 @@ const DetailGroupBuying = ({route}: Props) => {
     const modalOptionRef = useRef<any>(null);
     const modalJoinedRef = useRef<Modalize>(null);
     const modalCommentLikeRef = useRef<ModalCommentLike>(null);
-    const modalConfirmJoin = useRef<Modalize>(null);
     const [load, setLoad] = useState(false);
     const [item, setItem] = useState(route.params?.item || fakeGroupBuying);
-
-    const chosenDeposit = useRef(LIST_DEPOSIT_PRICES[0]);
 
     const listJoinedPaging = !isModeExp
         ? usePaging({
@@ -266,7 +264,7 @@ const DetailGroupBuying = ({route}: Props) => {
     const [status, setStatus] = useState(item.status);
 
     const isMyBubble = item.relationship === RELATIONSHIP.self;
-    const isExpired = isTimeBefore(item.endDate, new Date());
+    const isExpired = item.status === STATUS.archive;
 
     const onRefresh = async () => {
         if (item) {
@@ -287,18 +285,6 @@ const DetailGroupBuying = ({route}: Props) => {
             }
         }
     };
-
-    useEffect(() => {
-        if (item.prices.length) {
-            const standardPrice =
-                Number(item.prices[item.prices.length - 1].value) * 0.2;
-            const temp =
-                LIST_DEPOSIT_PRICES.find(
-                    price => price.value > standardPrice,
-                ) || LIST_DEPOSIT_PRICES[LIST_DEPOSIT_PRICES.length - 1];
-            chosenDeposit.current = temp;
-        }
-    }, [item.prices]);
 
     useEffect(() => {
         const getData = async () => {
@@ -347,21 +333,20 @@ const DetailGroupBuying = ({route}: Props) => {
         }
     };
 
-    const onJoinGroupBuying = async () => {
+    const onJoinGroupBuying = async (params: TypeJoinGroupBookingRequest) => {
         if (isModeExp || status !== GROUP_BUYING_STATUS.notJoined) {
             return;
         }
 
         try {
-            modalConfirmJoin.current?.close();
             Redux.setIsLoading(true);
             const oldStatus = status;
             const oldListPeopleJoined = [...listJoinedPaging.list];
-            await requestPurchase(chosenDeposit.current.productId);
+            await requestPurchase(params.productId);
 
             try {
                 await apiCreatePurchaseHistory({
-                    money: chosenDeposit.current.money,
+                    money: params.money,
                     postId: item.id,
                 });
 
@@ -384,7 +369,10 @@ const DetailGroupBuying = ({route}: Props) => {
                 );
                 updateStatus = GROUP_BUYING_STATUS.joinedNotBought;
                 updateTotalJoins = 1;
-                await apiJoinGroupBuying(item.id);
+                await apiJoinGroupBuying({
+                    ...params,
+                    postId: item.id,
+                });
 
                 setTotalJoined(totalJoined + updateTotalJoins);
                 setList((preValue: Array<TypeGroupBuying>) => {
@@ -403,7 +391,7 @@ const DetailGroupBuying = ({route}: Props) => {
                 setStatus(oldStatus);
                 listJoinedPaging.setList(oldListPeopleJoined);
                 await apiCreateErrorLog(
-                    `Error when deposit, gb: ${item.id}, money: ${chosenDeposit.current.money}`,
+                    `Error when deposit, gb: ${item.id}, money: ${params.money}`,
                 );
                 appAlert(err);
             }
@@ -418,105 +406,25 @@ const DetailGroupBuying = ({route}: Props) => {
      * Render views
      */
     const Information = () => {
-        const chooseTextRemaining = () => {
-            const dayRemaining = formatDayFromNow(item.deadlineDate);
-            if (dayRemaining > 0) {
-                return (
-                    <StyleText
-                        i18Text="discovery.dayRemain"
-                        i18Params={{
-                            value: formatDayFromNow(item.deadlineDate),
-                        }}
-                        customStyle={[
-                            styles.textTime,
-                            {
-                                color: isExpired
-                                    ? Theme.common.red
-                                    : theme.textColor,
-                            },
-                        ]}
-                    />
-                );
-            }
-
-            if (dayRemaining === 0) {
-                return (
-                    <StyleText
-                        i18Text="discovery.today"
-                        customStyle={[
-                            styles.textTime,
-                            {
-                                color: Theme.common.red,
-                                fontWeight: 'bold',
-                            },
-                        ]}
-                    />
-                );
-            }
-
-            return null;
-        };
-
         return (
             <>
                 <TitleInformation
-                    icon={Images.icons.calendar}
-                    title="discovery.applicationPeriod"
+                    icon={Images.icons.username}
+                    title="discovery.retailPrice"
                     titleColor={theme.textHightLight}
                 />
-                <View style={styles.timeView}>
-                    <StyleText
-                        originValue={formatDayGroupBuying(item.startDate)}
-                        customStyle={[
-                            styles.textTime,
-                            {color: theme.textColor},
-                        ]}
-                    />
-                    <StyleText
-                        originValue="~"
-                        customStyle={[
-                            styles.textTime,
-                            {color: theme.borderColor},
-                        ]}
-                    />
-                    <StyleText
-                        originValue={formatDayGroupBuying(item.endDate)}
-                        customStyle={[
-                            styles.textTime,
-                            {
-                                color: isExpired
-                                    ? Theme.common.red
-                                    : theme.textColor,
-                            },
-                        ]}
-                    />
-                </View>
-
-                <TitleInformation
-                    icon={Images.icons.deadline}
-                    title="profile.subscriptionDeadline"
-                    titleColor={theme.textHightLight}
-                />
-                <View style={styles.timeView}>
-                    <StyleText
-                        originValue={formatDayGroupBuying(item.deadlineDate)}
-                        customStyle={[
-                            styles.textTime,
-                            {color: theme.textColor},
-                        ]}
-                    />
-                    {!isExpired && (
-                        <>
-                            <StyleText
-                                originValue=":"
-                                customStyle={[
-                                    styles.textTime,
-                                    {color: theme.borderColor},
-                                ]}
-                            />
-                            {chooseTextRemaining()}
-                        </>
-                    )}
+                <View style={styles.pricesView}>
+                    <View style={styles.priceBox}>
+                        <StyleText
+                            originValue={`${formatLocaleNumber(
+                                item.retailPrice,
+                            )} vnd`}
+                            style={[
+                                styles.peoplePriceText,
+                                {color: theme.highlightColor},
+                            ]}
+                        />
+                    </View>
                 </View>
 
                 <TitleInformation
@@ -572,10 +480,58 @@ const DetailGroupBuying = ({route}: Props) => {
                         originValue={item.creatorLocation}
                         customStyle={[
                             styles.titleInformation,
-                            {color: theme.textColor, fontWeight: 'normal'},
+                            {
+                                color: theme.textColor,
+                                fontWeight: 'normal',
+                                marginLeft: 5,
+                            },
                         ]}
                     />
                 </View>
+
+                {item.amount !== null && item.deposit !== null && (
+                    <View style={styles.depositView}>
+                        <View
+                            style={[
+                                styles.depositBox,
+                                {borderColor: theme.borderColor},
+                            ]}>
+                            {item.amount && (
+                                <StyleText
+                                    i18Text="discovery.amountBookGb"
+                                    i18Params={{
+                                        value: item.amount,
+                                    }}
+                                    customStyle={[
+                                        styles.textDeposit,
+                                        {color: theme.textHightLight},
+                                    ]}
+                                />
+                            )}
+                            {item.deposit && (
+                                <StyleText
+                                    i18Text="discovery.depositAmount"
+                                    i18Params={{
+                                        value: formatLocaleNumber(item.deposit),
+                                    }}
+                                    customStyle={[
+                                        styles.textDeposit,
+                                        {color: theme.textHightLight},
+                                    ]}
+                                />
+                            )}
+                            {!!item.note && (
+                                <StyleText
+                                    originValue={item.note}
+                                    customStyle={[
+                                        styles.textDeposit,
+                                        {color: theme.borderColor},
+                                    ]}
+                                />
+                            )}
+                        </View>
+                    </View>
+                )}
             </>
         );
     };
@@ -707,21 +663,23 @@ const DetailGroupBuying = ({route}: Props) => {
 
         return (
             <>
-                <StyleText
-                    i18Text={
-                        totalJoined
-                            ? 'discovery.numberPeopleJoin'
-                            : 'discovery.beTheFirstJoin'
-                    }
-                    customStyle={[
-                        styles.titleListPeopleBuying,
-                        {color: theme.textHightLight},
-                    ]}
-                    i18Params={{
-                        value: totalJoined,
-                    }}
-                    onPress={() => modalJoinedRef.current?.open()}
-                />
+                {!isMyBubble && (
+                    <StyleText
+                        i18Text={
+                            totalJoined
+                                ? 'discovery.numberPeopleJoin'
+                                : 'discovery.beTheFirstJoin'
+                        }
+                        customStyle={[
+                            styles.titleListPeopleBuying,
+                            {color: theme.textHightLight},
+                        ]}
+                        i18Params={{
+                            value: totalJoined,
+                        }}
+                        onPress={() => modalJoinedRef.current?.open()}
+                    />
+                )}
                 <StyleTouchable
                     customStyle={styles.peopleJoinView}
                     onPress={() => modalJoinedRef.current?.open()}>
@@ -790,43 +748,113 @@ const DetailGroupBuying = ({route}: Props) => {
                             {color: theme.highlightColor},
                         ]}
                     />
-                </>
-            );
-        }
 
-        if (
-            [
-                GROUP_BUYING_STATUS.notJoined,
-                GROUP_BUYING_STATUS.joinedNotBought,
-            ].includes(status)
-        ) {
-            const hadDeposited = status === GROUP_BUYING_STATUS.joinedNotBought;
-            const colorGradient = hadDeposited
-                ? [Theme.common.orange, Theme.common.orange]
-                : [Theme.common.gradientTabBar1, Theme.common.gradientTabBar2];
-            return (
-                <>
                     <LinearGradient
-                        colors={colorGradient}
-                        style={[
-                            styles.groupBuyingBox,
-                            {opacity: isExpired ? 0.5 : 1},
-                        ]}>
+                        colors={[
+                            Theme.common.gradientTabBar1,
+                            Theme.common.gradientTabBar2,
+                        ]}
+                        style={styles.groupBuyingBox}>
                         <StyleTouchable
                             customStyle={styles.touchGroupBuying}
-                            onPress={() => modalConfirmJoin.current?.open()}
-                            disable={isExpired || hadDeposited}
-                            disableOpacity={1}>
+                            onPress={() => {
+                                navigate(ROOT_SCREEN.detailGroupBuying, {
+                                    itemId: item.id,
+                                });
+                            }}>
                             <StyleText
-                                i18Text={
-                                    hadDeposited
-                                        ? 'discovery.deposited'
-                                        : 'discovery.joinGroupBuying'
-                                }
+                                i18Text="discovery.continueJoin"
                                 customStyle={styles.textGroupBuying}
                             />
                         </StyleTouchable>
                     </LinearGradient>
+                </>
+            );
+        }
+
+        if (status === GROUP_BUYING_STATUS.joinedNotBought) {
+            return (
+                <>
+                    <LinearGradient
+                        colors={[Theme.common.orange, Theme.common.orange]}
+                        style={[
+                            styles.groupBuyingBox,
+                            {opacity: isExpired ? 0.5 : 1},
+                        ]}>
+                        <View style={styles.touchGroupBuying}>
+                            <StyleText
+                                i18Text="discovery.deposited"
+                                customStyle={styles.textGroupBuying}
+                            />
+                        </View>
+                    </LinearGradient>
+
+                    {isExpired && (
+                        <StyleText
+                            i18Text="discovery.gbExpired"
+                            customStyle={styles.expiredText}
+                        />
+                    )}
+                </>
+            );
+        }
+
+        if (status === GROUP_BUYING_STATUS.notJoined) {
+            return (
+                <>
+                    <View style={styles.buttonJoinView}>
+                        <StyleTouchable
+                            customStyle={[
+                                styles.buySeparatelyBox,
+                                {backgroundColor: theme.backgroundButtonColor},
+                            ]}
+                            onPress={() =>
+                                modalConfirmJoin.showModal({
+                                    isRetail: true,
+                                })
+                            }>
+                            <StyleText
+                                i18Text="discovery.buySeparately"
+                                customStyle={[
+                                    styles.textGroupBuying,
+                                    {
+                                        color: theme.textColor,
+                                        fontWeight: 'normal',
+                                    },
+                                ]}
+                            />
+                        </StyleTouchable>
+                        <View style={{width: '3%'}} />
+                        <LinearGradient
+                            colors={[
+                                Theme.common.gradientTabBar1,
+                                Theme.common.gradientTabBar2,
+                            ]}
+                            style={[
+                                styles.groupBuyingBox,
+                                {opacity: isExpired ? 0.5 : 1, marginTop: 0},
+                            ]}>
+                            <StyleTouchable
+                                customStyle={styles.groupJoinBox}
+                                onPress={() =>
+                                    modalConfirmJoin.showModal({
+                                        isRetail: false,
+                                    })
+                                }
+                                disable={isExpired}
+                                disableOpacity={1}>
+                                <StyleIcon
+                                    source={Images.icons.createGroup}
+                                    size={15}
+                                    customStyle={styles.iconGroup}
+                                />
+                                <StyleText
+                                    i18Text="discovery.joinGroupBuying"
+                                    customStyle={styles.textGroupBuying}
+                                />
+                            </StyleTouchable>
+                        </LinearGradient>
+                    </View>
 
                     {isExpired && (
                         <StyleText
@@ -883,6 +911,12 @@ const DetailGroupBuying = ({route}: Props) => {
             </View>
         );
     };
+
+    const modalConfirmJoin = ModalConfirmJoinGb({
+        onConfirm: onJoinGroupBuying,
+        retailPrice: item.retailPrice,
+        prices: item.prices,
+    });
 
     return (
         <>
@@ -998,11 +1032,7 @@ const DetailGroupBuying = ({route}: Props) => {
                     });
                 }}
             />
-            <ModalConfirmJoinGb
-                ref={modalConfirmJoin}
-                onConfirm={onJoinGroupBuying}
-                money={chosenDeposit.current.money}
-            />
+            {modalConfirmJoin.jsx()}
 
             {isLoading && <LoadingScreen />}
 
@@ -1127,12 +1157,35 @@ const styles = ScaledSheet.create({
         fontSize: FONT_SIZE.small,
         marginTop: '10@vs',
     },
+    buttonJoinView: {
+        width: '100%',
+        marginTop: '15@vs',
+        flexDirection: 'row',
+        paddingHorizontal: '20@s',
+    },
+    buySeparatelyBox: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: '10@ms',
+    },
     groupBuyingBox: {
-        width: '75%',
+        width: '65%',
         backgroundColor: Theme.common.gradientTabBar1,
         alignSelf: 'center',
         marginTop: '15@vs',
         borderRadius: '10@ms',
+    },
+    groupJoinBox: {
+        width: '100%',
+        paddingVertical: '5@vs',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    iconGroup: {
+        marginRight: '5@s',
+        tintColor: Theme.common.white,
     },
     touchGroupBuying: {
         width: '100%',
@@ -1227,6 +1280,21 @@ const styles = ScaledSheet.create({
     textSuccessfully: {
         fontSize: FONT_SIZE.small,
         alignSelf: 'center',
+    },
+    depositView: {
+        marginTop: '15@vs',
+        flexDirection: 'row',
+        paddingHorizontal: '20@s',
+        justifyContent: 'center',
+    },
+    depositBox: {
+        borderWidth: borderWidthTiny,
+        paddingHorizontal: '15@s',
+        paddingVertical: '5@vs',
+        borderRadius: '5@ms',
+    },
+    textDeposit: {
+        fontSize: FONT_SIZE.normal,
     },
 });
 

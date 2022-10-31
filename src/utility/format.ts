@@ -95,6 +95,9 @@ export const formatDayGroupBuying = (date: string) => {
 };
 
 export const formatLocaleNumber = (value: string) => {
+    if (!value) {
+        return '';
+    }
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 

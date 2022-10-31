@@ -220,13 +220,14 @@ const styles = ScaledSheet.create({
     },
     titleGroupBooking: {
         fontSize: FONT_SIZE.big,
-        // fontWeight: 'bold',
+        fontWeight: 'bold',
         left: '10@s',
         marginTop: '20@vs',
         marginBottom: '10@vs',
     },
     titleDiscovery: {
         fontSize: FONT_SIZE.big,
+        fontWeight: 'bold',
         left: '10@s',
         marginTop: '20@vs',
     },
@@ -277,7 +278,7 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
     },
     textCategory: {
-        fontSize: FONT_SIZE.tiny,
+        fontSize: '10@ms',
         marginTop: '5@vs',
     },
 });

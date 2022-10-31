@@ -19,12 +19,8 @@ export interface TypeCreateGroupBuying {
     topic: Array<number>;
     content: string;
     images: Array<string>;
-    deadlineDate: string;
-    startDate: string;
-    endDate: string;
     retailPrice: string;
     prices: Array<TypePrice>;
-    maxGroups: number;
     isDraft: boolean;
 }
 
@@ -41,4 +37,14 @@ export interface TypeEditGroupBooking {
     content: string;
     is_public_from_draft?: boolean;
     // max_groups: number;
+}
+
+export interface TypeJoinGroupBookingRequest {
+    postId: string;
+    money: string;
+    amount: number;
+    time_will_buy: string;
+    note: string;
+    is_retail: boolean;
+    productId: string;
 }
