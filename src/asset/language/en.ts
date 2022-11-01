@@ -52,7 +52,7 @@ const login = {
         send: {
             header: 'Forgot password',
             receiveThrow: 'Receive OTP via',
-            phone: 'Phone no',
+            phone: 'Phone',
         },
         form: {
             header: 'Set up password',
@@ -65,7 +65,7 @@ const login = {
         type: {
             header: 'Sign up',
             chooseMethod: 'Choose method signing up',
-            phone: 'Phone no',
+            phone: 'Phone',
         },
         form: {
             header: 'Sign up',
@@ -160,7 +160,7 @@ const discovery = {
     continueJoin: 'Continue joining',
     joined: 'Joined',
     deposited: 'Deposited',
-    numberPeopleJoin: '{{value}} turns joined buying',
+    numberGroupJoined: '{{value}} groups joined',
     beTheFirstJoin: 'Be the first person join this campaign',
     bought: 'Bought',
     confirmBought: 'Confirm bought',
@@ -210,6 +210,9 @@ const discovery = {
     amount: 'Amount:',
     noteForMerchant: 'Note for merchant',
     arrivalTime: 'Arrival time:',
+    note: 'Note: ',
+    numberRetailTurns: '{{value}} buying separately turns',
+    addPhoneNumber: 'Add phone number',
 };
 
 // REPUTATION
@@ -439,6 +442,8 @@ const alert = {
     clickHeartModeExp: 'Finding hobby chat is only used when you logged in !',
     clickPlusModeExp: 'Create bubble chat only used when you logged in !',
     moreButtonContent: 'Go to Sign up',
+    needToAddPhone: 'You need to add phone number\nin order to join services',
+    phoneExisted: 'This phone have been used by one other',
 
     // FOR SETTING
     nowPassError: 'Current password not true !',

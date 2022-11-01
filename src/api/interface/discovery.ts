@@ -2,12 +2,24 @@ export type TypeShowModalCommentOrLike = 'comment' | 'like';
 
 export interface TypePeopleJoinedResponse {
     id: string;
+    deposit: string | null;
+    amount: number | null;
+    timeWillBuy: string | null;
+    note: string | null;
     creator: number;
     creatorName: string;
     creatorAvatar: string;
+    creatorPhone: string;
     created: string;
     status: number | null;
     relationship: number | null;
+}
+
+export interface TypeGroupPeopleJoined {
+    id: string;
+    totalMembers: number;
+    listPeople: Array<TypePeopleJoinedResponse>;
+    created: string;
 }
 
 export interface TypePrice {
@@ -47,4 +59,8 @@ export interface TypeJoinGroupBookingRequest {
     note: string;
     is_retail: boolean;
     productId: string;
+}
+export interface TypeJoinGbResponse {
+    groupId: string | null;
+    joinId: string;
 }

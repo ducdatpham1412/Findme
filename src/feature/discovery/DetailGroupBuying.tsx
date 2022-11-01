@@ -1,7 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import {BlurView} from '@react-native-community/blur';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
-import {apiGetListPeopleJoined, apiJoinGroupBuying} from 'api/discovery';
+import {
+    apiGetListGroupPeopleJoin,
+    apiGetListPeopleRetail,
+    apiJoinGroupBuying,
+} from 'api/discovery';
 import {TypeGroupBuying} from 'api/interface';
 import {
     TypeJoinGroupBookingRequest,
@@ -9,12 +13,7 @@ import {
     TypeShowModalCommentOrLike,
 } from 'api/interface/discovery';
 import {apiGetDetailBubble} from 'api/module';
-import {
-    apiCreateErrorLog,
-    apiCreatePurchaseHistory,
-    apiLikePost,
-    apiUnLikePost,
-} from 'api/profile';
+import {apiCreateErrorLog, apiLikePost, apiUnLikePost} from 'api/profile';
 import {
     GROUP_BUYING_STATUS,
     RELATIONSHIP,
@@ -77,6 +76,7 @@ import {
 import {formatFromNow, formatLocaleNumber} from 'utility/format';
 import {I18Normalize} from 'utility/I18Next';
 import ModalPeopleJoined from './components/ModalPeopleJoined';
+import ModalPeopleRetail from './components/ModalPeopleRetail';
 
 interface Props {
     route: {
@@ -234,22 +234,33 @@ const DetailGroupBuying = ({route}: Props) => {
     const isInRoot = route.name === ROOT_SCREEN.detailGroupBuying;
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
-    const {profile} = Redux.getPassport();
     const isLoading = Redux.getIsLoading();
 
     const modalOptionRef = useRef<any>(null);
     const modalJoinedRef = useRef<Modalize>(null);
+    const modalPersonalRef = useRef<Modalize>(null);
     const modalCommentLikeRef = useRef<ModalCommentLike>(null);
     const [load, setLoad] = useState(false);
     const [item, setItem] = useState(route.params?.item || fakeGroupBuying);
 
-    const listJoinedPaging = !isModeExp
+    const listGroupsJoinPaging = !isModeExp
         ? usePaging({
-              request: apiGetListPeopleJoined,
+              request: apiGetListGroupPeopleJoin,
               params: {
                   postId: item.id || route.params?.itemId,
                   take: 10,
               },
+          })
+        : modeExpUsePaging();
+
+    const listJoinPersonalPaging = !isModeExp
+        ? usePaging({
+              request: apiGetListPeopleRetail,
+              params: {
+                  postId: item.id || route.params?.itemId,
+                  take: 10,
+              },
+              isInitNotRunRequest: true,
           })
         : modeExpUsePaging();
 
@@ -259,7 +270,6 @@ const DetailGroupBuying = ({route}: Props) => {
 
     const [isLiked, setIsLiked] = useState(item.isLiked);
     const [totalLikes, setTotalLikes] = useState(item.totalLikes);
-    const [totalJoined, setTotalJoined] = useState(item.totalJoins);
     const [disableShare, setDisableShare] = useState(false);
     const [status, setStatus] = useState(item.status);
 
@@ -272,12 +282,21 @@ const DetailGroupBuying = ({route}: Props) => {
                 setLoad(true);
                 const res = await apiGetDetailBubble(item.id);
                 const {data} = res;
+                if (setList) {
+                    setList((preValue: Array<TypeGroupBuying>) => {
+                        return preValue.map((gb: TypeGroupBuying) => {
+                            if (gb.id !== data.id) {
+                                return gb;
+                            }
+                            return data;
+                        });
+                    });
+                }
                 setItem(data);
                 setIsLiked(data.isLiked);
                 setTotalLikes(data.totalLikes);
-                setTotalJoined(data.totalJoins);
                 setStatus(data.status);
-                listJoinedPaging.onRefresh();
+                listGroupsJoinPaging.onRefresh();
             } catch (err) {
                 appAlert(err);
             } finally {
@@ -296,10 +315,19 @@ const DetailGroupBuying = ({route}: Props) => {
                     setLoad(true);
                     const res = await apiGetDetailBubble(route.params.itemId);
                     const {data} = res;
+                    if (setList) {
+                        setList((preValue: Array<TypeGroupBuying>) => {
+                            return preValue.map((gb: TypeGroupBuying) => {
+                                if (gb.id !== data.id) {
+                                    return gb;
+                                }
+                                return data;
+                            });
+                        });
+                    }
                     setItem(data);
                     setIsLiked(data.isLiked);
                     setTotalLikes(data.totalLikes);
-                    setTotalJoined(data.totalJoins);
                     setStatus(data.status);
                 } catch (err) {
                     appAlert(err);
@@ -310,6 +338,12 @@ const DetailGroupBuying = ({route}: Props) => {
         };
         getData();
     }, [isModeExp]);
+
+    useEffect(() => {
+        if (isMyBubble) {
+            listJoinPersonalPaging.onLoadMore();
+        }
+    }, [isMyBubble]);
 
     const onShowModalComment = (type: TypeShowModalCommentOrLike) => {
         if (isModeExp) {
@@ -340,56 +374,15 @@ const DetailGroupBuying = ({route}: Props) => {
 
         try {
             Redux.setIsLoading(true);
-            const oldStatus = status;
-            const oldListPeopleJoined = [...listJoinedPaging.list];
             await requestPurchase(params.productId);
 
             try {
-                await apiCreatePurchaseHistory({
-                    money: params.money,
-                    postId: item.id,
-                });
-
-                let updateStatus = status;
-                let updateTotalJoins = 0;
-                setStatus(GROUP_BUYING_STATUS.joinedNotBought);
-                listJoinedPaging.setList(
-                    (preValue: Array<TypePeopleJoinedResponse>) => {
-                        const temp: TypePeopleJoinedResponse = {
-                            id: '',
-                            creator: profile.id,
-                            creatorName: profile.name,
-                            creatorAvatar: profile.avatar,
-                            created: String(new Date()),
-                            status: null,
-                            relationship: RELATIONSHIP.self,
-                        };
-                        return [temp].concat(preValue);
-                    },
-                );
-                updateStatus = GROUP_BUYING_STATUS.joinedNotBought;
-                updateTotalJoins = 1;
                 await apiJoinGroupBuying({
                     ...params,
                     postId: item.id,
                 });
-
-                setTotalJoined(totalJoined + updateTotalJoins);
-                setList((preValue: Array<TypeGroupBuying>) => {
-                    return preValue.map(value => {
-                        if (value.id !== item.id) {
-                            return value;
-                        }
-                        return {
-                            ...value,
-                            totalJoins: value.totalJoins + updateTotalJoins,
-                            status: updateStatus,
-                        };
-                    });
-                });
+                onRefresh();
             } catch (err) {
-                setStatus(oldStatus);
-                listJoinedPaging.setList(oldListPeopleJoined);
                 await apiCreateErrorLog(
                     `Error when deposit, gb: ${item.id}, money: ${params.money}`,
                 );
@@ -655,19 +648,34 @@ const DetailGroupBuying = ({route}: Props) => {
         );
     };
 
-    const ListPeopleBuying = () => {
-        const isBiggerThanFive = listJoinedPaging.list.length > 5;
-        const displayPeople = isBiggerThanFive
-            ? listJoinedPaging.list.slice(0, 5)
-            : listJoinedPaging.list;
+    const ListGroupJoined = () => {
+        const isBiggerThanSix = item.totalGroups > 6;
+        const displayPeople: Array<TypePeopleJoinedResponse> = [];
+        listGroupsJoinPaging.list.every(group => {
+            group.listPeople.every((join: any) => {
+                if (displayPeople.length < 6) {
+                    displayPeople.push(join);
+                    return true;
+                }
+                return false;
+            });
+            if (displayPeople.length < 6) {
+                return true;
+            }
+            return false;
+        });
+
+        const displayText =
+            (isMyBubble && item.totalGroups) ||
+            (!isMyBubble && status === GROUP_BUYING_STATUS.notJoined);
 
         return (
             <>
-                {!isMyBubble && (
+                {displayText && (
                     <StyleText
                         i18Text={
-                            totalJoined
-                                ? 'discovery.numberPeopleJoin'
+                            item.totalGroups
+                                ? 'discovery.numberGroupJoined'
                                 : 'discovery.beTheFirstJoin'
                         }
                         customStyle={[
@@ -675,7 +683,7 @@ const DetailGroupBuying = ({route}: Props) => {
                             {color: theme.textHightLight},
                         ]}
                         i18Params={{
-                            value: totalJoined,
+                            value: item.totalGroups,
                         }}
                         onPress={() => modalJoinedRef.current?.open()}
                     />
@@ -698,7 +706,7 @@ const DetailGroupBuying = ({route}: Props) => {
                             />
                         ),
                     )}
-                    {isBiggerThanFive && (
+                    {isBiggerThanSix && (
                         <View
                             style={[
                                 styles.peopleMoreBox,
@@ -708,14 +716,91 @@ const DetailGroupBuying = ({route}: Props) => {
                             ]}>
                             <StyleImage
                                 source={{
-                                    uri: listJoinedPaging.list[5].creatorAvatar,
+                                    uri: displayPeople[5]?.creatorAvatar || '',
                                 }}
                                 customStyle={styles.avatarMore}
                             />
                             <StyleText
                                 originValue={`+${
-                                    listJoinedPaging.list.length -
-                                    displayPeople.length
+                                    item.totalGroups - displayPeople.length
+                                }`}
+                                customStyle={[
+                                    styles.textJoinMore,
+                                    {color: theme.textHightLight},
+                                ]}
+                            />
+                        </View>
+                    )}
+                </StyleTouchable>
+            </>
+        );
+    };
+
+    const ListPeopleRetail = () => {
+        if (!isMyBubble) {
+            return null;
+        }
+
+        const isBiggerThanSix = item.totalGroups > 6;
+        const displayPeople: Array<TypePeopleJoinedResponse> = [];
+        listJoinPersonalPaging.list.every(
+            (personal: TypePeopleJoinedResponse) => {
+                if (displayPeople.length < 6) {
+                    displayPeople.push(personal);
+                    return true;
+                }
+                return false;
+            },
+        );
+
+        return (
+            <>
+                <StyleText
+                    i18Text="discovery.numberRetailTurns"
+                    customStyle={[
+                        styles.titleListPeopleBuying,
+                        {color: theme.textHightLight},
+                    ]}
+                    i18Params={{
+                        value: item.totalPersonals,
+                    }}
+                    onPress={() => modalPersonalRef.current?.open()}
+                />
+                <StyleTouchable
+                    customStyle={styles.peopleJoinView}
+                    onPress={() => modalPersonalRef.current?.open()}>
+                    {displayPeople.map(
+                        (
+                            peopleJoin: TypePeopleJoinedResponse,
+                            index: number,
+                        ) => (
+                            <StyleImage
+                                key={index}
+                                source={{uri: peopleJoin.creatorAvatar}}
+                                customStyle={[
+                                    styles.peopleJoinAvatar,
+                                    {marginLeft: index > 0 ? -5 : 0},
+                                ]}
+                            />
+                        ),
+                    )}
+                    {isBiggerThanSix && (
+                        <View
+                            style={[
+                                styles.peopleMoreBox,
+                                {
+                                    backgroundColor: theme.holderColor,
+                                },
+                            ]}>
+                            <StyleImage
+                                source={{
+                                    uri: displayPeople[5]?.creatorAvatar || '',
+                                }}
+                                customStyle={styles.avatarMore}
+                            />
+                            <StyleText
+                                originValue={`+${
+                                    item.totalGroups - displayPeople.length
                                 }`}
                                 customStyle={[
                                     styles.textJoinMore,
@@ -775,19 +860,24 @@ const DetailGroupBuying = ({route}: Props) => {
         if (status === GROUP_BUYING_STATUS.joinedNotBought) {
             return (
                 <>
-                    <LinearGradient
-                        colors={[Theme.common.orange, Theme.common.orange]}
+                    <View
                         style={[
-                            styles.groupBuyingBox,
-                            {opacity: isExpired ? 0.5 : 1},
+                            styles.depositedBox,
+                            {
+                                opacity: isExpired ? 0.5 : 1,
+                                borderColor: theme.highlightColor,
+                            },
                         ]}>
                         <View style={styles.touchGroupBuying}>
                             <StyleText
                                 i18Text="discovery.deposited"
-                                customStyle={styles.textGroupBuying}
+                                customStyle={[
+                                    styles.textGroupBuying,
+                                    {color: theme.highlightColor},
+                                ]}
                             />
                         </View>
-                    </LinearGradient>
+                    </View>
 
                     {isExpired && (
                         <StyleText
@@ -976,7 +1066,8 @@ const DetailGroupBuying = ({route}: Props) => {
                 {Information()}
                 {ToolReaction()}
                 {ButtonCheckJoin()}
-                {ListPeopleBuying()}
+                {ListGroupJoined()}
+                {ListPeopleRetail()}
                 {Content()}
             </ScrollView>
 
@@ -994,8 +1085,18 @@ const DetailGroupBuying = ({route}: Props) => {
                 <ModalPeopleJoined
                     ref={modalJoinedRef}
                     postId={item.id}
-                    listPaging={listJoinedPaging}
+                    listPaging={listGroupsJoinPaging}
                     isMyBubble={isMyBubble}
+                    totalGroups={item.totalGroups}
+                />
+            )}
+
+            {!isModeExp && isMyBubble && (
+                <ModalPeopleRetail
+                    ref={modalPersonalRef}
+                    postId={item.id}
+                    listPaging={listJoinPersonalPaging}
+                    totalRetailTurns={item.totalPersonals}
                 />
             )}
 
@@ -1175,6 +1276,13 @@ const styles = ScaledSheet.create({
         alignSelf: 'center',
         marginTop: '15@vs',
         borderRadius: '10@ms',
+    },
+    depositedBox: {
+        width: '65%',
+        alignSelf: 'center',
+        marginTop: '15@vs',
+        borderRadius: '10@ms',
+        borderWidth: '1@ms',
     },
     groupJoinBox: {
         width: '100%',

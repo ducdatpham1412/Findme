@@ -15,11 +15,13 @@ import {DISCOVERY_ROUTE} from 'navigation/config/routes';
 import {goBack, navigate} from 'navigation/NavigationService';
 import {showCommentDiscovery} from 'navigation/screen/MainTabs';
 import React, {useEffect, useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Platform, TextInput, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {borderWidthTiny} from 'utility/assistant';
 import BubbleGroupBuying from './components/BubbleGroupBuying';
 import HeaderFilterPrice from './HeaderFilterPrice';
 import HeaderFilterTopic from './HeaderFilterTopic';
@@ -42,6 +44,7 @@ const SearchScreen = ({route}: Props) => {
 
     const theme = Redux.getTheme();
     const {listPrices} = Redux.getResource();
+    const {t} = useTranslation();
 
     const [price, setPrice] = useState(listPrices[0]);
     const [topics, setTopics] = useState(
@@ -111,8 +114,8 @@ const SearchScreen = ({route}: Props) => {
                 </StyleTouchable>
                 <AppInput
                     ref={inputRef}
-                    style={[styles.input]}
-                    placeholder="Aa"
+                    style={[styles.input, {color: theme.textHightLight}]}
+                    placeholder={t('discovery.searchAround')}
                     onChangeText={text => setSearch(text)}
                     defaultValue={searchRoute}
                     returnKeyType="search"
@@ -128,17 +131,22 @@ const SearchScreen = ({route}: Props) => {
                     }}
                     placeholderTextColor={theme.holderColorLighter}
                 />
-                <StyleTouchable
-                    onPress={() => {
-                        inputRef.current?.clear();
-                        setSearch('');
-                    }}
-                    customStyle={styles.clearView}>
-                    <Feather
-                        name="x"
-                        style={[styles.iconClear, {color: theme.borderColor}]}
-                    />
-                </StyleTouchable>
+                {!!search && (
+                    <StyleTouchable
+                        onPress={() => {
+                            inputRef.current?.clear();
+                            setSearch('');
+                        }}
+                        customStyle={styles.clearView}>
+                        <Feather
+                            name="x"
+                            style={[
+                                styles.iconClear,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                    </StyleTouchable>
+                )}
             </View>
         );
     };
@@ -149,7 +157,7 @@ const SearchScreen = ({route}: Props) => {
                 <StyleTouchable
                     customStyle={[
                         styles.toolBox,
-                        {borderColor: theme.borderColor},
+                        {borderColor: theme.textHightLight},
                     ]}
                     onPress={() => {
                         inputRef.current?.blur();
@@ -160,27 +168,27 @@ const SearchScreen = ({route}: Props) => {
                         i18Text="profile.price"
                         customStyle={[
                             styles.textTool,
-                            {color: theme.borderColor},
+                            {color: theme.textHightLight},
                         ]}>
                         {!!price.value && (
                             <StyleText
                                 originValue={` (${1})`}
                                 customStyle={[
                                     styles.textTool,
-                                    {color: theme.borderColor},
+                                    {color: theme.textHightLight},
                                 ]}
                             />
                         )}
                     </StyleText>
                     <AntDesign
                         name="down"
-                        style={[styles.iconDown, {color: theme.borderColor}]}
+                        style={[styles.iconDown, {color: theme.textHightLight}]}
                     />
                 </StyleTouchable>
                 <StyleTouchable
                     customStyle={[
                         styles.toolBox,
-                        {marginLeft: 15, borderColor: theme.borderColor},
+                        {marginLeft: 15, borderColor: theme.textHightLight},
                     ]}
                     onPress={() => {
                         inputRef.current?.blur();
@@ -198,12 +206,12 @@ const SearchScreen = ({route}: Props) => {
                         }}
                         customStyle={[
                             styles.textTool,
-                            {color: theme.borderColor},
+                            {color: theme.textHightLight},
                         ]}
                     />
                     <AntDesign
                         name="down"
-                        style={[styles.iconDown, {color: theme.borderColor}]}
+                        style={[styles.iconDown, {color: theme.textHightLight}]}
                     />
                 </StyleTouchable>
             </View>
@@ -343,10 +351,7 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: '2@vs',
-        borderWidth: Platform.select({
-            ios: '0.25@ms',
-            android: '0.5@ms',
-        }),
+        borderWidth: borderWidthTiny,
         paddingHorizontal: '8@s',
         borderRadius: '20@ms',
     },
