@@ -168,7 +168,7 @@ const discovery = {
     bought: 'Đã mua',
     confirmBought: 'Xác nhận đã mua',
     participators: '{{value}} người tham gia',
-    gbExpired: 'Chiến dịch mua chung đã hết hạn',
+    gbExpired: 'Cửa hàng tạm thời không nhận thêm order',
     reviewAbout: 'Bạn đang viết review về ',
     goToProfile: 'Xem trang cá nhân',
     openLink: 'Mở đường dẫn',
@@ -209,7 +209,9 @@ const discovery = {
     searchAround: 'Tìm kiếm mọi người hoặc nơi đến',
     category: 'Loại hình ({{value}})',
     available: 'Có sẵn',
-    temporarilyClosed: 'Tạm đóng',
+    temporarilyClosed: 'Tạm dừng nhận đơn',
+    notWorry:
+        'Đừng lo lắng.\nCửa hàng chỉ tạm thời không nhận thêm order nữa\nĐơn đặt hàng của bạn vẫn tiếp tục được tiến hành.',
     closed: 'Đã kết thúc',
     amount: 'Số lượng:',
     noteForMerchant: 'Ghi chú cho người bán',
@@ -217,6 +219,7 @@ const discovery = {
     note: 'Ghi chú: ',
     numberRetailTurns: '{{value}} lượt mua riêng',
     addPhoneNumber: 'Thêm số điện thoại',
+    openAvailable: 'Mở nhận đặt đơn',
 };
 
 // REPUTATION
@@ -270,7 +273,7 @@ const profile = {
         archive: 'Tạm ẩn',
         unArchive: 'Hiện lại bảng tin',
         delete: 'Xoá',
-        sureDeletePost: 'Bạn chắc chắn muốn xoá\nbức ảnh này chứ?',
+        sureDeletePost: 'Bạn chắc chắn muốn xoá\nbài đăng này chứ?',
         enterTopic: 'Tự nhập chủ đề',
         pickImage: 'Chọn ảnh',
         addLink: 'Thêm link',
@@ -309,7 +312,8 @@ const profile = {
     subscriptionDeadline: 'Thời hạn đăng ký',
     startDate: 'Ngày bắt đầu',
     endDate: 'Ngày kết thúc',
-    addPrice: 'Thêm',
+    addPrice: 'Thêm giá',
+    editPrice: 'Sửa giá',
     number: 'Số lượng',
     price: 'Giá',
     toBecomeShopAccount:
@@ -422,6 +426,7 @@ const setting = {
     userGuide: {
         title: 'Hướng dẫn sử dụng',
     },
+    updateStatus: 'Cập nhật trạng thái',
 };
 
 // NOTIFICATION
@@ -480,6 +485,8 @@ const alert = {
     canNotEditStartTimeAndPrice:
         'Bạn không thể chỉnh ngày bắt đầu và giá mua chung',
     canChooseMaximum3: 'Bạn chỉ có thể chọn tối đa 3 chủ đề',
+    requestDeleteGbSuccess:
+        'Gửi yêu cầu xoá thành công.\nChúng tôi sẽ xét duyệt và gửi lại thông báo trong vòng 24h.\nBạn có thể huỷ yêu cầu xoá bằng việc cập nhật trạng bài đăng về lại "Có sẵn"',
 
     // PERMISSION
     permissionCamera: 'Cho phép Doffy truy cập vào máy ảnh',

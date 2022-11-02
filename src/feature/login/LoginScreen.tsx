@@ -130,56 +130,6 @@ const LoginScreen = () => {
     /**
      * Render view
      */
-
-    const InputUsernamePassword = () => {
-        return (
-            <>
-                <InputBox
-                    i18Placeholder="login.loginScreen.username"
-                    value={user}
-                    onChangeText={value => setUser(value)}
-                    onFocus={() => setUserRef(true)}
-                    onBlur={() => setUserRef(false)}
-                    onSubmitEditing={() => passRef.current.focus()}
-                    selectionColor={Theme.darkTheme.textHightLight}
-                />
-
-                <InputBox
-                    ref={passRef}
-                    i18Placeholder="login.loginScreen.password"
-                    value={pass}
-                    onChangeText={value => setPass(value)}
-                    containerStyle={styles.inputForm}
-                    returnKeyType="default"
-                    secureTextEntry
-                    selectionColor={Theme.darkTheme.textHightLight}
-                />
-            </>
-        );
-    };
-
-    const RememberPassword = () => {
-        return (
-            <RemForPass
-                isKeepSignIn={isKeepSign}
-                onClickKeepSignIn={() => setIsKeepSign(!isKeepSign)}
-            />
-        );
-    };
-
-    const ForgotPassword = () => {
-        return (
-            <StyleTouchable
-                customStyle={styles.forgotPasswordView}
-                onPress={() => navigate(LOGIN_ROUTE.forgetPasswordType)}>
-                <StyleText
-                    i18Text="login.forgotPassword"
-                    customStyle={styles.forgotPasswordText}
-                />
-            </StyleTouchable>
-        );
-    };
-
     const SignInPlatforms = () => {
         return (
             <View style={styles.signUpView}>
@@ -224,15 +174,31 @@ const LoginScreen = () => {
         <View style={styles.container}>
             <StyleContainer containerStyle={styles.body}>
                 <View style={styles.inputView}>
-                    {InputUsernamePassword()}
-                    {RememberPassword()}
-                    {userRef && !user && (
-                        <ListSaveAcc
-                            listAcc={listSaveAcc}
-                            selectAcc={selectSaveAcc}
-                            deleteAcc={deleteSaveAcc}
-                        />
-                    )}
+                    <InputBox
+                        i18Placeholder="login.loginScreen.username"
+                        value={user}
+                        onChangeText={value => setUser(value)}
+                        onFocus={() => setUserRef(true)}
+                        onBlur={() => setUserRef(false)}
+                        onSubmitEditing={() => passRef.current.focus()}
+                        selectionColor={Theme.darkTheme.textHightLight}
+                    />
+
+                    <InputBox
+                        ref={passRef}
+                        i18Placeholder="login.loginScreen.password"
+                        value={pass}
+                        onChangeText={value => setPass(value)}
+                        containerStyle={styles.inputForm}
+                        returnKeyType="default"
+                        secureTextEntry
+                        selectionColor={Theme.darkTheme.textHightLight}
+                    />
+
+                    <RemForPass
+                        isKeepSignIn={isKeepSign}
+                        onClickKeepSignIn={() => setIsKeepSign(!isKeepSign)}
+                    />
                 </View>
                 <StyleButton
                     title="login.loginScreen.signIn"
@@ -240,8 +206,25 @@ const LoginScreen = () => {
                     disable={!user || !pass}
                     onPress={onSubmitLogin}
                 />
-                {ForgotPassword()}
+
+                <StyleTouchable
+                    customStyle={styles.forgotPasswordView}
+                    onPress={() => navigate(LOGIN_ROUTE.forgetPasswordType)}>
+                    <StyleText
+                        i18Text="login.forgotPassword"
+                        customStyle={styles.forgotPasswordText}
+                    />
+                </StyleTouchable>
+
                 {SignInPlatforms()}
+
+                {userRef && !user && (
+                    <ListSaveAcc
+                        listAcc={listSaveAcc}
+                        selectAcc={selectSaveAcc}
+                        deleteAcc={deleteSaveAcc}
+                    />
+                )}
             </StyleContainer>
         </View>
     );

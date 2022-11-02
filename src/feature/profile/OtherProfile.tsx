@@ -52,6 +52,7 @@ interface Props {
         params: {
             id: number;
             onGoBack(): void;
+            seeReviewFirst?: boolean;
         };
         [key: string]: any;
     };
@@ -87,6 +88,8 @@ const onSendMessage = (profile: any) => {
 
 const OtherProfile = ({route}: Props) => {
     const {id, onGoBack} = route.params;
+    const seeReviewFirst = useRef(route.params?.seeReviewFirst).current;
+    const initIndex = useRef(seeReviewFirst ? 1 : 0).current;
     const shouldRenderOtherProfile = Redux.getShouldRenderOtherProfile();
 
     const theme = Redux.getTheme();
@@ -96,12 +99,14 @@ const OtherProfile = ({route}: Props) => {
     const optionsRef = useRef<any>(null);
     const optionPostReviewRef = useRef<any>(null);
     const tabViewRef = useRef<StyleTabView>(null);
-    const translateXIndicator = useRef(new Animated.Value(0)).current;
+    const translateXIndicator = useRef(
+        new Animated.Value(initIndex * (width / 2)),
+    ).current;
 
     const [profile, setProfile] = useState<TypeGetProfileResponse>();
     const [isFollowing, setIsFollowing] = useState(false);
     const [bubbleFocusing, setBubbleFocusing] = useState<TypeBubblePalace>();
-    const [tabIndex, setTabIndex] = useState(0);
+    const [tabIndex, setTabIndex] = useState(initIndex);
     const [postIdFocusing, setPostIdFocusing] = useState('');
 
     const isBlock = profile?.relationship === RELATIONSHIP.block;
@@ -404,7 +409,10 @@ const OtherProfile = ({route}: Props) => {
                     <StyleTabView
                         ref={tabViewRef}
                         onFirstNavigateToIndex={index => {
-                            if (index === 1 && isShopAccount) {
+                            if (
+                                (index === 1 && isShopAccount) ||
+                                seeReviewFirst
+                            ) {
                                 listPostsReviewAbout.onLoadMore();
                             }
                         }}
@@ -413,7 +421,8 @@ const OtherProfile = ({route}: Props) => {
                             if (e.index !== tabIndex) {
                                 setTabIndex(e.index);
                             }
-                        }}>
+                        }}
+                        initIndex={initIndex}>
                         <View style={styles.tabView}>
                             {listPostsPaging.list.map(item =>
                                 RenderItemMyGb(item),

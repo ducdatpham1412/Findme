@@ -48,8 +48,6 @@ const ListSaveAcc = (props: ListSaveAccProps) => {
 
     return (
         <ScrollView style={styles.container} keyboardShouldPersistTaps="always">
-            <View style={styles.background} />
-
             {listAcc.map((item, index) => (
                 <ModuleTagAcc
                     key={index}
@@ -69,16 +67,8 @@ const styles = ScaledSheet.create({
         maxHeight: '200@vs',
         position: 'absolute',
         paddingBottom: '20@vs',
-        top: '45@vs',
-        zIndex: 9,
+        top: '95@vs',
         alignSelf: 'center',
-    },
-    background: {
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        alignSelf: 'center',
-        opacity: 0.9,
         backgroundColor: Theme.darkTheme.backgroundColor,
     },
     moduleAcc: {

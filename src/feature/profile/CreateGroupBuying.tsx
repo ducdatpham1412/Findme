@@ -1,7 +1,7 @@
 import {apiCreateGroupBuying, apiEditGroupBooking} from 'api/discovery';
 import {TypeGroupBuying} from 'api/interface';
 import {TypeCreateGroupBuying} from 'api/interface/discovery';
-import {TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
+import {STATUS, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';
@@ -23,7 +23,7 @@ import {
     goBack,
     navigate,
 } from 'navigation/NavigationService';
-import React, {Component, useMemo, useRef, useState} from 'react';
+import React, {Component, useCallback, useMemo, useRef, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import {useTranslation} from 'react-i18next';
 import {Animated, Platform, TextInput, Vibration, View} from 'react-native';
@@ -184,6 +184,8 @@ const CreateGroupBuying = ({route}: Props) => {
                 itemError?.prices ||
                 itemDraft?.prices ||
                 [],
+            postStatus:
+                itemEdit?.postStatus || itemDraft?.postStatus || STATUS.active,
         };
     }, []);
 
@@ -192,6 +194,7 @@ const CreateGroupBuying = ({route}: Props) => {
     const [images] = useState(initValue.images);
     const [retailPrice, setRetailPrice] = useState(initValue.retailPrice);
     const [groupPrices, setGroupPrices] = useState(initValue.groupPrices);
+    const [postStatus, setPostStatus] = useState(initValue.postStatus);
 
     const modalTopicRef = useRef<Modalize>(null);
     const modalRetailPriceRef = useRef<ModalRetailPrice>(null);
@@ -299,7 +302,7 @@ const CreateGroupBuying = ({route}: Props) => {
                     postId: itemDraft.id,
                     content,
                     topic: topics,
-                    is_public_from_draft: true,
+                    status: STATUS.active,
                 });
                 Redux.setBubblePalaceAction({
                     action: TYPE_BUBBLE_PALACE_ACTION.editGroupBuying,
@@ -326,6 +329,7 @@ const CreateGroupBuying = ({route}: Props) => {
             images,
             retailPrice,
             groupPrices,
+            postStatus: initValue.postStatus,
         };
         if (!isEqual(temp, initValue)) {
             appAlertYesNo({
@@ -342,6 +346,31 @@ const CreateGroupBuying = ({route}: Props) => {
             goBack();
         }
     };
+
+    const onChangePostStatus = useCallback(
+        async (newPostStatus: number, postId: string) => {
+            try {
+                Redux.setIsLoading(true);
+                await apiEditGroupBooking({
+                    postId,
+                    status: newPostStatus,
+                });
+                setPostStatus(newPostStatus);
+                Redux.setBubblePalaceAction({
+                    action: TYPE_BUBBLE_PALACE_ACTION.editGroupBuying,
+                    payload: {
+                        id: postId,
+                        postStatus: newPostStatus,
+                    },
+                });
+            } catch (err) {
+                appAlert(err);
+            } finally {
+                Redux.setIsLoading(false);
+            }
+        },
+        [],
+    );
 
     /**
      * Render views
@@ -469,6 +498,19 @@ const CreateGroupBuying = ({route}: Props) => {
     };
 
     const InfoBox = () => {
+        let textStatus: I18Normalize = 'discovery.available';
+        let textButton: I18Normalize = 'discovery.temporarilyClosed';
+        let textButtonColor = theme.borderColor;
+
+        const isCloseOrDelete =
+            postStatus === STATUS.temporarilyClose ||
+            postStatus === STATUS.requestingDelete;
+        if (isCloseOrDelete) {
+            textStatus = 'discovery.temporarilyClosed';
+            textButton = 'discovery.openAvailable';
+            textButtonColor = theme.highlightColor;
+        }
+
         return (
             <>
                 <View style={styles.topicView}>
@@ -500,7 +542,7 @@ const CreateGroupBuying = ({route}: Props) => {
                         ]}>
                         <StyleIcon source={Images.icons.calendar} size={13} />
                         <StyleText
-                            i18Text="discovery.available"
+                            i18Text={textStatus}
                             customStyle={[
                                 styles.textLocation,
                                 {color: theme.textHightLight},
@@ -508,12 +550,21 @@ const CreateGroupBuying = ({route}: Props) => {
                         />
                     </View>
                     {!!itemEdit && (
-                        <StyleTouchable customStyle={styles.editStatusBox}>
+                        <StyleTouchable
+                            customStyle={styles.editStatusBox}
+                            onPress={() =>
+                                onChangePostStatus(
+                                    isCloseOrDelete
+                                        ? STATUS.active
+                                        : STATUS.temporarilyClose,
+                                    itemEdit.id,
+                                )
+                            }>
                             <StyleText
-                                i18Text="profile.post.edit"
+                                i18Text={textButton}
                                 customStyle={[
                                     styles.textEditStatus,
-                                    {color: theme.borderColor},
+                                    {color: textButtonColor},
                                 ]}
                             />
                         </StyleTouchable>
@@ -616,7 +667,9 @@ const CreateGroupBuying = ({route}: Props) => {
                                     priceValue: price.value,
                                     indexEdit: index,
                                 });
-                            }}>
+                            }}
+                            disable={!!itemEdit}
+                            disableOpacity={1}>
                             <View
                                 style={[
                                     styles.priceNumberPeople,
@@ -673,7 +726,7 @@ const CreateGroupBuying = ({route}: Props) => {
                     );
                 })}
 
-                {!itemEdit && (
+                {!itemEdit ? (
                     <AddInfoButton
                         ref={buttonAddPriceRef}
                         title="profile.addPrice"
@@ -681,6 +734,21 @@ const CreateGroupBuying = ({route}: Props) => {
                         borderColor={theme.borderColor}
                         onPress={() => modalPriceRef.current?.show()}
                     />
+                ) : (
+                    <StyleTouchable
+                        customStyle={styles.editPriceBox}
+                        hitSlop={{
+                            right: 15,
+                            bottom: 15,
+                        }}>
+                        <StyleText
+                            i18Text="profile.editPrice"
+                            customStyle={[
+                                styles.textEditPrice,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                    </StyleTouchable>
                 )}
             </View>
         );
@@ -925,7 +993,15 @@ const styles = ScaledSheet.create({
         marginLeft: '10@s',
     },
     textEditStatus: {
-        fontSize: FONT_SIZE.tiny,
+        fontSize: FONT_SIZE.small,
+        fontWeight: 'bold',
+        textDecorationLine: 'underline',
+    },
+    editPriceBox: {
+        paddingTop: '15@vs',
+    },
+    textEditPrice: {
+        fontSize: FONT_SIZE.small,
         fontWeight: 'bold',
         textDecorationLine: 'underline',
     },

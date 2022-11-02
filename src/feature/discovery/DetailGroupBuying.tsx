@@ -13,11 +13,17 @@ import {
     TypeShowModalCommentOrLike,
 } from 'api/interface/discovery';
 import {apiGetDetailBubble} from 'api/module';
-import {apiCreateErrorLog, apiLikePost, apiUnLikePost} from 'api/profile';
+import {
+    apiCreateErrorLog,
+    apiDeleteGroupBooking,
+    apiLikePost,
+    apiUnLikePost,
+} from 'api/profile';
 import {
     GROUP_BUYING_STATUS,
     RELATIONSHIP,
     STATUS,
+    TYPE_BUBBLE_PALACE_ACTION,
     TYPE_DYNAMIC_LINK,
 } from 'asset/enum';
 import Images from 'asset/img/images';
@@ -48,14 +54,21 @@ import ModalConfirmJoinGb from 'feature/common/components/ModalConfirmJoinGb';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
-import {appAlert, goBack, navigate} from 'navigation/NavigationService';
+import {
+    appAlert,
+    appAlertYesNo,
+    goBack,
+    navigate,
+} from 'navigation/NavigationService';
 import {showCommentDiscovery} from 'navigation/screen/MainTabs';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
     Platform,
     RefreshControl,
     ScrollView,
+    StyleProp,
     StyleSheet,
+    TextStyle,
     View,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -94,6 +107,7 @@ interface ParamsInformation {
     title: I18Normalize;
     icon: any;
     titleColor: string;
+    titleStyle?: StyleProp<TextStyle>;
 }
 
 const onHandleLike = async (params: {
@@ -158,13 +172,17 @@ const onHandleLike = async (params: {
 };
 
 const TitleInformation = (props: ParamsInformation) => {
-    const {icon, title, titleColor} = props;
+    const {icon, title, titleColor, titleStyle} = props;
     return (
         <View style={styles.informationView}>
             <StyleIcon source={icon} size={18} />
             <StyleText
                 i18Text={title}
-                customStyle={[styles.titleInformation, {color: titleColor}]}
+                customStyle={[
+                    styles.titleInformation,
+                    {color: titleColor},
+                    titleStyle,
+                ]}
             />
         </View>
     );
@@ -235,6 +253,7 @@ const DetailGroupBuying = ({route}: Props) => {
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
     const isLoading = Redux.getIsLoading();
+    const bubblePalaceAction = Redux.getBubblePalaceAction();
 
     const modalOptionRef = useRef<any>(null);
     const modalJoinedRef = useRef<Modalize>(null);
@@ -271,10 +290,9 @@ const DetailGroupBuying = ({route}: Props) => {
     const [isLiked, setIsLiked] = useState(item.isLiked);
     const [totalLikes, setTotalLikes] = useState(item.totalLikes);
     const [disableShare, setDisableShare] = useState(false);
-    const [status, setStatus] = useState(item.status);
 
     const isMyBubble = item.relationship === RELATIONSHIP.self;
-    const isExpired = item.status === STATUS.archive;
+    const isTemporarilyClose = item.status === STATUS.temporarilyClose;
 
     const onRefresh = async () => {
         if (item) {
@@ -295,7 +313,6 @@ const DetailGroupBuying = ({route}: Props) => {
                 setItem(data);
                 setIsLiked(data.isLiked);
                 setTotalLikes(data.totalLikes);
-                setStatus(data.status);
                 listGroupsJoinPaging.onRefresh();
             } catch (err) {
                 appAlert(err);
@@ -328,7 +345,6 @@ const DetailGroupBuying = ({route}: Props) => {
                     setItem(data);
                     setIsLiked(data.isLiked);
                     setTotalLikes(data.totalLikes);
-                    setStatus(data.status);
                 } catch (err) {
                     appAlert(err);
                 } finally {
@@ -344,6 +360,26 @@ const DetailGroupBuying = ({route}: Props) => {
             listJoinPersonalPaging.onLoadMore();
         }
     }, [isMyBubble]);
+
+    useEffect(() => {
+        if (
+            bubblePalaceAction.action ===
+            TYPE_BUBBLE_PALACE_ACTION.editGroupBuying
+        ) {
+            if (bubblePalaceAction.payload.id === item.id) {
+                setItem(preValue => {
+                    return {
+                        ...preValue,
+                        ...bubblePalaceAction.payload,
+                    };
+                });
+                Redux.setBubblePalaceAction({
+                    action: TYPE_BUBBLE_PALACE_ACTION.null,
+                    payload: null,
+                });
+            }
+        }
+    }, [bubblePalaceAction, item.id]);
 
     const onShowModalComment = (type: TypeShowModalCommentOrLike) => {
         if (isModeExp) {
@@ -368,7 +404,7 @@ const DetailGroupBuying = ({route}: Props) => {
     };
 
     const onJoinGroupBuying = async (params: TypeJoinGroupBookingRequest) => {
-        if (isModeExp || status !== GROUP_BUYING_STATUS.notJoined) {
+        if (isModeExp || item.status !== GROUP_BUYING_STATUS.notJoined) {
             return;
         }
 
@@ -395,12 +431,103 @@ const DetailGroupBuying = ({route}: Props) => {
         }
     };
 
+    const onDeleteGroupBuying = useCallback(() => {
+        const agreeDelete = async () => {
+            try {
+                Redux.setIsLoading(true);
+                goBack();
+                await apiDeleteGroupBooking(item.id);
+                setItem(preValue => ({
+                    ...preValue,
+                    postStatus: STATUS.requestingDelete,
+                }));
+                if (setList) {
+                    setList((preValue: Array<TypeGroupBuying>) => {
+                        return preValue.map(gb => {
+                            if (gb.id !== item.id) {
+                                return gb;
+                            }
+                            return {
+                                ...gb,
+                                postStatus: STATUS.requestingDelete,
+                            };
+                        });
+                    });
+                }
+            } catch (err) {
+                appAlert(err);
+            } finally {
+                Redux.setIsLoading(false);
+            }
+        };
+
+        appAlertYesNo({
+            i18Title: 'profile.post.sureDeletePost',
+            agreeChange: () => agreeDelete(),
+            refuseChange: () => goBack(),
+        });
+    }, [item.id]);
+
     /**
      * Render views
      */
     const Information = () => {
+        let textPostStatus: I18Normalize = 'common.null';
+        let colorTextPostStatus = theme.textHightLight;
+        if (item.postStatus === STATUS.active) {
+            textPostStatus = 'discovery.available';
+        } else if (
+            item.postStatus === STATUS.temporarilyClose ||
+            item.postStatus === STATUS.requestingDelete
+        ) {
+            textPostStatus = 'discovery.temporarilyClosed';
+            colorTextPostStatus = theme.highlightColor;
+        } else if (item.postStatus === STATUS.notActive) {
+            textPostStatus = 'discovery.closed';
+            colorTextPostStatus = Theme.common.red;
+        }
+
+        const displayDontWorry =
+            !isMyBubble &&
+            item.postStatus === STATUS.temporarilyClose &&
+            item.status === GROUP_BUYING_STATUS.joinedNotBought;
+        const displayRequestSuccessfully =
+            isMyBubble && item.postStatus === STATUS.requestingDelete;
+
         return (
-            <>
+            <View style={styles.infoPart}>
+                <TitleInformation
+                    icon={Images.icons.calendar}
+                    title={textPostStatus}
+                    titleColor={theme.textHightLight}
+                    titleStyle={{
+                        fontWeight: 'normal',
+                        color: colorTextPostStatus,
+                    }}
+                />
+                {displayDontWorry && (
+                    <View style={styles.pricesView}>
+                        <StyleText
+                            i18Text="discovery.notWorry"
+                            style={[
+                                styles.peoplePriceText,
+                                {color: theme.highlightColor},
+                            ]}
+                        />
+                    </View>
+                )}
+                {displayRequestSuccessfully && (
+                    <View style={[styles.pricesView, {width: '90%'}]}>
+                        <StyleText
+                            i18Text="alert.requestDeleteGbSuccess"
+                            style={[
+                                styles.peoplePriceText,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                    </View>
+                )}
+
                 <TitleInformation
                     icon={Images.icons.username}
                     title="discovery.retailPrice"
@@ -525,7 +652,25 @@ const DetailGroupBuying = ({route}: Props) => {
                         </View>
                     </View>
                 )}
-            </>
+
+                {isMyBubble && (
+                    <StyleTouchable
+                        customStyle={styles.updateStatusBox}
+                        onPress={() =>
+                            navigate(PROFILE_ROUTE.createGroupBuying, {
+                                itemEdit: item,
+                            })
+                        }>
+                        <StyleText
+                            i18Text="setting.updateStatus"
+                            customStyle={[
+                                styles.textUpdateStatus,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                    </StyleTouchable>
+                )}
+            </View>
         );
     };
 
@@ -643,6 +788,45 @@ const DetailGroupBuying = ({route}: Props) => {
                             customStyle={{tintColor: theme.textColor}}
                         />
                     </StyleTouchable>
+                    <StyleText
+                        i18Text="discovery.share.title"
+                        customStyle={[
+                            styles.textStar,
+                            {color: theme.borderColor},
+                        ]}
+                        onPress={() => onShowModalShare(item, setDisableShare)}
+                    />
+                </View>
+
+                <View style={styles.starBox}>
+                    <StyleTouchable
+                        customStyle={[
+                            styles.starTouch,
+                            {backgroundColor: theme.backgroundButtonColor},
+                        ]}
+                        onPress={() =>
+                            onGoToProfile(item.creator, {
+                                seeReviewFirst: true,
+                            })
+                        }>
+                        <StyleIcon
+                            source={Images.icons.reputation}
+                            size={21}
+                            customStyle={{tintColor: theme.textColor}}
+                        />
+                    </StyleTouchable>
+                    <StyleText
+                        i18Text="profile.rating"
+                        customStyle={[
+                            styles.textStar,
+                            {color: theme.borderColor},
+                        ]}
+                        onPress={() =>
+                            onGoToProfile(item.creator, {
+                                seeReviewFirst: true,
+                            })
+                        }
+                    />
                 </View>
             </View>
         );
@@ -667,7 +851,7 @@ const DetailGroupBuying = ({route}: Props) => {
 
         const displayText =
             (isMyBubble && item.totalGroups) ||
-            (!isMyBubble && status === GROUP_BUYING_STATUS.notJoined);
+            (!isMyBubble && item.status === GROUP_BUYING_STATUS.notJoined);
 
         return (
             <>
@@ -818,7 +1002,7 @@ const DetailGroupBuying = ({route}: Props) => {
         if (isMyBubble) {
             return null;
         }
-        if (status === GROUP_BUYING_STATUS.bought) {
+        if (item.status === GROUP_BUYING_STATUS.bought) {
             return (
                 <>
                     <StyleIcon
@@ -857,14 +1041,14 @@ const DetailGroupBuying = ({route}: Props) => {
             );
         }
 
-        if (status === GROUP_BUYING_STATUS.joinedNotBought) {
+        if (item.status === GROUP_BUYING_STATUS.joinedNotBought) {
             return (
                 <>
                     <View
                         style={[
                             styles.depositedBox,
                             {
-                                opacity: isExpired ? 0.5 : 1,
+                                opacity: isTemporarilyClose ? 0.5 : 1,
                                 borderColor: theme.highlightColor,
                             },
                         ]}>
@@ -879,17 +1063,17 @@ const DetailGroupBuying = ({route}: Props) => {
                         </View>
                     </View>
 
-                    {isExpired && (
+                    {/* {isTemporarilyClose && (
                         <StyleText
                             i18Text="discovery.gbExpired"
                             customStyle={styles.expiredText}
                         />
-                    )}
+                    )} */}
                 </>
             );
         }
 
-        if (status === GROUP_BUYING_STATUS.notJoined) {
+        if (item.status === GROUP_BUYING_STATUS.notJoined) {
             return (
                 <>
                     <View style={styles.buttonJoinView}>
@@ -902,7 +1086,8 @@ const DetailGroupBuying = ({route}: Props) => {
                                 modalConfirmJoin.showModal({
                                     isRetail: true,
                                 })
-                            }>
+                            }
+                            disable={isTemporarilyClose}>
                             <StyleText
                                 i18Text="discovery.buySeparately"
                                 customStyle={[
@@ -922,7 +1107,10 @@ const DetailGroupBuying = ({route}: Props) => {
                             ]}
                             style={[
                                 styles.groupBuyingBox,
-                                {opacity: isExpired ? 0.5 : 1, marginTop: 0},
+                                {
+                                    opacity: isTemporarilyClose ? 0.5 : 1,
+                                    marginTop: 0,
+                                },
                             ]}>
                             <StyleTouchable
                                 customStyle={styles.groupJoinBox}
@@ -931,7 +1119,7 @@ const DetailGroupBuying = ({route}: Props) => {
                                         isRetail: false,
                                     })
                                 }
-                                disable={isExpired}
+                                disable={isTemporarilyClose}
                                 disableOpacity={1}>
                                 <StyleIcon
                                     source={Images.icons.createGroup}
@@ -946,7 +1134,7 @@ const DetailGroupBuying = ({route}: Props) => {
                         </LinearGradient>
                     </View>
 
-                    {isExpired && (
+                    {isTemporarilyClose && (
                         <StyleText
                             i18Text="discovery.gbExpired"
                             customStyle={styles.expiredText}
@@ -1148,6 +1336,10 @@ const DetailGroupBuying = ({route}: Props) => {
                             }),
                     },
                     {
+                        text: 'profile.post.delete',
+                        action: () => onDeleteGroupBuying(),
+                    },
+                    {
                         text: 'common.cancel',
                         action: () => null,
                     },
@@ -1215,11 +1407,24 @@ const styles = ScaledSheet.create({
         fontSize: FONT_SIZE.small,
         marginBottom: '5@vs',
     },
+    infoPart: {
+        width: '100%',
+    },
+    updateStatusBox: {
+        position: 'absolute',
+        top: 0,
+        right: '10@s',
+        marginVertical: '10@vs',
+    },
+    textUpdateStatus: {
+        fontSize: FONT_SIZE.small,
+        textDecorationLine: 'underline',
+    },
     informationView: {
         width: '90%',
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: '15@vs',
+        marginTop: '10@vs',
         alignSelf: 'center',
     },
     titleInformation: {
@@ -1228,31 +1433,32 @@ const styles = ScaledSheet.create({
         marginLeft: '10@s',
     },
     reactionView: {
-        width: '90%',
+        width: '100%',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignSelf: 'center',
-        marginTop: '10@vs',
         borderTopWidth: Platform.select({
             ios: '0.25@ms',
             android: '0.5@ms',
         }),
-        paddingHorizontal: '40@s',
+        marginTop: '10@vs',
+        paddingHorizontal: '20@s',
+        paddingTop: '10@vs',
     },
     starBox: {
+        flex: 1,
         alignItems: 'center',
-        marginTop: '10@vs',
     },
     starTouch: {
-        width: '50@ms',
-        height: '50@ms',
+        width: '40@ms',
+        height: '40@ms',
         backgroundColor: 'red',
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: '25@ms',
     },
     star: {
-        fontSize: '25@ms',
+        fontSize: '20@ms',
     },
     textStar: {
         fontSize: FONT_SIZE.small,

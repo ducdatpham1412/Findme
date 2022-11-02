@@ -147,7 +147,7 @@ const styles = ScaledSheet.create({
         borderRadius: '15@s',
     },
     textButtonElement: {
-        fontSize: '18@ms',
+        fontSize: FONT_SIZE.normal,
         color: 'white',
     },
 });
