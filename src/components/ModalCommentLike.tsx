@@ -208,10 +208,10 @@ const styles = ScaledSheet.create({
     // header
     headerTouch: {
         width: '100%',
-        marginTop: '10@vs',
         marginBottom: '10@vs',
         flexDirection: 'row',
         alignItems: 'center',
+        paddingVertical: '5@vs',
     },
     textNumberComments: {
         fontSize: '13@ms',
@@ -226,7 +226,7 @@ const styles = ScaledSheet.create({
         right: '10@s',
     },
     iconTurnOff: {
-        fontSize: '13@ms',
+        fontSize: '20@ms',
     },
     // list comment
     tabContainer: {

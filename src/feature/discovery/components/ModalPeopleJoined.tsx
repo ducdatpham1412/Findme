@@ -1,36 +1,71 @@
 import {apiConfirmUserBought} from 'api/discovery';
-import {TypePeopleJoinedResponse} from 'api/interface/discovery';
+import {
+    TypeGroupPeopleJoined,
+    TypePeopleJoinedResponse,
+} from 'api/interface/discovery';
 import {apiFollowUser} from 'api/module';
 import {GROUP_BUYING_STATUS, RELATIONSHIP} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
-import {StyleImage, StyleText, StyleTouchable} from 'components/base';
+import {StyleIcon, StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
+import StyleTabView from 'components/StyleTabView';
 import Redux from 'hook/useRedux';
 import {appAlert} from 'navigation/NavigationService';
-import React, {forwardRef, useCallback} from 'react';
+import React, {
+    forwardRef,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 import {Platform, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {Modalize} from 'react-native-modalize';
 import {ScaledSheet} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Feather from 'react-native-vector-icons/Feather';
-import {onGoToProfile} from 'utility/assistant';
-import {formatFromNow} from 'utility/format';
+import {borderWidthTiny, onGoToProfile} from 'utility/assistant';
+import {
+    formatDayGroupBuying,
+    formatFromNow,
+    formatLocaleNumber,
+} from 'utility/format';
 
-const modalHeight = (Metrics.height * 2) / 3;
+const {width, height} = Metrics;
+const modalJoinHeight = (height * 2) / 3.3;
+const modalJoinHeightAdmin = (height * 2) / 2.5;
 
 interface Props {
     postId: string;
     listPaging: any;
     isMyBubble: boolean;
+    totalGroups: number;
 }
 
 const ModalPeopleJoined = (props: Props, ref: any) => {
-    const {listPaging, postId, isMyBubble} = props;
+    const {listPaging, isMyBubble, totalGroups} = props;
     const theme = Redux.getTheme();
     const myId = Redux.getPassport().profile.id;
+
+    const tabViewRef = useRef<StyleTabView>(null);
+    const groupIdFocusing = useRef('');
+
+    const [tabIndex, setTabIndex] = useState(0);
+    const [listPeopleJoin, setListPeopleJoin] = useState<
+        Array<TypePeopleJoinedResponse>
+    >([]);
+
+    useEffect(() => {
+        const temp = listPaging.list.find(
+            (joinGroup: TypeGroupPeopleJoined) =>
+                joinGroup.id === groupIdFocusing.current,
+        );
+        if (temp) {
+            setListPeopleJoin(temp.listPeople);
+        }
+    }, [listPaging.list]);
 
     const onPressButton = async (item: TypePeopleJoinedResponse) => {
         const oldList = [...listPaging.list];
@@ -38,14 +73,23 @@ const ModalPeopleJoined = (props: Props, ref: any) => {
             if (!isMyBubble) {
                 if (item.relationship === RELATIONSHIP.notFollowing) {
                     listPaging.setList(
-                        (preValue: Array<TypePeopleJoinedResponse>) => {
+                        (preValue: Array<TypeGroupPeopleJoined>) => {
                             return preValue.map(value => {
-                                if (value.id !== item.id) {
+                                if (value.id !== groupIdFocusing.current) {
                                     return value;
                                 }
                                 return {
                                     ...value,
-                                    relationship: RELATIONSHIP.following,
+                                    listPeople: value.listPeople.map(people => {
+                                        if (people.creator !== item.creator) {
+                                            return people;
+                                        }
+                                        return {
+                                            ...people,
+                                            relationship:
+                                                RELATIONSHIP.following,
+                                        };
+                                    }),
                                 };
                             });
                         },
@@ -56,22 +100,27 @@ const ModalPeopleJoined = (props: Props, ref: any) => {
             if (isMyBubble) {
                 if (item.status === GROUP_BUYING_STATUS.joinedNotBought) {
                     listPaging.setList(
-                        (preValue: Array<TypePeopleJoinedResponse>) => {
+                        (preValue: Array<TypeGroupPeopleJoined>) => {
                             return preValue.map(value => {
-                                if (value.id !== item.id) {
+                                if (value.id !== groupIdFocusing.current) {
                                     return value;
                                 }
                                 return {
                                     ...value,
-                                    status: GROUP_BUYING_STATUS.bought,
+                                    listPeople: value.listPeople.map(people => {
+                                        if (people.id !== item.id) {
+                                            return people;
+                                        }
+                                        return {
+                                            ...people,
+                                            status: GROUP_BUYING_STATUS.bought,
+                                        };
+                                    }),
                                 };
                             });
                         },
                     );
-                    await apiConfirmUserBought({
-                        post_id: postId,
-                        user_id: item.creator,
-                    });
+                    await apiConfirmUserBought(item.id);
                 }
             }
         } catch (err) {
@@ -84,7 +133,7 @@ const ModalPeopleJoined = (props: Props, ref: any) => {
         (itemJoined: TypePeopleJoinedResponse) => {
             const name =
                 itemJoined.creator === myId
-                    ? `(You) ${itemJoined.creatorName}`
+                    ? `(Bạn) ${itemJoined.creatorName}`
                     : itemJoined.creatorName;
 
             const CheckButtonJoined = () => {
@@ -162,46 +211,188 @@ const ModalPeopleJoined = (props: Props, ref: any) => {
                         styles.itemJoinedView,
                         {borderBottomColor: theme.holderColorLighter},
                     ]}>
-                    <StyleTouchable
-                        customStyle={styles.avatarJoined}
-                        onPress={() => onGoToProfile(itemJoined.creator)}>
-                        <StyleImage
-                            source={{uri: itemJoined.creatorAvatar}}
-                            customStyle={styles.avatarJoined}
-                        />
-                    </StyleTouchable>
-                    <View style={styles.nameTimeJoinedView}>
+                    <View
+                        style={[
+                            styles.itemJoinedUp,
+                            {borderBottomColor: theme.holderColorLighter},
+                        ]}>
+                        <StyleTouchable
+                            onPress={() => onGoToProfile(itemJoined.creator)}>
+                            <StyleIcon
+                                source={{uri: itemJoined.creatorAvatar}}
+                                size={40}
+                                customStyle={[
+                                    styles.creatorAvatar,
+                                    {marginLeft: 0},
+                                ]}
+                            />
+                        </StyleTouchable>
+                        <View style={styles.nameTimeJoinedView}>
+                            <StyleText
+                                originValue={name}
+                                customStyle={[
+                                    styles.nameJoined,
+                                    {
+                                        color: theme.textHightLight,
+                                    },
+                                ]}
+                                numberOfLines={1}
+                                onPress={() =>
+                                    onGoToProfile(itemJoined.creator)
+                                }
+                            />
+                            <StyleText
+                                originValue={formatFromNow(itemJoined.created)}
+                                customStyle={[
+                                    styles.timeJoined,
+                                    {color: theme.borderColor},
+                                ]}
+                            />
+                        </View>
+                        {CheckButtonJoined()}
+                    </View>
+                    {!!itemJoined.amount && !!itemJoined.deposit && (
+                        <View style={styles.infoBox}>
+                            <StyleText
+                                i18Text="discovery.amountBookGb"
+                                i18Params={{
+                                    value: itemJoined.amount,
+                                }}
+                                customStyle={[
+                                    styles.textInfo,
+                                    {color: theme.textColor},
+                                ]}
+                            />
+                            <StyleText
+                                i18Text="discovery.depositAmount"
+                                i18Params={{
+                                    value: formatLocaleNumber(
+                                        itemJoined.deposit,
+                                    ),
+                                }}
+                                customStyle={[
+                                    styles.textInfo,
+                                    {color: theme.textColor},
+                                ]}
+                            />
+                        </View>
+                    )}
+
+                    {!!itemJoined.timeWillBuy && (
                         <StyleText
-                            originValue={name}
-                            customStyle={[
-                                styles.nameJoined,
-                                {
-                                    color: theme.textHightLight,
-                                },
-                            ]}
-                            numberOfLines={1}
-                            onPress={() => onGoToProfile(itemJoined.creator)}
-                        />
-                        <StyleText
-                            originValue={formatFromNow(itemJoined.created)}
+                            i18Text="discovery.arrivalTime"
                             customStyle={[
                                 styles.timeJoined,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                    </View>
-                    {CheckButtonJoined()}
+                                {color: theme.textColor},
+                            ]}>
+                            <StyleText
+                                originValue={` ${formatDayGroupBuying(
+                                    itemJoined.timeWillBuy,
+                                )}`}
+                                customStyle={[
+                                    styles.textInfo,
+                                    {
+                                        color: theme.textColor,
+                                    },
+                                ]}
+                            />
+                        </StyleText>
+                    )}
+
+                    {!!itemJoined.creatorPhone && (
+                        <StyleText
+                            i18Text="login.signUp.type.phone"
+                            customStyle={[
+                                styles.timeJoined,
+                                {color: theme.textColor},
+                            ]}>
+                            <StyleText
+                                originValue={`: ${itemJoined.creatorPhone}`}
+                                customStyle={[
+                                    styles.textInfo,
+                                    {
+                                        color: theme.textColor,
+                                    },
+                                ]}
+                            />
+                        </StyleText>
+                    )}
+
+                    {!!itemJoined.note && (
+                        <StyleText
+                            i18Text="discovery.note"
+                            customStyle={[
+                                styles.timeJoined,
+                                {color: theme.textColor, fontWeight: 'bold'},
+                            ]}>
+                            <StyleText
+                                originValue={itemJoined.note}
+                                customStyle={[
+                                    styles.timeJoined,
+                                    {
+                                        color: theme.textColor,
+                                        fontWeight: 'normal',
+                                    },
+                                ]}
+                            />
+                        </StyleText>
+                    )}
                 </View>
             );
         },
-        [theme.backgroundColor, postId, myId, isMyBubble],
+        [theme.backgroundColor, isMyBubble, myId],
+    );
+
+    const RenderItemGroup = useCallback(
+        (item: TypeGroupPeopleJoined) => {
+            const isBiggerThanSix = item.listPeople.length > 6;
+            const displayPeople = isBiggerThanSix
+                ? item.listPeople.slice(0, 6)
+                : item.listPeople;
+            return (
+                <StyleTouchable
+                    customStyle={[
+                        styles.itemGroupView,
+                        {borderBottomColor: theme.holderColorLighter},
+                    ]}
+                    onPress={() => {
+                        setListPeopleJoin(item.listPeople);
+                        groupIdFocusing.current = item.id;
+                        setTabIndex(1);
+                        tabViewRef.current?.navigateToIndex(1);
+                    }}>
+                    {displayPeople.map((person, index) => {
+                        return (
+                            <View key={person.id} style={styles.avatarGroupBox}>
+                                <StyleIcon
+                                    source={{uri: person.creatorAvatar}}
+                                    size={35}
+                                    customStyle={styles.creatorAvatar}
+                                />
+                                {index === 5 && isBiggerThanSix && (
+                                    <View style={styles.morePeopleBox}>
+                                        <StyleText
+                                            originValue={`+${
+                                                item.listPeople.length - 6
+                                            }`}
+                                            customStyle={styles.textMore}
+                                        />
+                                    </View>
+                                )}
+                            </View>
+                        );
+                    })}
+                </StyleTouchable>
+            );
+        },
+        [theme.backgroundColor],
     );
 
     return (
         <Modalize
             ref={ref}
             withHandle={false}
-            modalHeight={modalHeight}
+            adjustToContentHeight
             modalStyle={{
                 backgroundColor: 'transparent',
             }}
@@ -210,20 +401,41 @@ const ModalPeopleJoined = (props: Props, ref: any) => {
             }}>
             <View
                 style={[
-                    styles.container,
+                    styles.headerView,
                     {backgroundColor: theme.backgroundColorSecond},
                 ]}>
-                <View style={styles.headerView}>
-                    <StyleText
-                        i18Text="discovery.participators"
-                        i18Params={{
-                            value: listPaging.list.length,
+                {tabIndex === 1 && (
+                    <StyleTouchable
+                        customStyle={styles.touchIconBack}
+                        onPress={() => {
+                            setTabIndex(0);
+                            tabViewRef.current?.navigateToIndex(0);
                         }}
-                        customStyle={[
-                            styles.textHeader,
-                            {color: theme.textHightLight},
-                        ]}
-                    />
+                        hitSlop={15}>
+                        <Feather
+                            name="arrow-left"
+                            style={[styles.iconBack, {color: theme.textColor}]}
+                        />
+                    </StyleTouchable>
+                )}
+                <StyleText
+                    i18Text={
+                        tabIndex === 0
+                            ? 'discovery.numberGroupJoined'
+                            : 'discovery.numberPeople'
+                    }
+                    i18Params={{
+                        value:
+                            tabIndex === 0
+                                ? totalGroups
+                                : listPeopleJoin.length,
+                    }}
+                    customStyle={[
+                        styles.textHeader,
+                        {color: theme.textHightLight},
+                    ]}
+                />
+                {tabIndex === 0 && (
                     <StyleTouchable
                         customStyle={styles.iconTurnOffTouch}
                         onPress={() => ref.current?.close()}
@@ -236,26 +448,57 @@ const ModalPeopleJoined = (props: Props, ref: any) => {
                             ]}
                         />
                     </StyleTouchable>
-                </View>
-                <StyleList
-                    data={listPaging.list}
-                    renderItem={joined => RenderItemJoined(joined.item)}
-                    keyExtractor={joined => joined.id}
-                    onLoadMore={listPaging.onLoadMore}
-                    refreshing={listPaging.refreshing}
-                    onRefresh={listPaging.onRefresh}
-                />
+                )}
             </View>
+
+            <StyleTabView
+                ref={tabViewRef}
+                containerStyle={[
+                    styles.container,
+                    {
+                        backgroundColor: theme.backgroundColorSecond,
+                        height: isMyBubble
+                            ? modalJoinHeightAdmin
+                            : modalJoinHeight,
+                    },
+                ]}
+                enableScroll={false}>
+                <View style={styles.elementContainer}>
+                    <StyleList
+                        data={listPaging.list}
+                        renderItem={({item}) => RenderItemGroup(item)}
+                        keyExtractor={item => item.id}
+                        onLoadMore={listPaging.onLoadMore}
+                        refreshing={listPaging.refreshing}
+                        onRefresh={listPaging.onRefresh}
+                    />
+                </View>
+
+                <View style={styles.elementContainer}>
+                    {tabIndex === 1 && (
+                        <StyleList
+                            data={listPeopleJoin}
+                            renderItem={({item}) => RenderItemJoined(item)}
+                            keyExtractor={item => item.id}
+                            onLoadMore={listPaging.onLoadMore}
+                            refreshing={listPaging.refreshing}
+                            onRefresh={listPaging.onRefresh}
+                        />
+                    )}
+                </View>
+            </StyleTabView>
         </Modalize>
     );
 };
 
 const styles = ScaledSheet.create({
     container: {
-        width: '100%',
-        height: modalHeight,
-        borderTopLeftRadius: '10@ms',
-        borderTopRightRadius: '10@ms',
+        height: modalJoinHeight,
+        marginTop: '-1@ms',
+    },
+    elementContainer: {
+        width,
+        height: '100%',
     },
     // header
     headerView: {
@@ -263,6 +506,15 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: '5@vs',
+        borderTopLeftRadius: '10@ms',
+        borderTopRightRadius: '10@ms',
+    },
+    touchIconBack: {
+        position: 'absolute',
+        left: '10@s',
+    },
+    iconBack: {
+        fontSize: '20@ms',
     },
     textHeader: {
         fontSize: FONT_SIZE.normal,
@@ -272,10 +524,10 @@ const styles = ScaledSheet.create({
         right: '10@s',
     },
     iconTurnOff: {
-        fontSize: '13@ms',
+        fontSize: '20@ms',
     },
-    // item joined
-    itemJoinedView: {
+    // item group join
+    itemGroupView: {
         width: '90%',
         alignSelf: 'center',
         flexDirection: 'row',
@@ -285,12 +537,39 @@ const styles = ScaledSheet.create({
             android: '0.5@ms',
         }),
         paddingVertical: '7.5@vs',
-        paddingHorizontal: '10@s',
+        paddingHorizontal: '10%',
     },
-    avatarJoined: {
-        width: '40@s',
-        height: '40@s',
-        borderRadius: '20@s',
+    avatarGroupBox: {
+        marginHorizontal: '2@s',
+    },
+    creatorAvatar: {
+        borderRadius: '20@ms',
+    },
+    morePeopleBox: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundColor: Theme.darkTheme.backgroundOpacity(0.5),
+        borderRadius: '20@ms',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    textMore: {
+        fontSize: FONT_SIZE.normal,
+        color: Theme.common.white,
+    },
+    // item joined
+    itemJoinedView: {
+        width: '90%',
+        alignSelf: 'center',
+        paddingHorizontal: '10@s',
+        borderBottomWidth: borderWidthTiny,
+        paddingVertical: '7.5@vs',
+    },
+    itemJoinedUp: {
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     nameTimeJoinedView: {
         flex: 1,
@@ -303,6 +582,15 @@ const styles = ScaledSheet.create({
     timeJoined: {
         fontSize: FONT_SIZE.small,
         marginTop: '3@vs',
+    },
+    infoBox: {
+        width: '100%',
+        flexDirection: 'row',
+        marginTop: '5@vs',
+    },
+    textInfo: {
+        fontSize: FONT_SIZE.small,
+        flex: 1,
     },
     buttonCheckJoined: {
         paddingVertical: '4@vs',

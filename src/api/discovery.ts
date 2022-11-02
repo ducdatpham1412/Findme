@@ -1,12 +1,15 @@
 import {
     TypeCreateGroupBuying,
     TypeEditGroupBooking,
+    TypeJoinGbResponse,
     TypeJoinGroupBookingRequest,
 } from 'api/interface/discovery';
 import {TypeParamsPaging} from './interface';
 import request from './request';
 
-export const apiJoinGroupBuying = (params: TypeJoinGroupBookingRequest) => {
+export const apiJoinGroupBuying = (
+    params: TypeJoinGroupBookingRequest,
+): Promise<TypeJoinGbResponse> => {
     return request.put(`/profile/join-group-buying/${params.postId}`, {
         money: params.money,
         amount: params.amount,
@@ -16,8 +19,8 @@ export const apiJoinGroupBuying = (params: TypeJoinGroupBookingRequest) => {
     });
 };
 
-export const apiGetListPeopleJoined = ({params}: TypeParamsPaging) => {
-    return request.get(`/profile/list-people-joined/${params.postId}`, {
+export const apiGetListGroupPeopleJoin = ({params}: TypeParamsPaging) => {
+    return request.get(`/profile/list-group-joined/${params.postId}`, {
         params: {
             pageIndex: params.pageIndex,
             take: params.take,
@@ -25,11 +28,17 @@ export const apiGetListPeopleJoined = ({params}: TypeParamsPaging) => {
     });
 };
 
-export const apiConfirmUserBought = (body: {
-    post_id: string;
-    user_id: number;
-}) => {
-    return request.put('profile/confirm-user-bought', body);
+export const apiGetListPeopleRetail = ({params}: TypeParamsPaging) => {
+    return request.get(`/profile/list-people-retail/${params.postId}`, {
+        params: {
+            pageIndex: params.pageIndex,
+            take: params.take,
+        },
+    });
+};
+
+export const apiConfirmUserBought = (join_id: string) => {
+    return request.put(`profile/confirm-user-bought/${join_id}`);
 };
 
 export const apiCreateGroupBuying = (body: TypeCreateGroupBuying) => {

@@ -263,7 +263,9 @@ const BubbleGroupBuying = (props: Props) => {
                                     customStyle={styles.iconNumberPeople}
                                 />
                                 <StyleText
-                                    originValue={item.totalJoins}
+                                    originValue={
+                                        item.totalGroups + item.totalPersonals
+                                    }
                                     customStyle={styles.textNumberPeople}
                                 />
                             </View>

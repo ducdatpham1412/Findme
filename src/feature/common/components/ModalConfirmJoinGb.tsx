@@ -19,6 +19,7 @@ import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {borderWidthTiny} from 'utility/assistant';
 import {addDate, formatDayGroupBuying, formatUTCDate} from 'utility/format';
+import AddPhone from './AddPhone';
 
 interface Props {
     onConfirm(params: TypeJoinGroupBookingRequest): void;
@@ -30,9 +31,11 @@ const ModalConfirmJoinGb = (props: Props) => {
     const {onConfirm, retailPrice, prices} = props;
     const {t} = useTranslation();
     const theme = Redux.getTheme();
+    const {phone} = Redux.getPassport().information;
 
     const modalizeRef = useRef<Modalize>(null);
     const modalTimeRef = useRef<Modalize>(null);
+    const modalAddPhoneRef = useRef<Modalize>(null);
     const datetimeRef = useRef<ClassDateTimePicker>(null);
     const moneyStandard = useRef(LIST_DEPOSIT_PRICES[0].value);
 
@@ -48,6 +51,20 @@ const ModalConfirmJoinGb = (props: Props) => {
     const [isRetail, setIsRetail] = useState(false);
     const [chosenDeposit, setChosenDeposit] =
         useState<typeof LIST_DEPOSIT_PRICES[0]>();
+
+    useEffect(() => {
+        if (prices.length && retailPrice) {
+            moneyStandard.current = isRetail
+                ? Number(retailPrice) * 0.2
+                : Number(prices[prices.length - 1].value) * 0.2;
+            const temp =
+                LIST_DEPOSIT_PRICES.find(
+                    item => item.value > moneyStandard.current,
+                ) || LIST_DEPOSIT_PRICES[LIST_DEPOSIT_PRICES.length - 1];
+            setChosenDeposit(temp);
+            setAmount(1);
+        }
+    }, [isRetail, prices, retailPrice]);
 
     const onChangeAmount = (value: number) => {
         const nextAmount = amount + value;
@@ -66,18 +83,6 @@ const ModalConfirmJoinGb = (props: Props) => {
         setIsRetail(params.isRetail);
         modalizeRef.current?.open();
     };
-
-    useEffect(() => {
-        moneyStandard.current = isRetail
-            ? Number(retailPrice) * 0.2
-            : Number(prices[prices.length - 1].value) * 0.2;
-        const temp =
-            LIST_DEPOSIT_PRICES.find(
-                item => item.value > moneyStandard.current,
-            ) || LIST_DEPOSIT_PRICES[LIST_DEPOSIT_PRICES.length - 1];
-        setChosenDeposit(temp);
-        setAmount(1);
-    }, [isRetail]);
 
     const jsx = () => {
         return (
@@ -200,6 +205,54 @@ const ModalConfirmJoinGb = (props: Props) => {
                         </View>
                     </View>
 
+                    <View style={styles.enterInfoView}>
+                        <StyleText
+                            i18Text="login.signUp.type.phone"
+                            customStyle={[
+                                styles.textTitleEnterInfo,
+                                {color: theme.textHightLight},
+                            ]}>
+                            <StyleText
+                                originValue=":"
+                                customStyle={[
+                                    styles.textTitleEnterInfo,
+                                    {color: theme.textHightLight},
+                                ]}
+                            />
+                        </StyleText>
+                        <View style={styles.minusPlusBox}>
+                            <StyleTouchable
+                                onPress={() => {
+                                    modalAddPhoneRef.current?.open();
+                                }}
+                                disable={!!phone}
+                                disableOpacity={1}>
+                                {phone ? (
+                                    <StyleText
+                                        originValue={phone}
+                                        customStyle={[
+                                            styles.textJoinDate,
+                                            {
+                                                color: theme.borderColor,
+                                                textDecorationLine: 'none',
+                                            },
+                                        ]}
+                                    />
+                                ) : (
+                                    <StyleText
+                                        i18Text="discovery.addPhoneNumber"
+                                        customStyle={[
+                                            styles.textJoinDate,
+                                            {
+                                                color: theme.highlightColor,
+                                            },
+                                        ]}
+                                    />
+                                )}
+                            </StyleTouchable>
+                        </View>
+                    </View>
+
                     <AppInput
                         value={note}
                         onChangeText={text => setNote(text)}
@@ -232,6 +285,7 @@ const ModalConfirmJoinGb = (props: Props) => {
                                 });
                             }
                         }}
+                        disable={!phone}
                     />
                 </Modalize>
 
@@ -251,6 +305,18 @@ const ModalConfirmJoinGb = (props: Props) => {
                         }}
                         onCancel={() => modalTimeRef.current?.close()}
                         theme={theme}
+                    />
+                </Modalize>
+
+                <Modalize
+                    ref={modalAddPhoneRef}
+                    adjustToContentHeight
+                    withHandle={false}
+                    modalStyle={{
+                        backgroundColor: 'transparent',
+                    }}>
+                    <AddPhone
+                        onCloseModal={() => modalAddPhoneRef.current?.close()}
                     />
                 </Modalize>
             </>

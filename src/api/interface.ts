@@ -321,7 +321,8 @@ export interface TypeGroupBuying {
     note: string | null;
     totalLikes: number;
     totalComments: number;
-    totalJoins: number;
+    totalGroups: number;
+    totalPersonals: number;
     creator: number;
     creatorName: string;
     creatorAvatar: string;

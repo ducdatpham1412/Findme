@@ -13,6 +13,7 @@ import {
     FEELING,
     GENDER_TYPE,
     LANGUAGE_TYPE,
+    RELATIONSHIP,
     SIGN_UP_TYPE,
     TYPE_COLOR,
 } from 'asset/enum';
@@ -455,7 +456,8 @@ export const fakeGroupBuying: TypeGroupBuying = {
     note: null,
     totalLikes: 0,
     totalComments: 0,
-    totalJoins: 0,
+    totalGroups: 0,
+    totalPersonals: 0,
     creator: 0,
     creatorName: '',
     creatorAvatar: '',
@@ -464,7 +466,7 @@ export const fakeGroupBuying: TypeGroupBuying = {
     isLiked: false,
     isDraft: false,
     status: 1,
-    relationship: 0,
+    relationship: RELATIONSHIP.notKnow,
 };
 
 export const onGoToProfile = (userId: number) => {

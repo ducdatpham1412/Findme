@@ -1,5 +1,5 @@
 import {TypeRequestOTPRequest} from 'api/interface';
-import {apiRequestOTP} from 'api/module';
+import {apiChangeInformation, apiRequestOTP} from 'api/module';
 import {SIGN_UP_TYPE, TYPE_OTP} from 'asset/enum';
 import {StyleButton, StyleContainer, StyleInput} from 'components/base';
 import LoadingScreen from 'components/LoadingScreen';
@@ -41,20 +41,10 @@ const EnterPassword = ({route}: Props) => {
             return;
         }
 
-        let targetInfo: number | undefined;
-        let username = '';
         if (newInfo.email) {
-            targetInfo = SIGN_UP_TYPE.email;
-            username = newInfo.email;
-        } else if (newInfo.phone) {
-            targetInfo = SIGN_UP_TYPE.phone;
-            username = newInfo.phone;
-        }
-
-        if (targetInfo !== undefined) {
             const paramsOTP: TypeRequestOTPRequest = {
-                username,
-                targetInfo,
+                username: newInfo.email,
+                targetInfo: SIGN_UP_TYPE.email,
                 typeOTP: TYPE_OTP.changeInfo,
             };
 
@@ -62,10 +52,27 @@ const EnterPassword = ({route}: Props) => {
                 Redux.setIsLoading(true);
                 await apiRequestOTP(paramsOTP);
                 navigate(SETTING_ROUTE.sendOTPChangeInfo, {
-                    name: username,
+                    name: newInfo.email,
                     newInfo,
                     paramsOTP,
                 });
+            } catch (err) {
+                appAlert(err);
+            } finally {
+                Redux.setIsLoading(false);
+            }
+        } else if (newInfo.phone) {
+            try {
+                Redux.setIsLoading(true);
+                await apiChangeInformation({
+                    phone: newInfo.phone,
+                });
+                Redux.updatePassport({
+                    information: {
+                        phone: newInfo.phone,
+                    },
+                });
+                navigate(SETTING_ROUTE.personalInformation);
             } catch (err) {
                 appAlert(err);
             } finally {

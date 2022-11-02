@@ -163,7 +163,7 @@ const discovery = {
     continueJoin: 'Tiếp tục tham gia',
     joined: 'Đã tham gia',
     deposited: 'Đã đặt cọc',
-    numberPeopleJoin: '{{value}} lượt tham gia mua chung',
+    numberGroupJoined: '{{value}} nhóm đã thamm gia',
     beTheFirstJoin: 'Hãy là người đầu tiên tham gia nào',
     bought: 'Đã mua',
     confirmBought: 'Xác nhận đã mua',
@@ -214,6 +214,9 @@ const discovery = {
     amount: 'Số lượng:',
     noteForMerchant: 'Ghi chú cho người bán',
     arrivalTime: 'Thời gian đến:',
+    note: 'Ghi chú: ',
+    numberRetailTurns: '{{value}} lượt mua riêng',
+    addPhoneNumber: 'Thêm số điện thoại',
 };
 
 // REPUTATION
@@ -446,6 +449,8 @@ const alert = {
     clickPlusModeExp:
         'Tạo bong bóng chat chỉ có thể sử dụng khi đăng nhập tài khoản !',
     moreButtonContent: 'Đi tới đăng ký',
+    needToAddPhone: 'Bạn cần thêm số điện thoại\nđể tham gia các dịch vụ',
+    phoneExisted: 'Số điện thoại đã được một người khác sử dụng',
 
     // FOR SETTING
     nowPassError: 'Mật khẩu hiện tại không đúng !',
