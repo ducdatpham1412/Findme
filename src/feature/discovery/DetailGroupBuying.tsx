@@ -51,6 +51,7 @@ import StyleActionSheet from 'components/common/StyleActionSheet';
 import LoadingScreen from 'components/LoadingScreen';
 import ModalCommentLike from 'components/ModalCommentLike';
 import ModalConfirmJoinGb from 'feature/common/components/ModalConfirmJoinGb';
+import UpdatePriceStatus from 'feature/common/components/UpdatePriceStatus';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
 import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
@@ -377,6 +378,19 @@ const DetailGroupBuying = ({route}: Props) => {
                     action: TYPE_BUBBLE_PALACE_ACTION.null,
                     payload: null,
                 });
+                if (setList) {
+                    setList((preValue: Array<TypeGroupBuying>) => {
+                        return preValue.map((gb: TypeGroupBuying) => {
+                            if (gb.id !== bubblePalaceAction.payload.id) {
+                                return gb;
+                            }
+                            return {
+                                ...gb,
+                                ...bubblePalaceAction.payload,
+                            };
+                        });
+                    });
+                }
             }
         }
     }, [bubblePalaceAction, item.id]);
@@ -489,10 +503,71 @@ const DetailGroupBuying = ({route}: Props) => {
 
         const displayDontWorry =
             !isMyBubble &&
-            item.postStatus === STATUS.temporarilyClose &&
+            (item.postStatus === STATUS.temporarilyClose ||
+                item.postStatus === STATUS.requestingDelete) &&
             item.status === GROUP_BUYING_STATUS.joinedNotBought;
         const displayRequestSuccessfully =
             isMyBubble && item.postStatus === STATUS.requestingDelete;
+
+        const BoxStatus = () => {
+            if (!isMyBubble && item.amount !== null && item.deposit !== null) {
+                return (
+                    <View style={styles.depositView}>
+                        <View
+                            style={[
+                                styles.depositBox,
+                                {borderColor: theme.borderColor},
+                            ]}>
+                            {item.amount && (
+                                <StyleText
+                                    i18Text="discovery.amountBookGb"
+                                    i18Params={{
+                                        value: item.amount,
+                                    }}
+                                    customStyle={[
+                                        styles.textDeposit,
+                                        {color: theme.textHightLight},
+                                    ]}
+                                />
+                            )}
+                            {item.deposit && (
+                                <StyleText
+                                    i18Text="discovery.depositAmount"
+                                    i18Params={{
+                                        value: formatLocaleNumber(item.deposit),
+                                    }}
+                                    customStyle={[
+                                        styles.textDeposit,
+                                        {color: theme.textHightLight},
+                                    ]}
+                                />
+                            )}
+                            {!!item.note && (
+                                <StyleText
+                                    originValue={item.note}
+                                    customStyle={[
+                                        styles.textDeposit,
+                                        {color: theme.borderColor},
+                                    ]}
+                                />
+                            )}
+                        </View>
+                    </View>
+                );
+            }
+
+            if (isMyBubble && item.requestUpdatePrice) {
+                return (
+                    <UpdatePriceStatus
+                        postId={item.id}
+                        retailPrice={item.requestUpdatePrice.retailPrice}
+                        prices={item.requestUpdatePrice.prices}
+                    />
+                );
+            }
+
+            return null;
+        };
 
         return (
             <View style={styles.infoPart}>
@@ -554,7 +629,9 @@ const DetailGroupBuying = ({route}: Props) => {
                 />
                 <View style={styles.pricesView}>
                     {item.prices.map((price, index) => (
-                        <View key={index} style={styles.priceBox}>
+                        <View
+                            key={index}
+                            style={[styles.priceBox, {marginBottom: 5}]}>
                             <StyleText
                                 i18Text="discovery.numberPeople"
                                 i18Params={{
@@ -609,49 +686,7 @@ const DetailGroupBuying = ({route}: Props) => {
                     />
                 </View>
 
-                {item.amount !== null && item.deposit !== null && (
-                    <View style={styles.depositView}>
-                        <View
-                            style={[
-                                styles.depositBox,
-                                {borderColor: theme.borderColor},
-                            ]}>
-                            {item.amount && (
-                                <StyleText
-                                    i18Text="discovery.amountBookGb"
-                                    i18Params={{
-                                        value: item.amount,
-                                    }}
-                                    customStyle={[
-                                        styles.textDeposit,
-                                        {color: theme.textHightLight},
-                                    ]}
-                                />
-                            )}
-                            {item.deposit && (
-                                <StyleText
-                                    i18Text="discovery.depositAmount"
-                                    i18Params={{
-                                        value: formatLocaleNumber(item.deposit),
-                                    }}
-                                    customStyle={[
-                                        styles.textDeposit,
-                                        {color: theme.textHightLight},
-                                    ]}
-                                />
-                            )}
-                            {!!item.note && (
-                                <StyleText
-                                    originValue={item.note}
-                                    customStyle={[
-                                        styles.textDeposit,
-                                        {color: theme.borderColor},
-                                    ]}
-                                />
-                            )}
-                        </View>
-                    </View>
-                )}
+                {BoxStatus()}
 
                 {isMyBubble && (
                     <StyleTouchable
@@ -1405,7 +1440,6 @@ const styles = ScaledSheet.create({
     },
     peoplePriceText: {
         fontSize: FONT_SIZE.small,
-        marginBottom: '5@vs',
     },
     infoPart: {
         width: '100%',
@@ -1596,7 +1630,7 @@ const styles = ScaledSheet.create({
         alignSelf: 'center',
     },
     depositView: {
-        marginTop: '15@vs',
+        marginTop: '10@vs',
         flexDirection: 'row',
         paddingHorizontal: '20@s',
         justifyContent: 'center',

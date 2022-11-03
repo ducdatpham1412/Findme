@@ -466,7 +466,10 @@ export const fakeGroupBuying: TypeGroupBuying = {
     isLiked: false,
     isDraft: false,
     status: 1,
+    postStatus: 1,
     relationship: RELATIONSHIP.notKnow,
+    joinId: '',
+    requestUpdatePrice: null,
 };
 
 export const onGoToProfile = (userId: number, params = {}) => {

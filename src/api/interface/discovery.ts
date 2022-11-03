@@ -45,10 +45,17 @@ export type TypeResultSearch = TypeResultSearchOk | null;
 
 export interface TypeEditGroupBooking {
     postId: string;
-    topic?: Array<number>;
-    content?: string;
-    status?: number;
-    // max_groups: number;
+    data: {
+        // for update price
+        retail_price?: string;
+        prices?: Array<TypePrice>;
+        // for normal edit
+        topic?: Array<number>;
+        content?: string;
+        status?: number;
+        // for reject updating price
+        reject_request_update_price?: boolean;
+    };
 }
 
 export interface TypeJoinGroupBookingRequest {

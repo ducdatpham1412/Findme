@@ -216,6 +216,8 @@ const discovery = {
     numberRetailTurns: '{{value}} buying separately turns',
     addPhoneNumber: 'Add phone number',
     openAvailable: 'Open receiving booking',
+    reviewUpdatePrice: 'Reviewing update prices',
+    cancelRequest: 'Cancel requesting',
 };
 
 // REPUTATION
@@ -362,6 +364,7 @@ const profile = {
     gbOrder: 'Group booking orders',
     editProfile: 'Edit profile',
     maxGroups: 'Maximum number of groups',
+    sendRequestChangePrice: 'Request changing prices',
 };
 
 // SETTING ROUTE
@@ -480,7 +483,9 @@ const alert = {
     canNotEditStartTimeAndPrice: 'You can not edit start time and prices',
     canChooseMaximum3: 'You can only choose maximum 3 topics',
     requestDeleteGbSuccess:
-        'Send request delete successfully.\nWe will review and return the result within 24 hours.\nYou can cancel this delete request by edit the status of this post to "Available"',
+        'Send request delete successfully.\nWe will review and return the result within 24 hours.\nYou can cancel this request by press "Update status", then Open receiving booking.',
+    ifUpdatePrice:
+        'We will review your prices change request within 24 hours.\nAlso, to protect the interests of who have deposited at the old price, people can also view your prices edit schedule.',
 
     // PERMISSION
     permissionCamera: 'Access camera',
