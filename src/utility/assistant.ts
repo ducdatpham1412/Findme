@@ -469,7 +469,7 @@ export const fakeGroupBuying: TypeGroupBuying = {
     relationship: RELATIONSHIP.notKnow,
 };
 
-export const onGoToProfile = (userId: number) => {
+export const onGoToProfile = (userId: number, params = {}) => {
     const isModeExp = FindmeStore.getState().accountSlice.modeExp;
     if (isModeExp) {
         return;
@@ -483,6 +483,7 @@ export const onGoToProfile = (userId: number) => {
     } else {
         push(ROOT_SCREEN.otherProfile, {
             id: userId,
+            ...params,
         });
     }
 };

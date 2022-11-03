@@ -331,6 +331,7 @@ export interface TypeGroupBuying {
     isLiked: boolean;
     isDraft: boolean;
     status: number;
+    postStatus: number;
     relationship: number;
     // other field follow on situation
     joinId?: string; // in get_list_gb_joining and joined

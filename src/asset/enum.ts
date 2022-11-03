@@ -202,7 +202,8 @@ export enum STATUS {
     notActive = 0,
     active = 1,
     draft = 2,
-    archive = 3,
+    temporarilyClose = 3,
+    requestingDelete = 4,
 }
 
 export enum POST_TYPE {

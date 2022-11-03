@@ -165,7 +165,7 @@ const discovery = {
     bought: 'Bought',
     confirmBought: 'Confirm bought',
     participators: '{{value}} participators',
-    gbExpired: 'Group buying campaign was expired',
+    gbExpired: 'Store is temporarily not accepting more orders',
     reviewAbout: "You're writing review about ",
     goToProfile: 'Visit profile',
     openLink: 'Open link',
@@ -206,6 +206,8 @@ const discovery = {
     category: 'Categories ({{value}})',
     available: 'Available',
     temporarilyClosed: 'Temporarily closed',
+    notWorry:
+        "Dont't worry.\nStore just is only temporarily not accepting any more orders\nYour booking is still being processed.",
     closed: 'Closed',
     amount: 'Amount:',
     noteForMerchant: 'Note for merchant',
@@ -213,6 +215,7 @@ const discovery = {
     note: 'Note: ',
     numberRetailTurns: '{{value}} buying separately turns',
     addPhoneNumber: 'Add phone number',
+    openAvailable: 'Open receiving booking',
 };
 
 // REPUTATION
@@ -336,6 +339,7 @@ const profile = {
     startDate: 'Start date',
     endDate: 'End date',
     addPrice: 'Add price',
+    editPrice: 'Edit prices',
     number: 'Number',
     price: 'Price',
     toBecomeShopAccount:
@@ -417,6 +421,7 @@ const setting = {
     userGuide: {
         title: 'User guide',
     },
+    updateStatus: 'Update status',
 };
 
 // NOTIFICATION
@@ -474,6 +479,8 @@ const alert = {
         'Joining deadline has to be before starting date: {{value}}',
     canNotEditStartTimeAndPrice: 'You can not edit start time and prices',
     canChooseMaximum3: 'You can only choose maximum 3 topics',
+    requestDeleteGbSuccess:
+        'Send request delete successfully.\nWe will review and return the result within 24 hours.\nYou can cancel this delete request by edit the status of this post to "Available"',
 
     // PERMISSION
     permissionCamera: 'Access camera',

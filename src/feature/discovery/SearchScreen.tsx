@@ -23,6 +23,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {borderWidthTiny} from 'utility/assistant';
 import BubbleGroupBuying from './components/BubbleGroupBuying';
+import SearchSuggestions from './components/SearchSuggestions';
 import HeaderFilterPrice from './HeaderFilterPrice';
 import HeaderFilterTopic from './HeaderFilterTopic';
 
@@ -55,6 +56,9 @@ const SearchScreen = ({route}: Props) => {
     const [search, setSearch] = useState(searchRoute || '');
     const [hadLoadMore, setHadLoadMore] = useState(
         !(topicRoute === undefined && searchRoute === undefined),
+    );
+    const [displayHint, setDisplayHint] = useState(
+        topicRoute === undefined && searchRoute === undefined,
     );
 
     const {
@@ -116,6 +120,7 @@ const SearchScreen = ({route}: Props) => {
                     ref={inputRef}
                     style={[styles.input, {color: theme.textHightLight}]}
                     placeholder={t('discovery.searchAround')}
+                    value={search}
                     onChangeText={text => setSearch(text)}
                     defaultValue={searchRoute}
                     returnKeyType="search"
@@ -130,11 +135,12 @@ const SearchScreen = ({route}: Props) => {
                         }));
                     }}
                     placeholderTextColor={theme.holderColorLighter}
+                    onFocus={() => setDisplayHint(true)}
+                    onBlur={() => setDisplayHint(false)}
                 />
                 {!!search && (
                     <StyleTouchable
                         onPress={() => {
-                            inputRef.current?.clear();
                             setSearch('');
                         }}
                         customStyle={styles.clearView}>
@@ -226,57 +232,76 @@ const SearchScreen = ({route}: Props) => {
             ]}>
             {Header()}
             {Tool()}
-
-            <StyleTabView containerStyle={styles.tabViewContainer}>
-                <View style={styles.elementView}>
-                    <StyleList
-                        data={list}
-                        renderItem={({item}) => {
-                            return (
-                                <BubbleGroupBuying
-                                    item={item}
-                                    onGoToDetailGroupBuying={() => {
-                                        navigate(
-                                            DISCOVERY_ROUTE.detailGroupBuying,
-                                            {
-                                                item,
-                                                setList,
-                                            },
-                                        );
-                                    }}
-                                    detailGroupTarget={
-                                        DISCOVERY_ROUTE.detailGroupBuying
-                                    }
-                                    onShowMoreOption={() => null}
-                                    onHandleLike={() => null}
-                                    onShowModalComment={() => {
-                                        if (inputRef.current?.isFocused()) {
-                                            inputRef.current.blur();
+            <View style={{flex: 1}}>
+                <StyleTabView containerStyle={styles.tabViewContainer}>
+                    <View style={styles.elementView}>
+                        <StyleList
+                            data={list}
+                            renderItem={({item}) => {
+                                return (
+                                    <BubbleGroupBuying
+                                        item={item}
+                                        onGoToDetailGroupBuying={() => {
+                                            navigate(
+                                                DISCOVERY_ROUTE.detailGroupBuying,
+                                                {
+                                                    item,
+                                                    setList,
+                                                },
+                                            );
+                                        }}
+                                        detailGroupTarget={
+                                            DISCOVERY_ROUTE.detailGroupBuying
                                         }
-                                        showCommentDiscovery({
-                                            post: item,
-                                            type: 'comment',
-                                            setList,
-                                        });
-                                    }}
-                                    onChangePostIdFocusing={() => null}
-                                    containerStyle={styles.itemView}
-                                />
-                            );
-                        }}
-                        keyExtractor={item => item.id}
-                        keyboardDismissMode="on-drag"
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                        onLoadMore={onLoadMore}
-                        contentContainerStyle={{
-                            paddingBottom: 20,
+                                        onShowMoreOption={() => null}
+                                        onHandleLike={() => null}
+                                        onShowModalComment={() => {
+                                            if (inputRef.current?.isFocused()) {
+                                                inputRef.current.blur();
+                                            }
+                                            showCommentDiscovery({
+                                                post: item,
+                                                type: 'comment',
+                                                setList,
+                                            });
+                                        }}
+                                        onChangePostIdFocusing={() => null}
+                                        containerStyle={styles.itemView}
+                                    />
+                                );
+                            }}
+                            keyExtractor={item => item.id}
+                            keyboardDismissMode="on-drag"
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                            onLoadMore={onLoadMore}
+                            contentContainerStyle={{
+                                paddingBottom: 20,
+                            }}
+                        />
+
+                        {loading && !displayHint && <LoadingScreen />}
+                    </View>
+                </StyleTabView>
+
+                {displayHint && (
+                    <SearchSuggestions
+                        onTouchBackground={() => inputRef.current?.blur()}
+                        onSearch={text => {
+                            inputRef.current?.blur();
+                            setSearch(text);
+                            if (!hadLoadMore) {
+                                setHadLoadMore(true);
+                                onLoadMore();
+                            }
+                            setParams(preValue => ({
+                                ...preValue,
+                                search: text,
+                            }));
                         }}
                     />
-
-                    {loading && <LoadingScreen />}
-                </View>
-            </StyleTabView>
+                )}
+            </View>
 
             <HeaderFilterTopic
                 ref={categoryRef}

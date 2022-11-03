@@ -49,7 +49,7 @@ export const apiEditGroupBooking = (body: TypeEditGroupBooking) => {
     return request.put(`profile/edit-group-buying/${body.postId}`, {
         topic: body.topic,
         content: body.content,
-        is_public_from_draft: body.is_public_from_draft,
+        status: body.status,
     });
 };
 

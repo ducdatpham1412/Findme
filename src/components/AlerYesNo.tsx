@@ -1,5 +1,6 @@
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
+import {FONT_SIZE} from 'asset/standardValue';
 import StyleText from 'components/base/StyleText';
 import Redux from 'hook/useRedux';
 import {goBack} from 'navigation/NavigationService';
@@ -172,7 +173,7 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
     },
     contentText: {
-        fontSize: '17@ms',
+        fontSize: FONT_SIZE.normal,
         fontStyle: 'italic',
     },
     // button view
@@ -191,7 +192,7 @@ const styles = ScaledSheet.create({
         justifyContent: 'center',
     },
     textButtonElement: {
-        fontSize: '17@ms',
+        fontSize: FONT_SIZE.normal,
         color: 'white',
     },
 });

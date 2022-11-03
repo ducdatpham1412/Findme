@@ -52,3 +52,7 @@ export const apiCreateErrorLog = (error: string) => {
         error,
     });
 };
+
+export const apiDeleteGroupBooking = (postId: string) => {
+    return request.put(`/profile/delete-group-buying/${postId}`);
+};

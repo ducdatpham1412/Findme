@@ -106,7 +106,7 @@ const ToolMyProfile = (props: Props) => {
                     customStyle={styles.buttonBox}
                     onPress={() => onChangeTab(3)}>
                     <Feather
-                        name="tag"
+                        name="star"
                         style={[
                             styles.icon,
                             {

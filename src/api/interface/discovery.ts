@@ -45,9 +45,9 @@ export type TypeResultSearch = TypeResultSearchOk | null;
 
 export interface TypeEditGroupBooking {
     postId: string;
-    topic: Array<number>;
-    content: string;
-    is_public_from_draft?: boolean;
+    topic?: Array<number>;
+    content?: string;
+    status?: number;
     // max_groups: number;
 }
 
