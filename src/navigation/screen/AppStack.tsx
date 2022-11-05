@@ -5,6 +5,7 @@ import {
 import {TypeBubblePalace} from 'api/interface';
 import ModalPreviewLink from 'components/ModalPreviewLink';
 import SwipeImages from 'components/SwipeImages';
+import EditHistory from 'feature/common/EditHistory';
 import PostsArchived from 'feature/common/PostsArchived';
 import UpdatePrices from 'feature/common/UpdatePrices';
 import UpgradeAccount from 'feature/common/UpgradeAccount';
@@ -161,6 +162,10 @@ const AppStack = () => {
                 <Stack.Screen
                     name={ROOT_SCREEN.upgradeAccount}
                     component={UpgradeAccount}
+                />
+                <Stack.Screen
+                    name={ROOT_SCREEN.editHistory}
+                    component={EditHistory}
                 />
             </Stack.Navigator>
 

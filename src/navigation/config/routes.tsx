@@ -17,6 +17,7 @@ const ROOT_SCREEN = {
     myProfile: '@ROOT_SCREEN/myProfile',
     postsArchived: '@ROOT_SCREEN/postsArchived',
     upgradeAccount: '@ROOT_SCREEN/upgradeAccount',
+    editHistory: '@ROOT_SCREEN/editHistory',
 };
 /**
  * ||

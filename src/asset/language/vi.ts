@@ -222,6 +222,7 @@ const discovery = {
     openAvailable: 'Mở nhận đặt đơn',
     reviewUpdatePrice: 'Đang duyệt cập nhật giá',
     cancelRequest: 'Huỷ yêu cầu',
+    historyEdit: 'Lịch sử chỉnh sửa',
 };
 
 // REPUTATION
