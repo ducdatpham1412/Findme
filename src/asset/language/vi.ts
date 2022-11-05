@@ -220,6 +220,8 @@ const discovery = {
     numberRetailTurns: '{{value}} lượt mua riêng',
     addPhoneNumber: 'Thêm số điện thoại',
     openAvailable: 'Mở nhận đặt đơn',
+    reviewUpdatePrice: 'Đang duyệt cập nhật giá',
+    cancelRequest: 'Huỷ yêu cầu',
 };
 
 // REPUTATION
@@ -336,6 +338,7 @@ const profile = {
     gbOrder: 'Đơn mua chung',
     editProfile: 'Chỉnh sửa',
     maxGroups: 'Số lượng nhóm tối đa',
+    sendRequestChangePrice: 'Yêu cầu thay đổi giá',
 };
 
 // MESS ROUTE
@@ -486,7 +489,9 @@ const alert = {
         'Bạn không thể chỉnh ngày bắt đầu và giá mua chung',
     canChooseMaximum3: 'Bạn chỉ có thể chọn tối đa 3 chủ đề',
     requestDeleteGbSuccess:
-        'Gửi yêu cầu xoá thành công.\nChúng tôi sẽ xét duyệt và gửi lại thông báo trong vòng 24h.\nBạn có thể huỷ yêu cầu xoá bằng việc cập nhật trạng bài đăng về lại "Có sẵn"',
+        'Gửi yêu cầu xoá thành công.\nChúng tôi sẽ xét duyệt và gửi lại thông báo trong vòng 24h.\nBạn có thể huỷ yêu cầu xoá bằng việc ấn vào "Cập nhật trạng thái", sau đó Mở nhận đặt đơn.',
+    ifUpdatePrice:
+        'Chúng tôi sẽ xét duyệt yêu cầu thay đổi giá của bạn trong vòng 24h.\nNgoài ra, để đảm bảo quyền lợi của những người đã đặt cọc với giá cũ, mọi người cũng có thể xem lịch sửa chỉnh sửa giá của bạn.',
 
     // PERMISSION
     permissionCamera: 'Cho phép Doffy truy cập vào máy ảnh',

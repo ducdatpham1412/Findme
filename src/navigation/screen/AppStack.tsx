@@ -6,6 +6,7 @@ import {TypeBubblePalace} from 'api/interface';
 import ModalPreviewLink from 'components/ModalPreviewLink';
 import SwipeImages from 'components/SwipeImages';
 import PostsArchived from 'feature/common/PostsArchived';
+import UpdatePrices from 'feature/common/UpdatePrices';
 import UpgradeAccount from 'feature/common/UpgradeAccount';
 import DetailGroupBuying from 'feature/discovery/DetailGroupBuying';
 import InteractBubble from 'feature/discovery/InteractBubble';
@@ -133,6 +134,10 @@ const AppStack = () => {
                     options={{
                         gestureEnabled: false,
                     }}
+                />
+                <Stack.Screen
+                    name={PROFILE_ROUTE.updatePrices}
+                    component={UpdatePrices}
                 />
                 <Stack.Screen
                     name={MESS_ROUTE.chatDetail}

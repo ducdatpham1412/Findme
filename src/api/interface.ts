@@ -335,6 +335,10 @@ export interface TypeGroupBuying {
     relationship: number;
     // other field follow on situation
     joinId?: string; // in get_list_gb_joining and joined
+    requestUpdatePrice: {
+        retailPrice: string;
+        prices: Array<TypePrice>;
+    } | null; // only for apiGetDetail to check is requesting update price
 }
 
 export interface TypeBubblePalaceAction {

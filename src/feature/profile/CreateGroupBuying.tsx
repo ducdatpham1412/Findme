@@ -1,6 +1,9 @@
 import {apiCreateGroupBuying, apiEditGroupBooking} from 'api/discovery';
 import {TypeGroupBuying} from 'api/interface';
-import {TypeCreateGroupBuying} from 'api/interface/discovery';
+import {
+    TypeCreateGroupBuying,
+    TypeEditGroupBooking,
+} from 'api/interface/discovery';
 import {STATUS, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
@@ -15,22 +18,22 @@ import {
 import ScrollSyncSizeImage from 'components/common/ScrollSyncSizeImage';
 import LoadingScreen from 'components/LoadingScreen';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
+import UpdatePriceStatus from 'feature/common/components/UpdatePriceStatus';
 import Redux from 'hook/useRedux';
-import ROOT_SCREEN from 'navigation/config/routes';
+import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {
     appAlert,
     appAlertYesNo,
     goBack,
     navigate,
 } from 'navigation/NavigationService';
-import React, {Component, useCallback, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import {useTranslation} from 'react-i18next';
-import {Animated, Platform, TextInput, Vibration, View} from 'react-native';
+import {TextInput, Vibration, View} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Modalize} from 'react-native-modalize';
 import {ScaledSheet} from 'react-native-size-matters';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
@@ -41,6 +44,7 @@ import {
 import {formatLocaleNumber} from 'utility/format';
 import {I18Normalize} from 'utility/I18Next';
 import ImageUploader from 'utility/ImageUploader';
+import AddInfoButton from './components/AddInfoButton';
 import PreviewVideo from './components/PreviewVideo';
 import ModalAddPrice from './post/ModalAddPrice';
 import ModalRetailPrice from './post/ModalRetailPrice';
@@ -60,92 +64,7 @@ interface Props {
     };
 }
 
-interface AddInfoProps {
-    borderColor: string;
-    titleColor: string;
-    title: I18Normalize;
-    onPress(): void;
-}
-
 const {width, safeBottomPadding} = Metrics;
-
-class AddInfoButton extends Component<AddInfoProps> {
-    scale = new Animated.Value(1);
-
-    translateX = new Animated.Value(0);
-
-    slug() {
-        Vibration.vibrate();
-        Animated.timing(this.scale, {
-            toValue: 1.5,
-            useNativeDriver: true,
-            duration: 100,
-        }).start(() => {
-            Animated.sequence([
-                Animated.timing(this.translateX, {
-                    toValue: 10,
-                    duration: 60,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(this.translateX, {
-                    toValue: -10,
-                    duration: 60,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(this.translateX, {
-                    toValue: 10,
-                    duration: 60,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(this.translateX, {
-                    toValue: 0,
-                    duration: 60,
-                    useNativeDriver: true,
-                }),
-            ]).start(() => {
-                Animated.timing(this.scale, {
-                    toValue: 1,
-                    useNativeDriver: true,
-                    duration: 100,
-                }).start();
-            });
-        });
-    }
-
-    render() {
-        const {borderColor, titleColor, title, onPress} = this.props;
-        return (
-            <View style={styles.topicView}>
-                <Animated.View
-                    style={{
-                        transform: [
-                            {scale: this.scale},
-                            {translateX: this.translateX},
-                        ],
-                    }}>
-                    <StyleTouchable
-                        customStyle={[styles.chooseTopicView, {borderColor}]}
-                        onPress={onPress}>
-                        <AntDesign
-                            name="plus"
-                            style={[
-                                styles.iconTopic,
-                                {color: Theme.common.gradientTabBar1},
-                            ]}
-                        />
-                        <StyleText
-                            i18Text={title}
-                            customStyle={[
-                                styles.textTopic,
-                                {color: titleColor, fontWeight: 'bold'},
-                            ]}
-                        />
-                    </StyleTouchable>
-                </Animated.View>
-            </View>
-        );
-    }
-}
 
 const CreateGroupBuying = ({route}: Props) => {
     const itemNew = useRef(route.params?.itemNew).current;
@@ -195,6 +114,9 @@ const CreateGroupBuying = ({route}: Props) => {
     const [retailPrice, setRetailPrice] = useState(initValue.retailPrice);
     const [groupPrices, setGroupPrices] = useState(initValue.groupPrices);
     const [postStatus, setPostStatus] = useState(initValue.postStatus);
+    const [requestUpdatePrice, setRequestUpdatePrice] = useState(
+        itemEdit?.requestUpdatePrice,
+    );
 
     const modalTopicRef = useRef<Modalize>(null);
     const modalRetailPriceRef = useRef<ModalRetailPrice>(null);
@@ -276,11 +198,17 @@ const CreateGroupBuying = ({route}: Props) => {
         if (itemEdit) {
             try {
                 Redux.setIsLoading(true);
-                await apiEditGroupBooking({
+                const dataEdit: TypeEditGroupBooking = {
                     postId: itemEdit.id,
-                    content,
-                    topic: topics,
-                });
+                    data: {},
+                };
+                if (content !== initValue.content) {
+                    dataEdit.data.content = content;
+                }
+                if (!isEqual(topics, initValue.topics)) {
+                    dataEdit.data.topic = topics;
+                }
+                await apiEditGroupBooking(dataEdit);
                 Redux.setBubblePalaceAction({
                     action: TYPE_BUBBLE_PALACE_ACTION.editGroupBuying,
                     payload: {
@@ -298,12 +226,25 @@ const CreateGroupBuying = ({route}: Props) => {
         } else if (itemDraft) {
             try {
                 Redux.setIsLoading(true);
-                await apiEditGroupBooking({
+                const dataEdit: TypeEditGroupBooking = {
                     postId: itemDraft.id,
-                    content,
-                    topic: topics,
-                    status: STATUS.active,
-                });
+                    data: {},
+                };
+                if (content !== initValue.content) {
+                    dataEdit.data.content = content;
+                }
+                if (!isEqual(topics, initValue.topics)) {
+                    dataEdit.data.topic = topics;
+                }
+                dataEdit.data.status = STATUS.active;
+                if (retailPrice !== initValue.retailPrice) {
+                    dataEdit.data.retail_price = retailPrice;
+                }
+                if (!isEqual(groupPrices, initValue.groupPrices)) {
+                    dataEdit.data.prices = groupPrices;
+                }
+
+                await apiEditGroupBooking(dataEdit);
                 Redux.setBubblePalaceAction({
                     action: TYPE_BUBBLE_PALACE_ACTION.editGroupBuying,
                     payload: {
@@ -311,6 +252,9 @@ const CreateGroupBuying = ({route}: Props) => {
                         content,
                         topic: topics,
                         isDraft: false,
+                        retailPrice,
+                        prices: groupPrices,
+                        postStatus: STATUS.active,
                     },
                 });
                 goBack();
@@ -353,7 +297,9 @@ const CreateGroupBuying = ({route}: Props) => {
                 Redux.setIsLoading(true);
                 await apiEditGroupBooking({
                     postId,
-                    status: newPostStatus,
+                    data: {
+                        status: newPostStatus,
+                    },
                 });
                 setPostStatus(newPostStatus);
                 Redux.setBubblePalaceAction({
@@ -376,6 +322,19 @@ const CreateGroupBuying = ({route}: Props) => {
      * Render views
      */
     const Header = () => {
+        let disableButtonEdit = true;
+        if (itemEdit) {
+            const temp: typeof initValue = {
+                topics,
+                content,
+                images,
+                retailPrice,
+                groupPrices,
+                postStatus: initValue.postStatus,
+            };
+            disableButtonEdit = isEqual(temp, initValue);
+        }
+
         return (
             <View
                 style={[
@@ -444,7 +403,8 @@ const CreateGroupBuying = ({route}: Props) => {
                             styles.postBox,
                             {backgroundColor: theme.highlightColor},
                         ]}
-                        onPress={() => onEditPost()}>
+                        onPress={() => onEditPost()}
+                        disable={disableButtonEdit}>
                         <StyleText
                             i18Text="profile.post.edit"
                             customStyle={[
@@ -466,6 +426,9 @@ const CreateGroupBuying = ({route}: Props) => {
     }, []);
 
     const Topic = () => {
+        const disableChooseTopic =
+            itemEdit && itemEdit.postStatus === STATUS.requestingDelete;
+
         if (topics.length === 0) {
             return (
                 <AddInfoButton
@@ -481,7 +444,8 @@ const CreateGroupBuying = ({route}: Props) => {
         return (
             <StyleTouchable
                 customStyle={styles.topicView}
-                onPress={() => modalTopicRef.current?.open()}>
+                onPress={() => modalTopicRef.current?.open()}
+                disable={disableChooseTopic}>
                 {topics.map(id => {
                     const chosenTopic = chooseIconTopic(id);
                     return (
@@ -502,10 +466,10 @@ const CreateGroupBuying = ({route}: Props) => {
         let textButton: I18Normalize = 'discovery.temporarilyClosed';
         let textButtonColor = theme.borderColor;
 
-        const isCloseOrDelete =
+        const isClosingOrRequestingDelete =
             postStatus === STATUS.temporarilyClose ||
             postStatus === STATUS.requestingDelete;
-        if (isCloseOrDelete) {
+        if (isClosingOrRequestingDelete) {
             textStatus = 'discovery.temporarilyClosed';
             textButton = 'discovery.openAvailable';
             textButtonColor = theme.highlightColor;
@@ -554,7 +518,7 @@ const CreateGroupBuying = ({route}: Props) => {
                             customStyle={styles.editStatusBox}
                             onPress={() =>
                                 onChangePostStatus(
-                                    isCloseOrDelete
+                                    isClosingOrRequestingDelete
                                         ? STATUS.active
                                         : STATUS.temporarilyClose,
                                     itemEdit.id,
@@ -575,6 +539,8 @@ const CreateGroupBuying = ({route}: Props) => {
     };
 
     const RetailPrice = () => {
+        const disableEditRetail = !!itemEdit;
+
         return (
             <View
                 style={[styles.priceView, {borderTopColor: theme.holderColor}]}>
@@ -591,19 +557,14 @@ const CreateGroupBuying = ({route}: Props) => {
 
                 {retailPrice ? (
                     <View style={styles.priceBox}>
-                        <StyleTouchable
-                            customStyle={[
+                        <View
+                            style={[
                                 styles.priceValue,
                                 {
                                     borderColor: theme.highlightColor,
                                     flex: undefined,
                                 },
-                            ]}
-                            onPress={() => {
-                                if (!itemEdit) {
-                                    modalRetailPriceRef.current?.show();
-                                }
-                            }}>
+                            ]}>
                             <StyleText
                                 originValue={`${formatLocaleNumber(
                                     retailPrice,
@@ -616,7 +577,23 @@ const CreateGroupBuying = ({route}: Props) => {
                                     },
                                 ]}
                             />
-                        </StyleTouchable>
+                        </View>
+
+                        {!disableEditRetail && (
+                            <StyleTouchable
+                                customStyle={styles.buttonEditRetail}
+                                onPress={() =>
+                                    modalRetailPriceRef.current?.show()
+                                }>
+                                <StyleText
+                                    i18Text="profile.post.edit"
+                                    customStyle={[
+                                        styles.textEditRetail,
+                                        {color: theme.textColor},
+                                    ]}
+                                />
+                            </StyleTouchable>
+                        )}
                     </View>
                 ) : (
                     <AddInfoButton
@@ -639,6 +616,64 @@ const CreateGroupBuying = ({route}: Props) => {
         const onDeletePrice = (valuePrice: string) => {
             setGroupPrices(preValue =>
                 preValue.filter(item => item.value !== valuePrice),
+            );
+        };
+
+        const ButtonPrice = () => {
+            if (!itemEdit) {
+                return (
+                    <AddInfoButton
+                        ref={buttonAddPriceRef}
+                        title="profile.addPrice"
+                        titleColor={theme.textHightLight}
+                        borderColor={theme.borderColor}
+                        onPress={() => modalPriceRef.current?.show()}
+                    />
+                );
+            }
+
+            if (itemEdit.postStatus === STATUS.requestingDelete) {
+                return null;
+            }
+
+            if (!requestUpdatePrice) {
+                return (
+                    <View style={styles.titlePriceView}>
+                        <StyleTouchable
+                            customStyle={styles.editPriceBox}
+                            hitSlop={{
+                                right: 15,
+                                bottom: 15,
+                            }}
+                            onPress={() =>
+                                navigate(PROFILE_ROUTE.updatePrices, {
+                                    item: itemEdit,
+                                    onUpdatePrice: (value: TypeGroupBuying) => {
+                                        setRequestUpdatePrice({
+                                            retailPrice: value.retailPrice,
+                                            prices: value.prices,
+                                        });
+                                    },
+                                })
+                            }>
+                            <StyleText
+                                i18Text="profile.editPrice"
+                                customStyle={[
+                                    styles.textEditPrice,
+                                    {color: theme.borderColor},
+                                ]}
+                            />
+                        </StyleTouchable>
+                    </View>
+                );
+            }
+
+            return (
+                <UpdatePriceStatus
+                    postId={itemEdit.id}
+                    retailPrice={itemEdit.retailPrice}
+                    prices={itemEdit.prices}
+                />
             );
         };
 
@@ -726,35 +761,15 @@ const CreateGroupBuying = ({route}: Props) => {
                     );
                 })}
 
-                {!itemEdit ? (
-                    <AddInfoButton
-                        ref={buttonAddPriceRef}
-                        title="profile.addPrice"
-                        titleColor={theme.textHightLight}
-                        borderColor={theme.borderColor}
-                        onPress={() => modalPriceRef.current?.show()}
-                    />
-                ) : (
-                    <StyleTouchable
-                        customStyle={styles.editPriceBox}
-                        hitSlop={{
-                            right: 15,
-                            bottom: 15,
-                        }}>
-                        <StyleText
-                            i18Text="profile.editPrice"
-                            customStyle={[
-                                styles.textEditPrice,
-                                {color: theme.borderColor},
-                            ]}
-                        />
-                    </StyleTouchable>
-                )}
+                {ButtonPrice()}
             </View>
         );
     };
 
     const Content = () => {
+        const disableEditCaption =
+            !!itemEdit && itemEdit.postStatus === STATUS.requestingDelete;
+
         return (
             <View
                 style={[styles.priceView, {borderTopColor: theme.holderColor}]}>
@@ -768,6 +783,7 @@ const CreateGroupBuying = ({route}: Props) => {
                     placeholderTextColor={theme.borderColor}
                     style={[styles.inputContent, {color: theme.textHightLight}]}
                     defaultValue={initValue.content}
+                    editable={!disableEditCaption}
                 />
             </View>
         );
@@ -851,10 +867,7 @@ const styles = ScaledSheet.create({
         flexDirection: 'row-reverse',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        borderBottomWidth: Platform.select({
-            ios: '0.25@ms',
-            android: '0.5@ms',
-        }),
+        borderBottomWidth: borderWidthTiny,
     },
     iconCloseView: {
         position: 'absolute',
@@ -895,10 +908,7 @@ const styles = ScaledSheet.create({
     chooseTopicView: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderWidth: Platform.select({
-            ios: '0.25@ms',
-            android: '0.5@ms',
-        }),
+        borderWidth: borderWidthTiny,
         paddingHorizontal: '13@s',
         paddingVertical: '5@vs',
         borderRadius: '5@ms',
@@ -906,18 +916,11 @@ const styles = ScaledSheet.create({
     iconTopic: {
         fontSize: '15@ms',
     },
-    textTopic: {
-        fontSize: FONT_SIZE.small,
-        marginLeft: '7@s',
-    },
     // titlePrice
     priceView: {
         marginTop: '15@vs',
         paddingTop: '5@vs',
-        borderTopWidth: Platform.select({
-            ios: '0.25@ms',
-            android: '0.5@ms',
-        }),
+        borderTopWidth: borderWidthTiny,
         paddingHorizontal: '10@s',
     },
     inputContent: {
@@ -941,10 +944,7 @@ const styles = ScaledSheet.create({
     priceNumberPeople: {
         flex: 1,
         paddingVertical: '7@vs',
-        borderWidth: Platform.select({
-            ios: '0.25@ms',
-            android: '0.5@ms',
-        }),
+        borderWidth: borderWidthTiny,
         borderRadius: '5@ms',
         alignItems: 'center',
     },
@@ -955,10 +955,7 @@ const styles = ScaledSheet.create({
     priceValue: {
         flex: 2,
         paddingVertical: '7@vs',
-        borderWidth: Platform.select({
-            ios: '0.25@ms',
-            android: '0.5@ms',
-        }),
+        borderWidth: borderWidthTiny,
         borderRadius: '5@ms',
         paddingHorizontal: '20@s',
     },
@@ -970,6 +967,14 @@ const styles = ScaledSheet.create({
     },
     textNumberPeople: {
         fontSize: FONT_SIZE.small,
+    },
+    buttonEditRetail: {
+        marginLeft: '10@s',
+    },
+    textEditRetail: {
+        fontSize: FONT_SIZE.small,
+        textDecorationLine: 'underline',
+        fontWeight: 'bold',
     },
     infoBox: {
         borderWidth: borderWidthTiny,

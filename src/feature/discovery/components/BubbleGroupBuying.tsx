@@ -126,7 +126,7 @@ const CustomBlurView = () => {
 
 const ButtonCheckJoined = (item: TypeGroupBuying, theme: TypeTheme) => {
     if (item.relationship === RELATIONSHIP.self) {
-        return null;
+        return <View />;
     }
     if (item.status === GROUP_BUYING_STATUS.bought) {
         return (
@@ -179,7 +179,7 @@ const ButtonCheckJoined = (item: TypeGroupBuying, theme: TypeTheme) => {
         );
     }
 
-    return null;
+    return <View />;
 };
 
 const BubbleGroupBuying = (props: Props) => {
@@ -635,9 +635,7 @@ const styles = ScaledSheet.create({
     iconLike: {
         fontSize: '25@ms',
     },
-    touchIconLike: {
-        marginLeft: '20@s',
-    },
+    touchIconLike: {},
     likeTouch: {
         paddingLeft: '10@s',
     },

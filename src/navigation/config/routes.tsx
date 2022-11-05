@@ -75,6 +75,7 @@ const PROFILE_ROUTE = {
     createPostPickImg: '@PROFILE_ROUTE/createPostPickImg',
     detailGroupBuying: '@PROFILE_ROUTE/detailGroupBuying',
     createGroupBuying: '@PROFILE_ROUTE/createGroupBuying',
+    updatePrices: '@PROFILE_ROUTE/updatePrice',
 };
 /**
  * ||
