@@ -1,6 +1,8 @@
 import {StyleContainer} from 'components/base';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
+import ROOT_SCREEN from 'navigation/config/routes';
+import {navigate} from 'navigation/NavigationService';
 import React, {useState} from 'react';
 import {ScaledSheet} from 'react-native-size-matters';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -53,6 +55,20 @@ const ExtendSetting = () => {
                     }
                 />
                 {isSettingLanguage && <LanguageSetting />}
+
+                <TypeDetailSetting
+                    title="profile.updateBankAccount"
+                    onPress={() => navigate(ROOT_SCREEN.updateBankAccount)}
+                    icon={
+                        <FontAwesome
+                            name="credit-card"
+                            style={[
+                                styles.stylesIcon,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                    }
+                />
             </StyleContainer>
         </>
     );

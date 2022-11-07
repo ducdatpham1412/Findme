@@ -57,8 +57,10 @@ const UpdatePrices = ({route}: Props) => {
             Redux.setIsLoading(true);
             await apiEditGroupBooking({
                 postId: item.id,
-                retail_price: item.retailPrice,
-                prices: item.prices,
+                data: {
+                    retail_price: item.retailPrice,
+                    prices: item.prices,
+                },
             });
             onUpdatePrice(item);
             goBack();

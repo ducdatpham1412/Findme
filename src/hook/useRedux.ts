@@ -45,6 +45,8 @@ export interface PassportType {
         theme?: number;
         language?: number;
         display_avatar?: boolean;
+        bank_account?: string;
+        bank_code?: string;
     };
 }
 

@@ -27,7 +27,9 @@ const UpdatePriceStatus = (props: Props) => {
             Redux.setIsLoading(true);
             await apiEditGroupBooking({
                 postId,
-                reject_request_update_price: true,
+                data: {
+                    reject_request_update_price: true,
+                },
             });
             Redux.setBubblePalaceAction({
                 action: TYPE_BUBBLE_PALACE_ACTION.editGroupBuying,

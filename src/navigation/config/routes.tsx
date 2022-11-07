@@ -18,6 +18,7 @@ const ROOT_SCREEN = {
     postsArchived: '@ROOT_SCREEN/postsArchived',
     upgradeAccount: '@ROOT_SCREEN/upgradeAccount',
     editHistory: '@ROOT_SCREEN/editHistory',
+    updateBankAccount: '@ROOT_SCREEN/updateBankAccount',
 };
 /**
  * ||

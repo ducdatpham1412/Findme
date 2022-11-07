@@ -324,6 +324,7 @@ const profile = {
     firstEnterLocation: 'Đầu tiên, hãy cho chúng tôi biết địa chỉ của bạn',
     location: 'Địa chỉ',
     bank: 'Chọn ngân hàng',
+    bankName: 'Ngân hàng',
     accountNumber: 'Số tài khoản',
     byTapping: 'Bằng việc ấn ',
     agreeSendTheseInformation:
@@ -340,6 +341,7 @@ const profile = {
     editProfile: 'Chỉnh sửa',
     maxGroups: 'Số lượng nhóm tối đa',
     sendRequestChangePrice: 'Yêu cầu thay đổi giá',
+    updateBankAccount: 'Tài khoản nhận tiền',
 };
 
 // MESS ROUTE
@@ -493,6 +495,8 @@ const alert = {
         'Gửi yêu cầu xoá thành công.\nChúng tôi sẽ xét duyệt và gửi lại thông báo trong vòng 24h.\nBạn có thể huỷ yêu cầu xoá bằng việc ấn vào "Cập nhật trạng thái", sau đó Mở nhận đặt đơn.',
     ifUpdatePrice:
         'Chúng tôi sẽ xét duyệt yêu cầu thay đổi giá của bạn trong vòng 24h.\nNgoài ra, để đảm bảo quyền lợi của những người đã đặt cọc với giá cũ, mọi người cũng có thể xem lịch sửa chỉnh sửa giá của bạn.',
+    sureUpdateBankAccount:
+        'Bạn chắc chắn muốn cập nhật tài khoản ngân hàng của mình?',
 
     // PERMISSION
     permissionCamera: 'Cho phép Doffy truy cập vào máy ảnh',

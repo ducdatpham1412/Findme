@@ -7,6 +7,7 @@ import ModalPreviewLink from 'components/ModalPreviewLink';
 import SwipeImages from 'components/SwipeImages';
 import EditHistory from 'feature/common/EditHistory';
 import PostsArchived from 'feature/common/PostsArchived';
+import UpdateBankAccount from 'feature/common/UpdateBankAccount';
 import UpdatePrices from 'feature/common/UpdatePrices';
 import UpgradeAccount from 'feature/common/UpgradeAccount';
 import DetailGroupBuying from 'feature/discovery/DetailGroupBuying';
@@ -166,6 +167,10 @@ const AppStack = () => {
                 <Stack.Screen
                     name={ROOT_SCREEN.editHistory}
                     component={EditHistory}
+                />
+                <Stack.Screen
+                    name={ROOT_SCREEN.updateBankAccount}
+                    component={UpdateBankAccount}
                 />
             </Stack.Navigator>
 
