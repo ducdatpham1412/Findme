@@ -71,3 +71,10 @@ export interface TypeJoinGbResponse {
     groupId: string | null;
     joinId: string;
 }
+
+export interface TypeEditPriceHistory {
+    id: string;
+    retailPrice: string;
+    prices: Array<TypePrice>;
+    created: string;
+}

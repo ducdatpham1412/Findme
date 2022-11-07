@@ -218,6 +218,7 @@ const discovery = {
     openAvailable: 'Open receiving booking',
     reviewUpdatePrice: 'Reviewing update prices',
     cancelRequest: 'Cancel requesting',
+    historyEdit: 'Editing history',
 };
 
 // REPUTATION

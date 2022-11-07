@@ -295,6 +295,51 @@ const DetailGroupBuying = ({route}: Props) => {
     const isMyBubble = item.relationship === RELATIONSHIP.self;
     const isTemporarilyClose = item.status === STATUS.temporarilyClose;
 
+    const listOptions = useCallback((): Array<{
+        text: I18Normalize;
+        action(): void;
+    }> => {
+        if (!isMyBubble) {
+            return [
+                {
+                    text: 'discovery.historyEdit',
+                    action: () =>
+                        navigate(ROOT_SCREEN.editHistory, {
+                            postId: item.id,
+                        }),
+                },
+                {
+                    text: 'common.cancel',
+                    action: () => null,
+                },
+            ];
+        }
+        return [
+            {
+                text: 'profile.post.edit',
+                action: () =>
+                    navigate(PROFILE_ROUTE.createGroupBuying, {
+                        itemEdit: item,
+                    }),
+            },
+            {
+                text: 'profile.post.delete',
+                action: () => onDeleteGroupBuying(),
+            },
+            {
+                text: 'discovery.historyEdit',
+                action: () =>
+                    navigate(ROOT_SCREEN.editHistory, {
+                        postId: item.id,
+                    }),
+            },
+            {
+                text: 'common.cancel',
+                action: () => null,
+            },
+        ];
+    }, [isMyBubble, item.id]);
+
     const onRefresh = async () => {
         if (item) {
             try {
@@ -1271,19 +1316,17 @@ const DetailGroupBuying = ({route}: Props) => {
                         containerStyle={styles.imagePreview}
                     />
 
-                    {isMyBubble && (
-                        <StyleTouchable
-                            customStyle={styles.iconOptionView}
-                            onPress={() => modalOptionRef.current?.show()}>
-                            <BlurView
-                                style={StyleSheet.absoluteFill}
-                                blurType="ultraThinMaterialLight"
-                                blurAmount={3}
-                                blurRadius={20}
-                            />
-                            <StyleIcon source={Images.icons.more} size={15} />
-                        </StyleTouchable>
-                    )}
+                    <StyleTouchable
+                        customStyle={styles.iconOptionView}
+                        onPress={() => modalOptionRef.current?.show()}>
+                        <BlurView
+                            style={StyleSheet.absoluteFill}
+                            blurType="ultraThinMaterialLight"
+                            blurAmount={3}
+                            blurRadius={20}
+                        />
+                        <StyleIcon source={Images.icons.more} size={15} />
+                    </StyleTouchable>
                 </SharedElement>
 
                 {Information()}
@@ -1362,23 +1405,7 @@ const DetailGroupBuying = ({route}: Props) => {
 
             <StyleActionSheet
                 ref={modalOptionRef}
-                listTextAndAction={[
-                    {
-                        text: 'profile.post.edit',
-                        action: () =>
-                            navigate(PROFILE_ROUTE.createGroupBuying, {
-                                itemEdit: item,
-                            }),
-                    },
-                    {
-                        text: 'profile.post.delete',
-                        action: () => onDeleteGroupBuying(),
-                    },
-                    {
-                        text: 'common.cancel',
-                        action: () => null,
-                    },
-                ]}
+                listTextAndAction={listOptions()}
             />
         </>
     );
