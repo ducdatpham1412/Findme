@@ -39,6 +39,8 @@ export const initialAccountState = {
             theme: THEME_TYPE.lightTheme,
             language: LANGUAGE_TYPE.vi,
             display_avatar: false,
+            bank_account: '',
+            bank_code: '',
         },
     },
     // modeExp

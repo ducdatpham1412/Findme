@@ -350,6 +350,7 @@ const profile = {
     firstEnterLocation: "First, let's us know your location",
     location: 'Location',
     bank: 'Choose bank',
+    bankName: 'Bank',
     accountNumber: 'Account number',
     byTapping: 'By tapping ',
     agreeSendTheseInformation:
@@ -366,6 +367,7 @@ const profile = {
     editProfile: 'Edit profile',
     maxGroups: 'Maximum number of groups',
     sendRequestChangePrice: 'Request changing prices',
+    updateBankAccount: 'Receiving account',
 };
 
 // SETTING ROUTE
@@ -487,6 +489,7 @@ const alert = {
         'Send request delete successfully.\nWe will review and return the result within 24 hours.\nYou can cancel this request by press "Update status", then Open receiving booking.',
     ifUpdatePrice:
         'We will review your prices change request within 24 hours.\nAlso, to protect the interests of who have deposited at the old price, people can also view your prices edit schedule.',
+    sureUpdateBankAccount: 'Are you sure want to update your bank account?',
 
     // PERMISSION
     permissionCamera: 'Access camera',

@@ -7,6 +7,7 @@ import {
     StyleContainer,
     StyleImage,
     StyleInput,
+    StyleText,
     StyleTouchable,
 } from 'components/base';
 import StyleActionSheet from 'components/common/StyleActionSheet';
@@ -14,13 +15,14 @@ import LoadingScreen from 'components/LoadingScreen';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import Redux from 'hook/useRedux';
 import StyleHeader from 'navigation/components/StyleHeader';
-import {PROFILE_ROUTE} from 'navigation/config/routes';
+import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {appAlert, navigate} from 'navigation/NavigationService';
 import React, {useMemo, useRef, useState} from 'react';
 import {Platform, TextInput, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {SharedElement} from 'react-navigation-shared-element';
 import {
+    borderWidthTiny,
     chooseImageFromCamera,
     chooseImageFromLibrary,
     seeDetailImage,
@@ -33,19 +35,21 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import BtnPenEdit from './components/BtnPenEdit';
 
 const EditProfile = () => {
-    const {profile} = Redux.getPassport();
+    const {profile, setting} = Redux.getPassport();
     const theme = Redux.getTheme();
     const isLoading = Redux.getIsLoading();
     const {t} = useTranslation();
 
     const inputDescriptionRef = useRef<TextInput>(null);
     const actionRef = useRef<any>(null);
+    const modalUpdateBank = useRef<any>(null);
+
     const [avatar, setAvatar] = useState(profile?.avatar);
     const [name, setName] = useState(profile?.name);
     const [location, setLocation] = useState(profile?.location);
     const [description, setDescription] = useState(profile?.description);
-    const isShopAccount = profile.account_type === ACCOUNT.shop;
 
+    const isShopAccount = profile.account_type === ACCOUNT.shop;
     const disableButton = isShopAccount ? !name || !location : !name;
 
     const listTextAndOption: Array<{
@@ -241,11 +245,51 @@ const EditProfile = () => {
                         multiline
                         onChangeText={value => setDescription(value)}
                         containerStyle={{width: '100%'}}
-                        inputStyle={styles.inputDescription}
+                        inputStyle={[
+                            styles.inputDescription,
+                            {color: theme.textHightLight},
+                        ]}
                         hasUnderLine={false}
                         hasErrorBox={false}
                         maxLength={1000}
                     />
+                </StyleTouchable>
+
+                <StyleTouchable
+                    customStyle={[
+                        styles.bankBox,
+                        {borderColor: theme.borderColor},
+                    ]}
+                    activeOpacity={1}
+                    onPress={() => modalUpdateBank.current?.show()}>
+                    <StyleText
+                        i18Text="profile.bankName"
+                        customStyle={[
+                            styles.textBankName,
+                            {color: theme.textHightLight},
+                        ]}>
+                        <StyleText
+                            originValue={`: ${setting.bank_code}`}
+                            customStyle={[
+                                styles.textBankName,
+                                {color: theme.textHightLight},
+                            ]}
+                        />
+                    </StyleText>
+                    <StyleText
+                        i18Text="profile.accountNumber"
+                        customStyle={[
+                            styles.textBankName,
+                            {color: theme.textHightLight},
+                        ]}>
+                        <StyleText
+                            originValue={`: ${setting.bank_account}`}
+                            customStyle={[
+                                styles.textBankName,
+                                {color: theme.textHightLight},
+                            ]}
+                        />
+                    </StyleText>
                 </StyleTouchable>
 
                 <StyleButton
@@ -257,6 +301,20 @@ const EditProfile = () => {
 
                 {isLoading && <LoadingScreen />}
             </StyleContainer>
+
+            <StyleActionSheet
+                ref={modalUpdateBank}
+                listTextAndAction={[
+                    {
+                        text: 'profile.post.edit',
+                        action: () => navigate(ROOT_SCREEN.updateBankAccount),
+                    },
+                    {
+                        text: 'common.cancel',
+                        action: () => null,
+                    },
+                ]}
+            />
         </>
     );
 };
@@ -300,7 +358,7 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
         paddingHorizontal: '5@s',
         borderRadius: '5@ms',
-        marginTop: '20@vs',
+        marginTop: '10@vs',
     },
     inputName: {
         flex: 1,
@@ -323,22 +381,30 @@ const styles = ScaledSheet.create({
         minHeight: '100@vs',
         paddingBottom: '10@vs',
         paddingTop: '5@vs',
-        borderWidth: Platform.select({
-            ios: '0.25@ms',
-            android: '0.5@ms',
-        }),
+        borderWidth: borderWidthTiny,
         borderColor: 'white',
-        borderRadius: '10@s',
-        marginTop: '20@vs',
+        borderRadius: '5@ms',
+        marginTop: '10@vs',
     },
     inputDescription: {
         fontSize: FONT_SIZE.normal,
     },
-
+    bankBox: {
+        width: '80%',
+        borderWidth: borderWidthTiny,
+        paddingVertical: '5@vs',
+        marginTop: '10@vs',
+        borderRadius: '5@ms',
+        paddingHorizontal: '10@s',
+    },
+    textBankName: {
+        fontSize: FONT_SIZE.normal,
+    },
     // btnSave
     saveBtnView: {
         paddingHorizontal: '60@s',
-        marginTop: '60@vs',
+        marginTop: '40@vs',
+        marginBottom: '10@vs',
     },
 });
 

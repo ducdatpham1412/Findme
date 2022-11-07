@@ -216,6 +216,8 @@ export interface TypeEditProfileRequest {
     avatar?: string;
     cover?: string;
     location?: string;
+    bank_code?: string;
+    bank_account?: string;
 }
 export interface TypeEditProfileResponse {
     success: boolean;
