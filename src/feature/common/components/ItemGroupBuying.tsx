@@ -20,7 +20,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {ScaledSheet} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {SharedElement} from 'react-navigation-shared-element';
-import {onGoToProfile} from 'utility/assistant';
+import {chosenBlurType, isIOS, onGoToProfile} from 'utility/assistant';
 import {formatLocaleNumber} from 'utility/format';
 
 interface Props {
@@ -36,13 +36,23 @@ interface Props {
 const {width} = Metrics;
 
 const CustomBlurView = () => {
+    if (isIOS) {
+        return (
+            <BlurView
+                style={styles.blurView}
+                blurType={chosenBlurType}
+                blurAmount={0}
+                blurRadius={1}
+                reducedTransparencyFallbackColor="white"
+            />
+        );
+    }
     return (
-        <BlurView
-            style={styles.blurView}
-            blurType="ultraThinMaterialLight"
-            blurAmount={0}
-            blurRadius={1}
-            reducedTransparencyFallbackColor="white"
+        <View
+            style={[
+                styles.blurView,
+                {backgroundColor: Theme.darkTheme.backgroundOpacity(0.6)},
+            ]}
         />
     );
 };
@@ -119,6 +129,90 @@ const ItemGroupBuying = (props: Props) => {
     const lastPrice = item.prices[item.prices.length - 1];
     const iconSize = (syncWidth / width) * 15;
 
+    const Image = () => {
+        return (
+            <SharedElement
+                style={[
+                    styles.imagePreview,
+                    {
+                        height: syncWidth * ratioImageGroupBuying,
+                    },
+                ]}
+                id={`item.group_buying.${item.id}.${!isHorizontal}`}>
+                <StyleImage
+                    source={{uri: item.images[0]}}
+                    customStyle={[
+                        styles.imagePreview,
+                        {
+                            height: syncWidth * ratioImageGroupBuying,
+                        },
+                    ]}
+                />
+
+                {showName && (
+                    <StyleTouchable
+                        customStyle={styles.creatorView}
+                        onPress={() => onGoToProfile(item.creator)}>
+                        <CustomBlurView />
+                        <View style={styles.avatarBox}>
+                            <StyleImage
+                                source={{uri: item.creatorAvatar}}
+                                customStyle={styles.avatar}
+                            />
+                        </View>
+                        <StyleText
+                            originValue={item.creatorName}
+                            numberOfLines={1}
+                            customStyle={styles.textName}
+                        />
+                    </StyleTouchable>
+                )}
+
+                <View style={styles.bottomView}>
+                    <View style={styles.numberJoinedBox}>
+                        <CustomBlurView />
+                        <StyleIcon
+                            source={Images.icons.createGroup}
+                            size={15}
+                            customStyle={styles.iconNumberPeople}
+                        />
+                        <StyleText
+                            originValue={item.totalGroups + item.totalPersonals}
+                            customStyle={styles.textNumberPeople}
+                        />
+                    </View>
+
+                    {!!item.creatorLocation && isHorizontal && (
+                        <View style={styles.locationBox}>
+                            <CustomBlurView />
+                            <Entypo
+                                name="location-pin"
+                                style={styles.iconLocation}
+                            />
+                            <StyleText
+                                originValue={item.creatorLocation}
+                                customStyle={styles.textLocation}
+                                numberOfLines={1}
+                            />
+                        </View>
+                    )}
+                </View>
+
+                {item.isDraft && (
+                    <View style={styles.draftView}>
+                        <View>
+                            <CustomBlurView />
+                            <StyleText
+                                i18Text="profile.draftPost"
+                                customStyle={styles.textDraft}
+                            />
+                        </View>
+                    </View>
+                )}
+            </SharedElement>
+        );
+    };
+
     const LocationAndPeopleJoined = () => {
         if (isHorizontal) {
             return null;
@@ -171,85 +265,7 @@ const ItemGroupBuying = (props: Props) => {
                     });
                 }
             }}>
-            {/* Image preview */}
-            <SharedElement
-                style={[
-                    styles.imagePreview,
-                    {
-                        height: syncWidth * ratioImageGroupBuying,
-                    },
-                ]}
-                id={`item.group_buying.${item.id}.${!isHorizontal}`}>
-                <StyleImage
-                    source={{uri: item.images[0]}}
-                    customStyle={[
-                        styles.imagePreview,
-                        {
-                            height: syncWidth * ratioImageGroupBuying,
-                        },
-                    ]}
-                />
-
-                {showName && (
-                    <StyleTouchable
-                        customStyle={styles.creatorView}
-                        onPress={() => onGoToProfile(item.creator)}>
-                        <CustomBlurView />
-                        <StyleIcon
-                            source={{uri: item.creatorAvatar}}
-                            size={20}
-                            customStyle={styles.avatar}
-                        />
-                        <StyleText
-                            originValue={item.creatorName}
-                            numberOfLines={1}
-                            customStyle={styles.textName}
-                        />
-                    </StyleTouchable>
-                )}
-
-                <View style={styles.bottomView}>
-                    <View style={styles.numberJoinedBox}>
-                        <CustomBlurView />
-                        <StyleIcon
-                            source={Images.icons.createGroup}
-                            size={15}
-                            customStyle={styles.iconNumberPeople}
-                        />
-                        <StyleText
-                            originValue={item.totalGroups + item.totalPersonals}
-                            customStyle={styles.textNumberPeople}
-                        />
-                    </View>
-
-                    {!!item.creatorLocation && isHorizontal && (
-                        <View style={styles.locationBox}>
-                            <CustomBlurView />
-                            <Entypo
-                                name="location-pin"
-                                style={styles.iconLocation}
-                            />
-                            <StyleText
-                                originValue={item.creatorLocation}
-                                customStyle={styles.textLocation}
-                                numberOfLines={1}
-                            />
-                        </View>
-                    )}
-                </View>
-
-                {item.isDraft && (
-                    <View style={styles.draftView}>
-                        <View>
-                            <CustomBlurView />
-                            <StyleText
-                                i18Text="profile.draftPost"
-                                customStyle={styles.textDraft}
-                            />
-                        </View>
-                    </View>
-                )}
-            </SharedElement>
+            {Image()}
 
             {/* Content */}
             {!!item.content && isHorizontal && (
@@ -333,10 +349,17 @@ const styles = ScaledSheet.create({
         ...StyleSheet.absoluteFillObject,
         borderRadius: '10@ms',
     },
-    avatar: {
-        borderRadius: '30@ms',
+    avatarBox: {
+        width: '20@ms',
+        height: '20@ms',
+        borderRadius: '10@ms',
+        overflow: 'hidden',
         marginLeft: '5@s',
         marginVertical: '2@s',
+    },
+    avatar: {
+        width: '100%',
+        height: '100%',
     },
     textName: {
         fontSize: FONT_SIZE.small,

@@ -79,7 +79,6 @@ class ModalBankAccount extends Component<Props, States> {
                             }
                             placeholder={I18Next.t('profile.accountNumber')}
                             placeholderTextColor={theme.borderColor}
-                            multiline
                             style={[styles.input, {color: theme.textColor}]}
                             keyboardType="numeric"
                         />
@@ -161,13 +160,12 @@ const styles = ScaledSheet.create({
         marginTop: '10@vs',
         borderRadius: '5@ms',
         paddingHorizontal: '8@s',
-        paddingVertical: '8@vs',
+        paddingVertical: '5@ms',
     },
     input: {
         marginVertical: 0,
         paddingTop: 0,
-        // paddingBottom: '0.25@vs',
-        maxHeight: '70@vs',
+        paddingBottom: 0,
     },
     textInvalidLink: {
         fontSize: '10@ms',

@@ -75,13 +75,15 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import {Modalize} from 'react-native-modalize';
 import Share from 'react-native-share';
-import {ScaledSheet} from 'react-native-size-matters';
+import {ScaledSheet, verticalScale} from 'react-native-size-matters';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SharedElement} from 'react-navigation-shared-element';
 import appPurchase from 'utility/appPurchase';
 import {
     borderWidthTiny,
+    chosenBlurType,
     fakeGroupBuying,
+    isIOS,
     logger,
     modeExpUsePaging,
     onGoToProfile,
@@ -186,6 +188,29 @@ const TitleInformation = (props: ParamsInformation) => {
                 ]}
             />
         </View>
+    );
+};
+
+const CustomBlurView = () => {
+    if (isIOS) {
+        return (
+            <BlurView
+                style={StyleSheet.absoluteFill}
+                blurType={chosenBlurType}
+                blurAmount={3}
+                blurRadius={20}
+            />
+        );
+    }
+    return (
+        <View
+            style={[
+                StyleSheet.absoluteFill,
+                {
+                    backgroundColor: Theme.darkTheme.backgroundOpacity(0.6),
+                },
+            ]}
+        />
     );
 };
 
@@ -1318,13 +1343,11 @@ const DetailGroupBuying = ({route}: Props) => {
 
                     <StyleTouchable
                         customStyle={styles.iconOptionView}
-                        onPress={() => modalOptionRef.current?.show()}>
-                        <BlurView
-                            style={StyleSheet.absoluteFill}
-                            blurType="ultraThinMaterialLight"
-                            blurAmount={3}
-                            blurRadius={20}
-                        />
+                        onPress={() => {
+                            modalOptionRef.current?.show();
+                        }}
+                        hitSlop={20}>
+                        <CustomBlurView />
                         <StyleIcon source={Images.icons.more} size={15} />
                     </StyleTouchable>
                 </SharedElement>
@@ -1337,13 +1360,11 @@ const DetailGroupBuying = ({route}: Props) => {
                 {Content()}
             </ScrollView>
 
-            <StyleTouchable customStyle={styles.iconBackView} onPress={goBack}>
-                <BlurView
-                    style={StyleSheet.absoluteFill}
-                    blurType="ultraThinMaterialLight"
-                    blurAmount={3}
-                    blurRadius={20}
-                />
+            <StyleTouchable
+                customStyle={styles.iconBackView}
+                onPress={goBack}
+                hitSlop={10}>
+                <CustomBlurView />
                 <Ionicons name="arrow-back" style={styles.iconBack} />
             </StyleTouchable>
 
@@ -1427,7 +1448,7 @@ const styles = ScaledSheet.create({
     iconBackView: {
         position: 'absolute',
         left: '10@s',
-        top: Metrics.safeTopPadding,
+        top: Metrics.safeTopPadding + verticalScale(5),
         padding: '5@ms',
         borderRadius: '15@ms',
     },
@@ -1438,7 +1459,7 @@ const styles = ScaledSheet.create({
     iconOptionView: {
         position: 'absolute',
         right: '10@s',
-        top: Metrics.safeTopPadding,
+        top: Metrics.safeTopPadding + verticalScale(5),
         paddingHorizontal: '7@ms',
         borderRadius: '15@ms',
     },

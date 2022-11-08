@@ -72,7 +72,7 @@ export const SocketProvider = ({children}: any) => {
             SocketClass.close();
             SocketClass.start();
             socket.on('connect', () => {
-                socket.emit(SOCKET_EVENT.authenticate, {
+                socket?.emit(SOCKET_EVENT.authenticate, {
                     token,
                 });
             });
@@ -132,7 +132,7 @@ export const useSocketChatTagBubble = () => {
             setList((previousChatTags: Array<TypeChatTagResponse>) => {
                 return [data].concat(previousChatTags);
             });
-            socket.emit(SOCKET_EVENT.joinRoom, data.id);
+            socket?.emit(SOCKET_EVENT.joinRoom, data.id);
         });
 
         socket?.off(SOCKET_EVENT.seenMessage);
@@ -397,7 +397,7 @@ export const useSocketChatTagBubble = () => {
     }, [listChatTags, myId]);
 
     const seenMessage = (conversationId: string) => {
-        socket.emit(SOCKET_EVENT.seenMessage, {myId, conversationId});
+        socket?.emit(SOCKET_EVENT.seenMessage, {myId, conversationId});
     };
 
     return {
@@ -475,7 +475,7 @@ export const useSocketChatDetail = (params: {
                     // Because if sender is me, not need to send socket "seenMessage" any more, only need set userData in local
 
                     // if (params.isMyChatTag) {
-                    //     socket.emit(SOCKET_EVENT.seenMessage, {
+                    //     socket?.emit(SOCKET_EVENT.seenMessage, {
                     //         myId,
                     //         conversationId: data.conversationId,
                     //     });
@@ -525,7 +525,7 @@ export const useSocketChatDetail = (params: {
             );
 
             if (isFocusingThisChatTag) {
-                socket.emit(SOCKET_EVENT.seenMessage, {
+                socket?.emit(SOCKET_EVENT.seenMessage, {
                     myId,
                     conversationId: data.conversationId,
                 });
@@ -578,12 +578,12 @@ export const useSocketChatDetail = (params: {
                     1080,
                 );
                 _params.content = messImages;
-                socket.emit(SOCKET_EVENT.message, _params);
+                socket?.emit(SOCKET_EVENT.message, _params);
             } catch (err) {
                 appAlert(err);
             }
         } else {
-            socket.emit(SOCKET_EVENT.message, _params);
+            socket?.emit(SOCKET_EVENT.message, _params);
         }
     };
 
@@ -713,15 +713,15 @@ export const useSocketComment = (params: ParamSocketComment) => {
         if (bubbleFocusingId) {
             if (bubbleFocusingId !== oldBubbleFocusingId) {
                 getData();
-                socket.emit(SOCKET_EVENT.joinRoom, bubbleFocusingId);
+                socket?.emit(SOCKET_EVENT.joinRoom, bubbleFocusingId);
                 hearingSocket();
                 if (oldBubbleFocusingId) {
-                    socket.emit(SOCKET_EVENT.leaveRoom, oldBubbleFocusingId);
+                    socket?.emit(SOCKET_EVENT.leaveRoom, oldBubbleFocusingId);
                 }
                 oldBubbleFocusingId = bubbleFocusingId;
             } else {
-                socket.emit(SOCKET_EVENT.leaveRoom, bubbleFocusingId);
-                socket.emit(SOCKET_EVENT.joinRoom, bubbleFocusingId);
+                socket?.emit(SOCKET_EVENT.leaveRoom, bubbleFocusingId);
+                socket?.emit(SOCKET_EVENT.joinRoom, bubbleFocusingId);
                 hearingSocket();
                 setDataComment(cachedListComments);
             }
@@ -789,29 +789,29 @@ export const useSocketNotification = () => {
  */
 export const startChatTag = (conversation: TypeConversationRequest) => {
     const {token} = FindmeStore.getState().logicSlice;
-    socket.emit(SOCKET_EVENT.createChatTag, {
+    socket?.emit(SOCKET_EVENT.createChatTag, {
         token,
         conversation,
     });
 };
 
 export const socketTyping = (params: TypingResponse) => {
-    socket.emit(SOCKET_EVENT.typing, params);
+    socket?.emit(SOCKET_EVENT.typing, params);
 };
 export const socketUnTyping = (params: TypingResponse) => {
-    socket.emit(SOCKET_EVENT.unTyping, params);
+    socket?.emit(SOCKET_EVENT.unTyping, params);
 };
 
 export const socketAddComment = (params: TypeSocketCommentRequest) => {
-    socket.emit(SOCKET_EVENT.addComment, params);
+    socket?.emit(SOCKET_EVENT.addComment, params);
 };
 
 export const socketJoinRoom = (roomId: string) => {
-    socket.emit(SOCKET_EVENT.joinRoom, roomId);
+    socket?.emit(SOCKET_EVENT.joinRoom, roomId);
 };
 
 export const socketLeaveRoom = (roomId: string) => {
-    socket.emit(SOCKET_EVENT.leaveRoom, roomId);
+    socket?.emit(SOCKET_EVENT.leaveRoom, roomId);
 };
 
 export const closeSocket = () => {

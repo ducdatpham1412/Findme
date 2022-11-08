@@ -3,8 +3,9 @@ import {StyleText} from 'components/base';
 import Redux from 'hook/useRedux';
 import {goBack} from 'navigation/NavigationService';
 import React from 'react';
-import {Platform, StyleProp, TextStyle, View, ViewStyle} from 'react-native';
+import {StyleProp, TextStyle, View, ViewStyle} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
+import {borderWidthTiny} from 'utility/assistant';
 import {I18Normalize} from 'utility/I18Next';
 import HeaderLeftIcon from './HeaderLeftIcon';
 
@@ -65,10 +66,7 @@ const styles = ScaledSheet.create({
         paddingTop: '3@vs',
         alignItems: 'center',
         justifyContent: 'center',
-        borderBottomWidth: Platform.select({
-            ios: '0.25@ms',
-            android: '0.5@ms',
-        }),
+        borderBottomWidth: borderWidthTiny,
     },
     titleText: {
         fontSize: FONT_SIZE.big,

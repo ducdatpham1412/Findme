@@ -35,6 +35,8 @@ target 'Findme' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec',
     :modular_headers => false
 
+    pod 'RNReanimated', :path => '../node_modules/react-native-reanimated'
+
     target 'FindmeTests' do
         inherit! :complete
         # Pods for testing

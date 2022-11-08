@@ -8,7 +8,7 @@ import {GROUP_BUYING_STATUS, RELATIONSHIP} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
-import {StyleIcon, StyleText, StyleTouchable} from 'components/base';
+import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import StyleTabView from 'components/StyleTabView';
 import Redux from 'hook/useRedux';
@@ -218,14 +218,15 @@ const ModalPeopleJoined = (props: Props, ref: any) => {
                         ]}>
                         <StyleTouchable
                             onPress={() => onGoToProfile(itemJoined.creator)}>
-                            <StyleIcon
-                                source={{uri: itemJoined.creatorAvatar}}
-                                size={40}
-                                customStyle={[
-                                    styles.creatorAvatar,
-                                    {marginLeft: 0},
-                                ]}
-                            />
+                            <View style={styles.avatarBox}>
+                                <StyleImage
+                                    source={{uri: itemJoined.creatorAvatar}}
+                                    customStyle={[
+                                        styles.creatorAvatar,
+                                        {marginLeft: 0},
+                                    ]}
+                                />
+                            </View>
                         </StyleTouchable>
                         <View style={styles.nameTimeJoinedView}>
                             <StyleText
@@ -364,11 +365,12 @@ const ModalPeopleJoined = (props: Props, ref: any) => {
                     {displayPeople.map((person, index) => {
                         return (
                             <View key={person.id} style={styles.avatarGroupBox}>
-                                <StyleIcon
-                                    source={{uri: person.creatorAvatar}}
-                                    size={35}
-                                    customStyle={styles.creatorAvatar}
-                                />
+                                <View style={styles.avatarBox}>
+                                    <StyleImage
+                                        source={{uri: person.creatorAvatar}}
+                                        customStyle={styles.creatorAvatar}
+                                    />
+                                </View>
                                 {index === 5 && isBiggerThanSix && (
                                     <View style={styles.morePeopleBox}>
                                         <StyleText
@@ -542,8 +544,15 @@ const styles = ScaledSheet.create({
     avatarGroupBox: {
         marginHorizontal: '2@s',
     },
-    creatorAvatar: {
+    avatarBox: {
+        width: '35@ms',
+        height: '35@ms',
         borderRadius: '20@ms',
+        overflow: 'hidden',
+    },
+    creatorAvatar: {
+        width: '100%',
+        height: '100%',
     },
     morePeopleBox: {
         position: 'absolute',

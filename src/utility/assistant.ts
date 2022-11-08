@@ -507,3 +507,8 @@ export const borderWidthTiny = Platform.select({
     ios: moderateScale(0.25),
     android: moderateScale(0.5),
 });
+
+export const chosenBlurType: any = Platform.select({
+    ios: 'ultraThinMaterialLight',
+    android: 'xlight',
+});

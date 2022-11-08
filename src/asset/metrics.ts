@@ -1,10 +1,14 @@
 import {Dimensions} from 'react-native';
 import {moderateScale} from 'react-native-size-matters';
 import StaticSafeAreaInsets from 'react-native-static-safe-area-insets';
+import DeviceInfo from 'react-native-device-info';
+import {isIOS} from 'utility/assistant';
 
 const {width, height} = Dimensions.get('screen');
-const safeTopPadding = StaticSafeAreaInsets.safeAreaInsetsTop;
-const safeBottomPadding = StaticSafeAreaInsets.safeAreaInsetsBottom;
+const safeTopPadding = DeviceInfo.hasNotch()
+    ? StaticSafeAreaInsets.safeAreaInsetsTop
+    : 0;
+const safeBottomPadding = isIOS ? StaticSafeAreaInsets.safeAreaInsetsBottom : 0;
 const safeLeftPadding = StaticSafeAreaInsets.safeAreaInsetsLeft;
 const safeRightPadding = StaticSafeAreaInsets.safeAreaInsetsRight;
 const contentSafeTop = safeTopPadding + moderateScale(45); // 45 is height of tab bar up

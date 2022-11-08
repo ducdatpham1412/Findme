@@ -146,7 +146,9 @@ const ModalConfirmJoinGb = (props: Props) => {
                             ]}
                         />
                         <View style={styles.minusPlusBox}>
-                            <StyleTouchable onPress={() => onChangeAmount(-1)}>
+                            <StyleTouchable
+                                onPress={() => onChangeAmount(-1)}
+                                hitSlop={10}>
                                 <AntDesign
                                     name="minussquareo"
                                     style={[
@@ -162,7 +164,9 @@ const ModalConfirmJoinGb = (props: Props) => {
                                     {color: theme.borderColor},
                                 ]}
                             />
-                            <StyleTouchable onPress={() => onChangeAmount(1)}>
+                            <StyleTouchable
+                                onPress={() => onChangeAmount(1)}
+                                hitSlop={10}>
                                 <AntDesign
                                     name="plussquareo"
                                     style={[
@@ -189,6 +193,10 @@ const ModalConfirmJoinGb = (props: Props) => {
                                     setTimeout(() => {
                                         datetimeRef.current?.show();
                                     }, 500);
+                                }}
+                                hitSlop={{
+                                    top: 10,
+                                    bottom: 10,
                                 }}>
                                 <StyleText
                                     originValue={`${formatDayGroupBuying(
@@ -226,7 +234,11 @@ const ModalConfirmJoinGb = (props: Props) => {
                                     modalAddPhoneRef.current?.open();
                                 }}
                                 disable={!!phone}
-                                disableOpacity={1}>
+                                disableOpacity={1}
+                                hitSlop={{
+                                    top: 10,
+                                    bottom: 10,
+                                }}>
                                 {phone ? (
                                     <StyleText
                                         originValue={phone}

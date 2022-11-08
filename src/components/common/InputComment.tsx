@@ -4,7 +4,7 @@ import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import AppInput from 'components/base/AppInput';
 import Redux from 'hook/useRedux';
 import React, {forwardRef, useMemo} from 'react';
-import {StyleProp, View, ViewStyle} from 'react-native';
+import {Platform, StyleProp, View, ViewStyle} from 'react-native';
 import {moderateScale, ScaledSheet} from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
 
@@ -153,13 +153,14 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
         paddingHorizontal: '12@s',
         paddingTop: '10@ms',
-        paddingBottom: moderateScale(10) + Metrics.safeBottomPadding,
+        paddingBottom: Metrics.safeBottomPadding + moderateScale(2),
         shadowOpacity: 0.1,
         shadowOffset: {
             width: 0,
             height: 15,
         },
         shadowRadius: 20,
+        maxHeight: '120@vs',
     },
     replyView: {
         width: '100%',
@@ -185,8 +186,14 @@ const styles = ScaledSheet.create({
     },
     containerInput: {
         flex: 1,
-        paddingTop: '5@ms',
-        paddingBottom: '5@ms',
+        paddingTop: Platform.select({
+            ios: '5@ms',
+            android: '2@ms',
+        }),
+        paddingBottom: Platform.select({
+            ios: '5@ms',
+            android: '2@ms',
+        }),
         borderRadius: '8@ms',
         fontSize: FONT_SIZE.normal,
         paddingHorizontal: '5@ms',
