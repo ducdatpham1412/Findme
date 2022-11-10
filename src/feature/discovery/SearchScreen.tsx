@@ -1,3 +1,4 @@
+import {TypeGroupBuying} from 'api/interface';
 import {apiGetListBubbleActive} from 'api/module';
 import {POST_TYPE, TOPIC} from 'asset/enum';
 import Images from 'asset/img/images';
@@ -8,20 +9,20 @@ import {StyleIcon, StyleText, StyleTouchable} from 'components/base';
 import AppInput from 'components/base/AppInput';
 import StyleList from 'components/base/StyleList';
 import LoadingScreen from 'components/LoadingScreen';
+import ModalCommentLike from 'components/ModalCommentLike';
 import StyleTabView from 'components/StyleTabView';
 import usePaging from 'hook/usePaging';
 import Redux from 'hook/useRedux';
-import {DISCOVERY_ROUTE} from 'navigation/config/routes';
+import ROOT_SCREEN from 'navigation/config/routes';
 import {goBack, navigate} from 'navigation/NavigationService';
-import {showCommentDiscovery} from 'navigation/screen/MainTabs';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Platform, TextInput, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {borderWidthTiny} from 'utility/assistant';
+import {borderWidthTiny, fakeGroupBuying} from 'utility/assistant';
 import BubbleGroupBuying from './components/BubbleGroupBuying';
 import SearchSuggestions from './components/SearchSuggestions';
 import HeaderFilterPrice from './HeaderFilterPrice';
@@ -42,6 +43,7 @@ const SearchScreen = ({route}: Props) => {
     const inputRef = useRef<TextInput>(null);
     const categoryRef = useRef<HeaderFilterTopic>(null);
     const priceRef = useRef<HeaderFilterPrice>(null);
+    const modalRef = useRef<ModalCommentLike>(null);
 
     const theme = Redux.getTheme();
     const {listPrices} = Redux.getResource();
@@ -53,6 +55,7 @@ const SearchScreen = ({route}: Props) => {
             ? [topicRoute]
             : LIST_TOPICS.map(item => item.id),
     );
+    const [bubbleFocusing, setBubbleFocusing] = useState(fakeGroupBuying);
     const [search, setSearch] = useState(searchRoute || '');
     const [hadLoadMore, setHadLoadMore] = useState(
         !(topicRoute === undefined && searchRoute === undefined),
@@ -232,6 +235,37 @@ const SearchScreen = ({route}: Props) => {
         );
     };
 
+    const RenderItem = useCallback(
+        (item: TypeGroupBuying) => {
+            return (
+                <BubbleGroupBuying
+                    item={item}
+                    onGoToDetailGroupBuying={() => {
+                        navigate(ROOT_SCREEN.detailGroupBuying, {
+                            item,
+                            setList,
+                        });
+                    }}
+                    detailGroupTarget={ROOT_SCREEN.detailGroupBuying}
+                    onShowMoreOption={() => null}
+                    onHandleLike={() => null}
+                    onShowModalComment={(post, type) => {
+                        if (inputRef.current?.isFocused()) {
+                            inputRef.current.blur();
+                        }
+                        modalRef.current?.show({
+                            post,
+                            type,
+                        });
+                    }}
+                    onChangePostIdFocusing={() => null}
+                    containerStyle={styles.itemView}
+                />
+            );
+        },
+        [bubbleFocusing],
+    );
+
     return (
         <View
             style={[
@@ -247,39 +281,7 @@ const SearchScreen = ({route}: Props) => {
                     <View style={styles.elementView}>
                         <StyleList
                             data={list}
-                            renderItem={({item}) => {
-                                return (
-                                    <BubbleGroupBuying
-                                        item={item}
-                                        onGoToDetailGroupBuying={() => {
-                                            navigate(
-                                                DISCOVERY_ROUTE.detailGroupBuying,
-                                                {
-                                                    item,
-                                                    setList,
-                                                },
-                                            );
-                                        }}
-                                        detailGroupTarget={
-                                            DISCOVERY_ROUTE.detailGroupBuying
-                                        }
-                                        onShowMoreOption={() => null}
-                                        onHandleLike={() => null}
-                                        onShowModalComment={() => {
-                                            if (inputRef.current?.isFocused()) {
-                                                inputRef.current.blur();
-                                            }
-                                            showCommentDiscovery({
-                                                post: item,
-                                                type: 'comment',
-                                                setList,
-                                            });
-                                        }}
-                                        onChangePostIdFocusing={() => null}
-                                        containerStyle={styles.itemView}
-                                    />
-                                );
-                            }}
+                            renderItem={({item}) => RenderItem(item)}
                             keyExtractor={item => item.id}
                             keyboardDismissMode="on-drag"
                             refreshing={refreshing}
@@ -312,6 +314,40 @@ const SearchScreen = ({route}: Props) => {
                     />
                 )}
             </View>
+
+            <ModalCommentLike
+                ref={modalRef}
+                theme={theme}
+                bubbleFocusing={bubbleFocusing}
+                updateBubbleFocusing={value =>
+                    setBubbleFocusing((preValue: any) => ({
+                        ...preValue,
+                        ...value,
+                    }))
+                }
+                setTotalComments={value => {
+                    setBubbleFocusing(preValue => {
+                        if (preValue) {
+                            return {
+                                ...preValue,
+                                totalComments: value,
+                            };
+                        }
+                        return preValue;
+                    });
+                }}
+                increaseTotalComments={value => {
+                    setBubbleFocusing(preValue => {
+                        if (preValue) {
+                            return {
+                                ...preValue,
+                                totalComments: preValue.totalComments + value,
+                            };
+                        }
+                        return preValue;
+                    });
+                }}
+            />
 
             <HeaderFilterTopic
                 ref={categoryRef}

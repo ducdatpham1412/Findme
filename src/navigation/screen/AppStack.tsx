@@ -13,6 +13,7 @@ import UpgradeAccount from 'feature/common/UpgradeAccount';
 import DetailGroupBuying from 'feature/discovery/DetailGroupBuying';
 import InteractBubble from 'feature/discovery/InteractBubble';
 import ReportUser from 'feature/discovery/ReportUser';
+import SearchScreen from 'feature/discovery/SearchScreen';
 import ChatDetail from 'feature/mess/ChatDetail';
 import ChatDetailSetting from 'feature/mess/ChatDetailSetting';
 import DetailBubble from 'feature/notification/DetailBubble';
@@ -24,7 +25,11 @@ import MyProfile from 'feature/profile/MyProfile';
 import OtherProfile from 'feature/profile/OtherProfile';
 import Redux from 'hook/useRedux';
 import StatusPostCreated from 'navigation/components/StatusPostCreated';
-import ROOT_SCREEN, {MESS_ROUTE, PROFILE_ROUTE} from 'navigation/config/routes';
+import ROOT_SCREEN, {
+    DISCOVERY_ROUTE,
+    MESS_ROUTE,
+    PROFILE_ROUTE,
+} from 'navigation/config/routes';
 import React from 'react';
 import MainAndChat from './MainAndChat';
 import SettingRoute from './tabs/SettingRoute';
@@ -171,6 +176,14 @@ const AppStack = () => {
                 <Stack.Screen
                     name={ROOT_SCREEN.updateBankAccount}
                     component={UpdateBankAccount}
+                />
+                <Stack.Screen
+                    name={DISCOVERY_ROUTE.searchScreen}
+                    component={SearchScreen}
+                    options={{
+                        cardStyleInterpolator:
+                            CardStyleInterpolators.forHorizontalIOS,
+                    }}
                 />
             </Stack.Navigator>
 
