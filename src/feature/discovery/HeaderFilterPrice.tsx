@@ -144,30 +144,27 @@ export default class HeaderFilterPrice extends Component<Props, States> {
                                     />
                                 )}
                                 <StyleTouchable
-                                    customStyle={[
-                                        styles.checkBox,
-                                        {borderColor: theme.borderColor},
-                                    ]}
+                                    customStyle={styles.checkTouchable}
                                     onPress={() => {
                                         this.setState({
                                             tempPrice: item,
                                         });
-                                    }}
-                                    hitSlop={{
-                                        top: 5,
-                                        bottom: 5,
-                                        left: 15,
-                                        right: 15,
                                     }}>
-                                    {isChosen && (
-                                        <AntDesign
-                                            name="check"
-                                            style={[
-                                                styles.iconCheck,
-                                                {color: theme.textColor},
-                                            ]}
-                                        />
-                                    )}
+                                    <View
+                                        style={[
+                                            styles.checkBox,
+                                            {borderColor: theme.borderColor},
+                                        ]}>
+                                        {isChosen && (
+                                            <AntDesign
+                                                name="check"
+                                                style={[
+                                                    styles.iconCheck,
+                                                    {color: theme.textColor},
+                                                ]}
+                                            />
+                                        )}
+                                    </View>
                                 </StyleTouchable>
                             </View>
                         );
@@ -238,7 +235,6 @@ const styles = ScaledSheet.create({
     footerView: {
         width: '100%',
         flexDirection: 'row',
-        paddingVertical: '10@vs',
         borderTopWidth: Platform.select({
             ios: '0.25@ms',
             android: '0.5@ms',
@@ -248,6 +244,7 @@ const styles = ScaledSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        paddingVertical: '10@vs',
     },
     textCancelSave: {
         fontSize: FONT_SIZE.normal,
@@ -261,14 +258,17 @@ const styles = ScaledSheet.create({
         alignSelf: 'center',
     },
     itemView: {
-        width: '70%',
+        width: '90%',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginVertical: '10@vs',
         alignSelf: 'center',
+        paddingLeft: '15@s',
     },
     textTitle: {
         fontSize: FONT_SIZE.small,
+    },
+    checkTouchable: {
+        padding: '15@s',
     },
     checkBox: {
         width: '18@ms',

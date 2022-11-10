@@ -172,7 +172,7 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: Theme.common.red,
-        top: '9@ms',
+        top: '3@ms',
         right: '10@ms',
     },
     textNewMessages: {

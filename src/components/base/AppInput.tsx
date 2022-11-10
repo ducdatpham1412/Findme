@@ -11,6 +11,8 @@ const AppInput = (props: TextInputProps, ref: any) => {
 const styles = StyleSheet.create({
     text: {
         fontFamily: FONT_FAMILY.openSans,
+        paddingTop: 0,
+        paddingBottom: 0,
     },
 });
 
