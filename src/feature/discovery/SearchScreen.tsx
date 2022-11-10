@@ -377,7 +377,7 @@ const styles = ScaledSheet.create({
         paddingTop: Metrics.safeTopPadding,
     },
     backView: {
-        paddingHorizontal: '10@s',
+        paddingHorizontal: '7@s',
     },
     searchView: {
         width: '100%',
@@ -391,7 +391,7 @@ const styles = ScaledSheet.create({
         }),
     },
     iconBack: {
-        fontSize: '18@ms',
+        fontSize: '20@ms',
     },
     input: {
         flex: 1,

@@ -6,7 +6,10 @@ import {FONT_SIZE} from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
-import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
+import ROOT_SCREEN, {
+    MAIN_SCREEN,
+    PROFILE_ROUTE,
+} from 'navigation/config/routes';
 import {navigate, push} from 'navigation/NavigationService';
 import React from 'react';
 import {View} from 'react-native';
@@ -58,7 +61,9 @@ const InformationProfile = (props: Props) => {
                             {backgroundColor: Theme.common.gradientTabBar1},
                         ]}
                         onPress={() => {
-                            navigate(PROFILE_ROUTE.editProfile);
+                            navigate(MAIN_SCREEN.profileRoute, {
+                                screen: PROFILE_ROUTE.editProfile,
+                            });
                         }}>
                         <StyleText
                             i18Text="profile.editProfile"

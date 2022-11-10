@@ -29,23 +29,17 @@ const ItemFilterTopic = (props: Props) => {
                 />
             </View>
             <StyleTouchable
-                customStyle={[
-                    styles.checkBox,
-                    {borderColor: theme.borderColor},
-                ]}
-                onPress={onPressTopic}
-                hitSlop={{
-                    top: 5,
-                    bottom: 5,
-                    left: 15,
-                    right: 15,
-                }}>
-                {isChosen && (
-                    <AntDesign
-                        name="check"
-                        style={[styles.iconCheck, {color: theme.textColor}]}
-                    />
-                )}
+                onPress={() => onPressTopic()}
+                customStyle={styles.checkTouchable}>
+                <View
+                    style={[styles.checkBox, {borderColor: theme.borderColor}]}>
+                    {isChosen && (
+                        <AntDesign
+                            name="check"
+                            style={[styles.iconCheck, {color: theme.textColor}]}
+                        />
+                    )}
+                </View>
             </StyleTouchable>
         </View>
     );
@@ -53,12 +47,12 @@ const ItemFilterTopic = (props: Props) => {
 
 const styles = ScaledSheet.create({
     container: {
-        width: '90%',
+        width: '100%',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignSelf: 'center',
         alignItems: 'center',
-        marginVertical: '10@vs',
+        paddingLeft: '15@s',
     },
     titleView: {
         flexDirection: 'row',
@@ -70,6 +64,9 @@ const styles = ScaledSheet.create({
     },
     iconCheck: {
         fontSize: '15@ms',
+    },
+    checkTouchable: {
+        padding: '15@s',
     },
     checkBox: {
         width: '18@ms',

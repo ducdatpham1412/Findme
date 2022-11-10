@@ -1,3 +1,4 @@
+import {TOPIC} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE, LIST_TOPICS} from 'asset/standardValue';
 import {TypeTheme} from 'asset/theme/Theme';
@@ -76,20 +77,29 @@ export default class HeaderFilterTopic extends Component<Props, States> {
     }
 
     private onChooseTopic(topic: number) {
-        let temp = [];
-        if (this.state.tempListTopics.includes(topic)) {
-            temp = this.state.tempListTopics.filter(item => item !== topic);
+        if (topic === TOPIC.all) {
+            this.setState({
+                tempListTopics: [TOPIC.all],
+            });
         } else {
-            temp = this.state.tempListTopics.concat(topic);
-        }
+            let temp = [...this.state.tempListTopics];
+            if (temp.includes(topic)) {
+                temp = temp.filter(item => {
+                    return item !== topic && item !== TOPIC.all;
+                });
+            } else {
+                temp = temp.filter(item => item !== TOPIC.all);
+                temp = temp.concat(topic);
+            }
 
-        if (!temp.length) {
-            return;
-        }
+            if (!temp.length) {
+                return;
+            }
 
-        this.setState({
-            tempListTopics: temp,
-        });
+            this.setState({
+                tempListTopics: temp,
+            });
+        }
     }
 
     render() {
@@ -199,7 +209,6 @@ const styles = ScaledSheet.create({
     footerView: {
         width: '100%',
         flexDirection: 'row',
-        paddingVertical: '10@vs',
         borderTopWidth: Platform.select({
             ios: '0.25@ms',
             android: '0.5@ms',
@@ -209,6 +218,7 @@ const styles = ScaledSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        paddingVertical: '10@vs',
     },
     textCancelSave: {
         fontSize: FONT_SIZE.normal,
