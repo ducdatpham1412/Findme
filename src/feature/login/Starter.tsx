@@ -10,7 +10,7 @@ import TopTabNavigator from 'navigation/components/TopTabNavigator';
 import {LOGIN_ROUTE} from 'navigation/config/routes';
 import React from 'react';
 import {View} from 'react-native';
-import {ScaledSheet, verticalScale} from 'react-native-size-matters';
+import {ScaledSheet} from 'react-native-size-matters';
 import ChoosingLoginOrEnjoy from './ChoosingLoginOrEnjoy';
 import BackgroundAuthen from './components/BackgroundAuthen';
 import LoginScreen from './LoginScreen';
@@ -70,7 +70,7 @@ const styles = ScaledSheet.create({
     },
     spaceView: {
         width: '100%',
-        height: Metrics.safeTopPadding + verticalScale(10),
+        height: Metrics.safeTopPadding,
     },
     tabBarContainer: {
         width: '90%',

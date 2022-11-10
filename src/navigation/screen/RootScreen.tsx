@@ -4,7 +4,6 @@ import {
     createStackNavigator,
     StackNavigationOptions,
 } from '@react-navigation/stack';
-import {Metrics} from 'asset/metrics';
 import Theme from 'asset/theme/Theme';
 import Alert from 'components/Alert';
 import AlertYesNo from 'components/AlerYesNo';
@@ -33,10 +32,6 @@ const alertOption: StackNavigationOptions = {
     animationEnabled: false,
     cardOverlayEnabled: true,
     headerShown: false,
-};
-
-const cardSafe = {
-    paddingTop: Metrics.safeTopPadding,
 };
 
 const RootScreen = () => {
@@ -148,7 +143,6 @@ const RootScreen = () => {
                                     {
                                         backgroundColor: theme.backgroundColor,
                                     },
-                                    cardSafe,
                                 ],
                             }}
                         />
@@ -163,7 +157,6 @@ const RootScreen = () => {
                                         backgroundColor:
                                             theme.backgroundOpacity(),
                                     },
-                                    cardSafe,
                                 ],
                                 cardStyleInterpolator:
                                     CardStyleInterpolators.forFadeFromBottomAndroid,

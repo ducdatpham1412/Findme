@@ -38,6 +38,8 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import {
     chooseIconFeeling,
     chooseTextTopic,
+    chosenBlurType,
+    isIOS,
     onGoToProfile,
     onGoToSignUp,
 } from 'utility/assistant';
@@ -179,13 +181,23 @@ const onGoToDetailPost = (bubble: TypeBubblePalace) => {
 };
 
 const CustomBlurView = () => {
+    if (isIOS) {
+        return (
+            <BlurView
+                style={styles.blurView}
+                blurType={chosenBlurType}
+                blurAmount={0}
+                blurRadius={1}
+                reducedTransparencyFallbackColor="white"
+            />
+        );
+    }
     return (
-        <BlurView
-            style={styles.blurView}
-            blurType="ultraThinMaterialLight"
-            blurAmount={0}
-            blurRadius={1}
-            reducedTransparencyFallbackColor="white"
+        <View
+            style={[
+                styles.blurView,
+                {backgroundColor: Theme.darkTheme.backgroundOpacity(0.6)},
+            ]}
         />
     );
 };
@@ -720,7 +732,7 @@ const styles = ScaledSheet.create({
         width: '100%',
         flexDirection: 'row-reverse',
         alignItems: 'center',
-        marginTop: '15@vs',
+        marginTop: '10@vs',
     },
     footerViewDraft: {
         width: '100%',
@@ -766,6 +778,7 @@ const styles = ScaledSheet.create({
     },
     likeTouch: {
         paddingLeft: '10@s',
+        paddingVertical: '10@vs',
     },
     textLike: {
         fontSize: '12@ms',
@@ -776,6 +789,7 @@ const styles = ScaledSheet.create({
     },
     commentTouch: {
         paddingLeft: '10@s',
+        paddingVertical: '10@vs',
     },
     // new optimize
     bottomView: {

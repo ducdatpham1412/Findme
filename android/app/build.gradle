@@ -84,6 +84,7 @@ android {
         resValue "string", "build_config_package", "com.findme"
         resValue 'string', "CODE_PUSH_APK_BUILD_TIME", String.format("\"%d\"", System.currentTimeMillis())
         multiDexEnabled true
+        missingDimensionStrategy "store", "play"
     }
     splits {
         abi {

@@ -397,6 +397,8 @@ PODS:
     - React-Core
   - RNDateTimePicker (3.5.2):
     - React-Core
+  - RNDeviceInfo (10.3.0):
+    - React-Core
   - RNFBApp (15.0.0):
     - Firebase/CoreOnly (= 9.1.0)
     - React-Core
@@ -427,7 +429,7 @@ PODS:
     - TOCropViewController
   - RNPermissions (3.0.5):
     - React-Core
-  - RNReanimated (2.10.0):
+  - RNReanimated (2.12.0):
     - DoubleConversion
     - FBLazyVector
     - FBReactNativeSpec
@@ -525,6 +527,7 @@ DEPENDENCIES:
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
+  - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
   - "RNFBDynamicLinks (from `../node_modules/@react-native-firebase/dynamic-links`)"
@@ -669,6 +672,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-picker/picker"
   RNDateTimePicker:
     :path: "../node_modules/@react-native-community/datetimepicker"
+  RNDeviceInfo:
+    :path: "../node_modules/react-native-device-info"
   RNFBApp:
     :path: "../node_modules/@react-native-firebase/app"
   RNFBAuth:
@@ -773,6 +778,7 @@ SPEC CHECKSUMS:
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
   RNCPicker: 9865e85857650bbc553c660acc580ff86abd056a
   RNDateTimePicker: 7658208086d86d09e1627b5c34ba0cf237c60140
+  RNDeviceInfo: 4701f0bf2a06b34654745053db0ce4cb0c53ada7
   RNFBApp: 3f5e4825054a65d6b5ea82548501738b857b088e
   RNFBAuth: 0ccb8166488476bc81e9eb5e57dd3ea5cd9d96a5
   RNFBDynamicLinks: 852e268dee224238a68391878ae967df583ac435
@@ -781,7 +787,7 @@ SPEC CHECKSUMS:
   RNIap: 0f5b7531f3a3724933e1f598e07743bd665a5722
   RNImageCropPicker: 35a3ceb837446fa11547704709bb22b5fac6d584
   RNPermissions: 7043bacbf928eae25808275cfe73799b8f618911
-  RNReanimated: cce4727fde9f4da9b800d999fa9975ea7a021dcf
+  RNReanimated: 69f427ef749f923934a9c1485ad439dd001fb73c
   RNScreens: f7ad633b2e0190b77b6a7aab7f914fad6f198d8d
   RNShare: d56424e3926cbc239db1cc1c168adcb051aad50b
   RNSharedElement: eb7d506733952d58634f34c82ec17e82f557e377
@@ -792,6 +798,6 @@ SPEC CHECKSUMS:
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
   Yoga: 8c8436d4171c87504c648ae23b1d81242bdf3bbf
 
-PODFILE CHECKSUM: cd824bc732b663cce030b6a9a07897efb1433031
+PODFILE CHECKSUM: 895c528e44a848ff5c6b3d6c307484a9bc6fbee4
 
 COCOAPODS: 1.11.2

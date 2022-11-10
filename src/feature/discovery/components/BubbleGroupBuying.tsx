@@ -22,7 +22,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {ScaledSheet} from 'react-native-size-matters';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {SharedElement} from 'react-navigation-shared-element';
-import {onGoToProfile} from 'utility/assistant';
+import {chosenBlurType, isIOS, onGoToProfile} from 'utility/assistant';
 import {formatLocaleNumber} from 'utility/format';
 import {TypeMoreOptionsMe} from '../DiscoveryScreen';
 
@@ -113,13 +113,23 @@ interface Props {
 const {width} = Metrics;
 
 const CustomBlurView = () => {
+    if (isIOS) {
+        return (
+            <BlurView
+                style={styles.blurView}
+                blurType={chosenBlurType}
+                blurAmount={0}
+                blurRadius={1}
+                reducedTransparencyFallbackColor="white"
+            />
+        );
+    }
     return (
-        <BlurView
-            style={styles.blurView}
-            blurType="ultraThinMaterialLight"
-            blurAmount={0}
-            blurRadius={1}
-            reducedTransparencyFallbackColor="white"
+        <View
+            style={[
+                styles.blurView,
+                {backgroundColor: Theme.darkTheme.backgroundOpacity(0.6)},
+            ]}
         />
     );
 };
@@ -238,11 +248,12 @@ const BubbleGroupBuying = (props: Props) => {
                             customStyle={styles.creatorView}
                             onPress={() => onGoToProfile(item.creator)}>
                             <CustomBlurView />
-                            <StyleIcon
-                                source={{uri: item.creatorAvatar}}
-                                size={20}
-                                customStyle={styles.avatar}
-                            />
+                            <View style={styles.avatarBox}>
+                                <StyleImage
+                                    source={{uri: item.creatorAvatar}}
+                                    customStyle={styles.avatar}
+                                />
+                            </View>
                             <StyleText
                                 originValue={item.creatorName}
                                 numberOfLines={1}
@@ -406,7 +417,6 @@ const BubbleGroupBuying = (props: Props) => {
                                     styles.iconLike,
                                     {color: theme.likeHeart},
                                 ]}
-                                touchableStyle={styles.touchIconLike}
                                 onPress={() =>
                                     onHandleLike({
                                         isLiked,
@@ -423,7 +433,6 @@ const BubbleGroupBuying = (props: Props) => {
                                     styles.iconLike,
                                     {color: theme.borderColor},
                                 ]}
-                                touchableStyle={styles.touchIconLike}
                                 onPress={() =>
                                     onHandleLike({
                                         isLiked,
@@ -482,7 +491,8 @@ const styles = ScaledSheet.create({
         marginTop: '10@vs',
     },
     imagePreview: {
-        borderRadius: '5@ms',
+        borderTopLeftRadius: '5@ms',
+        borderBottomLeftRadius: '5@ms',
     },
     creatorView: {
         flexDirection: 'row',
@@ -492,10 +502,17 @@ const styles = ScaledSheet.create({
     blurView: {
         ...StyleSheet.absoluteFillObject,
     },
-    avatar: {
-        borderRadius: '30@ms',
+    avatarBox: {
+        width: '20@ms',
+        height: '20@ms',
+        borderRadius: '10@ms',
+        overflow: 'hidden',
         marginLeft: '5@s',
         marginVertical: '2@s',
+    },
+    avatar: {
+        width: '100%',
+        height: '100%',
     },
     textName: {
         fontSize: FONT_SIZE.small,
@@ -635,7 +652,6 @@ const styles = ScaledSheet.create({
     iconLike: {
         fontSize: '25@ms',
     },
-    touchIconLike: {},
     likeTouch: {
         paddingLeft: '10@s',
     },

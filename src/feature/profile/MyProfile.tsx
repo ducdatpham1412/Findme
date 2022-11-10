@@ -74,7 +74,7 @@ const ProfileEnjoy = () => {
     return (
         <>
             <ViewSafeTopPadding />
-            <View style={{flex: 1}}>
+            <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
                 <SearchAndSetting
                     onShowOptions={onShowOption}
                     hasBackBtn={false}
@@ -336,6 +336,7 @@ const ProfileAccount = () => {
         (item: TypeGroupBuying) => {
             return (
                 <ItemGroupBuying
+                    key={item.id}
                     item={item}
                     setList={myGbPaging.setList}
                     isHorizontal={false}
@@ -353,6 +354,7 @@ const ProfileAccount = () => {
         (item: TypeGroupBuying) => {
             return (
                 <BubbleGroupBuying
+                    key={item.joinId}
                     item={item}
                     onGoToDetailGroupBuying={() => {
                         navigate(PROFILE_ROUTE.detailGroupBuying, {
@@ -385,6 +387,7 @@ const ProfileAccount = () => {
             if (item.postType === POST_TYPE.groupBuying) {
                 return (
                     <BubbleGroupBuying
+                        key={item.id}
                         item={item}
                         onGoToDetailGroupBuying={() => {
                             navigate(PROFILE_ROUTE.detailGroupBuying, {
@@ -411,6 +414,7 @@ const ProfileAccount = () => {
             if (item.postType === POST_TYPE.review) {
                 return (
                     <Bubble
+                        key={item.id}
                         item={item}
                         onShowMoreOption={params => {
                             modalBubbleOption = params.postModal;
@@ -441,6 +445,7 @@ const ProfileAccount = () => {
             if (item.postType === POST_TYPE.groupBuying) {
                 return (
                     <ItemGroupBuying
+                        key={item.id}
                         item={item}
                         setList={setList}
                         isHorizontal={false}
@@ -459,6 +464,7 @@ const ProfileAccount = () => {
         (item: TypeBubblePalace) => {
             return (
                 <Bubble
+                    key={item.id}
                     item={item}
                     onShowMoreOption={params => {
                         modalBubbleOption = params.postModal;

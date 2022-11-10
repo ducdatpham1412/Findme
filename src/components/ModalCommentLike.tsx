@@ -32,6 +32,8 @@ interface States {
     tabIndex: number;
 }
 
+const commentModalHeight = (Metrics.height * 2) / 2.7;
+
 class ModalCommentLike extends Component<Props> {
     modalRef = React.createRef<Modalize>();
 
@@ -116,7 +118,7 @@ class ModalCommentLike extends Component<Props> {
                     style={[
                         styles.container,
                         {
-                            backgroundColor: theme.backgroundColorSecond,
+                            backgroundColor: theme.backgroundColor,
                         },
                     ]}>
                     <View style={styles.headerTouch}>
@@ -166,38 +168,39 @@ class ModalCommentLike extends Component<Props> {
                         </StyleTouchable>
                     </View>
 
-                    <StyleTabView
-                        ref={this.tabViewRef}
-                        containerStyle={styles.tabContainer}
-                        initIndex={this.state.tabIndex}
-                        onScroll={e => {
-                            if (e.index !== tabIndex) {
-                                this.setState({
-                                    tabIndex: e.index,
-                                });
-                            }
-                        }}>
-                        <ListComments
-                            bubbleFocusing={bubbleFocusing}
-                            setTotalComments={setTotalComments}
-                            increaseTotalComments={increaseTotalComments}
-                            inputCommentContainerStyle={
-                                inputCommentContainerStyle
-                            }
-                            extraHeight={extraHeight}
-                        />
-                        <ListReacts
-                            postId={bubbleFocusing.id}
-                            updateBubbleFocusing={updateBubbleFocusing}
-                        />
-                    </StyleTabView>
+                    <View style={{flex: 1}}>
+                        <StyleTabView
+                            ref={this.tabViewRef}
+                            containerStyle={styles.tabContainer}
+                            initIndex={this.state.tabIndex}
+                            onScroll={e => {
+                                if (e.index !== tabIndex) {
+                                    this.setState({
+                                        tabIndex: e.index,
+                                    });
+                                }
+                            }}>
+                            <ListComments
+                                bubbleFocusing={bubbleFocusing}
+                                setTotalComments={setTotalComments}
+                                increaseTotalComments={increaseTotalComments}
+                                inputCommentContainerStyle={
+                                    inputCommentContainerStyle
+                                }
+                                extraHeight={extraHeight}
+                            />
+                            <ListReacts
+                                postId={bubbleFocusing.id}
+                                updateBubbleFocusing={updateBubbleFocusing}
+                            />
+                        </StyleTabView>
+                    </View>
                 </View>
             </Modalize>
         );
     }
 }
 
-const commentModalHeight = (Metrics.height * 2) / 2.7;
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
@@ -208,18 +211,19 @@ const styles = ScaledSheet.create({
     // header
     headerTouch: {
         width: '100%',
-        marginBottom: '10@vs',
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: '5@vs',
+        marginBottom: '2@vs',
     },
     textNumberComments: {
         fontSize: '13@ms',
         marginLeft: '20@s',
+        paddingVertical: '5@vs',
     },
     textNumberLikes: {
         fontSize: '13@ms',
         marginLeft: '25@s',
+        paddingVertical: '5@vs',
     },
     iconTurnOffTouch: {
         position: 'absolute',
@@ -231,7 +235,6 @@ const styles = ScaledSheet.create({
     // list comment
     tabContainer: {
         height: '100%',
-        paddingBottom: Metrics.safeBottomPadding,
     },
 });
 

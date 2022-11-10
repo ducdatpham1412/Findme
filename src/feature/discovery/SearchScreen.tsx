@@ -82,7 +82,9 @@ const SearchScreen = ({route}: Props) => {
 
     useEffect(() => {
         if (topicRoute === undefined && searchRoute === undefined) {
-            inputRef.current?.focus();
+            setTimeout(() => {
+                inputRef.current?.focus();
+            }, 300);
         }
     }, []);
 
@@ -110,7 +112,13 @@ const SearchScreen = ({route}: Props) => {
                     styles.searchView,
                     {borderBottomColor: theme.holderColorLighter},
                 ]}>
-                <StyleTouchable customStyle={styles.backView} onPress={goBack}>
+                <StyleTouchable
+                    customStyle={styles.backView}
+                    onPress={goBack}
+                    hitSlop={{
+                        top: 10,
+                        bottom: 10,
+                    }}>
                     <Ionicons
                         name="arrow-back"
                         style={[styles.iconBack, {color: theme.borderColor}]}
@@ -231,7 +239,9 @@ const SearchScreen = ({route}: Props) => {
                 {backgroundColor: theme.backgroundColor},
             ]}>
             {Header()}
+
             {Tool()}
+
             <View style={{flex: 1}}>
                 <StyleTabView containerStyle={styles.tabViewContainer}>
                     <View style={styles.elementView}>

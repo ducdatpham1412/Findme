@@ -129,6 +129,7 @@ const BannerTopGb = () => {
                     }}
                     showsHorizontalScrollIndicator={false}
                     directionalLockEnabled
+                    keyExtractor={item => String(item)}
                 />
             </View>
         );

@@ -50,7 +50,19 @@ const EditProfile = () => {
     const [description, setDescription] = useState(profile?.description);
 
     const isShopAccount = profile.account_type === ACCOUNT.shop;
-    const disableButton = isShopAccount ? !name || !location : !name;
+    let disableButton = true;
+    if (isShopAccount) {
+        disableButton =
+            !name ||
+            !location ||
+            (name === profile.name &&
+                location === profile.location &&
+                description === profile.description);
+    } else {
+        disableButton =
+            !name ||
+            (name === profile.name && description === profile.description);
+    }
 
     const listTextAndOption: Array<{
         text: I18Normalize;
@@ -255,42 +267,44 @@ const EditProfile = () => {
                     />
                 </StyleTouchable>
 
-                <StyleTouchable
-                    customStyle={[
-                        styles.bankBox,
-                        {borderColor: theme.borderColor},
-                    ]}
-                    activeOpacity={1}
-                    onPress={() => modalUpdateBank.current?.show()}>
-                    <StyleText
-                        i18Text="profile.bankName"
+                {isShopAccount && (
+                    <StyleTouchable
                         customStyle={[
-                            styles.textBankName,
-                            {color: theme.textHightLight},
-                        ]}>
+                            styles.bankBox,
+                            {borderColor: theme.borderColor},
+                        ]}
+                        activeOpacity={1}
+                        onPress={() => modalUpdateBank.current?.show()}>
                         <StyleText
-                            originValue={`: ${setting.bank_code}`}
+                            i18Text="profile.bankName"
                             customStyle={[
                                 styles.textBankName,
                                 {color: theme.textHightLight},
-                            ]}
-                        />
-                    </StyleText>
-                    <StyleText
-                        i18Text="profile.accountNumber"
-                        customStyle={[
-                            styles.textBankName,
-                            {color: theme.textHightLight},
-                        ]}>
+                            ]}>
+                            <StyleText
+                                originValue={`: ${setting.bank_code}`}
+                                customStyle={[
+                                    styles.textBankName,
+                                    {color: theme.textHightLight},
+                                ]}
+                            />
+                        </StyleText>
                         <StyleText
-                            originValue={`: ${setting.bank_account}`}
+                            i18Text="profile.accountNumber"
                             customStyle={[
                                 styles.textBankName,
                                 {color: theme.textHightLight},
-                            ]}
-                        />
-                    </StyleText>
-                </StyleTouchable>
+                            ]}>
+                            <StyleText
+                                originValue={`: ${setting.bank_account}`}
+                                customStyle={[
+                                    styles.textBankName,
+                                    {color: theme.textHightLight},
+                                ]}
+                            />
+                        </StyleText>
+                    </StyleTouchable>
+                )}
 
                 <StyleButton
                     title="profile.edit.confirmButton"

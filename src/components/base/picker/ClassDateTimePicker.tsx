@@ -42,8 +42,13 @@ class ClassDateTimePicker extends Component<Props, States> {
         });
     }
 
-    private onConfirm() {
-        this.props.onChangeDateTime(this.state.tempDate);
+    private onConfirm(date?: Date) {
+        if (date) {
+            this.setState({
+                tempDate: date,
+            });
+        }
+        this.props.onChangeDateTime(date || this.state.tempDate);
         this.hide();
     }
 
@@ -91,16 +96,17 @@ class ClassDateTimePicker extends Component<Props, States> {
                             display="spinner"
                             style={styles.pickView}
                             textColor={theme.textHightLight}
-                            onChange={(_: any, date: any) =>
+                            onChange={(_: any, date: any) => {
                                 this.setState({
                                     tempDate: date,
-                                })
-                            }
+                                });
+                            }}
                             minimumDate={minimumDate}
                             maximumDate={maximumDate}
                             themeVariant={dateTheme}
                             locale={chooseLanguageFromId(language)}
                         />
+
                         <View
                             style={[
                                 styles.buttonView,
@@ -145,16 +151,15 @@ class ClassDateTimePicker extends Component<Props, States> {
                 </View>
             );
         }
+
         return (
             <DateTimePicker
                 value={initDate}
                 display="spinner"
                 style={styles.pickView}
-                onChange={(_: any, date: any) =>
-                    this.setState({
-                        tempDate: date,
-                    })
-                }
+                onChange={(_: any, date: any) => {
+                    this.onConfirm(date);
+                }}
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}
             />

@@ -20,7 +20,7 @@ const tabBarHeight = moderateScale(50);
 const addMoreHeight = moderateScale(3);
 const checkBottom = Metrics.safeBottomPadding - verticalScale(10);
 const indicatorHeight = moderateScale(45);
-const safeBottomHeight = checkBottom <= 0 ? verticalScale(0) : checkBottom;
+const safeBottomHeight = checkBottom <= 0 ? 0 : checkBottom;
 export const tabBarViewHeight = tabBarHeight + safeBottomHeight + addMoreHeight;
 
 const TabNavigator = (props: any) => {

@@ -163,7 +163,7 @@ const discovery = {
     continueJoin: 'Tiếp tục tham gia',
     joined: 'Đã tham gia',
     deposited: 'Đã đặt cọc',
-    numberGroupJoined: '{{value}} nhóm đã thamm gia',
+    numberGroupJoined: '{{value}} nhóm đã tham gia',
     beTheFirstJoin: 'Hãy là người đầu tiên tham gia nào',
     bought: 'Đã mua',
     confirmBought: 'Xác nhận đã mua',

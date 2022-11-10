@@ -1,4 +1,5 @@
 import StyleWebView from 'components/base/StyleWebView';
+import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import StyleHeader from 'navigation/components/StyleHeader';
 import React from 'react';
 
@@ -16,6 +17,7 @@ const WebViewScreen = ({route}: Props) => {
 
     return (
         <>
+            <ViewSafeTopPadding />
             <StyleHeader title={title || ''} />
             <StyleWebView source={{uri: linkWeb}} />
         </>

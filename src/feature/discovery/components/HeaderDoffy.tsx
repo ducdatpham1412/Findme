@@ -4,7 +4,12 @@ import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';
 import Theme, {TypeTheme} from 'asset/theme/Theme';
-import {StyleIcon, StyleText, StyleTouchable} from 'components/base';
+import {
+    StyleIcon,
+    StyleImage,
+    StyleText,
+    StyleTouchable,
+} from 'components/base';
 import ROOT_SCREEN from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
 import React, {Component} from 'react';
@@ -53,11 +58,12 @@ class HeaderDoffy extends Component<Props> {
         return (
             <View style={styles.container}>
                 <View style={styles.toolLeftView}>
-                    <StyleIcon
-                        source={{uri: profile.avatar}}
-                        size={30}
-                        customStyle={styles.avatar}
-                    />
+                    <View style={styles.avatarBox}>
+                        <StyleImage
+                            source={{uri: profile.avatar}}
+                            customStyle={styles.avatar}
+                        />
+                    </View>
                     <View>
                         <StyleText
                             i18Text={textSession}
@@ -123,9 +129,16 @@ const styles = ScaledSheet.create({
         height: '100%',
         top: 0,
     },
-    avatar: {
-        borderRadius: '20@ms',
+    avatarBox: {
+        width: '30@ms',
+        height: '30@ms',
+        borderRadius: '15@ms',
         marginRight: '10@s',
+        overflow: 'hidden',
+    },
+    avatar: {
+        width: '100%',
+        height: '100%',
     },
     textHello: {
         fontSize: FONT_SIZE.small,

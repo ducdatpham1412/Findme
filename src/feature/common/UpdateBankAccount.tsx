@@ -238,6 +238,7 @@ const styles = ScaledSheet.create({
         marginLeft: '10@s',
         textDecorationLine: 'underline',
         fontWeight: 'bold',
+        marginVertical: '10@vs',
     },
     logoBank: {
         width: '100@s',

@@ -2,6 +2,7 @@ import {FONT_SIZE} from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
 import StyleInput, {StyleInputProps} from 'components/base/StyleInput';
 import React, {forwardRef} from 'react';
+import {Platform} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 
 const InputBox = (props: StyleInputProps, ref: any) => {
@@ -21,9 +22,16 @@ const styles = ScaledSheet.create({
     input: {
         color: Theme.common.white,
         backgroundColor: Theme.common.blueInput,
-        paddingVertical: '14@ms',
-        borderRadius: '6@ms',
+        borderRadius: '5@ms',
         fontSize: FONT_SIZE.normal,
+        paddingTop: Platform.select({
+            ios: '14@ms',
+            android: '8@ms',
+        }),
+        paddingBottom: Platform.select({
+            ios: '14@ms',
+            android: '8@ms',
+        }),
     },
 });
 
