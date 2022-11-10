@@ -6,12 +6,9 @@ import {FONT_SIZE} from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
-import ROOT_SCREEN, {
-    MAIN_SCREEN,
-    PROFILE_ROUTE,
-} from 'navigation/config/routes';
+import ROOT_SCREEN, {PROFILE_ROUTE} from 'navigation/config/routes';
 import {navigate, push} from 'navigation/NavigationService';
-import React from 'react';
+import React, {useRef} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -41,6 +38,9 @@ const InformationProfile = (props: Props) => {
 
     const isMyProfile = myId === profile.id;
     const isShopAccount = account_type === ACCOUNT.shop;
+    const isInTabProfile = useRef(
+        route.name === PROFILE_ROUTE.myProfile,
+    ).current;
 
     const onNavigateFollow = (type: number) => {
         push(ROOT_SCREEN.listFollows, {
@@ -61,9 +61,11 @@ const InformationProfile = (props: Props) => {
                             {backgroundColor: Theme.common.gradientTabBar1},
                         ]}
                         onPress={() => {
-                            navigate(MAIN_SCREEN.profileRoute, {
-                                screen: PROFILE_ROUTE.editProfile,
-                            });
+                            if (isInTabProfile) {
+                                navigate(PROFILE_ROUTE.editProfile);
+                            } else {
+                                navigate(ROOT_SCREEN.editProfile);
+                            }
                         }}>
                         <StyleText
                             i18Text="profile.editProfile"

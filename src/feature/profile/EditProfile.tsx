@@ -309,7 +309,7 @@ const EditProfile = () => {
                 <StyleButton
                     title="profile.edit.confirmButton"
                     containerStyle={styles.saveBtnView}
-                    onPress={onSaveChange}
+                    onPress={() => onSaveChange()}
                     disable={disableButton}
                 />
 

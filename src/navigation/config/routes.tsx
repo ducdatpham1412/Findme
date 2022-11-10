@@ -15,6 +15,7 @@ const ROOT_SCREEN = {
     detailBubble: '@ROOT_SCREEN/detailBubble',
     detailGroupBuying: '@ROOT_SCREEN/detailGroupBuying',
     myProfile: '@ROOT_SCREEN/myProfile',
+    editProfile: '@ROOT_SCREEN/editProfile',
     postsArchived: '@ROOT_SCREEN/postsArchived',
     upgradeAccount: '@ROOT_SCREEN/upgradeAccount',
     editHistory: '@ROOT_SCREEN/editHistory',
