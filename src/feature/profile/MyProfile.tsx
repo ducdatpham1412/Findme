@@ -20,6 +20,7 @@ import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import StyleList from 'components/base/StyleList';
 import LoadingIndicator from 'components/common/LoadingIndicator';
 import StyleActionSheet from 'components/common/StyleActionSheet';
+import ModalCommentLike from 'components/ModalCommentLike';
 import StyleTabView from 'components/StyleTabView';
 import ViewSafeTopPadding from 'components/ViewSafeTopPadding';
 import ItemGroupBuying from 'feature/common/components/ItemGroupBuying';
@@ -44,6 +45,7 @@ import {
 } from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {
+    fakeGroupBuying,
     isScrollCloseToBottom,
     modalizeMyProfile,
     modalizeMyProfileShop,
@@ -175,9 +177,15 @@ const ProfileAccount = () => {
     const {profile} = Redux.getPassport();
     const bubblePalaceAction = Redux.getBubblePalaceAction();
     const theme = Redux.getTheme();
-    const isShopAccount = profile.account_type === ACCOUNT.shop;
-    const isInTabProfile = route.name === PROFILE_ROUTE.myProfile;
 
+    const isShopAccount = profile.account_type === ACCOUNT.shop;
+
+    const isInTabProfile = useRef(
+        route.name === PROFILE_ROUTE.myProfile,
+    ).current;
+    const detailGroupTarget = isInTabProfile
+        ? PROFILE_ROUTE.detailGroupBuying
+        : ROOT_SCREEN.detailGroupBuying;
     const checkIsFocus = useRef(true);
     const listCheckTabLazy = useRef<Array<boolean>>([
         true,
@@ -185,6 +193,7 @@ const ProfileAccount = () => {
         false,
         false,
     ]);
+    const modalRef = useRef<ModalCommentLike>(null);
 
     const myGbPaging = usePaging({
         request: apiGetListGroupBuying,
@@ -224,6 +233,7 @@ const ProfileAccount = () => {
 
     const [tabIndex, setTabIndex] = useState(initIndex);
     const [postIdFocusing, setPostIdFocusing] = useState('');
+    const [bubbleFocusing, setBubbleFocusing] = useState(fakeGroupBuying);
     const isFocusMyPost = tabIndex === 0;
     const isFocusPostLiked = tabIndex === 1;
     const isFocusJoinOrder = tabIndex === 2;
@@ -341,7 +351,7 @@ const ProfileAccount = () => {
                     setList={myGbPaging.setList}
                     isHorizontal={false}
                     syncWidth={width * 0.485}
-                    detailGroupTarget={PROFILE_ROUTE.detailGroupBuying}
+                    detailGroupTarget={detailGroupTarget}
                     containerStyle={styles.itemMyGroupBuying}
                     showName={false}
                 />
@@ -357,7 +367,7 @@ const ProfileAccount = () => {
                     key={item.joinId}
                     item={item}
                     onGoToDetailGroupBuying={() => {
-                        navigate(PROFILE_ROUTE.detailGroupBuying, {
+                        navigate(detailGroupTarget, {
                             item,
                             setList: gbJoinedPaging.setList,
                         });
@@ -366,13 +376,21 @@ const ProfileAccount = () => {
                     onHandleLike={params =>
                         onHandleLike(params, gbJoinedPaging.setList)
                     }
-                    onShowModalComment={(post, type) =>
-                        showCommentDiscovery({
-                            post,
-                            type,
-                            setList: gbJoinedPaging.setList,
-                        })
-                    }
+                    onShowModalComment={(post, type) => {
+                        if (isInTabProfile) {
+                            showCommentDiscovery({
+                                post,
+                                type,
+                                setList: gbJoinedPaging.setList,
+                            });
+                        } else {
+                            modalRef.current?.show({
+                                post,
+                                type,
+                                setList: gbJoinedPaging.setList,
+                            });
+                        }
+                    }}
                     onChangePostIdFocusing={() => null}
                     detailGroupTarget={PROFILE_ROUTE.detailGroupBuying}
                     containerWidth={width * 0.93}
@@ -390,22 +408,30 @@ const ProfileAccount = () => {
                         key={item.id}
                         item={item}
                         onGoToDetailGroupBuying={() => {
-                            navigate(PROFILE_ROUTE.detailGroupBuying, {
+                            navigate(detailGroupTarget, {
                                 item,
                                 setList,
                             });
                         }}
                         onShowMoreOption={() => null}
                         onHandleLike={params => onHandleLike(params, setList)}
-                        onShowModalComment={(post, type) =>
-                            showCommentDiscovery({
-                                post,
-                                type,
-                                setList,
-                            })
-                        }
+                        onShowModalComment={(post, type) => {
+                            if (isInTabProfile) {
+                                showCommentDiscovery({
+                                    post,
+                                    type,
+                                    setList,
+                                });
+                            } else {
+                                modalRef.current?.show({
+                                    post,
+                                    type,
+                                    setList,
+                                });
+                            }
+                        }}
                         onChangePostIdFocusing={() => null}
-                        detailGroupTarget={PROFILE_ROUTE.detailGroupBuying}
+                        detailGroupTarget={detailGroupTarget}
                         containerWidth={width * 0.93}
                         containerStyle={styles.itemGroupBuying}
                     />
@@ -420,13 +446,21 @@ const ProfileAccount = () => {
                             modalBubbleOption = params.postModal;
                             optionPostReviewRef.current?.show();
                         }}
-                        onShowModalComment={(post, type) =>
-                            showCommentDiscovery({
-                                post,
-                                type,
-                                setList: postReviewPaging.setList,
-                            })
-                        }
+                        onShowModalComment={(post, type) => {
+                            if (isInTabProfile) {
+                                showCommentDiscovery({
+                                    post,
+                                    type,
+                                    setList: postReviewPaging.setList,
+                                });
+                            } else {
+                                modalRef.current?.show({
+                                    post,
+                                    type,
+                                    setList: postReviewPaging.setList,
+                                });
+                            }
+                        }}
                         isFocusing={item.id === postIdFocusing}
                         onChangePostIdFocusing={postId =>
                             setPostIdFocusing(postId)
@@ -450,7 +484,7 @@ const ProfileAccount = () => {
                         setList={setList}
                         isHorizontal={false}
                         syncWidth={width * 0.43}
-                        detailGroupTarget={PROFILE_ROUTE.detailGroupBuying}
+                        detailGroupTarget={detailGroupTarget}
                         containerStyle={styles.itemJoiningContainer}
                     />
                 );
@@ -470,13 +504,21 @@ const ProfileAccount = () => {
                         modalBubbleOption = params.postModal;
                         optionPostReviewRef.current?.show();
                     }}
-                    onShowModalComment={(post, type) =>
-                        showCommentDiscovery({
-                            post,
-                            type,
-                            setList: postReviewPaging.setList,
-                        })
-                    }
+                    onShowModalComment={(post, type) => {
+                        if (isInTabProfile) {
+                            showCommentDiscovery({
+                                post,
+                                type,
+                                setList: postReviewPaging.setList,
+                            });
+                        } else {
+                            modalRef.current?.show({
+                                post,
+                                type,
+                                setList: postReviewPaging.setList,
+                            });
+                        }
+                    }}
                     isFocusing={item.id === postIdFocusing}
                     onChangePostIdFocusing={postId => setPostIdFocusing(postId)}
                     containerWidth={width * 0.93}
@@ -489,6 +531,7 @@ const ProfileAccount = () => {
     return (
         <>
             <ViewSafeTopPadding />
+
             <View style={{flex: 1, backgroundColor: theme.backgroundColor}}>
                 <SearchAndSetting
                     onShowOptions={() => optionRef.current.show()}
@@ -718,6 +761,40 @@ const ProfileAccount = () => {
                     ]}
                 />
             </View>
+
+            <ModalCommentLike
+                ref={modalRef}
+                theme={theme}
+                bubbleFocusing={bubbleFocusing}
+                updateBubbleFocusing={value =>
+                    setBubbleFocusing((preValue: any) => ({
+                        ...preValue,
+                        ...value,
+                    }))
+                }
+                setTotalComments={value => {
+                    setBubbleFocusing(preValue => {
+                        if (preValue) {
+                            return {
+                                ...preValue,
+                                totalComments: value,
+                            };
+                        }
+                        return preValue;
+                    });
+                }}
+                increaseTotalComments={value => {
+                    setBubbleFocusing(preValue => {
+                        if (preValue) {
+                            return {
+                                ...preValue,
+                                totalComments: preValue.totalComments + value,
+                            };
+                        }
+                        return preValue;
+                    });
+                }}
+            />
         </>
     );
 };

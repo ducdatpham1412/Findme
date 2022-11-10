@@ -105,7 +105,8 @@ const OtherProfile = ({route}: Props) => {
 
     const [profile, setProfile] = useState<TypeGetProfileResponse>();
     const [isFollowing, setIsFollowing] = useState(false);
-    const [bubbleFocusing, setBubbleFocusing] = useState<TypeBubblePalace>();
+    const [bubbleFocusing, setBubbleFocusing] =
+        useState<TypeBubblePalace>(fakeBubbleFocusing);
     const [tabIndex, setTabIndex] = useState(initIndex);
     const [postIdFocusing, setPostIdFocusing] = useState('');
 
@@ -454,7 +455,7 @@ const OtherProfile = ({route}: Props) => {
             <ModalCommentLike
                 ref={modalRef}
                 theme={theme}
-                bubbleFocusing={bubbleFocusing || fakeBubbleFocusing}
+                bubbleFocusing={bubbleFocusing}
                 updateBubbleFocusing={value =>
                     setBubbleFocusing((preValue: any) => ({
                         ...preValue,
