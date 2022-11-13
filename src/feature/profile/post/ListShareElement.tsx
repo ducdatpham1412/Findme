@@ -64,23 +64,6 @@ const onGoToEditPost = () => {
     }
 };
 
-// const onArchivePost = async () => {
-//     if (postModal) {
-//         try {
-//             await apiArchivePost(postModal.id);
-//             Redux.setBubblePalaceAction({
-//                 action: TYPE_BUBBLE_PALACE_ACTION.archivePost,
-//                 payload: {
-//                     ...postModal,
-//                     isArchived: true,
-//                 },
-//             });
-//         } catch (err) {
-//             appAlert(err);
-//         }
-//     }
-// };
-
 export default class ListShareElement extends Component<Props, States> {
     pan = new Animated.ValueXY();
 
@@ -198,7 +181,7 @@ export default class ListShareElement extends Component<Props, States> {
         const {id} = FindmeStore.getState().accountSlice.passport.profile;
         postModal = params.postModal;
         if (postModal.creator === id) {
-            if (postModal.isDraft || postModal.isArchived) {
+            if (postModal.isDraft) {
                 this.draftOptionRef.current?.show();
             } else {
                 this.myOptionRef.current?.show();

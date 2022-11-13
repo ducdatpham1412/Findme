@@ -36,6 +36,7 @@ interface Props {
         paused?: boolean;
     };
     children?: ReactNode;
+    defaultRatio?: number;
 }
 
 const indicatorPointWidth = scale(10);
@@ -51,12 +52,13 @@ const ScrollSyncSizeImage = (props: Props) => {
         onChangeIndex,
         videoProps,
         children,
+        defaultRatio = 0,
     } = props;
 
     const currentIndexRef = useRef(0);
     const numberTabsRef = useRef(0);
 
-    const [ratio, setRatio] = useState(0);
+    const [ratio, setRatio] = useState(defaultRatio);
 
     const height = ratio * syncWidth;
     const numberTabs = images.length;
@@ -265,7 +267,9 @@ const ScrollSyncSizeImage = (props: Props) => {
                     return (
                         <StyleVideo
                             key={ind}
-                            source={{uri: url}}
+                            source={{
+                                uri: url,
+                            }}
                             style={{
                                 width: syncWidth,
                                 height,

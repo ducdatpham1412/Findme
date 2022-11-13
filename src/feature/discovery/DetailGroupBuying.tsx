@@ -1339,6 +1339,7 @@ const DetailGroupBuying = ({route}: Props) => {
                             }
                         }}
                         containerStyle={styles.imagePreview}
+                        defaultRatio={0.5}
                     />
 
                     <StyleTouchable

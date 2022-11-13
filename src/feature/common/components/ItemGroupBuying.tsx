@@ -11,6 +11,7 @@ import {
     StyleText,
     StyleTouchable,
 } from 'components/base';
+import StyleVideo from 'components/base/StyleVideo';
 import Redux from 'hook/useRedux';
 import {PROFILE_ROUTE} from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
@@ -22,6 +23,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import {SharedElement} from 'react-navigation-shared-element';
 import {chosenBlurType, isIOS, onGoToProfile} from 'utility/assistant';
 import {formatLocaleNumber} from 'utility/format';
+import {checkIsVideo} from 'utility/validate';
 
 interface Props {
     item: TypeGroupBuying;
@@ -128,8 +130,116 @@ const ItemGroupBuying = (props: Props) => {
 
     const lastPrice = item.prices[item.prices.length - 1];
     const iconSize = (syncWidth / width) * 15;
+    const isVideo = checkIsVideo(item.images[0]);
 
     const Image = () => {
+        const TopBottomView = () => {
+            return (
+                <>
+                    {showName && (
+                        <StyleTouchable
+                            customStyle={styles.creatorView}
+                            onPress={() => onGoToProfile(item.creator)}>
+                            <CustomBlurView />
+                            <View style={styles.avatarBox}>
+                                <StyleImage
+                                    source={{uri: item.creatorAvatar}}
+                                    customStyle={styles.avatar}
+                                />
+                            </View>
+                            <StyleText
+                                originValue={item.creatorName}
+                                numberOfLines={1}
+                                customStyle={styles.textName}
+                            />
+                        </StyleTouchable>
+                    )}
+
+                    <View style={styles.bottomView}>
+                        <View style={styles.numberJoinedBox}>
+                            <CustomBlurView />
+                            <StyleIcon
+                                source={Images.icons.createGroup}
+                                size={15}
+                                customStyle={styles.iconNumberPeople}
+                            />
+                            <StyleText
+                                originValue={
+                                    item.totalGroups + item.totalPersonals
+                                }
+                                customStyle={styles.textNumberPeople}
+                            />
+                        </View>
+
+                        {!!item.creatorLocation && isHorizontal && (
+                            <View style={styles.locationBox}>
+                                <CustomBlurView />
+                                <Entypo
+                                    name="location-pin"
+                                    style={styles.iconLocation}
+                                />
+                                <StyleText
+                                    originValue={item.creatorLocation}
+                                    customStyle={styles.textLocation}
+                                    numberOfLines={1}
+                                />
+                            </View>
+                        )}
+                    </View>
+
+                    {item.isDraft && (
+                        <View style={styles.draftView}>
+                            <View>
+                                <CustomBlurView />
+                                <StyleText
+                                    i18Text="profile.draftPost"
+                                    customStyle={styles.textDraft}
+                                />
+                            </View>
+                        </View>
+                    )}
+                </>
+            );
+        };
+
+        if (isVideo) {
+            return (
+                <View
+                    style={[
+                        styles.imagePreview,
+                        {
+                            height: syncWidth * ratioImageGroupBuying,
+                        },
+                    ]}>
+                    <StyleVideo
+                        source={{uri: item.images[0]}}
+                        style={[
+                            styles.imagePreview,
+                            {
+                                height: syncWidth * ratioImageGroupBuying,
+                            },
+                        ]}
+                        currentTime={2}
+                        paused
+                        isOverlay
+                        onPressOverlay={() => {
+                            if (item.isDraft) {
+                                navigate(PROFILE_ROUTE.createGroupBuying, {
+                                    itemDraft: item,
+                                });
+                            } else {
+                                navigate(detailGroupTarget, {
+                                    item,
+                                    setList,
+                                    isFromTopGroupBuying: !isHorizontal,
+                                });
+                            }
+                        }}
+                    />
+                </View>
+            );
+        }
+
         return (
             <SharedElement
                 style={[
@@ -147,68 +257,9 @@ const ItemGroupBuying = (props: Props) => {
                             height: syncWidth * ratioImageGroupBuying,
                         },
                     ]}
+                    defaultSource={Images.images.defaultImage}
                 />
-
-                {showName && (
-                    <StyleTouchable
-                        customStyle={styles.creatorView}
-                        onPress={() => onGoToProfile(item.creator)}>
-                        <CustomBlurView />
-                        <View style={styles.avatarBox}>
-                            <StyleImage
-                                source={{uri: item.creatorAvatar}}
-                                customStyle={styles.avatar}
-                            />
-                        </View>
-                        <StyleText
-                            originValue={item.creatorName}
-                            numberOfLines={1}
-                            customStyle={styles.textName}
-                        />
-                    </StyleTouchable>
-                )}
-
-                <View style={styles.bottomView}>
-                    <View style={styles.numberJoinedBox}>
-                        <CustomBlurView />
-                        <StyleIcon
-                            source={Images.icons.createGroup}
-                            size={15}
-                            customStyle={styles.iconNumberPeople}
-                        />
-                        <StyleText
-                            originValue={item.totalGroups + item.totalPersonals}
-                            customStyle={styles.textNumberPeople}
-                        />
-                    </View>
-
-                    {!!item.creatorLocation && isHorizontal && (
-                        <View style={styles.locationBox}>
-                            <CustomBlurView />
-                            <Entypo
-                                name="location-pin"
-                                style={styles.iconLocation}
-                            />
-                            <StyleText
-                                originValue={item.creatorLocation}
-                                customStyle={styles.textLocation}
-                                numberOfLines={1}
-                            />
-                        </View>
-                    )}
-                </View>
-
-                {item.isDraft && (
-                    <View style={styles.draftView}>
-                        <View>
-                            <CustomBlurView />
-                            <StyleText
-                                i18Text="profile.draftPost"
-                                customStyle={styles.textDraft}
-                            />
-                        </View>
-                    </View>
-                )}
+                {TopBottomView()}
             </SharedElement>
         );
     };

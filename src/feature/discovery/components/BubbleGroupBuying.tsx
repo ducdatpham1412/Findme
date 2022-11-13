@@ -12,6 +12,7 @@ import {
     StyleText,
     StyleTouchable,
 } from 'components/base';
+import StyleVideo from 'components/base/StyleVideo';
 import IconLiked from 'components/common/IconLiked';
 import IconNotLiked from 'components/common/IconNotLiked';
 import Redux from 'hook/useRedux';
@@ -24,6 +25,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import {SharedElement} from 'react-navigation-shared-element';
 import {chosenBlurType, isIOS, onGoToProfile} from 'utility/assistant';
 import {formatLocaleNumber} from 'utility/format';
+import {checkIsVideo} from 'utility/validate';
 import {TypeMoreOptionsMe} from '../DiscoveryScreen';
 
 export interface ParamsLikeGB {
@@ -222,8 +224,118 @@ const BubbleGroupBuying = (props: Props) => {
 
     const lastPrice = item.prices[item.prices.length - 1];
     const imageWidth = containerWidth * 0.4;
+    const isVideo = checkIsVideo(item.images[0]);
 
     const Image = () => {
+        const TopBottomView = () => {
+            return (
+                <>
+                    {showTopView && (
+                        <View style={styles.topView}>
+                            <StyleTouchable
+                                customStyle={styles.creatorView}
+                                onPress={() => onGoToProfile(item.creator)}>
+                                <CustomBlurView />
+                                <View style={styles.avatarBox}>
+                                    <StyleImage
+                                        source={{uri: item.creatorAvatar}}
+                                        customStyle={styles.avatar}
+                                    />
+                                </View>
+                                <StyleText
+                                    originValue={item.creatorName}
+                                    numberOfLines={1}
+                                    customStyle={styles.textName}
+                                />
+                            </StyleTouchable>
+                        </View>
+                    )}
+
+                    {showBottomView && (
+                        <View style={styles.bottomView}>
+                            <View style={styles.bottomLeft}>
+                                <View style={styles.numberJoinedBox}>
+                                    <CustomBlurView />
+                                    <StyleIcon
+                                        source={Images.icons.createGroup}
+                                        size={15}
+                                        customStyle={styles.iconNumberPeople}
+                                    />
+                                    <StyleText
+                                        originValue={
+                                            item.totalGroups +
+                                            item.totalPersonals
+                                        }
+                                        customStyle={styles.textNumberPeople}
+                                    />
+                                </View>
+                            </View>
+
+                            <View style={styles.leftRight}>
+                                <StyleTouchable
+                                    customStyle={styles.contractBox}
+                                    onPress={() =>
+                                        onShowModalComment(item, 'comment')
+                                    }
+                                    hitSlop={10}>
+                                    <CustomBlurView />
+                                    <StyleIcon
+                                        source={Images.icons.comment}
+                                        size={12}
+                                        customStyle={{
+                                            tintColor: Theme.common.white,
+                                        }}
+                                    />
+                                </StyleTouchable>
+                                {/* <StyleTouchable
+                                customStyle={styles.contractBox}
+                                disableOpacity={0.85}
+                                onPress={() =>
+                                    onShowModalShare(item, setDisableShare)
+                                }
+                                disable={disableShare}>
+                                <CustomBlurView />
+                                <StyleIcon
+                                    source={Images.icons.share}
+                                    size={15}
+                                    customStyle={{
+                                        tintColor: Theme.common.white,
+                                    }}
+                                />
+                            </StyleTouchable> */}
+                            </View>
+                        </View>
+                    )}
+                </>
+            );
+        };
+
+        if (isVideo) {
+            return (
+                <View
+                    style={{
+                        width: imageWidth,
+                        height: imageWidth * ratioImageGroupBuying,
+                    }}>
+                    <StyleVideo
+                        source={{uri: item.images[0]}}
+                        style={[
+                            styles.imagePreview,
+                            {
+                                width: imageWidth,
+                                height: imageWidth * ratioImageGroupBuying,
+                            },
+                        ]}
+                        currentTime={2}
+                        paused
+                        isOverlay
+                        onPressOverlay={() => onGoToDetailGroupBuying(item)}
+                    />
+                    {TopBottomView()}
+                </View>
+            );
+        }
+
         return (
             <SharedElement
                 style={{
@@ -241,84 +353,45 @@ const BubbleGroupBuying = (props: Props) => {
                         },
                     ]}
                 />
-
-                {showTopView && (
-                    <View style={styles.topView}>
-                        <StyleTouchable
-                            customStyle={styles.creatorView}
-                            onPress={() => onGoToProfile(item.creator)}>
-                            <CustomBlurView />
-                            <View style={styles.avatarBox}>
-                                <StyleImage
-                                    source={{uri: item.creatorAvatar}}
-                                    customStyle={styles.avatar}
-                                />
-                            </View>
-                            <StyleText
-                                originValue={item.creatorName}
-                                numberOfLines={1}
-                                customStyle={styles.textName}
-                            />
-                        </StyleTouchable>
-                    </View>
-                )}
-
-                {showBottomView && (
-                    <View style={styles.bottomView}>
-                        <View style={styles.bottomLeft}>
-                            <View style={styles.numberJoinedBox}>
-                                <CustomBlurView />
-                                <StyleIcon
-                                    source={Images.icons.createGroup}
-                                    size={15}
-                                    customStyle={styles.iconNumberPeople}
-                                />
-                                <StyleText
-                                    originValue={
-                                        item.totalGroups + item.totalPersonals
-                                    }
-                                    customStyle={styles.textNumberPeople}
-                                />
-                            </View>
-                        </View>
-
-                        <View style={styles.leftRight}>
-                            <StyleTouchable
-                                customStyle={styles.contractBox}
-                                onPress={() =>
-                                    onShowModalComment(item, 'comment')
-                                }
-                                hitSlop={10}>
-                                <CustomBlurView />
-                                <StyleIcon
-                                    source={Images.icons.comment}
-                                    size={12}
-                                    customStyle={{
-                                        tintColor: Theme.common.white,
-                                    }}
-                                />
-                            </StyleTouchable>
-                            {/* <StyleTouchable
-                                customStyle={styles.contractBox}
-                                disableOpacity={0.85}
-                                onPress={() =>
-                                    onShowModalShare(item, setDisableShare)
-                                }
-                                disable={disableShare}>
-                                <CustomBlurView />
-                                <StyleIcon
-                                    source={Images.icons.share}
-                                    size={15}
-                                    customStyle={{
-                                        tintColor: Theme.common.white,
-                                    }}
-                                />
-                            </StyleTouchable> */}
-                        </View>
-                    </View>
-                )}
             </SharedElement>
         );
+
+        // return (
+        //     <SharedElement
+        //         style={{
+        //             width: imageWidth,
+        //             height: imageWidth * ratioImageGroupBuying,
+        //         }}
+        //         id={`item.group_buying.${item.id}.false`}>
+        //         {isVideo ? (
+        //             <StyleVideo
+        //                 source={{uri: item.images[0]}}
+        //                 style={[
+        //                     styles.imagePreview,
+        //                     {
+        //                         width: imageWidth,
+        //                         height: imageWidth * ratioImageGroupBuying,
+        //                     },
+        //                 ]}
+        //                 currentTime={2}
+        //                 paused
+        //                 isOverlay
+        //                 onPressOverlay={() => onGoToDetailGroupBuying(item)}
+        //             />
+        //         ) : (
+        //             <StyleImage
+        //                 source={{uri: item.images[0]}}
+        //                 customStyle={[
+        //                     styles.imagePreview,
+        //                     {
+        //                         width: imageWidth,
+        //                         height: imageWidth * ratioImageGroupBuying,
+        //                     },
+        //                 ]}
+        //             />
+        //         )}
+        //     </SharedElement>
+        // );
     };
 
     const Content = () => {

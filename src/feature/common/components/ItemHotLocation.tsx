@@ -3,6 +3,7 @@ import Images from 'asset/img/images';
 import {FONT_SIZE} from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
 import {StyleImage, StyleText, StyleTouchable} from 'components/base';
+import StyleVideo from 'components/base/StyleVideo';
 import Redux from 'hook/useRedux';
 import {DISCOVERY_ROUTE} from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
@@ -10,6 +11,7 @@ import React, {useEffect, useState} from 'react';
 import {Platform, StyleProp, View, ViewStyle} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import {checkIsVideo} from 'utility/validate';
 
 interface Props {
     item: TypeHotLocation;
@@ -55,13 +57,30 @@ const ItemHotLocation = (props: Props) => {
                     },
                 ]}>
                 {images.map((url, index) => {
+                    const isVideo = checkIsVideo(url);
+
                     return (
                         <View key={index} style={styles.imageBox}>
-                            <StyleImage
-                                source={{uri: url}}
-                                customStyle={styles.image}
-                                defaultSource={Images.images.defaultImage}
-                            />
+                            {isVideo ? (
+                                <StyleVideo
+                                    source={{uri: url}}
+                                    style={styles.image}
+                                    isOverlay
+                                    onPressOverlay={() => {
+                                        navigate(DISCOVERY_ROUTE.searchScreen, {
+                                            search: item.location,
+                                        });
+                                    }}
+                                    paused
+                                    currentTime={2}
+                                />
+                            ) : (
+                                <StyleImage
+                                    source={{uri: url}}
+                                    customStyle={styles.image}
+                                    defaultSource={Images.images.defaultImage}
+                                />
+                            )}
 
                             {index === 3 && item.total_posts > 4 && (
                                 <View style={styles.totalPostsBox}>

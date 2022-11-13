@@ -107,10 +107,14 @@ export const checkIsSingleEmoji = (str: string) => {
 };
 
 export const checkIsVideo = (fileName: string) => {
-    const temp = fileName.split('.');
-    const typeFile = temp[temp.length - 1];
-    if (['mp4', 'mov', 'MOV'].includes(typeFile)) {
-        return true;
+    const listElements = fileName.toLowerCase().split('.');
+    for (let i = listElements.length - 1; i >= 0; i--) {
+        if (
+            listElements[i].includes('mp4') ||
+            listElements[i].includes('mov')
+        ) {
+            return true;
+        }
     }
     return false;
 };
