@@ -210,6 +210,7 @@ const OtherProfile = ({route}: Props) => {
         (item: TypeGroupBuying) => {
             return (
                 <ItemGroupBuying
+                    key={item.id}
                     item={item}
                     setList={listPostsPaging.setList}
                     isHorizontal={false}
@@ -228,6 +229,7 @@ const OtherProfile = ({route}: Props) => {
             if (item.postType === POST_TYPE.review) {
                 return (
                     <Bubble
+                        key={item.id}
                         item={item}
                         onShowMoreOption={params => {
                             modalBubbleOption = params.postModal;

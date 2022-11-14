@@ -2,7 +2,13 @@ import React from 'react';
 import {VideoProperties} from 'react-native-video';
 import VideoPlayer from 'react-native-video-controls';
 
-const StyleVideo = (props: VideoProperties) => {
+interface Props extends VideoProperties {
+    disableSeekbar?: boolean;
+    isOverlay?: boolean;
+    onPressOverlay?(): void;
+}
+
+const StyleVideo = (props: Props) => {
     return (
         <VideoPlayer
             // onProgress={data => console.log(data)}
@@ -17,6 +23,9 @@ const StyleVideo = (props: VideoProperties) => {
             disablePlayPause
             disableFullscreen
             disableBack
+            onPlay={() => null}
+            isOverlay={props.isOverlay}
+            onPressOverlay={() => props.onPressOverlay?.()}
         />
     );
 };

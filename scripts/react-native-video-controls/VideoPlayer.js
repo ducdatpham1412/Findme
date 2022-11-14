@@ -30,6 +30,8 @@ export default class VideoPlayer extends Component {
         volume: 1,
         title: '',
         rate: 1,
+        isOverlay: false,
+        onPressOverlay: () => null,
     };
 
     constructor(props) {
@@ -68,6 +70,7 @@ export default class VideoPlayer extends Component {
             currentTime: 0,
             error: false,
             duration: 0,
+            isOverlay: this.props.isOverlay,
         };
 
         /**
@@ -955,6 +958,10 @@ export default class VideoPlayer extends Component {
      * view and spaces them out.
      */
     renderTopControls() {
+        if (this.state.isOverlay) {
+            return null;
+        }
+
         const icon =
             this.state.volume === 0
                 ? require('./assets/img/no_volume.png')
@@ -1219,6 +1226,23 @@ export default class VideoPlayer extends Component {
         return null;
     }
 
+    renderOverlay() {
+        if (this.state.isOverlay) {
+            return (
+                <Pressable
+                    style={{
+                        position: 'absolute',
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'transparent',
+                    }}
+                    onPress={() => this.props.onPressOverlay?.()}
+                />
+            );
+        }
+        return null;
+    }
+
     /**
      * Provide all of our options and render the whole component.
      */
@@ -1254,6 +1278,7 @@ export default class VideoPlayer extends Component {
                     {this.renderTopControls()}
                     {this.renderBottomControls()}
                     {this.renderPausePlay()}
+                    {this.renderOverlay()}
                 </View>
             </TouchableWithoutFeedback>
         );

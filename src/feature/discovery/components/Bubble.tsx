@@ -2,8 +2,8 @@ import {BlurView} from '@react-native-community/blur';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeBubblePalace} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
-import {apiLikePost, apiUnArchivePost, apiUnLikePost} from 'api/profile';
-import {TYPE_BUBBLE_PALACE_ACTION, TYPE_DYNAMIC_LINK} from 'asset/enum';
+import {apiLikePost, apiUnLikePost} from 'api/profile';
+import {TYPE_DYNAMIC_LINK} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {
@@ -100,21 +100,6 @@ const onGoToPublicDraft = (item: TypeBubblePalace) => {
     navigate(PROFILE_ROUTE.createPostPreview, {
         itemDraft: item,
     });
-};
-
-const onUnArchivePost = async (post: TypeBubblePalace) => {
-    try {
-        await apiUnArchivePost(post.id);
-        Redux.setBubblePalaceAction({
-            action: TYPE_BUBBLE_PALACE_ACTION.unArchivePost,
-            payload: {
-                ...post,
-                isArchived: false,
-            },
-        });
-    } catch (err) {
-        appAlert(err);
-    }
 };
 
 const onShowModalShare = async (
@@ -330,7 +315,7 @@ const Bubble = (props: Props) => {
                     />
                     <StyleTouchable
                         customStyle={[
-                            styles.goToPostBox,
+                            styles.draftBox,
                             {backgroundColor: theme.backgroundButtonColor},
                         ]}
                         onPress={() => onGoToPublicDraft(item)}>
@@ -355,16 +340,14 @@ const Bubble = (props: Props) => {
                             {color: theme.likeHeart},
                         ]}
                         onPress={() => {
-                            if (!item.isArchived) {
-                                onHandleLike({
-                                    isModeExp,
-                                    isLiked,
-                                    setIsLiked,
-                                    totalLikes,
-                                    setTotalLikes,
-                                    postId: item.id,
-                                });
-                            }
+                            onHandleLike({
+                                isModeExp,
+                                isLiked,
+                                setIsLiked,
+                                totalLikes,
+                                setTotalLikes,
+                                postId: item.id,
+                            });
                         }}
                         touchableStyle={styles.touchIconLike}
                     />
@@ -375,16 +358,14 @@ const Bubble = (props: Props) => {
                             {color: theme.borderColor},
                         ]}
                         onPress={() => {
-                            if (!item.isArchived) {
-                                onHandleLike({
-                                    isModeExp,
-                                    isLiked,
-                                    setIsLiked,
-                                    totalLikes,
-                                    setTotalLikes,
-                                    postId: item.id,
-                                });
-                            }
+                            onHandleLike({
+                                isModeExp,
+                                isLiked,
+                                setIsLiked,
+                                totalLikes,
+                                setTotalLikes,
+                                postId: item.id,
+                            });
                         }}
                         touchableStyle={styles.touchIconLike}
                     />
@@ -395,7 +376,7 @@ const Bubble = (props: Props) => {
                     onPress={() => {
                         if (totalLikes) {
                             onShowModalComment(item, 'like');
-                        } else if (!item.isArchived) {
+                        } else {
                             onHandleLike({
                                 isModeExp,
                                 isLiked,
@@ -441,24 +422,19 @@ const Bubble = (props: Props) => {
                     />
                 </StyleTouchable>
 
-                {item.isArchived && (
-                    <StyleTouchable
-                        customStyle={[
-                            styles.goToPostBox,
-                            {backgroundColor: theme.backgroundButtonColor},
-                        ]}
-                        onPress={() => onUnArchivePost(item)}>
+                <View style={styles.leftBottom}>
+                    <View style={styles.blurContainer}>
+                        <CustomBlurView />
+                        <AntDesign name="star" style={styles.star} />
                         <StyleText
-                            i18Text="profile.post.unArchive"
+                            originValue={item.stars}
                             customStyle={[
-                                styles.textGoToPost,
-                                {color: theme.textHightLight},
+                                styles.textStars,
+                                {color: theme.borderColor},
                             ]}
                         />
-                    </StyleTouchable>
-                )}
-
-                <View style={styles.captionBox} />
+                    </View>
+                </View>
             </View>
         );
     };
@@ -535,7 +511,7 @@ const Bubble = (props: Props) => {
                 images={item.images}
                 syncWidth={containerWidth}
                 onDoublePress={() => {
-                    if (!isLiked && !item.isArchived) {
+                    if (!isLiked) {
                         onHandleLike({
                             isModeExp,
                             isLiked,
@@ -573,16 +549,7 @@ const Bubble = (props: Props) => {
                 </View>
 
                 <View style={styles.bottomView}>
-                    <View style={styles.leftBottom}>
-                        <View style={styles.blurContainer}>
-                            <CustomBlurView />
-                            <AntDesign name="star" style={styles.star} />
-                            <StyleText
-                                originValue={item.stars}
-                                customStyle={styles.textStars}
-                            />
-                        </View>
-
+                    <View style={styles.leftBottomPreview}>
                         <StyleTouchable
                             customStyle={styles.blurLink}
                             onPress={() => showPreviewLink(item)}>
@@ -590,7 +557,6 @@ const Bubble = (props: Props) => {
                             {chooseLink()}
                         </StyleTouchable>
                     </View>
-
                     {bottomRight()}
                 </View>
             </ScrollSyncSizeImage>
@@ -743,7 +709,7 @@ const styles = ScaledSheet.create({
         marginTop: '10@vs',
         alignSelf: 'center',
     },
-    goToPostBox: {
+    draftBox: {
         paddingHorizontal: '10@s',
         paddingVertical: '5@vs',
         borderRadius: '5@ms',
@@ -800,9 +766,16 @@ const styles = ScaledSheet.create({
         paddingHorizontal: '10@s',
         justifyContent: 'space-between',
     },
-    leftBottom: {
+    leftBottomPreview: {
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'flex-end',
+    },
+    leftBottom: {
+        flex: 1,
+        paddingHorizontal: '10@s',
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     blurContainer: {
         flexDirection: 'row',

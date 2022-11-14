@@ -17,14 +17,6 @@ export const apiUnLikePost = (idPost: string) => {
     return request.put(`/profile/unlike-post/${idPost}`);
 };
 
-export const apiArchivePost = (idPost: string) => {
-    return request.put(`/profile/archive-post/${idPost}`);
-};
-
-export const apiUnArchivePost = (idPost: string) => {
-    return request.put(`/profile/un-archive-post/${idPost}`);
-};
-
 export const apiGetListGroupBuying = ({params}: TypeParamsPaging) => {
     return request.get(`/profile/list-group-buying/${params.userId}`, {
         params: {
