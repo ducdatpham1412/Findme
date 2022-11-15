@@ -1,7 +1,8 @@
 import {TypeJoinGroupBookingRequest, TypePrice} from 'api/interface/discovery';
+import {TypePurchaseResource} from 'app-redux/account/logicSlice';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
-import {FONT_SIZE, LIST_DEPOSIT_PRICES} from 'asset/standardValue';
+import {FONT_SIZE} from 'asset/standardValue';
 import {
     StyleButton,
     StyleIcon,
@@ -18,7 +19,12 @@ import {Modalize} from 'react-native-modalize';
 import {ScaledSheet} from 'react-native-size-matters';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {borderWidthTiny} from 'utility/assistant';
-import {addDate, formatDayGroupBuying, formatUTCDate} from 'utility/format';
+import {
+    addDate,
+    formatDayGroupBuying,
+    formatLocaleNumber,
+    formatUTCDate,
+} from 'utility/format';
 import AddPhone from './AddPhone';
 
 interface Props {
@@ -32,12 +38,13 @@ const ModalConfirmJoinGb = (props: Props) => {
     const {t} = useTranslation();
     const theme = Redux.getTheme();
     const {phone} = Redux.getPassport().information;
+    const {listPurchases} = Redux.getResource();
 
     const modalizeRef = useRef<Modalize>(null);
     const modalTimeRef = useRef<Modalize>(null);
     const modalAddPhoneRef = useRef<Modalize>(null);
     const datetimeRef = useRef<ClassDateTimePicker>(null);
-    const moneyStandard = useRef(LIST_DEPOSIT_PRICES[0].value);
+    const moneyStandard = useRef(listPurchases[0].value);
 
     const [amount, setAmount] = useState(1);
     const [timeWillJoin, setTimeWillJoin] = useState(
@@ -49,8 +56,7 @@ const ModalConfirmJoinGb = (props: Props) => {
     const [note, setNote] = useState('');
 
     const [isRetail, setIsRetail] = useState(false);
-    const [chosenDeposit, setChosenDeposit] =
-        useState<typeof LIST_DEPOSIT_PRICES[0]>();
+    const [chosenDeposit, setChosenDeposit] = useState<TypePurchaseResource>();
 
     useEffect(() => {
         if (prices.length && retailPrice) {
@@ -58,9 +64,9 @@ const ModalConfirmJoinGb = (props: Props) => {
                 ? Number(retailPrice) * 0.2
                 : Number(prices[prices.length - 1].value) * 0.2;
             const temp =
-                LIST_DEPOSIT_PRICES.find(
+                listPurchases.find(
                     item => item.value > moneyStandard.current,
-                ) || LIST_DEPOSIT_PRICES[LIST_DEPOSIT_PRICES.length - 1];
+                ) || listPurchases[listPurchases.length - 1];
             setChosenDeposit(temp);
             setAmount(1);
         }
@@ -74,14 +80,18 @@ const ModalConfirmJoinGb = (props: Props) => {
         setAmount(nextAmount);
         const nextMoney = moneyStandard.current * nextAmount;
         const temp =
-            LIST_DEPOSIT_PRICES.find(item => item.value > nextMoney) ||
-            LIST_DEPOSIT_PRICES[LIST_DEPOSIT_PRICES.length - 1];
+            listPurchases.find(item => item.value > nextMoney) ||
+            listPurchases[listPurchases.length - 1];
         setChosenDeposit(temp);
     };
 
     const showModal = (params: {isRetail: boolean}) => {
         setIsRetail(params.isRetail);
         modalizeRef.current?.open();
+    };
+
+    const hideModal = () => {
+        modalizeRef.current?.close();
     };
 
     const jsx = () => {
@@ -128,7 +138,9 @@ const ModalConfirmJoinGb = (props: Props) => {
                         ]}>
                         {!!chosenDeposit && (
                             <StyleText
-                                originValue={chosenDeposit?.money}
+                                originValue={`${formatLocaleNumber(
+                                    String(chosenDeposit.value),
+                                )}vnd`}
                                 customStyle={[
                                     styles.textMoney,
                                     {color: theme.highlightColor},
@@ -293,7 +305,7 @@ const ModalConfirmJoinGb = (props: Props) => {
                                     time_will_buy: formatUTCDate(timeWillJoin),
                                     note,
                                     is_retail: isRetail,
-                                    productId: chosenDeposit.productId,
+                                    productId: chosenDeposit.product_id,
                                 });
                             }
                         }}
@@ -338,6 +350,7 @@ const ModalConfirmJoinGb = (props: Props) => {
     return {
         jsx,
         showModal,
+        hideModal,
     };
 };
 

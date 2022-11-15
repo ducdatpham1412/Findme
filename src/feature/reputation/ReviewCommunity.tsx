@@ -45,7 +45,7 @@ const ReviewCommunity = () => {
         usePaging({
             request: apiGetListBubbleActive,
             params: {
-                postTypes: [POST_TYPE.review],
+                postTypes: String(`[${[POST_TYPE.review]}]`),
                 include_me: true,
             },
         });

@@ -1,4 +1,3 @@
-import {apiGetTopGroupBuying} from 'api/discovery';
 import {TypeGroupBuying} from 'api/interface';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE, LIST_TOPICS} from 'asset/standardValue';
@@ -13,7 +12,7 @@ import ItemGroupBuying from 'feature/common/components/ItemGroupBuying';
 import ItemHotLocation from 'feature/common/components/ItemHotLocation';
 import Redux from 'hook/useRedux';
 import {DISCOVERY_ROUTE} from 'navigation/config/routes';
-import {appAlert, navigate} from 'navigation/NavigationService';
+import {navigate} from 'navigation/NavigationService';
 import React, {memo, useEffect, useState} from 'react';
 import {View} from 'react-native';
 import {ScaledSheet, verticalScale} from 'react-native-size-matters';
@@ -74,21 +73,13 @@ const Categories = memo(() => {
 
 const BannerTopGb = () => {
     const theme = Redux.getTheme();
-    const {banners, hotLocations} = Redux.getResource();
+    const {banners, hotLocations, topGroupBookings} = Redux.getResource();
 
     const [list, setList] = useState<Array<TypeGroupBuying>>([]);
 
     useEffect(() => {
-        const getData = async () => {
-            try {
-                const res = await apiGetTopGroupBuying();
-                setList(res.data);
-            } catch (err) {
-                appAlert(err);
-            }
-        };
-        getData();
-    }, []);
+        setList(topGroupBookings);
+    }, [topGroupBookings]);
 
     const SearchBar = () => {
         return (
@@ -130,6 +121,12 @@ const BannerTopGb = () => {
                     showsHorizontalScrollIndicator={false}
                     directionalLockEnabled
                     keyExtractor={item => String(item)}
+                    onTouchStart={() => {
+                        Redux.setScrollMainAndChatEnable(false);
+                    }}
+                    onTouchEnd={() => {
+                        Redux.setScrollMainAndChatEnable(true);
+                    }}
                 />
             </View>
         );
@@ -163,6 +160,12 @@ const BannerTopGb = () => {
                     showsHorizontalScrollIndicator={false}
                     directionalLockEnabled
                     keyExtractor={item => item.id}
+                    onTouchStart={() => {
+                        Redux.setScrollMainAndChatEnable(false);
+                    }}
+                    onTouchEnd={() => {
+                        Redux.setScrollMainAndChatEnable(true);
+                    }}
                 />
             </>
         );
@@ -191,6 +194,12 @@ const BannerTopGb = () => {
                     showsHorizontalScrollIndicator={false}
                     directionalLockEnabled
                     keyExtractor={item => item.location}
+                    onTouchStart={() => {
+                        Redux.setScrollMainAndChatEnable(false);
+                    }}
+                    onTouchEnd={() => {
+                        Redux.setScrollMainAndChatEnable(true);
+                    }}
                 />
             </>
         );

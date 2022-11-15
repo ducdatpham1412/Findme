@@ -49,10 +49,6 @@ export const apiEditGroupBooking = (body: TypeEditGroupBooking) => {
     return request.put(`profile/edit-group-buying/${body.postId}`, body.data);
 };
 
-export const apiGetTopGroupBuying = () => {
-    return request.get('/common/get-top-group-buying');
-};
-
 export const apiGetListEditHistory = ({params}: TypeParamsPaging) => {
     return request.get(`/common/list-edit-history/${params.postId}`, {
         params: {

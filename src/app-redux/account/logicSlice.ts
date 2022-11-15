@@ -5,6 +5,7 @@ import {
     TypeChatTagResponse,
     TypeCreatePostRequest,
     TypeGradient,
+    TypeGroupBuying,
 } from 'api/interface';
 import {TypeCreateGroupBuying} from 'api/interface/discovery';
 import {DEFAULT_IMAGE_BACKGROUND} from 'asset/standardValue';
@@ -24,6 +25,11 @@ export interface TypePriceResource {
     id: number;
     value: null | Array<number | string>;
     text: null | string;
+}
+
+export interface TypePurchaseResource {
+    product_id: string;
+    value: number;
 }
 
 export const initialLogicState = {
@@ -59,6 +65,8 @@ export const initialLogicState = {
         banners: [],
         hotLocations: <Array<TypeHotLocation>>[],
         listPrices: <Array<TypePriceResource>>[],
+        listPurchases: <Array<TypePurchaseResource>>[],
+        topGroupBookings: <Array<TypeGroupBuying>>[],
     },
 };
 

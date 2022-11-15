@@ -423,8 +423,11 @@ const Bubble = (props: Props) => {
                 </StyleTouchable>
 
                 <View style={styles.leftBottom}>
-                    <View style={styles.blurContainer}>
-                        <CustomBlurView />
+                    <View
+                        style={[
+                            styles.blurContainer,
+                            {backgroundColor: theme.backgroundButtonColor},
+                        ]}>
                         <AntDesign name="star" style={styles.star} />
                         <StyleText
                             originValue={item.stars}
