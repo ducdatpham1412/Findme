@@ -35,7 +35,6 @@ import {
     DYNAMIC_LINK_SHARE,
     FONT_SIZE,
     LANDING_PAGE_URL,
-    LIST_DEPOSIT_PRICES,
 } from 'asset/standardValue';
 import Theme from 'asset/theme/Theme';
 import {
@@ -271,7 +270,7 @@ const onShowModalShare = async (
     }
 };
 
-const screenWidth = Metrics.width;
+const {width} = Metrics;
 
 const DetailGroupBuying = ({route}: Props) => {
     const setList = route.params?.setList;
@@ -280,6 +279,7 @@ const DetailGroupBuying = ({route}: Props) => {
     const isModeExp = Redux.getModeExp();
     const isLoading = Redux.getIsLoading();
     const bubblePalaceAction = Redux.getBubblePalaceAction();
+    const {listPurchases} = Redux.getResource();
 
     const modalOptionRef = useRef<any>(null);
     const modalJoinedRef = useRef<Modalize>(null);
@@ -310,7 +310,7 @@ const DetailGroupBuying = ({route}: Props) => {
         : modeExpUsePaging();
 
     const {requestPurchase} = appPurchase({
-        skus: LIST_DEPOSIT_PRICES.map(price => price.productId),
+        skus: listPurchases.map(purchase => purchase.product_id),
     });
 
     const [isLiked, setIsLiked] = useState(item.isLiked);
@@ -502,6 +502,7 @@ const DetailGroupBuying = ({route}: Props) => {
                     postId: item.id,
                 });
                 onRefresh();
+                modalConfirmJoin.hideModal();
             } catch (err) {
                 await apiCreateErrorLog(
                     `Error when deposit, gb: ${item.id}, money: ${params.money}`,
@@ -1324,7 +1325,7 @@ const DetailGroupBuying = ({route}: Props) => {
                     style={styles.imageView}>
                     <ScrollSyncSizeImage
                         images={item.images}
-                        syncWidth={screenWidth}
+                        syncWidth={width}
                         onDoublePress={() => {
                             if (!isLiked) {
                                 onHandleLike({
@@ -1444,7 +1445,7 @@ const styles = ScaledSheet.create({
         width: '100%',
     },
     imagePreview: {
-        width: screenWidth,
+        width,
     },
     iconBackView: {
         position: 'absolute',

@@ -14,7 +14,7 @@ import ROOT_SCREEN from 'navigation/config/routes';
 import {navigate} from 'navigation/NavigationService';
 import React, {Component} from 'react';
 import isEqual from 'react-fast-compare';
-import {Animated, View} from 'react-native';
+import {Animated, Platform, View} from 'react-native';
 import {ScaledSheet} from 'react-native-size-matters';
 import {getSessionOfDay} from 'utility/format';
 import {I18Normalize} from 'utility/I18Next';
@@ -172,7 +172,10 @@ const styles = ScaledSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: Theme.common.red,
-        top: '3@ms',
+        top: Platform.select({
+            android: '3@ms',
+            ios: '7@ms',
+        }),
         right: '10@ms',
     },
     textNewMessages: {
