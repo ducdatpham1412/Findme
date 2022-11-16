@@ -416,7 +416,7 @@ const styles = ScaledSheet.create({
     },
     messageText: {
         fontSize: FONT_SIZE.normal,
-        marginVertical: '8.5@ms',
+        marginVertical: '6@ms',
     },
     dateText: {
         alignSelf: 'center',

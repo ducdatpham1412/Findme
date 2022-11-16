@@ -273,13 +273,17 @@ const onShowModalShare = async (
 const {width} = Metrics;
 
 const DetailGroupBuying = ({route}: Props) => {
-    const setList = route.params?.setList;
-    const isInRoot = route.name === ROOT_SCREEN.detailGroupBuying;
+    const setList = useRef(route.params?.setList).current;
+    const isInRoot = useRef(
+        route.name === ROOT_SCREEN.detailGroupBuying,
+    ).current;
+
     const theme = Redux.getTheme();
     const isModeExp = Redux.getModeExp();
     const isLoading = Redux.getIsLoading();
     const bubblePalaceAction = Redux.getBubblePalaceAction();
     const {listPurchases} = Redux.getResource();
+    const bubbleFocusing = Redux.getBubbleFocusing();
 
     const modalOptionRef = useRef<any>(null);
     const modalJoinedRef = useRef<Modalize>(null);
@@ -416,6 +420,9 @@ const DetailGroupBuying = ({route}: Props) => {
                     setItem(data);
                     setIsLiked(data.isLiked);
                     setTotalLikes(data.totalLikes);
+                    if (!isInRoot) {
+                        Redux.updateBubbleFocusing(data);
+                    }
                 } catch (err) {
                     appAlert(err);
                 } finally {
@@ -478,11 +485,13 @@ const DetailGroupBuying = ({route}: Props) => {
             modalCommentLikeRef.current?.show({
                 post: item,
                 type,
+                setList,
             });
         } else {
             showCommentDiscovery({
                 post: item,
                 type,
+                setList,
             });
         }
     };
@@ -781,6 +790,9 @@ const DetailGroupBuying = ({route}: Props) => {
     };
 
     const ToolReaction = () => {
+        const totalComments = isInRoot
+            ? item.totalComments
+            : bubbleFocusing.totalComments;
         return (
             <View
                 style={[
@@ -865,12 +877,12 @@ const DetailGroupBuying = ({route}: Props) => {
                     </StyleTouchable>
                     <StyleText
                         i18Text={
-                            item.totalComments
+                            totalComments
                                 ? 'discovery.numberComments'
                                 : 'discovery.comment'
                         }
                         i18Params={{
-                            numberComments: item.totalComments,
+                            numberComments: totalComments,
                         }}
                         customStyle={[
                             styles.textStar,
