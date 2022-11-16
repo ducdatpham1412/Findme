@@ -4,12 +4,7 @@ import Redux from 'hook/useRedux';
 import React, {memo} from 'react';
 import isEqual from 'react-fast-compare';
 import {View} from 'react-native';
-import {
-    moderateScale,
-    scale,
-    ScaledSheet,
-    verticalScale,
-} from 'react-native-size-matters';
+import {scale, ScaledSheet, verticalScale} from 'react-native-size-matters';
 import {onGoToProfile} from 'utility/assistant';
 import {formatFromNow} from 'utility/format';
 
@@ -19,9 +14,12 @@ interface Props {
     onPressReply?(idComment: string, personReplied: string): void;
 }
 
+const scale15 = scale(15);
+const scale50 = scale(50);
+const verticalScale5 = verticalScale(5);
+
 const ItemComment = (props: Props) => {
     const {item, commentReplied = '', onPressReply} = props;
-
     const theme = Redux.getTheme();
 
     // const [numberLikes, setNumberLikes] = useState(item.numberLikes);
@@ -29,10 +27,8 @@ const ItemComment = (props: Props) => {
 
     // const color = isLiked ? theme.likeHeart : theme.unLikeHeart;
 
-    const paddingLeft = !commentReplied
-        ? scale(15)
-        : scale(25) + moderateScale(25);
-    const marginBottom = !commentReplied ? verticalScale(20) : verticalScale(0);
+    const paddingLeft = !commentReplied ? scale15 : scale50;
+    const marginBottom = !commentReplied ? verticalScale5 : 0;
 
     // const onLikeOrUnLike = async () => {
     //     const currentNumberLikes = numberLikes;
@@ -54,12 +50,29 @@ const ItemComment = (props: Props) => {
     const RenderNameAndContent = () => {
         return (
             <View style={styles.nameAndContentTouch}>
-                <StyleText
-                    originValue={`${item.creatorName} ・ ${formatFromNow(
-                        item.created,
-                    )}`}
-                    customStyle={[styles.nameText, {color: theme.borderColor}]}
-                />
+                <StyleText customStyle={styles.nameText} numberOfLines={1}>
+                    <StyleText
+                        originValue={`${item.creatorName}`}
+                        customStyle={[
+                            styles.nameText,
+                            {color: theme.borderColor},
+                        ]}
+                    />
+                    <StyleText
+                        originValue=" ・ "
+                        customStyle={[
+                            styles.nameText,
+                            {color: theme.borderColor},
+                        ]}
+                    />
+                    <StyleText
+                        originValue={`${formatFromNow(item.created)}`}
+                        customStyle={[
+                            styles.nameText,
+                            {color: theme.borderColor},
+                        ]}
+                    />
+                </StyleText>
                 <StyleText
                     originValue={item.content}
                     customStyle={[
@@ -67,8 +80,8 @@ const ItemComment = (props: Props) => {
                         {color: theme.textHightLight},
                     ]}
                 />
-                <View style={styles.timeReplyBox}>
-                    {!commentReplied && (
+                {!commentReplied && (
+                    <View style={styles.replyBox}>
                         <StyleTouchable
                             onPress={() =>
                                 onPressReply?.(item.id, item.creatorName)
@@ -82,8 +95,8 @@ const ItemComment = (props: Props) => {
                                 ]}
                             />
                         </StyleTouchable>
-                    )}
-                </View>
+                    </View>
+                )}
             </View>
         );
     };
@@ -117,7 +130,7 @@ const ItemComment = (props: Props) => {
     };
 
     return (
-        <View style={{marginBottom, marginTop: verticalScale(10)}}>
+        <View style={[styles.container, {marginBottom}]}>
             <View style={[styles.itemCommentBox, {paddingLeft}]}>
                 <StyleTouchable onPress={() => onGoToProfile(item.creator)}>
                     <StyleImage
@@ -141,6 +154,10 @@ const ItemComment = (props: Props) => {
 };
 
 const styles = ScaledSheet.create({
+    container: {
+        width: '100%',
+        marginTop: '10@vs',
+    },
     itemCommentBox: {
         width: '100%',
         flexDirection: 'row',
@@ -154,16 +171,16 @@ const styles = ScaledSheet.create({
     // name, content, reply
     nameAndContentTouch: {
         flex: 1,
-        paddingHorizontal: '7@s',
+        paddingLeft: '7@s',
     },
     nameText: {
         fontSize: '11.5@ms',
     },
     contentText: {
         fontSize: '13@ms',
-        marginTop: '5@ms',
+        marginTop: '3@ms',
     },
-    timeReplyBox: {
+    replyBox: {
         width: '100%',
         height: '20@ms',
         flexDirection: 'row',

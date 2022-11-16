@@ -79,7 +79,7 @@ export default class HeaderFilterTopic extends Component<Props, States> {
     private onChooseTopic(topic: number) {
         if (topic === TOPIC.all) {
             this.setState({
-                tempListTopics: [TOPIC.all],
+                tempListTopics: LIST_TOPICS.map(item => item.id),
             });
         } else {
             let temp = [...this.state.tempListTopics];
