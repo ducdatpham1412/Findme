@@ -23,3 +23,7 @@ fi
 if [ ./react-native-video-controls/assets/img/no_volume@3x.png ]; then
     cp ./react-native-video-controls/assets/img/no_volume@3x.png ../node_modules/react-native-video-controls/assets/img/no_volume@3x.png
 fi
+
+if [ ./react-native-size-matters/scaling-utils.js ]; then
+  cp ./react-native-size-matters/scaling-utils.js ../node_modules/./react-native-size-matters/lib/scaling-utils.js
+fi

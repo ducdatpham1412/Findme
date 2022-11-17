@@ -5,9 +5,11 @@ import DeviceInfo from 'react-native-device-info';
 import {isIOS} from 'utility/assistant';
 
 const {width, height} = Dimensions.get('screen');
-const safeTopPadding = DeviceInfo.hasNotch()
+const safeTopAndroid = DeviceInfo.hasNotch()
     ? StaticSafeAreaInsets.safeAreaInsetsTop
     : 0;
+const safeTopiOS = StaticSafeAreaInsets.safeAreaInsetsTop;
+const safeTopPadding = isIOS ? safeTopiOS : safeTopAndroid;
 const safeBottomPadding = isIOS ? StaticSafeAreaInsets.safeAreaInsetsBottom : 0;
 const safeLeftPadding = StaticSafeAreaInsets.safeAreaInsetsLeft;
 const safeRightPadding = StaticSafeAreaInsets.safeAreaInsetsRight;

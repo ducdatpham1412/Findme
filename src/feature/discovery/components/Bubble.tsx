@@ -3,7 +3,7 @@ import dynamicLinks from '@react-native-firebase/dynamic-links';
 import {TypeBubblePalace} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {apiLikePost, apiUnLikePost} from 'api/profile';
-import {TYPE_DYNAMIC_LINK} from 'asset/enum';
+import {REACT, TYPE_DYNAMIC_LINK} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {
@@ -76,9 +76,15 @@ const onHandleLike = async (params: {
             setIsLiked(!currentLike);
             setTotalLikes(currentNumberLikes + (currentLike ? -1 : 1));
             if (currentLike) {
-                await apiUnLikePost(postId);
+                await apiUnLikePost({
+                    type: REACT.post,
+                    reactedId: postId,
+                });
             } else {
-                await apiLikePost(postId);
+                await apiLikePost({
+                    type: REACT.post,
+                    reactedId: postId,
+                });
             }
         } catch (err) {
             setIsLiked(currentLike);
@@ -246,28 +252,27 @@ const Bubble = (props: Props) => {
                             customStyle={[
                                 styles.textCreated,
                                 {color: theme.borderColor},
-                            ]}
-                        />
-                    </View>
-
-                    {item.topic.map(topic => (
-                        <StyleText
-                            key={topic}
-                            originValue="   ・ "
-                            customStyle={[
-                                styles.textTopic,
-                                {color: theme.textColor},
-                            ]}
-                            onPress={() => onGoToDetailPost(item)}>
-                            <StyleText
-                                i18Text={chooseTextTopic(topic)}
-                                customStyle={[
-                                    styles.textTopic,
-                                    {color: theme.textColor},
-                                ]}
-                            />
+                            ]}>
+                            {item.topic.map(topic => (
+                                <StyleText
+                                    key={topic}
+                                    originValue="・"
+                                    customStyle={[
+                                        styles.textTopic,
+                                        {color: theme.borderColor},
+                                    ]}
+                                    onPress={() => onGoToDetailPost(item)}>
+                                    <StyleText
+                                        i18Text={chooseTextTopic(topic)}
+                                        customStyle={[
+                                            styles.textTopic,
+                                            {color: theme.borderColor},
+                                        ]}
+                                    />
+                                </StyleText>
+                            ))}
                         </StyleText>
-                    ))}
+                    </View>
 
                     <StyleTouchable
                         customStyle={styles.iconMore}
@@ -592,7 +597,7 @@ const styles = ScaledSheet.create({
     // header
     headerView: {
         width: '100%',
-        paddingHorizontal: '15@s',
+        paddingLeft: '15@s',
     },
     avatarNameOptionBox: {
         width: '100%',
@@ -614,23 +619,26 @@ const styles = ScaledSheet.create({
         left: '23@ms',
     },
     nameTime: {
-        maxWidth: '50%',
-        marginLeft: '10@s',
+        flex: 1,
+        paddingLeft: '7@s',
     },
     textName: {
-        fontSize: '14@ms',
+        fontSize: FONT_SIZE.normal,
         fontWeight: 'bold',
     },
     textCreated: {
-        fontSize: '10@ms',
+        fontSize: '9@ms',
         marginTop: '2@vs',
     },
     textTopic: {
-        fontSize: '12@ms',
+        fontSize: '9@ms',
     },
     iconMore: {
-        position: 'absolute',
-        right: 0,
+        height: '100%',
+        paddingLeft: '5@s',
+        paddingRight: '15@s',
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     locationBox: {
         flexDirection: 'row',

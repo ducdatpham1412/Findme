@@ -21,6 +21,7 @@ import {
 } from 'api/profile';
 import {
     GROUP_BUYING_STATUS,
+    REACT,
     RELATIONSHIP,
     STATUS,
     TYPE_BUBBLE_PALACE_ACTION,
@@ -138,9 +139,15 @@ const onHandleLike = async (params: {
             setIsLiked(!currentLike);
             setTotalLikes(currentNumberLikes + (currentLike ? -1 : 1));
             if (currentLike) {
-                await apiUnLikePost(postId);
+                await apiUnLikePost({
+                    type: REACT.post,
+                    reactedId: postId,
+                });
             } else {
-                await apiLikePost(postId);
+                await apiLikePost({
+                    type: REACT.post,
+                    reactedId: postId,
+                });
             }
             if (setList) {
                 setList((preValue: Array<TypeGroupBuying>) => {
@@ -428,6 +435,8 @@ const DetailGroupBuying = ({route}: Props) => {
                 } finally {
                     setLoad(false);
                 }
+            } else {
+                Redux.updateBubbleFocusing(item);
             }
         };
         getData();

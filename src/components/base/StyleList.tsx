@@ -17,8 +17,8 @@ interface StyleListProps extends FlatListProps<any> {
     loadingMore?: boolean;
     disableRefresh?: boolean;
     refreshing?: boolean;
-    onRefresh?(): void;
-    onLoadMore?(): void;
+    onRefresh?: () => void;
+    onLoadMore?: () => void;
 }
 
 const StyleList = (props: StyleListProps, ref: any) => {

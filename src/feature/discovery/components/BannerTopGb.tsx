@@ -1,4 +1,5 @@
 import {TypeGroupBuying} from 'api/interface';
+import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE, LIST_TOPICS} from 'asset/standardValue';
 import {
@@ -51,10 +52,7 @@ const Categories = memo(() => {
                                         topic: item.id,
                                     })
                                 }>
-                                <StyleIcon
-                                    source={item.icon}
-                                    size={width * 0.11}
-                                />
+                                <StyleIcon source={item.icon} size={40} />
                                 <StyleText
                                     i18Text={item.text}
                                     customStyle={[
@@ -81,8 +79,8 @@ const BannerTopGb = () => {
         setList(topGroupBookings);
     }, [topGroupBookings]);
 
-    const SearchBar = () => {
-        return (
+    return (
+        <View style={styles.container}>
             <StyleTouchable
                 customStyle={[
                     styles.searchView,
@@ -101,11 +99,7 @@ const BannerTopGb = () => {
                     ]}
                 />
             </StyleTouchable>
-        );
-    };
 
-    const Banner = () => {
-        return (
             <View style={styles.bannerView}>
                 <StyleList
                     horizontal
@@ -115,6 +109,7 @@ const BannerTopGb = () => {
                             <StyleImage
                                 source={{uri: item}}
                                 customStyle={styles.image}
+                                defaultSource={Images.images.defaultImage}
                             />
                         );
                     }}
@@ -129,89 +124,67 @@ const BannerTopGb = () => {
                     }}
                 />
             </View>
-        );
-    };
 
-    const TopGroupBooking = () => {
-        return (
-            <>
-                <StyleText
-                    i18Text="discovery.topGroupBooking"
-                    customStyle={[
-                        styles.titleGroupBooking,
-                        {color: theme.borderColor},
-                    ]}
-                />
-                <StyleList
-                    data={list}
-                    renderItem={({item}) => (
-                        <ItemGroupBuying
-                            item={item}
-                            setList={setList}
-                            containerStyle={styles.itemView}
-                            detailGroupTarget={
-                                DISCOVERY_ROUTE.detailGroupBuying
-                            }
-                            syncWidth={itemWidth}
-                            isHorizontal={false}
-                        />
-                    )}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    directionalLockEnabled
-                    keyExtractor={item => item.id}
-                    onTouchStart={() => {
-                        Redux.setScrollMainAndChatEnable(false);
-                    }}
-                    onTouchEnd={() => {
-                        Redux.setScrollMainAndChatEnable(true);
-                    }}
-                />
-            </>
-        );
-    };
-
-    const TopLocation = () => {
-        return (
-            <>
-                <StyleText
-                    i18Text="discovery.hotLocation"
-                    customStyle={[
-                        styles.titleGroupBooking,
-                        {color: theme.borderColor},
-                    ]}
-                />
-                <StyleList
-                    data={hotLocations}
-                    renderItem={({item}) => (
-                        <ItemHotLocation
-                            item={item}
-                            syncWidth={itemWidth}
-                            containerStyle={styles.itemView}
-                        />
-                    )}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    directionalLockEnabled
-                    keyExtractor={item => item.location}
-                    onTouchStart={() => {
-                        Redux.setScrollMainAndChatEnable(false);
-                    }}
-                    onTouchEnd={() => {
-                        Redux.setScrollMainAndChatEnable(true);
-                    }}
-                />
-            </>
-        );
-    };
-
-    return (
-        <View style={styles.container}>
-            {SearchBar()}
-            {Banner()}
             <Categories />
-            {TopGroupBooking()}
-            {TopLocation()}
+
+            <StyleText
+                i18Text="discovery.topGroupBooking"
+                customStyle={[
+                    styles.titleGroupBooking,
+                    {color: theme.borderColor},
+                ]}
+            />
+            <StyleList
+                data={list}
+                renderItem={({item}) => (
+                    <ItemGroupBuying
+                        item={item}
+                        setList={setList}
+                        containerStyle={styles.itemView}
+                        detailGroupTarget={DISCOVERY_ROUTE.detailGroupBuying}
+                        syncWidth={itemWidth}
+                        isHorizontal={false}
+                    />
+                )}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                directionalLockEnabled
+                keyExtractor={item => item.id}
+                onTouchStart={() => {
+                    Redux.setScrollMainAndChatEnable(false);
+                }}
+                onTouchEnd={() => {
+                    Redux.setScrollMainAndChatEnable(true);
+                }}
+            />
+
+            <StyleText
+                i18Text="discovery.hotLocation"
+                customStyle={[
+                    styles.titleGroupBooking,
+                    {color: theme.borderColor},
+                ]}
+            />
+            <StyleList
+                data={hotLocations}
+                renderItem={({item}) => (
+                    <ItemHotLocation
+                        item={item}
+                        syncWidth={itemWidth}
+                        containerStyle={styles.itemView}
+                    />
+                )}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                directionalLockEnabled
+                keyExtractor={item => item.location}
+                onTouchStart={() => {
+                    Redux.setScrollMainAndChatEnable(false);
+                }}
+                onTouchEnd={() => {
+                    Redux.setScrollMainAndChatEnable(true);
+                }}
+            />
 
             <StyleText
                 i18Text="discovery.discovery"

@@ -4,7 +4,7 @@ import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {apiDeletePost} from 'api/module';
 import {apiLikePost, apiUnLikePost} from 'api/profile';
 import FindmeStore from 'app-redux/store';
-import {POST_TYPE} from 'asset/enum';
+import {POST_TYPE, REACT} from 'asset/enum';
 import {Metrics} from 'asset/metrics';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
@@ -218,9 +218,15 @@ export default class ListShareElement extends Component<Props, States> {
             setIsLiked(!currentLike);
             setTotalLikes(currentNumberLikes + (currentLike ? -1 : 1));
             if (currentLike) {
-                await apiUnLikePost(postId);
+                await apiUnLikePost({
+                    type: REACT.post,
+                    reactedId: postId,
+                });
             } else {
-                await apiLikePost(postId);
+                await apiLikePost({
+                    type: REACT.post,
+                    reactedId: postId,
+                });
             }
 
             this.props.listPaging.setList(

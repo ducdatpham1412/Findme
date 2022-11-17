@@ -165,8 +165,8 @@ const discovery = {
     deposited: 'Đã đặt cọc',
     numberGroupJoined: '{{value}} nhóm đã tham gia',
     beTheFirstJoin: 'Hãy là người đầu tiên tham gia nào',
-    bought: 'Đã mua',
-    confirmBought: 'Xác nhận đã mua',
+    bought: 'Thanh toán đủ',
+    confirmBought: 'Xác nhận thanh toán đủ',
     participators: '{{value}} người tham gia',
     gbExpired: 'Cửa hàng tạm thời không nhận thêm order',
     reviewAbout: 'Bạn đang viết review về ',
@@ -223,6 +223,8 @@ const discovery = {
     reviewUpdatePrice: 'Đang duyệt cập nhật giá',
     cancelRequest: 'Huỷ yêu cầu',
     historyEdit: 'Lịch sử chỉnh sửa',
+    viewReply: 'Phản hồi ({{value}})',
+    hide: 'Ẩn',
 };
 
 // REPUTATION

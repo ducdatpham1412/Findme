@@ -9,7 +9,6 @@ import {
     TypeChatTagResponse,
     TypeCheckOTPRequest,
     TypeCheckOTPResponse,
-    TypeCommentResponse,
     TypeCreateGroupResponse,
     TypeCreatePostRequest,
     TypeEditPostRequest,
@@ -154,13 +153,14 @@ export const apiGetDetailBubble = (
     return request.get(`/common/detail-bubble-profile/${idBubble}`);
 };
 
-export const apiGetListComments = (
-    idBubble: string,
-): Promise<{
-    success: boolean;
-    data: Array<TypeCommentResponse>;
-}> => {
-    return request.get(`/common/list-comments/${idBubble}`);
+export const apiGetListComments = ({params}: TypeParamsPaging) => {
+    return request.get(`/common/list-comments/${params.postId}`, {
+        params: {
+            pageIndex: params.pageIndex,
+            take: params.take,
+            replied_id: params.replied_id || undefined,
+        },
+    });
 };
 
 export const apiGetListReactsPost = ({

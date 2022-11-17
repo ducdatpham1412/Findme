@@ -49,7 +49,7 @@ const ListComments = (props: Props) => {
     const [personReplied, setPersonReplied] = useState('');
     const [commentReplied, setCommentReplied] = useState('');
 
-    const {list, refreshing, onRefresh} = useSocketComment({
+    const {list, refreshing, onRefresh, onLoadMore} = useSocketComment({
         bubbleFocusingId: bubbleFocusing.id,
         setTotalComments,
         increaseTotalComments,
@@ -97,15 +97,19 @@ const ListComments = (props: Props) => {
         setPersonReplied('');
     }, []);
 
-    const RenderItemComment = useCallback((item: TypeCommentResponse) => {
-        return (
-            <ItemComment
-                item={item}
-                commentReplied=""
-                onPressReply={onPresReply}
-            />
-        );
-    }, []);
+    const RenderItemComment = useCallback(
+        (item: TypeCommentResponse) => {
+            return (
+                <ItemComment
+                    item={item}
+                    onPressReply={onPresReply}
+                    containerStyle={styles.itemCommentTouch}
+                    postId={bubbleFocusing.id}
+                />
+            );
+        },
+        [bubbleFocusing.id],
+    );
 
     return (
         <StyleKeyboardAwareView
@@ -123,6 +127,7 @@ const ListComments = (props: Props) => {
                 contentContainerStyle={{paddingBottom: 100}}
                 refreshing={refreshing}
                 onRefresh={onRefresh}
+                onLoadMore={onLoadMore}
             />
 
             <InputComment
@@ -150,6 +155,9 @@ const styles = ScaledSheet.create({
     },
     listCommentBox: {
         flex: 1,
+    },
+    itemCommentTouch: {
+        paddingHorizontal: '15@s',
     },
 });
 
