@@ -3,32 +3,27 @@ import {StyleImage, StyleText, StyleTouchable} from 'components/base';
 import Redux from 'hook/useRedux';
 import React, {memo} from 'react';
 import isEqual from 'react-fast-compare';
-import {View} from 'react-native';
-import {scale, ScaledSheet, verticalScale} from 'react-native-size-matters';
+import {StyleProp, View, ViewStyle} from 'react-native';
+import {ScaledSheet} from 'react-native-size-matters';
 import {onGoToProfile} from 'utility/assistant';
 import {formatFromNow} from 'utility/format';
+import CommentReplies from './CommentReplies';
 
 interface Props {
     item: TypeCommentResponse;
-    commentReplied: string;
     onPressReply?(idComment: string, personReplied: string): void;
+    containerStyle?: StyleProp<ViewStyle>;
+    postId: string;
 }
 
-const scale15 = scale(15);
-const scale50 = scale(50);
-const verticalScale5 = verticalScale(5);
-
 const ItemComment = (props: Props) => {
-    const {item, commentReplied = '', onPressReply} = props;
+    const {item, onPressReply, containerStyle, postId} = props;
     const theme = Redux.getTheme();
 
     // const [numberLikes, setNumberLikes] = useState(item.numberLikes);
     // const [isLiked, setIsLiked] = useState(item.isLiked);
 
     // const color = isLiked ? theme.likeHeart : theme.unLikeHeart;
-
-    const paddingLeft = !commentReplied ? scale15 : scale50;
-    const marginBottom = !commentReplied ? verticalScale5 : 0;
 
     // const onLikeOrUnLike = async () => {
     //     const currentNumberLikes = numberLikes;
@@ -80,23 +75,22 @@ const ItemComment = (props: Props) => {
                         {color: theme.textHightLight},
                     ]}
                 />
-                {!commentReplied && (
-                    <View style={styles.replyBox}>
-                        <StyleTouchable
-                            onPress={() =>
-                                onPressReply?.(item.id, item.creatorName)
-                            }
-                            hitSlop={10}>
-                            <StyleText
-                                i18Text="common.reply"
-                                customStyle={[
-                                    styles.replyText,
-                                    {color: theme.borderColor},
-                                ]}
-                            />
-                        </StyleTouchable>
-                    </View>
-                )}
+                <View style={styles.replyBox}>
+                    <StyleTouchable
+                        onPress={() =>
+                            onPressReply?.(item.id, item.creatorName)
+                        }
+                        hitSlop={10}
+                        customStyle={styles.replyTouch}>
+                        <StyleText
+                            i18Text="common.reply"
+                            customStyle={[
+                                styles.replyText,
+                                {color: theme.borderColor},
+                            ]}
+                        />
+                    </StyleTouchable>
+                </View>
             </View>
         );
     };
@@ -130,8 +124,8 @@ const ItemComment = (props: Props) => {
     };
 
     return (
-        <View style={[styles.container, {marginBottom}]}>
-            <View style={[styles.itemCommentBox, {paddingLeft}]}>
+        <View style={[styles.container, containerStyle]}>
+            <View style={styles.itemCommentBox}>
                 <StyleTouchable onPress={() => onGoToProfile(item.creator)}>
                     <StyleImage
                         source={{uri: item.creatorAvatar}}
@@ -142,13 +136,14 @@ const ItemComment = (props: Props) => {
                 {RenderLike()}
             </View>
 
-            {item.listCommentsReply?.map((itemReply, index) => (
-                <ItemComment
-                    item={itemReply}
-                    commentReplied={item.id}
-                    key={index}
+            {item.totalReplies > 0 && (
+                <CommentReplies
+                    repliedCommentId={item.id}
+                    totalReplies={item.totalReplies}
+                    postId={postId}
+                    onPressReply={onPressReply}
                 />
-            ))}
+            )}
         </View>
     );
 };
@@ -156,7 +151,7 @@ const ItemComment = (props: Props) => {
 const styles = ScaledSheet.create({
     container: {
         width: '100%',
-        marginTop: '10@vs',
+        marginBottom: '10@vs',
     },
     itemCommentBox: {
         width: '100%',
@@ -177,14 +172,16 @@ const styles = ScaledSheet.create({
         fontSize: '11.5@ms',
     },
     contentText: {
-        fontSize: '13@ms',
+        fontSize: '12@ms',
         marginTop: '3@ms',
     },
     replyBox: {
         width: '100%',
-        height: '20@ms',
         flexDirection: 'row',
         alignItems: 'flex-end',
+    },
+    replyTouch: {
+        paddingVertical: '3@ms',
     },
     replyText: {
         fontSize: '10@ms',
@@ -208,9 +205,6 @@ const styles = ScaledSheet.create({
 
 export default memo(ItemComment, (preProps: Props, nextProps: any) => {
     if (!isEqual(preProps.item, nextProps.item)) {
-        return false;
-    }
-    if (preProps.commentReplied !== nextProps.commentReplied) {
         return false;
     }
     return true;

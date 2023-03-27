@@ -352,6 +352,7 @@ const BubbleGroupBuying = (props: Props) => {
                             height: imageWidth * ratioImageGroupBuying,
                         },
                     ]}
+                    defaultSource={Images.images.defaultImage}
                 />
             </SharedElement>
         );

@@ -1,5 +1,7 @@
 /* eslint-disable no-underscore-dangle */
+import Images from 'asset/img/images';
 import Theme from 'asset/theme/Theme';
+import {StyleImage} from 'components/base';
 import StyleTouchHaveDouble from 'components/base/StyleTouchHaveDouble';
 import StyleVideo from 'components/base/StyleVideo';
 import PinchImage from 'components/PinchImage';
@@ -23,7 +25,7 @@ import {
     swipeVelocityThreshold,
     useAnimatedValue,
 } from 'utility/animation';
-import {checkIsVideo} from 'utility/validate';
+import {checkFileType} from 'utility/validate';
 
 interface Props {
     images: Array<string>;
@@ -203,7 +205,7 @@ const ScrollSyncSizeImage = (props: Props) => {
 
     useEffect(() => {
         let isSubscribe = true;
-        if (images[0] && !checkIsVideo(images[0])) {
+        if (images[0] && checkFileType(images[0]) === 'image') {
             Image.getSize(
                 images[0],
                 (w, h) => {
@@ -248,7 +250,8 @@ const ScrollSyncSizeImage = (props: Props) => {
                 }}
                 {...panResponder.panHandlers}>
                 {images.map((url, ind) => {
-                    if (!checkIsVideo(url)) {
+                    const fileType = checkFileType(url);
+                    if (fileType === 'image') {
                         return (
                             <PinchImage
                                 key={ind}
@@ -264,34 +267,52 @@ const ScrollSyncSizeImage = (props: Props) => {
                         );
                     }
 
+                    if (fileType === 'video') {
+                        return (
+                            <StyleVideo
+                                key={ind}
+                                source={{
+                                    uri: url,
+                                }}
+                                style={{
+                                    width: syncWidth,
+                                    height,
+                                }}
+                                onLoad={e => {
+                                    let tempRatio = 1;
+                                    if (
+                                        e.naturalSize.orientation ===
+                                        'landscape'
+                                    ) {
+                                        tempRatio =
+                                            e.naturalSize.height /
+                                            e.naturalSize.width;
+                                    } else if (
+                                        e.naturalSize.orientation === 'portrait'
+                                    ) {
+                                        tempRatio =
+                                            e.naturalSize.width /
+                                            e.naturalSize.height;
+                                    }
+                                    tempRatio =
+                                        tempRatio > 1.3 ? 1.3 : tempRatio;
+                                    setRatio(tempRatio);
+                                }}
+                                resizeMode="cover"
+                                {...videoProps}
+                            />
+                        );
+                    }
+
                     return (
-                        <StyleVideo
+                        <StyleImage
                             key={ind}
-                            source={{
-                                uri: url,
-                            }}
                             style={{
                                 width: syncWidth,
                                 height,
                             }}
-                            onLoad={e => {
-                                let tempRatio = 1;
-                                if (e.naturalSize.orientation === 'landscape') {
-                                    tempRatio =
-                                        e.naturalSize.height /
-                                        e.naturalSize.width;
-                                } else if (
-                                    e.naturalSize.orientation === 'portrait'
-                                ) {
-                                    tempRatio =
-                                        e.naturalSize.width /
-                                        e.naturalSize.height;
-                                }
-                                tempRatio = tempRatio > 1.3 ? 1.3 : tempRatio;
-                                setRatio(tempRatio);
-                            }}
-                            resizeMode="cover"
-                            {...videoProps}
+                            source={{uri: ''}}
+                            defaultSource={Images.images.defaultImage}
                         />
                     );
                 })}

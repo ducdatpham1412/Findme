@@ -162,8 +162,8 @@ const discovery = {
     deposited: 'Deposited',
     numberGroupJoined: '{{value}} groups joined',
     beTheFirstJoin: 'Be the first person join this campaign',
-    bought: 'Bought',
-    confirmBought: 'Confirm bought',
+    bought: 'Full payment',
+    confirmBought: 'Full payment confirm',
     participators: '{{value}} participators',
     gbExpired: 'Store is temporarily not accepting more orders',
     reviewAbout: "You're writing review about ",
@@ -219,6 +219,8 @@ const discovery = {
     reviewUpdatePrice: 'Reviewing update prices',
     cancelRequest: 'Cancel requesting',
     historyEdit: 'Editing history',
+    viewReply: 'View replies ({{value}})',
+    hide: 'Hide',
 };
 
 // REPUTATION

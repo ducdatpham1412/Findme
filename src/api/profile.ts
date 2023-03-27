@@ -1,4 +1,5 @@
 import {TypeParamsPaging} from './interface';
+import {TypeReactRequest} from './interface/discovery';
 import {TypeCreatePurchaseRequest} from './interface/profile';
 import request from './request';
 
@@ -10,11 +11,15 @@ export const apiUnSavePost = (postId: string) => {
     return request.put(`/profile/un-save-post/${postId}`);
 };
 
-export const apiLikePost = (idPost: string) => {
-    return request.put(`/profile/like-post/${idPost}`);
+export const apiLikePost = (param: TypeReactRequest) => {
+    return request.put(`/profile/like-post/${param.reactedId}`, {
+        type: param.type,
+    });
 };
-export const apiUnLikePost = (idPost: string) => {
-    return request.put(`/profile/unlike-post/${idPost}`);
+export const apiUnLikePost = (params: TypeReactRequest) => {
+    return request.put(`/profile/unlike-post/${params.reactedId}`, {
+        type: params.type,
+    });
 };
 
 export const apiGetListGroupBuying = ({params}: TypeParamsPaging) => {

@@ -4,7 +4,7 @@ import {TypeBubblePalace, TypeGroupBuying} from 'api/interface';
 import {TypeShowModalCommentOrLike} from 'api/interface/discovery';
 import {apiGetListBubbleActive} from 'api/module';
 import {apiLikePost, apiUnLikePost} from 'api/profile';
-import {POST_TYPE, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
+import {POST_TYPE, REACT, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import StyleList from 'components/base/StyleList';
 import StyleActionSheet from 'components/common/StyleActionSheet';
 import usePaging from 'hook/usePaging';
@@ -129,9 +129,15 @@ const DiscoveryScreen = () => {
                     setIsLiked(!currentLike);
                     setTotalLikes(currentNumberLikes + (currentLike ? -1 : 1));
                     if (currentLike) {
-                        await apiUnLikePost(postId);
+                        await apiUnLikePost({
+                            type: REACT.post,
+                            reactedId: postId,
+                        });
                     } else {
-                        await apiLikePost(postId);
+                        await apiLikePost({
+                            type: REACT.post,
+                            reactedId: postId,
+                        });
                     }
 
                     setList((preValue: Array<TypeGroupBuying>) => {

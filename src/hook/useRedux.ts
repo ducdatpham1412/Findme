@@ -62,10 +62,18 @@ interface ResourceType {
 
 interface TypeBubblePalaceUpdate {
     id?: string;
-    topic?: number | null;
+    postType?: number;
+    topic?: Array<number>;
     feeling?: number | null;
     location?: string | null;
     link?: string | null;
+    userReviewed?: {
+        id: number;
+        name: string;
+        avatar: string;
+        location: string;
+        description: string;
+    };
     content?: string;
     images?: Array<string>;
     stars?: number;
@@ -78,6 +86,7 @@ interface TypeBubblePalaceUpdate {
     created?: string;
     isLiked?: boolean;
     isSaved?: boolean;
+    isDraft?: boolean;
     relationship?: number;
 }
 

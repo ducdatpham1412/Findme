@@ -78,3 +78,8 @@ export interface TypeEditPriceHistory {
     prices: Array<TypePrice>;
     created: string;
 }
+
+export interface TypeReactRequest {
+    type: number;
+    reactedId: string;
+}

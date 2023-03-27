@@ -4,7 +4,6 @@ import {
     TypeChatMessageResponse,
     TypeChatMessageSend,
     TypeChatTagResponse,
-    TypeCommentResponse,
     TypeConversationRequest,
     TypeDeleteMessageResponse,
     TypeNotificationResponse,
@@ -26,9 +25,10 @@ import {
     MESSAGE_TYPE,
     RELATIONSHIP,
     SOCKET_EVENT,
+    TYPE_BUBBLE_PALACE_ACTION,
 } from 'asset/enum';
 import {appAlert} from 'navigation/NavigationService';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {AppState, AppStateStatus} from 'react-native';
 import Config from 'react-native-config';
 import {io, Socket} from 'socket.io-client';
@@ -610,64 +610,29 @@ interface ParamSocketComment {
     clearText(): void;
 }
 
-let oldBubbleFocusingId = '';
-let cachedListComments: Array<TypeCommentResponse> = [];
+// let oldBubbleFocusingId = '';
+// const cachedListComments: Array<TypeCommentResponse> = [];
 
 export const useSocketComment = (params: ParamSocketComment) => {
     const {
         bubbleFocusingId,
-        setTotalComments,
+        // setTotalComments,
         increaseTotalComments,
         myId,
         scrollToIndex,
         clearText,
         scrollToEnd,
     } = params;
-    const [isLoading, setIsLoading] = useState(false);
-    const [refreshing, setRefreshing] = useState(false);
-    const [dataComment, setDataComment] = useState<Array<TypeCommentResponse>>(
-        [],
-    );
 
-    const getData = async () => {
-        try {
-            setIsLoading(true);
-            const res = await apiGetListComments(bubbleFocusingId || '');
-            setDataComment(res.data);
+    const {list, setList, refreshing, onRefresh, onLoadMore} = usePaging({
+        request: apiGetListComments,
+        params: {
+            postId: bubbleFocusingId,
+        },
+    });
 
-            let totalComments = res.data.length;
-            res.data.forEach(item => {
-                if (item.listCommentsReply) {
-                    totalComments += item.listCommentsReply?.length;
-                }
-            });
-            setTotalComments(totalComments);
-        } catch (err) {
-            appAlert(err);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const onRefresh = async () => {
-        try {
-            setRefreshing(true);
-            const res = await apiGetListComments(bubbleFocusingId || '');
-            setDataComment(res.data);
-
-            let totalComments = res.data.length;
-            res.data.forEach(item => {
-                if (item.listCommentsReply) {
-                    totalComments += item.listCommentsReply?.length;
-                }
-            });
-            setTotalComments(totalComments);
-        } catch (err) {
-            appAlert(err);
-        } finally {
-            setRefreshing(false);
-        }
-    };
+    // const oldBubbleFocusingId = useRef('');
+    // const cachedListComments = useRef<Array<TypeCommentResponse>>([]);
 
     const hearingSocket = () => {
         socket?.off(SOCKET_EVENT.addComment);
@@ -675,24 +640,37 @@ export const useSocketComment = (params: ParamSocketComment) => {
             SOCKET_EVENT.addComment,
             (data: TypeSocketCommentResponse) => {
                 if (data.commentReplied) {
-                    setDataComment(preValue =>
-                        preValue.map((item, index) => {
-                            if (item.id !== data.commentReplied) {
-                                return item;
-                            }
-                            if (data.data.creator === myId) {
-                                scrollToIndex(index);
-                                clearText();
-                            }
-                            return {
-                                ...item,
-                                listCommentsReply:
-                                    item.listCommentsReply?.concat(data.data),
-                            };
-                        }),
-                    );
+                    // setList(preValue =>
+                    //     preValue.map((item, index) => {
+                    //         if (item.id !== data.commentReplied) {
+                    //             return item;
+                    //         }
+                    //         if (data.data.creator === myId) {
+                    //             scrollToIndex(index);
+                    //             clearText();
+                    //         }
+                    //         return {
+                    //             ...item,
+                    //             listCommentsReply:
+                    //                 item.listCommentsReply?.concat(data.data),
+                    //         };
+                    //     }),
+                    // );
+                    Redux.setBubblePalaceAction({
+                        action: TYPE_BUBBLE_PALACE_ACTION.addReplyComment,
+                        payload: data,
+                    });
+                    if (data.data.creator === myId) {
+                        const indexScroll = list.findIndex(
+                            item => item.id === data.commentReplied,
+                        );
+                        if (indexScroll >= 0) {
+                            scrollToIndex(indexScroll);
+                        }
+                        clearText();
+                    }
                 } else {
-                    setDataComment(preValue => preValue.concat(data.data));
+                    setList(preValue => preValue.concat(data.data));
                     if (data.data.creator === myId) {
                         scrollToEnd();
                         clearText();
@@ -703,36 +681,46 @@ export const useSocketComment = (params: ParamSocketComment) => {
         );
     };
 
-    useEffect(() => {
-        return () => {
-            cachedListComments = dataComment;
-        };
-    }, [dataComment]);
+    // useEffect(() => {
+    //     return () => {
+    //         cachedListComments.current = list;
+    //     };
+    // }, [list]);
 
     useEffect(() => {
-        if (bubbleFocusingId) {
-            if (bubbleFocusingId !== oldBubbleFocusingId) {
-                getData();
-                socket?.emit(SOCKET_EVENT.joinRoom, bubbleFocusingId);
-                hearingSocket();
-                if (oldBubbleFocusingId) {
-                    socket?.emit(SOCKET_EVENT.leaveRoom, oldBubbleFocusingId);
-                }
-                oldBubbleFocusingId = bubbleFocusingId;
-            } else {
-                socket?.emit(SOCKET_EVENT.leaveRoom, bubbleFocusingId);
-                socket?.emit(SOCKET_EVENT.joinRoom, bubbleFocusingId);
-                hearingSocket();
-                setDataComment(cachedListComments);
-            }
-        }
-    }, [bubbleFocusingId, myId]);
+        // if (bubbleFocusingId) {
+        //     if (bubbleFocusingId !== oldBubbleFocusingId.current) {
+        //         setParams({
+        //             postId: bubbleFocusingId,
+        //         });
+        //         socket?.emit(SOCKET_EVENT.joinRoom, bubbleFocusingId);
+        //         hearingSocket();
+        //         if (oldBubbleFocusingId.current) {
+        //             socket?.emit(
+        //                 SOCKET_EVENT.leaveRoom,
+        //                 oldBubbleFocusingId.current,
+        //             );
+        //         }
+        //         oldBubbleFocusingId.current = bubbleFocusingId;
+        //     } else {
+        //         socket?.emit(SOCKET_EVENT.leaveRoom, bubbleFocusingId);
+        //         socket?.emit(SOCKET_EVENT.joinRoom, bubbleFocusingId);
+        //         hearingSocket();
+        //         setList(cachedListComments.current);
+        //     }
+        // }
+        socket?.emit(SOCKET_EVENT.joinRoom, bubbleFocusingId);
+        hearingSocket();
+        return () => {
+            socket?.emit(SOCKET_EVENT.leaveRoom, bubbleFocusingId);
+        };
+    }, [myId, bubbleFocusingId]);
 
     return {
-        list: dataComment,
-        loading: isLoading,
+        list,
         refreshing,
         onRefresh,
+        onLoadMore,
     };
 };
 

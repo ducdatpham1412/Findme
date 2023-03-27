@@ -118,3 +118,21 @@ export const checkIsVideo = (fileName: string) => {
     }
     return false;
 };
+
+export const checkFileType = (fileName: string): 'image' | 'video' | null => {
+    const listElements = fileName.toLowerCase().split('.');
+    for (let i = listElements.length - 1; i >= 0; i--) {
+        const element = listElements[i];
+        if (element.includes('mp4') || element.includes('mov')) {
+            return 'video';
+        }
+        if (
+            element.includes('png') ||
+            element.includes('jpg') ||
+            element.includes('jpeg')
+        ) {
+            return 'image';
+        }
+    }
+    return null;
+};

@@ -19,8 +19,6 @@ import {ScaledSheet} from 'react-native-size-matters';
 import {getSessionOfDay} from 'utility/format';
 import {I18Normalize} from 'utility/I18Next';
 
-const {safeTopPadding} = Metrics;
-
 interface Props {
     theme: TypeTheme;
     profile: TypeGetProfileResponse;
@@ -115,7 +113,7 @@ const styles = ScaledSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         height: '40@vs',
-        marginTop: safeTopPadding,
+        marginTop: Metrics.safeTopPadding,
         justifyContent: 'space-between',
     },
     body: {
@@ -176,7 +174,7 @@ const styles = ScaledSheet.create({
             android: '3@ms',
             ios: '7@ms',
         }),
-        right: '10@ms',
+        right: '10@s',
     },
     textNewMessages: {
         fontSize: '8@ms',

@@ -130,13 +130,13 @@ export interface TypeCommentResponse {
     id: string;
     content: string;
     images: Array<string>;
-    numberLikes: number;
+    totalLikes: number;
+    totalReplies: number;
     isLiked: number;
     creator: number;
     creatorName: string;
     creatorAvatar: string;
     created: string;
-    listCommentsReply?: Array<TypeCommentResponse>;
 }
 
 export interface TypeGetLikePostsResponse {

@@ -12,7 +12,7 @@ import {
     apiLikePost,
     apiUnLikePost,
 } from 'api/profile';
-import {ACCOUNT, POST_TYPE, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
+import {ACCOUNT, POST_TYPE, REACT, TYPE_BUBBLE_PALACE_ACTION} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {FONT_SIZE} from 'asset/standardValue';
@@ -146,9 +146,15 @@ const onHandleLike = async (params: ParamsLikeGB, setList: any) => {
         setIsLiked(!currentLike);
         setTotalLikes(currentNumberLikes + (currentLike ? -1 : 1));
         if (currentLike) {
-            await apiUnLikePost(postId);
+            await apiUnLikePost({
+                type: REACT.post,
+                reactedId: postId,
+            });
         } else {
-            await apiLikePost(postId);
+            await apiLikePost({
+                type: REACT.post,
+                reactedId: postId,
+            });
         }
 
         setList((preValue: Array<TypeGroupBuying>) => {

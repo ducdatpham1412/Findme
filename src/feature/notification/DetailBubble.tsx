@@ -8,7 +8,7 @@ import {
     apiUnLikePost,
     apiUnSavePost,
 } from 'api/profile';
-import {TYPE_DYNAMIC_LINK} from 'asset/enum';
+import {REACT, TYPE_DYNAMIC_LINK} from 'asset/enum';
 import Images from 'asset/img/images';
 import {Metrics} from 'asset/metrics';
 import {
@@ -135,9 +135,15 @@ const DetailBubble = ({route}: Props) => {
                     totalLikes: currentTotalLikes + (currentLike ? -1 : 1),
                 });
                 if (currentLike) {
-                    await apiUnLikePost(bubble.id);
+                    await apiUnLikePost({
+                        type: REACT.post,
+                        reactedId: bubble.id,
+                    });
                 } else {
-                    apiLikePost(bubble.id);
+                    apiLikePost({
+                        type: REACT.post,
+                        reactedId: bubble.id,
+                    });
                 }
             } catch (err) {
                 setBubble({
